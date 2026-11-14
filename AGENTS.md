@@ -67,6 +67,6 @@ An app is ready when all of these are true:
 
 The owner does not track these. When an import finishes, or the owner asks what is next, say which of them are now due.
 
-- **Right after codename is in:** pin every GitHub Action to a full commit SHA with a version comment, and turn on "Require actions to be pinned to a full-length commit SHA" in Settings → Actions → General (Dependabot keeps the pins current). Check that CodeQL now lists JavaScript and TypeScript. Clear the lint warnings the import brings (react-hooks, and codename's inline `eslint-disable` comments, which break the rule against disabling lint inline), then consider `--max-warnings 0`.
+- **Right after codename is in:** check that CodeQL now lists JavaScript and TypeScript. Clear the lint warnings the import brings (react-hooks, and codename's inline `eslint-disable` comments, which break the rule against disabling lint inline), then consider `--max-warnings 0`.
 - **After codename is in and green:** move `jsx-a11y` to its `strict` config, and raise TypeScript strictness in `tsconfig.base.json` one flag at a time, `noUncheckedIndexedAccess` first. One PR per change, and only when every app passes. Codename's own config is the floor until then, so none of this may land before it.
 - **Before the first app is released:** confirm the GitHub settings in README.md "GitHub settings" are all on, and that the `checks` job is required on `dev` and `main`.

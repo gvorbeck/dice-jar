@@ -4,6 +4,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
 const script = process.argv[2];
 const failed = [];
+// shortcut: spawns npm directly, which fails on native Windows; use WSL, or add shell: true if Windows support is wanted
 // shortcut: packages run alphabetically, not by their dependencies on each other; order them once one package needs another built first
 for (const root of ['packages', 'apps']) {
   for (const name of readdirSync(root).sort()) {
