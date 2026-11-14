@@ -1,0 +1,43 @@
+{
+  "name": "dice-jar",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": "24"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "knip": "knip",
+    "build": "node scripts/workspaces.js build",
+    "test": "node scripts/workspaces.js test",
+    "typecheck": "node scripts/workspaces.js typecheck",
+    "test:coverage": "node scripts/workspaces.js test:coverage",
+    "test:rules": "node scripts/workspaces.js test:rules",
+    "test:e2e": "node scripts/workspaces.js test:e2e",
+    "check": "prettier --check . && npm run lint && npm run knip && npm run typecheck && npm run test:coverage"
+  },
+  "lint-staged": {
+    "*": "prettier --check --ignore-unknown",
+    "*.{js,mjs,cjs,jsx,ts,mts,cts,tsx}": "eslint"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "husky": "^9.1.7",
+    "knip": "6.44.2",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.10.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.2"
+  }
+}

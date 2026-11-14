@@ -1,0 +1,73 @@
+# dice-jar
+
+Tabletop RPG character apps, one per game, sharing their tooling and, once a second app needs it, their code. Package scope: `@dice-jar/*`.
+
+No apps are in yet. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
+
+| App         | Game              | Rules MCP server    | Access    |
+| ----------- | ----------------- | ------------------- | --------- |
+| codename    | Delta Green       | `rules-delta-green` | link-only |
+| hearthfire  | Stonetop          | `rules-stonetop`    | link-only |
+| codex-quest | Basic Fantasy RPG | `rules-bfrpg`       | accounts  |
+| glyph-quest | Knave             | `rules-knave`       | accounts  |
+
+None of these rules servers exist yet. Today there is one, `ttrpg-rules` (Delta Green only); it is split into one server per game before hearthfire comes in (see "Rules MCP" in the brief). Until then, codename uses `ttrpg-rules`.
+
+## Layout
+
+```
+apps/<app>/          one app each: its own firebase.json, .firebaserc, firestore.rules, functions/, e2e/, test/
+packages/<name>/     shared code, created only when a second app needs it
+scripts/             workspaces.js: runs a script in every workspace that has it
+.github/             checks workflow, dependabot.yml
+.husky/              git hooks
+```
+
+## Running locally
+
+Use Node 24 (`.nvmrc`; `engine-strict` refuses anything else).
+
+```bash
+npm ci
+```
+
+```bash
+npm run check
+```
+
+`npm ci` also installs the git hooks. One app's script: `npm run dev -w apps/<app>`.
+
+| Root script                                                                     |                                                                                                   |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `npm run check`                                                                 | `prettier --check .`, `eslint .`, `knip`, then `typecheck` and `test:coverage` in every workspace |
+| `npm run format`                                                                | Prettier, writing                                                                                 |
+| `npm run lint` / `knip`                                                         | ESLint / unused files, exports and dependencies, whole repo                                       |
+| `npm run build`, `test`, `typecheck`, `test:coverage`, `test:rules`, `test:e2e` | That script in every workspace that has it. `test:rules` and `test:e2e` need Java 21              |
+
+Every workspace uses the same script names: `dev`, `build`, `test`, `lint`, `typecheck`, `knip`, `test:coverage`, `test:rules`, `test:e2e`, `check`.
+
+## Hooks
+
+- `pre-commit`: Prettier (`--check`) and ESLint on staged files. A commit with unformatted or lint-failing code is refused; run `npm run format` and commit again.
+- `pre-push`: `npm run check`.
+
+## CI
+
+[`.github/workflows/checks.yml`](.github/workflows/checks.yml) runs one `checks` job on every PR to `dev` and every push to `dev` and `main`: `npm ci`, `npm ci` in each app's `functions/`, `npm run check`, then `test:rules` and `test:e2e`. Work goes to `dev`; `main` deploys. Each app brings its own deploy workflow.
+
+Dependabot targets `dev`: npm weekly (minor and patch grouped, each major alone), GitHub Actions monthly. Greptile reviews PRs against [AGENTS.md](AGENTS.md) (`greptile.json`).
+
+## Branch protection
+
+Set in GitHub → Settings → Branches (or Rules → Rulesets), once for `dev` and once for `main`:
+
+| Setting                                                 | `dev` | `main` |
+| ------------------------------------------------------- | ----- | ------ |
+| Require a pull request before merging                   | no    | yes    |
+| Require status checks to pass, required check: `checks` | yes   | yes    |
+| Require branches to be up to date before merging        | yes   | no     |
+| Allow force pushes                                      | no    | no     |
+| Allow deletions                                         | no    | no     |
+| Do not allow bypassing the above settings               | no    | yes    |
+
+A required check blocks direct pushes, because a new commit hasn't passed it yet. So admins may bypass on `dev` to push work there; Dependabot's PRs to `dev` still need `checks`. `main` takes changes only through a PR from `dev`, whose `checks` run is the push to `dev`. `main` doesn't require being up to date: each merge adds a commit `dev` lacks, so that setting would block every next release until `main` is merged back.

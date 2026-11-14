@@ -1,0 +1,17 @@
+node_modules
+dist
+coverage
+test-results
+playwright-report
+.env
+.firebase
+*.tsbuildinfo
+**/functions/lib
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+.claude/settings.local.json
+.claude/worktrees
+.agents
+skills-lock.json
+.DS_Store

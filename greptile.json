@@ -1,0 +1,12 @@
+{
+  "includeBranches": ["dev"],
+  "ignorePatterns": "**/package-lock.json\n**/dist/**\n**/coverage/**",
+  "customContext": {
+    "files": [
+      {
+        "path": "AGENTS.md",
+        "description": "The rules every change must follow. Flag any change that breaks one of them."
+      }
+    ]
+  }
+}

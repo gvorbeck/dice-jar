@@ -8,12 +8,12 @@ Read this whole file before doing anything. It is the context for scaffolding a 
 
 The owner has built the same kind of app four times, each on a slightly different stack. Each time the Firebase setup, the save logic, the UI kit and the tooling were rebuilt from nothing. The fourth app, codename, is the one that got it right. The monorepo exists so that work is written once and every app uses it.
 
-| App | Game | Local path | Stack today |
-| --- | --- | --- | --- |
-| codename (yourcodena.me) | Delta Green | `/Users/g/Sites/codename` | Vite, React 19, React Aria Components, plain CSS tokens, Zod, react-router. **The standard.** |
-| codex-quest | Basic Fantasy RPG | `/Users/g/Sites/codex-quest` | Vite, Tailwind, zustand, react-query, wouter, Firebase Auth |
-| hearthfire | Stonetop | `/Users/g/Sites/hearthfire` | Vite, CSS modules, tiptap, react-router |
-| glyph-quest | Knave | `/Users/g/Sites/glyph-quest` | Next.js, MUI, emotion, Firebase Auth |
+| App                      | Game              | Local path                   | Stack today                                                                                   |
+| ------------------------ | ----------------- | ---------------------------- | --------------------------------------------------------------------------------------------- |
+| codename (yourcodena.me) | Delta Green       | `/Users/g/Sites/codename`    | Vite, React 19, React Aria Components, plain CSS tokens, Zod, react-router. **The standard.** |
+| codex-quest              | Basic Fantasy RPG | `/Users/g/Sites/codex-quest` | Vite, Tailwind, zustand, react-query, wouter, Firebase Auth                                   |
+| hearthfire               | Stonetop          | `/Users/g/Sites/hearthfire`  | Vite, CSS modules, tiptap, react-router                                                       |
+| glyph-quest              | Knave             | `/Users/g/Sites/glyph-quest` | Next.js, MUI, emotion, Firebase Auth                                                          |
 
 ## Decisions already made
 
@@ -59,17 +59,17 @@ Do not create empty packages or placeholder apps. `apps/` and `packages/` start 
 
 Copy these from codename, changing only what a workspace root needs:
 
-| Thing | Standard | Source in codename |
-| --- | --- | --- |
-| Node | 24, in `.nvmrc` and `engines`, with `engine-strict=true` in `.npmrc` | `README.md`, `deploy.yml` |
-| Package manager | npm workspaces, one root lockfile | new |
-| TypeScript | `strict`, `noUnusedLocals`, `moduleResolution: bundler`, `ES2022`. Becomes `tsconfig.base.json`; apps extend it. Keep the separate Node tsconfig for tests and configs | `tsconfig.json`, `tsconfig.node.json` |
-| ESLint | flat config, one file at the root: `@eslint/js`, `typescript-eslint` recommended, `jsx-a11y` recommended, `react-hooks`. Same rule overrides. Globs widen to `apps/*/src/**` and so on | `eslint.config.js` |
-| Unused code | knip with a workspace entry per app. Version pinned exactly | `knip.jsonc` |
-| Unit tests | Vitest, `*.test.ts` next to the file, v8 coverage with a floor per app that only goes up | `vite.config.ts` |
-| Rules tests | `@firebase/rules-unit-testing` against the Firestore emulator, project ID `demo-<app>` | `vitest.rules.config.ts`, `test/` |
-| Browser tests | Playwright against the emulator with dummy keys | `playwright.config.ts`, `e2e/` |
-| Branches | work goes to `dev`; `main` deploys | `deploy.yml` |
+| Thing           | Standard                                                                                                                                                                               | Source in codename                    |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| Node            | 24, in `.nvmrc` and `engines`, with `engine-strict=true` in `.npmrc`                                                                                                                   | `README.md`, `deploy.yml`             |
+| Package manager | npm workspaces, one root lockfile                                                                                                                                                      | new                                   |
+| TypeScript      | `strict`, `noUnusedLocals`, `moduleResolution: bundler`, `ES2022`. Becomes `tsconfig.base.json`; apps extend it. Keep the separate Node tsconfig for tests and configs                 | `tsconfig.json`, `tsconfig.node.json` |
+| ESLint          | flat config, one file at the root: `@eslint/js`, `typescript-eslint` recommended, `jsx-a11y` recommended, `react-hooks`. Same rule overrides. Globs widen to `apps/*/src/**` and so on | `eslint.config.js`                    |
+| Unused code     | knip with a workspace entry per app. Version pinned exactly                                                                                                                            | `knip.jsonc`                          |
+| Unit tests      | Vitest, `*.test.ts` next to the file, v8 coverage with a floor per app that only goes up                                                                                               | `vite.config.ts`                      |
+| Rules tests     | `@firebase/rules-unit-testing` against the Firestore emulator, project ID `demo-<app>`                                                                                                 | `vitest.rules.config.ts`, `test/`     |
+| Browser tests   | Playwright against the emulator with dummy keys                                                                                                                                        | `playwright.config.ts`, `e2e/`        |
+| Branches        | work goes to `dev`; `main` deploys                                                                                                                                                     | `deploy.yml`                          |
 
 Script names stay the same in every workspace: `dev`, `build`, `test`, `lint`, `typecheck`, `knip`, `test:coverage`, `test:rules`, `test:e2e`, `check`.
 
@@ -102,11 +102,11 @@ Each rebuilt app follows codename's Firestore conventions. Read codename's `READ
 
 Each app uses exactly one. Everything in the list above applies to both.
 
-| | Link-only (codename, hearthfire) | Accounts (codex-quest, glyph-quest) |
-| --- | --- | --- |
-| Document path | `games/{gameId}/...` | `users/{uid}/...` |
-| Rule guard | knowing the ID | `request.auth.uid == uid` |
-| Extra UI | game ID entry, recent games | sign-in, sign-out |
+|               | Link-only (codename, hearthfire) | Accounts (codex-quest, glyph-quest) |
+| ------------- | -------------------------------- | ----------------------------------- |
+| Document path | `games/{gameId}/...`             | `users/{uid}/...`                   |
+| Rule guard    | knowing the ID                   | `request.auth.uid == uid`           |
+| Extra UI      | game ID entry, recent games      | sign-in, sign-out                   |
 
 - Shared save code takes a document reference from the app. It never builds a path, so it works under either model. codename's `src/lib/agents.ts` builds `games/{g}/agents/{a}` itself today; that changes when the code moves to `packages/`.
 - Auth code goes in its own package, created when codex-quest comes in and not before. Link-only apps never depend on it.
@@ -124,14 +124,14 @@ Each app uses exactly one. Everything in the list above applies to both.
 
 Read from the code in November 2026. Re-read before designing a migration.
 
-| | hearthfire | codex-quest | glyph-quest |
-| --- | --- | --- | --- |
-| Paths | `games/{id}`, one document per game | `users/{uid}/characters/{id}`, `users/{uid}/games/{id}` | `users/{uid}/characters/{id}` |
-| Shape | Everything in the one document: `characters` array, roll log, notes, steading | A game lists players as `{ user, character }` and reads those characters from other users' paths | Characters only, no games |
-| Types | TypeScript interfaces, no Zod, no `schemaVersion` | Interfaces with open index signatures; `settings.version` (2.6) | Interfaces |
-| Rules | In the repo. Check four fields, cap `characters` at 20, allow any new top-level key | **Not in the repo.** They exist only in the Firebase console | **Not in the repo** |
-| Sign-in | none | email and Google | email |
-| Existing migration code | Admin scripts in `scripts/` (backup, restore, migrate) | Migrates on read in `src/services/characterMigration.ts` | none |
+|                         | hearthfire                                                                          | codex-quest                                                                                      | glyph-quest                   |
+| ----------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------- |
+| Paths                   | `games/{id}`, one document per game                                                 | `users/{uid}/characters/{id}`, `users/{uid}/games/{id}`                                          | `users/{uid}/characters/{id}` |
+| Shape                   | Everything in the one document: `characters` array, roll log, notes, steading       | A game lists players as `{ user, character }` and reads those characters from other users' paths | Characters only, no games     |
+| Types                   | TypeScript interfaces, no Zod, no `schemaVersion`                                   | Interfaces with open index signatures; `settings.version` (2.6)                                  | Interfaces                    |
+| Rules                   | In the repo. Check four fields, cap `characters` at 20, allow any new top-level key | **Not in the repo.** They exist only in the Firebase console                                     | **Not in the repo**           |
+| Sign-in                 | none                                                                                | email and Google                                                                                 | email                         |
+| Existing migration code | Admin scripts in `scripts/` (backup, restore, migrate)                              | Migrates on read in `src/services/characterMigration.ts`                                         | none                          |
 
 What this means for each migration:
 

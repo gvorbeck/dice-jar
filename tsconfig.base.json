@@ -1,0 +1,14 @@
+{
+  // Apps extend this from their own tsconfig.json (adding "types" and "include"), and keep a tsconfig.node.json for e2e, test and configs.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  }
+}

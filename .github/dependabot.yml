@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Targets dev like npm: checks only run on PRs to dev, and main requires them.
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: monthly
+  # One root lockfile covers every workspace. Each app's functions/ has its own lockfile: switch to
+  # `directories: [/, /apps/<app>/functions]` when the first one arrives.
+  # Minor and patch updates come as one PR a week; each major version gets its own PR, since those can break things.
+  - package-ecosystem: npm
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # shortcut: eslint-plugin-jsx-a11y 6.10.2 only allows eslint ≤9, drop this once it supports 10
+      - dependency-name: eslint
+        update-types: ['version-update:semver-major']
