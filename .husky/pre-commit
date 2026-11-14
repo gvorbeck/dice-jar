@@ -1,1 +1,6 @@
+# Once main is published, work goes to dev (or another branch) and reaches main through a PR.
+if [ "$(git branch --show-current)" = main ] && git rev-parse -q --verify origin/main >/dev/null; then
+  echo "Don't commit to main: switch to dev (git switch dev) or another branch." >&2
+  exit 1
+fi
 lint-staged

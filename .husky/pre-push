@@ -1,1 +1,8 @@
+# Refuse updating main on GitHub; the first push (main doesn't exist there yet) is allowed.
+while read -r _ _ remote_ref remote_sha; do
+  if [ "$remote_ref" = refs/heads/main ] && echo "$remote_sha" | grep -qv '^0*$'; then
+    echo "Don't push to main: open a PR from dev instead." >&2
+    exit 1
+  fi
+done
 npm run check
