@@ -21,3 +21,9 @@ updates:
       # shortcut: eslint-plugin-jsx-a11y 6.10.2 only allows eslint ≤9, drop this once it supports 10
       - dependency-name: eslint
         update-types: ['version-update:semver-major']
+      # shortcut: @eslint/js 10 expects eslint 10, which we can't use yet (see above); drop this together with the eslint ignore
+      - dependency-name: '@eslint/js'
+        update-types: ['version-update:semver-major']
+      # shortcut: typescript-eslint 8.72 only allows typescript <6.1, so typescript 7 breaks npm ci; drop this once typescript-eslint supports 7
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
