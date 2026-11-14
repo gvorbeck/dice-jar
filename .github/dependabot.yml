@@ -6,6 +6,8 @@ updates:
     target-branch: dev
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7 # wait a week before taking a new release; security updates ignore this
   # One root lockfile covers every workspace. Each app's functions/ has its own lockfile: switch to
   # `directories: [/, /apps/<app>/functions]` when the first one arrives.
   # Minor and patch updates come as one PR a week; each major version gets its own PR, since those can break things.
@@ -14,6 +16,8 @@ updates:
     target-branch: dev
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7 # wait a week before taking a new release; security updates ignore this
     groups:
       minor-and-patch:
         update-types: [minor, patch]
