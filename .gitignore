@@ -15,3 +15,4 @@ ui-debug.log
 .agents
 skills-lock.json
 .DS_Store
+.vscode/settings.json

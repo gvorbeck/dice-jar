@@ -1,5 +1,7 @@
 {
   "includeBranches": ["dev"],
+  "autoReview": ["open", "push"],
+  "excludeAuthors": ["dependabot*"],
   "ignorePatterns": "**/package-lock.json\n**/dist/**\n**/coverage/**",
   "customContext": {
     "files": [

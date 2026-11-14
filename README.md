@@ -66,7 +66,7 @@ Adding or removing a Firestore field takes two releases, because open tabs keep 
 
 ## CI
 
-[`.github/workflows/checks.yml`](.github/workflows/checks.yml) runs one `checks` job on every PR to `dev` and every push to `dev` and `main`: `npm ci`, `npm ci` in each app's `functions/`, `npm run check`, then `test:rules` and `test:e2e`. Work goes to `dev`; `main` deploys. Each app brings its own deploy workflow.
+[`.github/workflows/checks.yml`](.github/workflows/checks.yml) runs one `checks` job on every PR to `dev` or `main` and every push to `dev` and `main`: `npm ci`, `npm ci` in each app's `functions/`, `npm run check`, then `test:rules` and `test:e2e`. Work goes to `dev`; `main` deploys. Each app brings its own deploy workflow.
 
 Dependabot targets `dev`: npm weekly (minor and patch grouped, each major alone), GitHub Actions monthly. Greptile reviews PRs against [AGENTS.md](AGENTS.md) (`greptile.json`).
 
@@ -78,9 +78,18 @@ Set in GitHub → Settings → Branches (or Rules → Rulesets), once for `dev` 
 | ------------------------------------------------------- | ----- | ------ |
 | Require a pull request before merging                   | no    | yes    |
 | Require status checks to pass, required check: `checks` | yes   | yes    |
-| Require branches to be up to date before merging        | yes   | no     |
+| Require branches to be up to date before merging        | no    | no     |
 | Allow force pushes                                      | no    | no     |
 | Allow deletions                                         | no    | no     |
 | Do not allow bypassing the above settings               | no    | yes    |
 
-A required check blocks direct pushes, because a new commit hasn't passed it yet. So admins may bypass on `dev` to push work there; Dependabot's PRs to `dev` still need `checks`. `main` takes changes only through a PR from `dev`, whose `checks` run is the push to `dev`. `main` doesn't require being up to date: each merge adds a commit `dev` lacks, so that setting would block every next release until `main` is merged back.
+A required check blocks direct pushes, because a new commit hasn't passed it yet. So admins may bypass on `dev` to push work there; Dependabot's PRs to `dev` still need `checks`. `main` takes changes only through a PR from `dev`, where `checks` runs on the PR as well. Neither branch requires being up to date, so Dependabot's weekly PRs don't each need an update and a new CI run after another one merges. On `main` it would also block every next release, because each merge adds a commit `dev` lacks, until `main` is merged back.
+
+## GitHub settings
+
+The repo is public. In Settings:
+
+- **General → Pull Requests:** turn on "Automatically delete head branches".
+- **Advanced Security:** turn on Dependabot alerts, Dependabot security updates, secret scanning with push protection, and CodeQL (default setup, JavaScript/TypeScript: scans pushes and PRs on `dev` and `main`, and weekly).
+- **Rules → Rulesets:** one ruleset per branch, as in "Branch protection" above. Both are saved in [.github/rulesets/](.github/rulesets/) and can be imported (New ruleset → Import a ruleset). If you change a ruleset in GitHub, update its file. On `main`, set the pull request rule's allowed merge methods to **merge commit only**, so a release can't be squashed by mistake.
+- **Greptile:** install the GitHub app on this repo only, at greptile.com. `greptile.json` is its config, and it reads [AGENTS.md](AGENTS.md).
