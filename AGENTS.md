@@ -43,6 +43,14 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 
 ## Bringing an app in
 
+Copy the app to `apps/<app>/` as it is, without `.git`, `node_modules`, `dist` or `.env`. Then, in this order (rehearsed with codename: every check passed afterwards):
+
+1. Delete the app's own `eslint.config.js`, `knip.jsonc`, `AGENTS.md`, `CLAUDE.md`, `.github/` and `package-lock.json`. The root versions replace them. Its deploy workflow is moved into the root `.github/workflows/` by hand, not copied.
+2. Run `npx prettier --write apps/<app>` once, as a commit of its own.
+3. Remove `@eslint/js`, `eslint-plugin-jsx-a11y`, `eslint-plugin-react-hooks`, `globals` and `typescript-eslint` from the app's `package.json`. They live in the root, and knip fails on them otherwise. Then `npm install` at the root.
+4. Add the app, and its `functions/` if it has one, to `knip.jsonc`. The `functions/` entry must include `src/**/*.test.ts`, or knip reports its tests and the exports they use as unused.
+5. Install the Functions dependencies: `npm ci --prefix apps/<app>/functions`.
+
 An app is ready when all of these are true:
 
 - Its `check`, `test:rules` and `test:e2e` pass.
@@ -57,6 +65,7 @@ An app is ready when all of these are true:
 
 The owner does not track these. When an import finishes, or the owner asks what is next, say which of them are now due.
 
+- **Right after codename is in:** pin every GitHub Action to a full commit SHA with a version comment, and turn on "Require actions to be pinned to a full-length commit SHA" in Settings → Actions → General (Dependabot keeps the pins current). Check that CodeQL now lists JavaScript and TypeScript. Clear the lint warnings the import brings (react-hooks, and codename's inline `eslint-disable` comments, which break the rule against disabling lint inline), then consider `--max-warnings 0`.
 - **After codename is in and green:** move `jsx-a11y` to its `strict` config, and raise TypeScript strictness in `tsconfig.base.json` one flag at a time, `noUncheckedIndexedAccess` first. One PR per change, and only when every app passes. Codename's own config is the floor until then, so none of this may land before it.
-- **Before the first deploy workflow lands:** the owner decides on a `LICENSE` and a `SECURITY.md`. The games' text and rules are licensed content, so do not write either without them.
+- **Before the first deploy workflow lands:** the owner decides on a `LICENSE` and a `SECURITY.md`, and turns on private vulnerability reporting (Settings → Advanced Security). The games' text and rules are licensed content, so do not write either without them.
 - **Before the first app is released:** confirm the GitHub settings in README.md "GitHub settings" are all on, and that the `checks` job is required on `dev` and `main`.
