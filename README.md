@@ -33,13 +33,13 @@ Where an app has its own `LICENSE` or `NOTICE`, that file governs the app's dire
 apps/<app>/          one app each: its own firebase.json, .firebaserc, firestore.rules, functions/, e2e/, test/
 packages/<name>/     shared code, created only when a second app needs it
 scripts/             workspaces.js: runs a script in every workspace that has it
-.github/             checks workflow, dependabot.yml
+.github/             checks workflow, dependabot.yml, rulesets, CODEOWNERS, PR template
 .husky/              git hooks
 ```
 
 ## Running locally
 
-Use Node 24 (`.nvmrc`; `engine-strict` refuses anything else).
+Use Node 24 (`.nvmrc`; `engine-strict` refuses anything else), on macOS, Linux or WSL. The hooks and `scripts/` assume `sh` and `npm` on the PATH, so native Windows isn't supported.
 
 ```bash
 npm ci
@@ -80,24 +80,17 @@ Adding or removing a Firestore field takes two releases, because open tabs keep 
 
 ## CI
 
-[`.github/workflows/checks.yml`](.github/workflows/checks.yml) runs one `checks` job on every PR to `dev` or `main` and every push to `dev` and `main`: `npm ci`, `npm ci` in each app's `functions/`, `npm run check`, then `test:rules` and `test:e2e`. Work goes to `dev`; `main` deploys. Each app brings its own deploy workflow.
+[`.github/workflows/checks.yml`](.github/workflows/checks.yml) runs one `checks` job on every PR to `dev` or `main` and every push to `dev` and `main`: `npm ci`, `npm ci` in each app's `functions/`, `npm run check`, `npm run build`, then `test:rules` and `test:e2e`. Work goes to `dev`; `main` deploys. Each app brings its own deploy workflow.
 
 Dependabot targets `dev`: npm weekly (minor and patch grouped, each major alone), GitHub Actions monthly. Greptile reviews PRs against [AGENTS.md](AGENTS.md) (`greptile.json`).
 
 ## Branch protection
 
-Set in GitHub → Settings → Branches (or Rules → Rulesets), once for `dev` and once for `main`:
+The rules are in [.github/rulesets/](.github/rulesets/), and the GitHub settings section below says how to import them. Both branches require `checks` and block force pushes and deletions. The differences, and why:
 
-| Setting                                                 | `dev` | `main` |
-| ------------------------------------------------------- | ----- | ------ |
-| Require a pull request before merging                   | no    | yes    |
-| Require status checks to pass, required check: `checks` | yes   | yes    |
-| Require branches to be up to date before merging        | no    | no     |
-| Allow force pushes                                      | no    | no     |
-| Allow deletions                                         | no    | no     |
-| Do not allow bypassing the above settings               | no    | yes    |
-
-A required check blocks direct pushes, because a new commit hasn't passed it yet. So admins may bypass on `dev` to push work there; Dependabot's PRs to `dev` still need `checks`. `main` takes changes only through a PR from `dev`, where `checks` runs on the PR as well. Neither branch requires being up to date, so Dependabot's weekly PRs don't each need an update and a new CI run after another one merges. On `main` it would also block every next release, because each merge adds a commit `dev` lacks, until `main` is merged back.
+- `dev` has no pull request rule, and admins may bypass it, so you can push work there. A required check blocks direct pushes, because a new commit hasn't passed it yet, so the bypass is what allows them. Dependabot's PRs to `dev` still need `checks`.
+- `main` takes changes only through a PR from `dev`, merged with a merge commit, and nobody can bypass it. `checks` runs on that PR too.
+- Neither requires being up to date, so Dependabot's weekly PRs don't each need an update and a new CI run after another one merges. On `main` it would also block every next release, because each merge adds a commit `dev` lacks, until `main` is merged back.
 
 ## GitHub settings
 

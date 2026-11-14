@@ -1,5 +1,7 @@
 # Monorepo brief
 
+> **Status (Nov 2026):** the scaffold described here is done. The rules agents follow now live in [AGENTS.md](../AGENTS.md). "Scope of this work" is history; "Later phases" is still the plan, starting with importing codename.
+
 Repo name: `dice-jar`. Package scope: `@dice-jar/*`.
 
 Read this whole file before doing anything. It is the context for scaffolding a new monorepo that will hold several tabletop RPG character apps.

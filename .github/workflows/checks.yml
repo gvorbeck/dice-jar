@@ -24,6 +24,7 @@ jobs:
       # Each app's functions/ is its own npm package with its own lockfile, not a workspace.
       - run: for d in apps/*/functions; do if [ -f "$d/package-lock.json" ]; then npm ci --prefix "$d"; fi; done
       - run: npm run check # format, lint, unused code, then types and unit tests with coverage floors in every workspace
+      - run: npm run build # catches what only the bundler sees, such as a bad import path
       # Firestore rules in the emulator (Java is preinstalled on ubuntu-latest).
       - run: npm run test:rules
       - run: if [ -x node_modules/.bin/playwright ]; then npx playwright install --with-deps chromium; fi

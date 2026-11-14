@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -46,4 +46,31 @@ test('a failing workspace does not stop the others, and the run fails naming it'
   assert.equal(status, 1);
   assert.ok(stdout.includes('RAN-fine'));
   assert.ok(stderr.includes('apps/broken') && !stderr.includes('apps/fine'));
+});
+
+// The branch guards in .husky/: GitHub's rulesets are the real wall, these catch it earlier on a developer's machine.
+const hook = (name) => resolve(import.meta.dirname, '../.husky', name);
+
+test('pre-push refuses to update main on GitHub', () => {
+  const input = 'refs/heads/main 1111111 refs/heads/main 2222222\n';
+  const { status, stderr } = spawnSync('sh', [hook('pre-push')], { input, encoding: 'utf8' });
+  assert.equal(status, 1);
+  assert.match(stderr, /Don't push to main/);
+});
+
+test('pre-commit refuses a commit on main once origin/main exists', () => {
+  const repo = mkdtempSync(join(tmpdir(), 'hook-'));
+  const git = (...args) =>
+    execFileSync(
+      'git',
+      ['-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', ...args],
+      { cwd: repo },
+    );
+  git('init', '-q', '-b', 'main');
+  git('commit', '-q', '--allow-empty', '-m', 'x');
+  git('update-ref', 'refs/remotes/origin/main', 'HEAD');
+  const { status, stderr } = spawnSync('sh', [hook('pre-commit')], { cwd: repo, encoding: 'utf8' });
+  rmSync(repo, { recursive: true, force: true });
+  assert.equal(status, 1);
+  assert.match(stderr, /Don't commit to main/);
 });
