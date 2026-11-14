@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20 # shortcut: sized for an empty repo, raise it once apps' rules and e2e tests run here
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with: { persist-credentials: false } # nothing here pushes, so the job token isn't left in .git
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with: { node-version-file: .nvmrc, cache: npm, cache-dependency-path: '**/package-lock.json' }
       - run: npm ci
       # Each app's functions/ is its own npm package with its own lockfile, not a workspace.
