@@ -61,7 +61,11 @@ test('pre-push refuses to update main on GitHub', () => {
 test('pre-commit refuses a commit on main once origin/main exists', () => {
   const repo = mkdtempSync(join(tmpdir(), 'hook-'));
   const git = (...args) =>
-    execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'core.hooksPath=/dev/null', ...args], { cwd: repo });
+    execFileSync(
+      'git',
+      ['-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', ...args],
+      { cwd: repo },
+    );
   git('init', '-q', '-b', 'main');
   git('commit', '-q', '--allow-empty', '-m', 'x');
   git('update-ref', 'refs/remotes/origin/main', 'HEAD');
