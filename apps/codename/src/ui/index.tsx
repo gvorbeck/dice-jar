@@ -1,0 +1,445 @@
+import {
+  Button,
+  Checkbox,
+  ComboBox,
+  ComboBoxStateContext,
+  Dialog,
+  Heading,
+  Input,
+  Label,
+  ListBox,
+  ListBoxItem,
+  Modal,
+  ModalOverlay,
+  NumberField,
+  Popover,
+  Radio,
+  RadioGroup,
+  TextArea,
+  TextField,
+} from 'react-aria-components';
+import { useContext, useId, type ReactNode } from 'react';
+export { Win } from './Win';
+import { MAX_LINE, MAX_PROSE, type Character } from '../model/character';
+import { SKILL_FAMILIES, TYPED_SKILLS, TYPE_SUGGESTIONS, familyOf, makeKey, typeOf } from '../rules/data/skills';
+import { clamp, filterSkills, skillsOf } from '../rules';
+
+export type Up = (fn: (draft: Character) => void) => void;
+export interface StepProps {
+  c: Character;
+  up: Up;
+}
+
+export const Rule = () => <div className="rule" aria-hidden />;
+
+/** 8x8 pixel d6 showing five; drawn on a grid so it stays crisp at any size. */
+const Dice = () => (
+  <svg viewBox="0 0 8 8" width="16" height="16" shapeRendering="crispEdges" aria-hidden fill="currentColor">
+    <path d="M1 0h6v1h1v6h-1v1H1V7H0V1h1z M2 2h1v1H2z M5 2h1v1H5z M3.5 3.5h1v1h-1z M2 5h1v1H2z M5 5h1v1H5z" fillRule="evenodd" />
+  </svg>
+);
+
+/** `max` matches the character schema: a line or a text area, unless given. */
+export const Text = ({
+  label,
+  value,
+  onChange,
+  area,
+  onRoll,
+  max = area ? MAX_PROSE : MAX_LINE,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  area?: boolean;
+  onRoll?: () => void;
+  max?: number;
+}) => (
+  <TextField className="field" value={value} onChange={onChange} maxLength={max}>
+    <Label>{label}</Label>
+    <div className="with-roll">
+      {area ? <TextArea /> : <Input />}
+      {onRoll && (
+        <Button className="btn roll" aria-label={`Randomize ${label}`} onPress={onRoll}>
+          <Dice />
+        </Button>
+      )}
+    </div>
+  </TextField>
+);
+
+export const Num = ({
+  label,
+  value,
+  onChange,
+  min = 3,
+  max = 18,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  min?: number;
+  max?: number;
+}) => (
+  <NumberField className="field" value={value} minValue={min} maxValue={max} onChange={(v) => Number.isFinite(v) && onChange(v)}>
+    <Label>{label}</Label>
+    <Input />
+  </NumberField>
+);
+
+export const Btn = ({
+  children,
+  onPress,
+  disabled,
+  className,
+  label,
+}: {
+  children: ReactNode;
+  onPress: () => void;
+  disabled?: boolean;
+  className?: string;
+  label?: string;
+}) => (
+  <Button className={className ? `btn ${className}` : 'btn'} onPress={onPress} isDisabled={disabled} aria-label={label}>
+    {children}
+  </Button>
+);
+
+/** A labelled number with − and + buttons; `onRoll` makes the label a button that rolls it, `warn` turns the number red. */
+export function Counter({
+  label,
+  note,
+  value,
+  max,
+  step = 1,
+  warn,
+  onChange,
+  onRoll,
+}: {
+  label: string;
+  note?: string;
+  value: number;
+  max?: number;
+  step?: number;
+  warn?: boolean;
+  onChange: (v: number) => void;
+  onRoll?: () => void;
+}) {
+  const set = (v: number) => onChange(clamp(v, 0, max ?? Infinity));
+  const noteId = useId();
+  return (
+    // describedby: the note is announced with the group, since CSS may show it before the controls it follows in the DOM
+    <div
+      className={note ? 'row counter noted' : 'row counter'}
+      role="group"
+      aria-label={label}
+      aria-describedby={note ? noteId : undefined}
+    >
+      <strong>
+        {onRoll ? (
+          <button className="rollable" onClick={onRoll}>
+            {label}
+          </button>
+        ) : (
+          label
+        )}
+      </strong>
+      <Btn label={`Decrease ${label}`} onPress={() => set(value - step)}>
+        −
+      </Btn>
+      <output className={warn ? 'warn' : undefined}>
+        {value}
+        {max !== undefined && ` / ${max}`}
+      </output>
+      <Btn label={`Increase ${label}`} onPress={() => set(value + step)}>
+        +
+      </Btn>
+      {note && (
+        <span className="dim note" id={noteId}>
+          {note}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/** In-page replacement for window.confirm(): focus is trapped, Escape and a click outside cancel. */
+export const ConfirmDialog = ({
+  open,
+  title,
+  children,
+  confirm,
+  onConfirm,
+  onClose,
+}: {
+  open: boolean;
+  title: string;
+  children: ReactNode;
+  confirm: string;
+  onConfirm: () => void;
+  onClose: () => void;
+}) => (
+  <ModalOverlay
+    isOpen={open}
+    onOpenChange={(o) => {
+      if (!o) onClose();
+    }}
+    isDismissable
+    className="overlay"
+  >
+    <Modal className="modal">
+      <Dialog role="alertdialog" className="dialog">
+        <Heading slot="title">{title}</Heading>
+        <p>{children}</p>
+        <div className="row">
+          <Btn
+            className="primary"
+            onPress={() => {
+              onClose();
+              onConfirm();
+            }}
+          >
+            {confirm}
+          </Btn>
+          <Btn onPress={onClose}>Cancel</Btn>
+        </div>
+      </Dialog>
+    </Modal>
+  </ModalOverlay>
+);
+
+/** A native select, labelled for screen readers; `visible` also shows the label beside it (clicking it focuses the select). */
+export function Select({
+  label,
+  visible,
+  value,
+  onChange,
+  className,
+  disabled,
+  children,
+}: {
+  label: string;
+  visible?: boolean;
+  value: string | number;
+  onChange: (v: string) => void;
+  className?: string;
+  disabled?: boolean;
+  children: ReactNode;
+}) {
+  const id = useId();
+  return (
+    <>
+      {visible && (
+        <label className="lbl" htmlFor={id}>
+          {label}
+        </label>
+      )}
+      <select
+        id={visible ? id : undefined}
+        aria-label={visible ? undefined : label}
+        className={className}
+        value={value}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {children}
+      </select>
+    </>
+  );
+}
+
+export const Choice = ({ value, children, disabled }: { value: string; children: ReactNode; disabled?: boolean }) => (
+  <Radio className="choice radio" value={value} isDisabled={disabled}>
+    <span className="mark" />
+    {children}
+  </Radio>
+);
+
+export const Pick = ({
+  id,
+  selected,
+  onChange,
+  children,
+  disabled,
+}: {
+  id: string;
+  selected: boolean;
+  onChange: (v: boolean) => void;
+  children: ReactNode;
+  disabled?: boolean;
+}) => (
+  <Checkbox className="choice" id={id} isSelected={selected} onChange={onChange} isDisabled={disabled}>
+    <span className="mark" />
+    {children}
+  </Checkbox>
+);
+
+export { RadioGroup, Label };
+
+/** Opens the list on click; keyboard focus alone (tabbing past) stays quiet. */
+const ClickInput = () => {
+  const state = useContext(ComboBoxStateContext);
+  return <Input placeholder="type…" maxLength={100} onClick={() => state?.open(null, 'manual')} />;
+};
+
+/** Free-text input with suggestions. A real ComboBox (not <datalist>) so the popup can be styled and anchors to the input. */
+export const TypeInput = ({
+  label,
+  suggestions,
+  value,
+  onChange,
+  inline,
+}: {
+  label: string;
+  suggestions: string[];
+  value: string;
+  onChange: (v: string) => void;
+  inline?: boolean;
+}) => {
+  const items = suggestions.map((id) => ({ id }));
+  // A value that already is a suggestion would filter the list down to itself; show everything instead.
+  const complete = items.some((i) => i.id.toLowerCase() === value.toLowerCase());
+  return (
+    <ComboBox
+      aria-label={label}
+      allowsCustomValue
+      inputValue={value}
+      onInputChange={onChange}
+      defaultItems={items}
+      defaultFilter={complete ? () => true : undefined}
+      className={inline ? 'combo inline' : 'combo'}
+    >
+      <ClickInput />
+      <Popover className="popover">
+        <ListBox className="listbox">{(t: { id: string }) => <ListBoxItem className="option">{t.id}</ListBoxItem>}</ListBox>
+      </Popover>
+    </ComboBox>
+  );
+};
+
+/** Family select + type input; emits "Family(Type)" keys. `""` = unset. */
+export function SkillPicker({ label, value, onChange }: { label: string; value: string; onChange: (key: string) => void }) {
+  const family = familyOf(value),
+    type = typeOf(value);
+  const typed = TYPED_SKILLS.includes(family);
+  const id = useId();
+  return (
+    <div className="field">
+      <label htmlFor={id}>{label}</label>
+      <div className="row nowrap">
+        <select id={id} value={family} onChange={(e) => onChange(e.target.value)}>
+          <option value="">— select —</option>
+          {SKILL_FAMILIES.filter((f) => f !== 'Unnatural').map((f) => (
+            <option key={f}>{f}</option>
+          ))}
+        </select>
+        {typed && (
+          <TypeInput
+            label={`${label} type`}
+            suggestions={TYPE_SUGGESTIONS[family] ?? []}
+            value={type}
+            onChange={(v) => onChange(makeKey(family, v))}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Typed skills break after the family ("Foreign Language" / "(Mandarin)") so a long name is two short lines, not one that wraps unpredictably. */
+const skillName = (key: string) =>
+  typeOf(key) ? (
+    <>
+      {familyOf(key)}
+      <small className="skilltype">({typeOf(key)})</small>
+    </>
+  ) : (
+    key
+  );
+
+export function SkillTable({
+  c,
+  onlyTouched,
+  onRoll,
+  filter = '',
+  advance,
+  checked = [],
+  onUncheck,
+}: {
+  c: Character;
+  onlyTouched?: boolean;
+  onRoll?: (label: string, chance: number) => void;
+  filter?: string;
+  advance?: Record<string, number>;
+  checked?: string[];
+  onUncheck?: (key: string) => void;
+}) {
+  const q = filter.trim();
+  const rows = filterSkills(
+    skillsOf(c, advance).filter((s) => (onlyTouched ? s.professional !== null || s.bonus || s.veteran || s.adjust : s.total > 0)),
+    q,
+  );
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Skill</th>
+          <th className="num">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((s) => (
+          <tr key={s.key}>
+            <td className={s.professional !== null ? '' : 'dim'}>
+              <span className="skillname">
+                {onRoll ? (
+                  <button className="rollable" onClick={() => onRoll(s.key, s.total)}>
+                    {skillName(s.key)}
+                  </button>
+                ) : (
+                  <span>{s.key}</span>
+                )}
+                {s.professional !== null && (
+                  <span className="mark" title="Professional skill">
+                    <span aria-hidden>▪</span>
+                    <span className="sr-only">professional skill</span>
+                  </span>
+                )}
+                {s.adjust !== 0 && (
+                  <span className="mark" title="Handler adjustment">
+                    <span aria-hidden>±</span>
+                    <span className="sr-only">adjusted by the Handler</span>
+                  </span>
+                )}
+                {checked.includes(s.key) &&
+                  (onUncheck ? (
+                    <button
+                      className="mark noprint"
+                      title="Failed this session: tap to uncheck"
+                      aria-label="Failed this session, will advance. Uncheck"
+                      onClick={() => onUncheck(s.key)}
+                    >
+                      <span aria-hidden>✓</span>
+                    </button>
+                  ) : (
+                    <span className="mark" title="Failed this session">
+                      <span aria-hidden>✓</span>
+                      <span className="sr-only">failed this session, will advance</span>
+                    </span>
+                  ))}
+              </span>
+            </td>
+            <td className="num">{s.total}%</td>
+          </tr>
+        ))}
+        {rows.length === 0 && q && (
+          <tr>
+            <td className="dim" colSpan={2}>
+              No skill matches “{filter}”.
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
+}

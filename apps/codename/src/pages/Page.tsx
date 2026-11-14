@@ -1,0 +1,49 @@
+import { useEffect, type ReactNode } from 'react';
+import { Legal } from '../ui/Legal';
+import { MenuBar } from '../ui/MenuBar';
+import { Win, useFocusMain } from '../ui/Win';
+
+export const useTitle = (title?: string) =>
+  useEffect(() => {
+    document.title = title ? `${title} // YOURCODENA.ME` : 'YOURCODENA.ME // Agent Intake';
+  }, [title]);
+
+interface PageProps {
+  title?: string;
+  /** Replaces the default screen-reader-only <h1> (the title). */
+  heading?: ReactNode;
+  subtitle?: string;
+  /** The page's own menu bar items, aligned right. */
+  actions?: ReactNode;
+  /** Status bar items before the legal line. */
+  status?: ReactNode;
+  /** The page lays out its own column (.shell) instead of the .page one. */
+  wide?: boolean;
+  children: ReactNode;
+}
+
+/** A page holding one window: errors, "not found" and the like. */
+export const Notice = ({ page, title, children }: { page?: string; title: string; children: ReactNode }) => (
+  <Page title={page}>
+    <Win title={title}>{children}</Win>
+  </Page>
+);
+
+/** Menu bar, <main> and status bar shared by every page except the live sheet. */
+export const Page = ({ title, heading, subtitle, actions, status, wide, children }: PageProps) => {
+  useTitle(title);
+  useFocusMain();
+  return (
+    <>
+      <MenuBar subtitle={subtitle}>{actions}</MenuBar>
+      <main id="main" tabIndex={-1} className={wide ? undefined : 'page'}>
+        {heading ?? <h1 className="sr-only">{title || 'Agent intake'}</h1>}
+        {children}
+      </main>
+      <footer className="statusbar noprint">
+        {status}
+        <Legal />
+      </footer>
+    </>
+  );
+};
