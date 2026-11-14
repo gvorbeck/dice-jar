@@ -8,17 +8,17 @@ Read this whole file before doing anything. It is the context for scaffolding a 
 
 The owner has built the same kind of app four times, each on a slightly different stack. Each time the Firebase setup, the save logic, the UI kit and the tooling were rebuilt from nothing. The fourth app, codename, is the one that got it right. The monorepo exists so that work is written once and every app uses it.
 
-| App                      | Game              | Local path                   | Stack today                                                                                   |
-| ------------------------ | ----------------- | ---------------------------- | --------------------------------------------------------------------------------------------- |
-| codename (yourcodena.me) | Delta Green       | `/Users/g/Sites/codename`    | Vite, React 19, React Aria Components, plain CSS tokens, Zod, react-router. **The standard.** |
-| codex-quest              | Basic Fantasy RPG | `/Users/g/Sites/codex-quest` | Vite, Tailwind, zustand, react-query, wouter, Firebase Auth                                   |
-| hearthfire               | Stonetop          | `/Users/g/Sites/hearthfire`  | Vite, CSS modules, tiptap, react-router                                                       |
-| glyph-quest              | Knave             | `/Users/g/Sites/glyph-quest` | Next.js, MUI, emotion, Firebase Auth                                                          |
+| App                      | Game              | Local path            | Stack today                                                                                   |
+| ------------------------ | ----------------- | --------------------- | --------------------------------------------------------------------------------------------- |
+| codename (yourcodena.me) | Delta Green       | `~/Sites/codename`    | Vite, React 19, React Aria Components, plain CSS tokens, Zod, react-router. **The standard.** |
+| codex-quest              | Basic Fantasy RPG | `~/Sites/codex-quest` | Vite, Tailwind, zustand, react-query, wouter, Firebase Auth                                   |
+| hearthfire               | Stonetop          | `~/Sites/hearthfire`  | Vite, CSS modules, tiptap, react-router                                                       |
+| glyph-quest              | Knave             | `~/Sites/glyph-quest` | Next.js, MUI, emotion, Firebase Auth                                                          |
 
 ## Decisions already made
 
 - **codename is the standard.** Every app in the monorepo, including codename itself when it arrives, is aligned to codename's conventions. Where this brief is silent, do what codename does.
-- **codename is not imported yet.** Treat `/Users/g/Sites/codename` as a read-only reference. Do not edit it, and do not copy its app code in during scaffolding.
+- **codename is not imported yet.** Treat `~/Sites/codename` as a read-only reference. Do not edit it, and do not copy its app code in during scaffolding.
 - **Set up everything so that importing codename later is the lightest possible lift.** Same Node version, same script names, same ESLint rules, same tsconfig, same test layout. Do not add a stricter rule that codename would fail unless this brief lists it.
 - **Other apps are rebuilt to the standard, not ported as they are.** That means React Aria Components for UI, codename's Firestore setup and document conventions (each app needs a data migration), and codename's tooling.
 - **Import order: codename, hearthfire, codex-quest, glyph-quest.** codename comes in first, after the scaffold is done.
@@ -143,7 +143,7 @@ What this means for each migration:
 
 codename was built with an MCP server that lets the agent search the game's rulebooks and cite the page, so rules are implemented from the book and not from memory. Every app gets the same.
 
-- Repo: `/Users/g/Sites/ttrpg-rules-mcp` (private, `gvorbeck/ttrpg-rules-mcp`). Registered today as one server, `ttrpg-rules`, holding Delta Green only. Tools: `search_rules`, `read_rules`, `list_sections`.
+- Repo: `~/Sites/ttrpg-rules-mcp` (private, `gvorbeck/ttrpg-rules-mcp`). Registered today as one server, `ttrpg-rules`, holding Delta Green only. Tools: `search_rules`, `read_rules`, `list_sections`.
 - **It stays a separate, private repo.** It holds text from copyrighted books. Never copy its `data/` or any book text into dice-jar.
 - **One server per game, never mixed.** Same code, one running copy per game, each loading only that game's books and registered under its own name: `rules-delta-green`, `rules-stonetop`, `rules-bfrpg`, `rules-knave`. A server cannot return another game's text, and the tool name says which game it is. Games share terms with different rules (Delta Green and Stonetop both have "Bonds"), so a shared index with an optional filter is not safe enough.
 - **How:** the server already reads its books from `RULES_DATA_DIR`. Move each game's `.jsonl` files into `rules-server/data/<game>/`, and have `install.sh` register one server per folder with that variable set. The existing `ttrpg-rules` registration is removed.

@@ -3,7 +3,7 @@ on:
   push:
     branches: [main, dev]
   pull_request:
-    branches: [dev]
+    branches: [main, dev] # main too: the ruleset requires checks there, and a PR from any branch but dev has no earlier push run
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,7 +14,7 @@ concurrency:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 20 # shortcut: sized for an empty repo, raise it once apps' rules and e2e tests run here
     steps:
       - uses: actions/checkout@v7
         with: { persist-credentials: false } # nothing here pushes, so the job token isn't left in .git
