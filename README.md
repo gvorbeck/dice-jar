@@ -50,6 +50,7 @@ Every workspace uses the same script names: `dev`, `build`, `test`, `lint`, `typ
 
 - `pre-commit`: Prettier (`--check`) and ESLint on staged files. A commit with unformatted or lint-failing code is refused; run `npm run format` and commit again.
 - `pre-push`: `npm run check`.
+- Once `main` is on GitHub, both hooks also refuse a commit on `main` and a push to it. Work on `dev` (or another branch) and open a PR into `main`. The first push of `main` is allowed. Branch protection on GitHub enforces the same rule for everyone.
 
 ## CI
 
