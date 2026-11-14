@@ -46,6 +46,18 @@ npm run check
 
 Every workspace uses the same script names: `dev`, `build`, `test`, `lint`, `typecheck`, `knip`, `test:coverage`, `test:rules`, `test:e2e`, `check`.
 
+## Working on a change
+
+`main` is production and deploys. `dev` is where work lands first and never deploys. Nothing reaches `main` except through a PR from `dev`.
+
+1. **Start from `dev`.** `git switch dev && git pull`. For anything bigger than a small fix, cut a branch: `git switch -c <name>`.
+2. **Work.** Run `npm run check` as you go, plus `npm run test:rules` and `npm run test:e2e` when [AGENTS.md](AGENTS.md) says to.
+3. **Commit and push the branch.** The hooks check formatting and lint on commit, and run the full `npm run check` on push. They can't be skipped, and they refuse `main`.
+4. **PR into `dev`.** It's the default base. The `checks` job runs; merge when it's green. Dependabot's PRs go through the same step. Nothing is live yet.
+5. **Release.** Open a PR with base `main` and compare `dev`. Merge it with **Create a merge commit**, not squash, or `main` and `dev` drift apart and the next release shows the same changes again. The merge deploys: rules first, then Functions, then Hosting.
+
+Adding or removing a Firestore field takes two releases, because open tabs keep running the old build. Release 1 allows the field in `firestore.rules`; release 2 starts using it. For example, adding avatars to a character sheet: one PR that allows `avatarUrl` in the rules, released; then a later PR where the app writes it.
+
 ## Hooks
 
 - `pre-commit`: Prettier (`--check`) and ESLint on staged files. A commit with unformatted or lint-failing code is refused; run `npm run format` and commit again.
