@@ -20,6 +20,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 - Comments say why, in one line. No comments that repeat the code.
 - A coverage floor only goes up. A new app starts at or above codename's floor (lines 77, statements 74, branches 68, functions 78).
 - Never skip a hook (`--no-verify`), disable a lint rule inline, or lower a threshold to get a change through. Fix the cause or ask.
+- Licensing: the root `LICENSE` is MIT and covers everything except a directory with its own `LICENSE` or `NOTICE`. An app's game content follows the game's license, not MIT. Never commit book text or other licensed material to the root or `packages/`; ask the owner what an app's `NOTICE` must say.
 - Never commit, push or merge. The user does that.
 
 ## Branches and releases
@@ -43,6 +44,14 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 
 ## Bringing an app in
 
+Copy the app to `apps/<app>/` as it is, without `.git`, `node_modules`, `dist` or `.env`. Then, in this order (rehearsed with codename: every check passed afterwards):
+
+1. Delete the app's own `eslint.config.js`, `knip.jsonc`, `AGENTS.md`, `CLAUDE.md`, `.github/` and `package-lock.json`. The root versions replace them. Its deploy workflow is moved into the root `.github/workflows/` by hand, not copied.
+2. Run `npx prettier --write apps/<app>` once, as a commit of its own.
+3. Remove `@eslint/js`, `eslint-plugin-jsx-a11y`, `eslint-plugin-react-hooks`, `globals` and `typescript-eslint` from the app's `package.json`. They live in the root, and knip fails on them otherwise. Then `npm install` at the root.
+4. Add the app, and its `functions/` if it has one, to `knip.jsonc`. The `functions/` entry must include `src/**/*.test.ts`, or knip reports its tests and the exports they use as unused.
+5. Install the Functions dependencies: `npm ci --prefix apps/<app>/functions`.
+
 An app is ready when all of these are true:
 
 - Its `check`, `test:rules` and `test:e2e` pass.
@@ -50,6 +59,7 @@ An app is ready when all of these are true:
 - It has a coverage floor, at or above codename's.
 - Its Dependabot entries exist (its `functions/` directory, if it has one).
 - Nothing in it imports from another app.
+- It has an `apps/<app>/LICENSE` or `NOTICE` stating the terms its game content is under, and its `package.json` `license` field matches (`SEE LICENSE IN LICENSE` if the terms are custom).
 - Every page has a `lang` attribute, a unique `<title>` and a description. Pages of link-only games (`/g/...`) are `noindex`, since a game is unlisted, not secret.
 - Its e2e tests run the automated accessibility check (axe) on every page. The first app in adds `@axe-core/playwright` (ask the owner first) and the helper moves to `packages/` when a second app needs it.
 
@@ -57,6 +67,6 @@ An app is ready when all of these are true:
 
 The owner does not track these. When an import finishes, or the owner asks what is next, say which of them are now due.
 
+- **Right after codename is in:** pin every GitHub Action to a full commit SHA with a version comment, and turn on "Require actions to be pinned to a full-length commit SHA" in Settings → Actions → General (Dependabot keeps the pins current). Check that CodeQL now lists JavaScript and TypeScript. Clear the lint warnings the import brings (react-hooks, and codename's inline `eslint-disable` comments, which break the rule against disabling lint inline), then consider `--max-warnings 0`.
 - **After codename is in and green:** move `jsx-a11y` to its `strict` config, and raise TypeScript strictness in `tsconfig.base.json` one flag at a time, `noUncheckedIndexedAccess` first. One PR per change, and only when every app passes. Codename's own config is the floor until then, so none of this may land before it.
-- **Before the first deploy workflow lands:** the owner decides on a `LICENSE` and a `SECURITY.md`. The games' text and rules are licensed content, so do not write either without them.
 - **Before the first app is released:** confirm the GitHub settings in README.md "GitHub settings" are all on, and that the `checks` job is required on `dev` and `main`.

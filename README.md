@@ -13,6 +13,20 @@ No apps are in yet. The plan and the conventions every app follows are in [docs/
 
 None of these rules servers exist yet. Today there is one, `ttrpg-rules` (Delta Green only); it is split into one server per game before hearthfire comes in (see "Rules MCP" in the brief). Until then, codename uses `ttrpg-rules`.
 
+## Licensing
+
+The code here is MIT ([LICENSE](LICENSE)): the tooling, everything in `packages/`, and app code. Use it, fork it, learn from it.
+
+Game content is different. The rules text, game data, art, names and trademarks in an app belong to the game's publisher, and an app may need its own terms to match the license its game is published under. So:
+
+| What                                                 | Terms                                                | Where it's stated                |
+| ---------------------------------------------------- | ---------------------------------------------------- | -------------------------------- |
+| Tooling, `packages/`, app code                       | MIT                                                  | the root `LICENSE`               |
+| An app's game content (rules text, data, art, names) | the game's own license or the publisher's permission | `apps/<app>/LICENSE` or `NOTICE` |
+| Book text                                            | never committed to this repo                         | the private rules server         |
+
+Where an app has its own `LICENSE` or `NOTICE`, that file governs the app's directory. Codename's Legal section in its README is the model: published by arrangement with the publisher, with the code's own copyright kept apart from the game's.
+
 ## Layout
 
 ```
@@ -92,4 +106,6 @@ The repo is public. In Settings:
 - **General → Pull Requests:** turn on "Automatically delete head branches".
 - **Advanced Security:** turn on Dependabot alerts, Dependabot security updates, secret scanning with push protection, and CodeQL (default setup, JavaScript/TypeScript: scans pushes and PRs on `dev` and `main`, and weekly).
 - **Rules → Rulesets:** one ruleset per branch, as in "Branch protection" above. Both are saved in [.github/rulesets/](.github/rulesets/) and can be imported (New ruleset → Import a ruleset). If you change a ruleset in GitHub, update its file. On `main`, set the pull request rule's allowed merge methods to **merge commit only**, so a release can't be squashed by mistake.
+- **Private vulnerability reporting:** turn it on in Advanced Security. [SECURITY.md](SECURITY.md) sends reporters there.
+- **Actions → General → Fork pull request workflows:** require approval for all external contributors (already set).
 - **Greptile:** install the GitHub app on this repo only, at greptile.com. `greptile.json` is its config, and it reads [AGENTS.md](AGENTS.md).
