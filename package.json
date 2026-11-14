@@ -27,7 +27,7 @@
     "*.{js,mjs,cjs,jsx,ts,mts,cts,tsx}": "eslint"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
+    "@eslint/js": "^10.0.1",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
