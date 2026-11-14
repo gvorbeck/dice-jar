@@ -21,7 +21,8 @@
     "test:coverage": "node scripts/workspaces.js test:coverage",
     "test:rules": "node scripts/workspaces.js test:rules",
     "test:e2e": "node scripts/workspaces.js test:e2e",
-    "check": "prettier --check . && npm run lint && npm run knip && npm run typecheck && npm run test:coverage"
+    "test:scripts": "node --test scripts/workspaces.test.js",
+    "check": "prettier --check . && npm run lint && npm run knip && npm run test:scripts && npm run typecheck && npm run test:coverage"
   },
   "lint-staged": {
     "*": "prettier --check --ignore-unknown",

@@ -32,7 +32,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 
 ## Done means
 
-- `npm run check` passes at the root (format, lint, unused code, then types and unit tests with coverage in every workspace).
+- `npm run check` passes at the root (format, lint, unused code, the `scripts/` tests, then types and unit tests with coverage in every workspace).
 - If you touched an app's `firestore.rules`, `src/lib`, `src/pages` or Functions, or anything in `packages/`, `npm run test:rules` and `npm run test:e2e` pass for every affected app (`npm run test:rules -w apps/<app>`). Both need Java 21 on `PATH`.
 
 ## Things that trip people up
