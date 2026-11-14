@@ -22,6 +22,13 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 - Never skip a hook (`--no-verify`), disable a lint rule inline, or lower a threshold to get a change through. Fix the cause or ask.
 - Never commit, push or merge. The user does that.
 
+## Branches and releases
+
+- `main` is production and deploys. Never work on it. Work happens on `dev`, or on a branch cut from `dev` for bigger changes. If you find yourself on `main`, switch before editing anything.
+- Changes reach `dev` by PR (or a direct push by the user), and reach `main` only by a PR from `dev` merged with a merge commit, never squash. Nothing is live until that release PR merges.
+- A field added or removed takes two releases: one that allows it in `firestore.rules`, a later one that uses it. Plan the change as two PRs through `dev` and `main`.
+- When you finish, tell the user what is ready to commit and on which branch. The workflow they follow is in [README.md](README.md) under "Working on a change".
+
 ## Done means
 
 - `npm run check` passes at the root (format, lint, unused code, then types and unit tests with coverage in every workspace).
