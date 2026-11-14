@@ -3,7 +3,7 @@ name: Deploy codename
 on:
   push:
     branches: [main]
-    paths: [apps/codename/**, packages/**]
+    paths: [apps/codename/**, packages/**, package.json, package-lock.json, .nvmrc] # root files too: npm ci runs from the root, so a lockfile-only update must rebuild
   workflow_dispatch:
 permissions:
   contents: read
