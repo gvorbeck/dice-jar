@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { randomInt } from './random';
+import { pick, randomInt } from './random';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -10,4 +10,8 @@ it('redraws a value that would favour the low results', () => {
     return a;
   }) as typeof crypto.getRandomValues);
   expect(randomInt(3)).toBe(1);
+});
+
+it('picking from an empty list throws instead of returning undefined', () => {
+  expect(() => pick([])).toThrow('empty list');
 });

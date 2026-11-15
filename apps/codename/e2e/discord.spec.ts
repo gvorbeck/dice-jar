@@ -70,7 +70,7 @@ test('a SAN loss held in Discord shows on the live sheet and the Handler boxes u
   await handle(
     {
       type: 3,
-      data: { custom_id: choice!.components![0].components.find((b) => b.custom_id.startsWith('san:take:'))!.custom_id },
+      data: { custom_id: choice!.components![0]!.components.find((b) => b.custom_id.startsWith('san:take:'))!.custom_id },
       guild_id: guild,
       channel_id: 'c1',
       member: { user: { id: `u-${guild}` }, permissions: String(1 << 4) },

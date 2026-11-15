@@ -68,7 +68,7 @@ export function findTest(a: Agent, value: string): Test | null {
   const exact = tests.find((t) => t.id === value || sameText(t.name, value) || sameText(t.label, value));
   if (exact) return exact;
   const some = tests.filter((t) => matches(t.name, value));
-  return some.length === 1 ? some[0] : null;
+  return some.length === 1 ? (some[0] ?? null) : null;
 }
 
 /** Same as the live sheet's test(): WP penalty, the sheet's flat penalty and exhaustion, plus a signed modifier (−20 is a penalty). */

@@ -251,7 +251,7 @@ describe('creation cap and veteran picks', () => {
 describe('stat methods (p. 14)', () => {
   const stats = (c: ReturnType<typeof newCharacter>, v: number[]) => {
     ['STR', 'DEX', 'CON', 'INT', 'POW', 'CHA'].forEach((s, i) => {
-      (c.stats as Record<string, number>)[s] = v[i];
+      (c.stats as Record<string, number>)[s] = v[i]!;
     });
   };
   const issue = (c: ReturnType<typeof newCharacter>) =>
@@ -450,7 +450,7 @@ it('colours roll results, underlining the extremes so colour is not the only cue
 describe('rollExpression', () => {
   const fixed = (...faces: number[]) => {
     let i = 0;
-    return () => faces[i++];
+    return () => faces[i++]!;
   };
   it('rolls dice plus a modifier, never below 0', () => {
     expect(rollExpression('2d6+1', fixed(4, 3))).toEqual({ expr: '2D6+1', dice: [4, 3], mod: 1, total: 8 });

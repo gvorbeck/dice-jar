@@ -58,8 +58,8 @@ export function ProfessionStep({ c, up }: StepProps) {
   const fixedSlot = (s: Slot) =>
     s.alts.length === 1 ? (
       <li key={s.id}>
-        {altLabel(s.alts[0])}
-        {typeInput(s.id, s.alts[0])}
+        {altLabel(s.alts[0]!)}
+        {typeInput(s.id, s.alts[0]!)}
       </li>
     ) : (
       <li key={s.id}>
@@ -82,7 +82,7 @@ export function ProfessionStep({ c, up }: StepProps) {
             </Choice>
           ))}
         </RadioGroup>
-        {typeInput(s.id, s.alts[c.orPicks[s.id] ?? 0])}
+        {typeInput(s.id, s.alts[c.orPicks[s.id] ?? 0]!)}
       </li>
     );
 
@@ -177,7 +177,7 @@ export function ProfessionStep({ c, up }: StepProps) {
                   />
                   <Num
                     label={`Points ${i + 1}`}
-                    value={c.custom.points[i]}
+                    value={c.custom.points[i] ?? 0}
                     min={0}
                     max={CUSTOM_MAX_RATING}
                     onChange={(v) =>
@@ -186,7 +186,7 @@ export function ProfessionStep({ c, up }: StepProps) {
                       })
                     }
                   />
-                  {k && <span className="dim">→ {baseRating(k) + c.custom.points[i]}%</span>}
+                  {k && <span className="dim">→ {baseRating(k) + (c.custom.points[i] ?? 0)}%</span>}
                 </div>
               ))}
             </>
@@ -227,7 +227,7 @@ export function ProfessionStep({ c, up }: StepProps) {
                           {o.alts.map(altLabel).join(' / ')}
                           {have && <span className="dim"> · already have</span>}
                         </Pick>
-                        {on && typeInput(o.id, o.alts[0])}
+                        {on && typeInput(o.id, o.alts[0]!)}
                       </div>
                     );
                   })}

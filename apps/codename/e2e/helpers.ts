@@ -44,7 +44,7 @@ export async function startAgent(page: Page, atStep?: (page: Page) => Promise<vo
   await page.getByRole('button', { name: 'Generate game' }).click();
   await page.getByRole('button', { name: 'New agent' }).click();
   await page.waitForURL(/\/g\/[^/]+\/a\/[^/]+$/);
-  const [, gameId, agentId] = new URL(page.url()).pathname.match(/^\/g\/([^/]+)\/a\/([^/]+)$/)!;
+  const [gameId, agentId] = new URL(page.url()).pathname.match(/^\/g\/([^/]+)\/a\/([^/]+)$/)!.slice(1) as [string, string];
 
   await atStep?.(page);
   await choose(page, 'Assignable set');

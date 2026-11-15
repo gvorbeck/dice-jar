@@ -4,10 +4,14 @@ export const randomInt = (n: number) => {
   const limit = 2 ** 32 - (2 ** 32 % n),
     buf = new Uint32Array(1);
   do crypto.getRandomValues(buf);
-  while (buf[0] >= limit);
-  return buf[0] % n;
+  while (buf[0]! >= limit);
+  return buf[0]! % n;
 };
-export const pick = <T>(a: readonly T[]) => a[randomInt(a.length)];
+export const pick = <T>(a: readonly T[]): T => {
+  const x = a[randomInt(a.length)];
+  if (x === undefined) throw new Error('pick from an empty list');
+  return x;
+};
 export const FIRST = [
   'James',
   'Mary',

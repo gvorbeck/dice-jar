@@ -9,7 +9,7 @@ export function BondsStep({ c, up }: StepProps) {
   const set = (i: number, k: 'name' | 'note', v: string) =>
     up((d) => {
       while (d.bonds.length <= i) d.bonds.push({ name: '', note: '' });
-      d.bonds[i][k] = v;
+      d.bonds[i]![k] = v; // the loop above made it exist
     });
   return (
     <>

@@ -123,7 +123,7 @@ const migrations: Record<number, (c: Raw) => Raw> = {};
 
 export function parseCharacter(raw: unknown): Character {
   let c = raw as Raw | null;
-  while (c && typeof c.version === 'number' && c.version < CHARACTER_VERSION) c = migrations[c.version](c);
+  while (c && typeof c.version === 'number' && c.version < CHARACTER_VERSION) c = migrations[c.version]!(c);
   return characterSchema.parse(c);
 }
 
