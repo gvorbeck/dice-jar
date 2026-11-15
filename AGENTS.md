@@ -23,6 +23,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 - Never skip a hook (`--no-verify`), disable a lint rule inline, or lower a threshold to get a change through. Fix the cause or ask.
 - Licensing: the root `LICENSE` is MIT and covers everything except a directory with its own `LICENSE` or `NOTICE`. An app's game content follows the game's license, not MIT. Never commit book text or other licensed material to the root or `packages/`; ask the owner what an app's `NOTICE` must say.
 - Never commit, push or merge. The user does that.
+- Never create a git worktree. Do one change at a time on one branch in this checkout. If a second change is ready while the first is uncommitted, finish and report the first, and ask the user to commit before starting the second.
 
 ## Branches and releases
 
