@@ -6,12 +6,12 @@ Only delta-green is in so far. The plan and the conventions every app follows ar
 
 | App         | Game              | Rules MCP server    | Access    |
 | ----------- | ----------------- | ------------------- | --------- |
-| delta-green | Delta Green       | `rules-delta-green` | link-only |
-| hearthfire  | Stonetop          | `rules-stonetop`    | link-only |
-| codex-quest | Basic Fantasy RPG | `rules-bfrpg`       | accounts  |
-| glyph-quest | Knave             | `rules-knave`       | accounts  |
+| delta-green | Delta Green       | `delta-green-rules` | link-only |
+| stonetop    | Stonetop          | `stonetop-rules`    | link-only |
+| codex-quest | Basic Fantasy RPG | `bfrpg-rules`       | accounts  |
+| glyph-quest | Knave             | `knave-rules`       | accounts  |
 
-None of these rules servers exist yet. Today there is one, `ttrpg-rules` (Delta Green only); it is split into one server per game before hearthfire comes in (see "Rules MCP" in the brief). Until then, delta-green uses `ttrpg-rules`.
+Rules servers are named `<game>-rules`. `delta-green-rules` and `stonetop-rules` are connected; the other two are not yet.
 
 ## Licensing
 
