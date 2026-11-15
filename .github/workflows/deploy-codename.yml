@@ -1,0 +1,85 @@
+name: Deploy codename
+# Ships to production (codename-dg). The release PR into main already passed the required `checks` job, so it isn't repeated here.
+on:
+  push:
+    branches: [main]
+    paths: [apps/codename/**, packages/**, package.json, package-lock.json, .nvmrc] # root files too: npm ci runs from the root, so a lockfile-only update must rebuild
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read # the Functions check finds the last successful deploy
+  checks: write # the hosting action reports through the job token; same as the original workflow
+# Two deploys at once could interleave rules, Functions and Hosting; the second waits.
+concurrency:
+  group: deploy-codename
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with: { fetch-depth: 0, persist-credentials: false } # full history, so the Functions check below can diff against the previous push
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with: { node-version-file: .nvmrc, cache: npm, cache-dependency-path: '**/package-lock.json' }
+      - run: npm ci
+      - run: npm ci --prefix apps/codename/functions # esbuild for the Functions check, and the Functions deploy
+      - run: npm run build -w apps/codename
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_APPCHECK_SITE_KEY: ${{ secrets.VITE_APPCHECK_SITE_KEY }}
+      # Rules go first, so a new build never runs against old rules that reject its fields. Open tabs keep running the
+      # old build, so rules must accept both builds' writes: add a field in one release, stop allowing it in a later one.
+      # The hosting action ships Hosting only. The service account needs the "Firebase Rules Admin" role for this step.
+      # Tools that receive the service account are pinned: bump these by hand.
+      - name: Deploy Firestore rules
+        working-directory: apps/codename
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CODENAME_DG }}
+        run: |
+          printf '%s' "$SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json" npx --yes firebase-tools@15.34.1 deploy --only firestore:rules --project codename-dg
+          rm -f "$RUNNER_TEMP/sa.json"
+      # The bot bundles shared files from src/ at deploy time, so it must redeploy when they change or Discord shows stale
+      # chances. esbuild's metafile lists exactly which ones, so a UI-only change doesn't redeploy every Function.
+      # It diffs against the last deploy that succeeded, not the previous push, so a failed Functions deploy is retried by the next run.
+      # Manual runs and runs with no successful deploy to compare with always deploy.
+      - name: Check whether Functions changed
+        id: functions
+        env:
+          EVENT: ${{ github.event_name }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BEFORE=$(gh run list --workflow deploy-codename.yml --branch main --status success --limit 1 --json headSha --jq '.[0].headSha // empty') || BEFORE= # an API error falls back to deploying
+          if [ "$EVENT" != push ] || [ -z "$BEFORE" ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          elif npx --prefix apps/codename/functions esbuild apps/codename/functions/src/index.ts --bundle --platform=node --format=esm --packages=external \
+                 --metafile="$RUNNER_TEMP/meta.json" --outfile="$RUNNER_TEMP/bot.js" --log-level=error \
+               && SHARED=$(node -e "console.log(Object.keys(require(process.argv[1]).inputs).filter((f) => !f.startsWith('apps/codename/functions/')).join(' '))" "$RUNNER_TEMP/meta.json") \
+               && git diff --quiet "$BEFORE" HEAD -- apps/codename/functions $SHARED; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+      # Before Hosting, so a new build never calls a Function that isn't live yet. No --force: a Function missing from
+      # the code fails the deploy instead of being deleted. The service account needs the roles listed in the README.
+      - name: Deploy Functions
+        if: steps.functions.outputs.deploy == 'true'
+        working-directory: apps/codename
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CODENAME_DG }}
+        run: |
+          printf '%s' "$SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json" npx --yes firebase-tools@15.34.1 deploy --only functions --project codename-dg --non-interactive
+          rm -f "$RUNNER_TEMP/sa.json"
+      - uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CODENAME_DG }}
+          channelId: live
+          projectId: codename-dg
+          entryPoint: apps/codename

@@ -26,6 +26,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 ## Branches and releases
 
 - `main` is production and deploys. Never work on it. Work happens on `dev`, or on a branch cut from `dev` for bigger changes. If you find yourself on `main`, switch before editing anything.
+- Fixing review comments on an open PR: work on that PR's head branch (`gh pr view <n> --json headRefName`), not a new one, so the fix lands in the PR. For a release PR that branch is `dev`. Update it first (`git pull --ff-only`), since a local `dev` can lag.
 - Changes reach `dev` by PR (or a direct push by the user), and reach `main` only by a PR from `dev` merged with a merge commit, never squash. Nothing is live until that release PR merges.
 - A field added or removed takes two releases: one that allows it in `firestore.rules`, a later one that uses it. Plan the change as two PRs through `dev` and `main`.
 - When you finish, tell the user what is ready to commit and on which branch. The workflow they follow is in [README.md](README.md) under "Working on a change".
@@ -47,7 +48,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 Copy the app to `apps/<app>/` as it is, without `.git`, `node_modules`, `dist` or `.env`. Then, in this order (rehearsed with codename: every check passed afterwards):
 
 1. Delete the app's own `eslint.config.js`, `knip.jsonc`, `AGENTS.md`, `CLAUDE.md`, `.github/` and `package-lock.json`. The root versions replace them. Its deploy workflow is moved into the root `.github/workflows/` by hand, not copied.
-2. Run `npx prettier --write apps/<app>` once, as a commit of its own.
+2. Run `npx prettier --write apps/<app>` once. It goes in the same commit as the copy, because the hooks refuse unformatted files.
 3. Remove `@eslint/js`, `eslint-plugin-jsx-a11y`, `eslint-plugin-react-hooks`, `globals` and `typescript-eslint` from the app's `package.json`. They live in the root, and knip fails on them otherwise. Then `npm install` at the root.
 4. Add the app, and its `functions/` if it has one, to `knip.jsonc`. The `functions/` entry must include `src/**/*.test.ts`, or knip reports its tests and the exports they use as unused.
 5. Install the Functions dependencies: `npm ci --prefix apps/<app>/functions`.
@@ -69,4 +70,6 @@ The owner does not track these. When an import finishes, or the owner asks what 
 
 - **Right after codename is in:** check that CodeQL now lists JavaScript and TypeScript. Clear the lint warnings the import brings (react-hooks, and codename's inline `eslint-disable` comments, which break the rule against disabling lint inline), then consider `--max-warnings 0`.
 - **After codename is in and green:** move `jsx-a11y` to its `strict` config, and raise TypeScript strictness in `tsconfig.base.json` one flag at a time, `noUncheckedIndexedAccess` first. One PR per change, and only when every app passes. Codename's own config is the floor until then, so none of this may land before it.
+- **Right after hearthfire is in:** codename and hearthfire share a lot of architecture (hearthfire inspired codename), so look for what to move to `packages/` now that two apps use it. Start with the axe helper (`expectAccessible` in codename's `e2e/helpers.ts`, and `@axe-core/playwright`): hearthfire needs the same check to be ready, so it uses the shared helper from the start and does not copy it. Then the items the brief lists: `src/ui`, the tokens, Firebase init, diff saves, autosave, stale-build reload.
+- **Next release after codename's first:** in `apps/codename/firestore.rules`, drop `|| request.resource.data.createdAt is number` from the `rolls` create rule and its `shortcut:` comment (its date, 2026-11-14, has passed). Add a case in `test/firestore.rules.test.ts` that a numeric `createdAt` is refused, then run `test:rules`.
 - **Before the first app is released:** confirm the GitHub settings in README.md "GitHub settings" are all on, and that the `checks` job is required on `dev` and `main`.

@@ -1,0 +1,173 @@
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import { Link } from 'react-router-dom';
+import { importJson, nameOf, type Character } from './model/character';
+import { store } from './lib/storage';
+import { gameUrl } from './lib/paths';
+import { Alert, useJsonPicker } from './ui/bits';
+import { blocking, clamp, plural, type validate } from './rules';
+import { Btn, ConfirmDialog, Win, type Up } from './ui';
+import { Page } from './pages/Page';
+import { StatsStep } from './steps/StatsStep';
+import { ProfessionStep } from './steps/ProfessionStep';
+import { BondsStep } from './steps/BondsStep';
+import { DetailsStep } from './steps/DetailsStep';
+import { ReviewStep } from './steps/ReviewStep';
+import { STEPS } from './steps';
+
+const STEP_KEY = 'dg.step';
+
+interface EditorProps {
+  agentId: string;
+  c: Character;
+  issues: ReturnType<typeof validate>;
+  setC: Dispatch<SetStateAction<Character>>;
+  gameId: string;
+  failed: string;
+  onLive: () => void;
+}
+
+export function Editor({ agentId, c, issues, setC, gameId, failed, onLive }: EditorProps) {
+  // Remembers the last agent's step only (one key, not one per agent), so a reload returns to where you were and a new agent starts at step 1.
+  const [step, setStep] = useState(() => {
+    const [id, n] = (store.get(STEP_KEY) ?? '').split(' ');
+    return id === agentId ? clamp(Number(n) || 0, 0, STEPS.length - 1) : 0;
+  });
+  useEffect(() => {
+    store.set(STEP_KEY, `${agentId} ${step}`);
+  }, [step, agentId]);
+  // Return to the top on step change. Comparing with the previous step (not a mounted flag) survives StrictMode's double effect run.
+  const prevStep = useRef(step);
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (prevStep.current !== step) {
+      scrollTo(0, 0);
+      heading.current?.focus();
+    }
+    prevStep.current = step;
+  }, [step]);
+  const [askImport, setAskImport] = useState(false);
+  const [importError, setImportError] = useState(false);
+  const [imports, setImports] = useState(0); // keys the step so its local state (e.g. roll undo) resets on import
+  const picker = useJsonPicker(async (f) => {
+    try {
+      setC(await importJson(f));
+      setStep(0);
+      setImports((n) => n + 1);
+      setImportError(false);
+    } catch {
+      setImportError(true);
+    }
+  });
+  const pickFile = () => setAskImport(true);
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => {
+      // Alt+key, never a bare letter, so typing and speech input can't trigger it (WCAG 2.1.4).
+      if (!e.altKey || e.ctrlKey || e.metaKey) return;
+      // Option+I is a dead key on macOS (î), so leave text fields alone.
+      if (e.target instanceof Element && e.target.matches('input, textarea, select, [contenteditable]')) return;
+      if (e.code === 'KeyI') {
+        e.preventDefault();
+        pickFile();
+      }
+    };
+    addEventListener('keydown', k);
+    return () => removeEventListener('keydown', k);
+  }, []);
+
+  const up: Up = (fn) =>
+    setC((prev) => {
+      const d = structuredClone(prev);
+      fn(d);
+      return d;
+    });
+  const cur = STEPS[step];
+  const blockers = blocking(issues);
+  const open = blockers.length;
+  const here = issues.filter((x) => x.step === cur.id);
+  const props = { c, up };
+
+  const name = nameOf(c);
+  return (
+    <Page
+      wide
+      title={name}
+      subtitle="// Agent intake terminal"
+      heading={<h1 className="sr-only">Agent intake: {name}</h1>}
+      actions={
+        <>
+          <Link to={gameUrl(gameId)}>&lt; Game {gameId}</Link>
+          <button onClick={pickFile} aria-keyshortcuts="Alt+I">
+            [Alt+I] Import agent
+          </button>
+          {picker.input}
+        </>
+      }
+      status={
+        <>
+          <span>Agent: {name}</span>
+          <span className={open ? 'warn' : 'ok'}>{open ? plural(open, 'open item') : 'All steps complete'}</span>
+          {failed ? <Alert inline>{failed}</Alert> : <span className="dim">Autosaved to game {gameId} · Source: Agent's Handbook</span>}
+          <span className="cursor" aria-hidden />
+        </>
+      }
+    >
+      <div role="alert" className="noprint">
+        {importError && <p className="warn page">Not a valid Agent file.</p>}
+      </div>
+      <ConfirmDialog open={askImport} title="Import an agent" confirm="Import" onClose={() => setAskImport(false)} onConfirm={picker.open}>
+        Importing a file replaces this Agent. Continue?
+      </ConfirmDialog>
+      <div className="shell">
+        <Win title="CREATION STEPS">
+          <ol className="steps" role="list">
+            {STEPS.map((s, i) => {
+              const bad = s.id !== 'review' && blockers.some((x) => x.step === s.id);
+              return (
+                <li key={s.id}>
+                  <button aria-current={i === step ? 'step' : undefined} onClick={() => setStep(i)}>
+                    <span className="n">{i + 1}.</span>
+                    <span>{s.title}</span>
+                    <span className={`flag ${bad ? 'warn' : 'ok'}`}>
+                      {s.id === 'review' ? '' : bad ? '!' : '✓'}
+                      {s.id !== 'review' && <span className="sr-only">{bad ? ' has open items' : ' complete'}</span>}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </Win>
+
+        <Win title={`STEP ${step + 1} // ${cur.title.toUpperCase()}`} right={`${step + 1}/${STEPS.length}`} headingRef={heading}>
+          {cur.id === 'stats' && <StatsStep key={imports} {...props} />}
+          {cur.id === 'profession' && <ProfessionStep {...props} />}
+          {cur.id === 'bonds' && <BondsStep {...props} />}
+          {cur.id === 'details' && <DetailsStep {...props} />}
+          {cur.id === 'review' && <ReviewStep {...props} issues={issues} />}
+          {cur.id !== 'review' && here.length > 0 && (
+            <ul className="issues noprint">
+              {here.map((x, n) => (
+                <li key={n}>{x.msg}</li>
+              ))}
+            </ul>
+          )}
+          <div className="row noprint mt-l">
+            <Btn disabled={step === 0} onPress={() => setStep(step - 1)}>
+              &lt; Back
+            </Btn>
+            {/* The last step leads on to play instead of ending on a dead Next. */}
+            {cur.id === 'review' ? (
+              <Btn className="primary" disabled={open > 0} onPress={onLive}>
+                Live sheet &gt;
+              </Btn>
+            ) : (
+              <Btn className="primary" onPress={() => setStep(step + 1)}>
+                Next &gt;
+              </Btn>
+            )}
+          </div>
+        </Win>
+      </div>
+    </Page>
+  );
+}

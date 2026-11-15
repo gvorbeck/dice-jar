@@ -1,0 +1,88 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // No auth: a game is gated by its hard-to-guess ID. Anyone with the ID can
+    // read and write that game and delete its agents, but cannot list games or
+    // delete anything else (cleanup goes through admin scripts). Writes are shape-checked: only the
+    // fields below, with bounded strings, so a document can't be stuffed with
+    // arbitrary keys, and numbers stay in range so the roll log can't be
+    // stuffed with impossible results. Rules can't count children or measure
+    // bytes, so the number of agents and rolls per game is not capped here
+    // (turn on App Check: see VITE_APPCHECK_SITE_KEY in .env.example).
+    // Adding a field to a document means adding it to its hasOnly list.
+
+    // Discord webhook URLs and other server-only data. Only Cloud Functions (Admin SDK) touch it.
+    match /gameSecrets/{gameId} {
+      allow read, write: if false;
+    }
+    // A SAN loss held while its player decides whether to project it onto a Bond (functions/src/bot.ts).
+    match /discordPending/{agentId} {
+      allow read, write: if false;
+    }
+    // Discord bot: which server plays which game, and which Discord user plays which Agent. Functions only.
+    match /discordGuilds/{guildId} {
+      allow read, write: if false;
+    }
+    match /discordClaims/{claimId} {
+      allow read, write: if false;
+    }
+
+    match /games/{gameId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.resource.data.keys().hasOnly(['createdAt', 'schemaVersion'])
+        && request.resource.data.createdAt is number
+        && request.resource.data.schemaVersion is number;
+      allow update, delete: if false;
+
+      match /agents/{agentId} {
+        allow read: if true;
+        allow create, update: if request.resource.data.keys().hasOnly(['name', 'codename', 'profession', 'character', 'live', 'createdAt', 'updatedAt'])
+          && request.resource.data.name is string && request.resource.data.name.size() <= 100
+          && request.resource.data.codename is string && request.resource.data.codename.size() <= 100
+          && request.resource.data.profession is string && request.resource.data.profession.size() <= 100
+          && request.resource.data.character is map
+          && request.resource.data.character.version is number
+          && request.resource.data.character.keys().size() <= 30
+          && request.resource.data.character.bonds.size() <= 20
+          && (request.resource.data.live == null
+              || (request.resource.data.live is map
+                  && request.resource.data.live.keys().size() <= 30
+                  && request.resource.data.live.notes is string
+                  && request.resource.data.live.notes.size() <= 4000
+                  && request.resource.data.live.hp is number && request.resource.data.live.hp >= 0 && request.resource.data.live.hp <= 999
+                  && request.resource.data.live.wp is number && request.resource.data.live.wp >= 0 && request.resource.data.live.wp <= 999
+                  && request.resource.data.live.san is number && request.resource.data.live.san >= 0 && request.resource.data.live.san <= 999
+                  && request.resource.data.live.bp is number && request.resource.data.live.bp >= 0 && request.resource.data.live.bp <= 999
+                  && request.resource.data.live.bonds.size() <= 20))
+          && request.resource.data.createdAt is number
+          && request.resource.data.updatedAt is number;
+        // Anyone with the ID can already overwrite an agent, so deleting adds no new power.
+        allow delete: if true;
+      }
+
+      // A SAN loss held in Discord for a projection choice, so the sheet and Handler boxes can show it. Functions only write it.
+      match /pendingSan/{agentId} {
+        allow read: if true;
+        allow write: if false;
+      }
+
+      // Append-only roll log.
+      match /rolls/{rollId} {
+        allow read: if true;
+        allow create: if request.resource.data.keys().hasOnly(['agentId', 'agentName', 'label', 'chance', 'penalty', 'roll', 'outcome', 'createdAt'])
+          && request.resource.data.agentId is string && request.resource.data.agentId.size() > 0 && request.resource.data.agentId.size() <= 40
+          && request.resource.data.agentName is string && request.resource.data.agentName.size() <= 100
+          && request.resource.data.label is string && request.resource.data.label.size() > 0 && request.resource.data.label.size() <= 120
+          && request.resource.data.chance is number && request.resource.data.chance >= 0 && request.resource.data.chance <= 100
+          && request.resource.data.penalty is number && request.resource.data.penalty >= 0 && request.resource.data.penalty <= 200
+          && request.resource.data.roll is number && request.resource.data.roll >= 1 && request.resource.data.roll <= 100
+          && request.resource.data.outcome in ['critical success', 'success', 'failure', 'fumble']
+          // shortcut: numbers are still accepted from tabs opened before server times shipped (2026-10-31); drop `is number` after 2026-11-14.
+          && (request.resource.data.createdAt == request.time || request.resource.data.createdAt is number);
+        allow update, delete: if false;
+      }
+    }
+  }
+}

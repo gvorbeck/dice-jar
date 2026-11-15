@@ -5,5 +5,10 @@
   // The test glob is needed: the app's vitest runs those tests, but knip can't see that from inside functions/.
   "workspaces": {
     ".": {},
+    "apps/codename": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "vitest.rules.config.ts"] },
+    "apps/codename/functions": {
+      "entry": ["src/webhookTest.ts", "src/registerCommands.ts", "src/**/*.test.ts"],
+      "ignoreDependencies": ["zod"],
+    },
   },
 }
