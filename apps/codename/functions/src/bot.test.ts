@@ -81,12 +81,12 @@ describe('sanChoice', () => {
   it('first asks whether to project', () => {
     const r = sanChoice(held, a, 'Drew Rook');
     expect(r.content).toContain('about to lose **6 SAN** (violence) · SAN 50 → 44');
-    expect(r.components[0].components.map((b) => b.custom_id)).toEqual(['san:project:A1', 'san:take:A1']);
+    expect(r.components[0].components.map((b) => b.custom_id)).toEqual(['san:project:A1:0', 'san:take:A1:0']);
   });
   it('after the 1D4, offers Bonds with enough points', () => {
     const r = sanChoice({ ...held, n: 3 }, a, 'Drew Rook');
     expect(r.content).toContain('Rolled **3**: spend 3 WP (10 → 7) and lose 3 less SAN (6 → 3)');
-    expect(r.components[0].components).toEqual([{ type: 2, style: 1, label: 'Mom (10 → 7)', custom_id: 'san:bond:A1:0' }]);
+    expect(r.components[0].components).toEqual([{ type: 2, style: 1, label: 'Mom (10 → 7)', custom_id: 'san:bond:A1:0:0' }]);
   });
   it('falls back to any Bond with points, warning it drops to 0', () => {
     const low = agentOf({ character: c, live: { ...freshLive(c), bonds: [2] } });

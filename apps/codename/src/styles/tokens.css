@@ -18,6 +18,7 @@
   --accent: #9e4808;
   --inv-bg: #1d1d1b;
   --inv-fg: #e6dfc8;
+  --inv-dim: #a8a08a; /* dim text on --inv-bg */
   --warn: #a4160f;
   --ok: #2c6b2f;
   --scan: color-mix(in srgb, var(--fg) 7%, transparent); /* failing-monitor scan line */
@@ -38,6 +39,7 @@
     --accent: #ffd08a;
     --inv-bg: #ffa133;
     --inv-fg: #141414;
+    --inv-dim: #5f3f0f;
     --warn: #ff6a5a;
     --ok: #8fd18a;
   }

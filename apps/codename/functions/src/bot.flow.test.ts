@@ -147,7 +147,7 @@ beforeEach(() => {
 describe('/dg san projection buttons', () => {
   it("Take the loss applies it, logs it, and clears the hold and the site's copy of it", async () => {
     store.set('games/g/pendingSan/A1', { amount: 6, kind: 'violence', createdAt: 0 });
-    const r = await press('san:take:A1');
+    const r = await press('san:take:A1:0');
     expect(r.type).toBe(7);
     expect(r.data.content).toContain('loses **6** SAN (violence)');
     expect(live().san).toBe(44);
@@ -157,14 +157,14 @@ describe('/dg san projection buttons', () => {
   });
 
   it('Project rolls 1D4 once, then the chosen Bond, WP and the loss all drop by it (p. 74)', async () => {
-    const first = await press('san:project:A1');
+    const first = await press('san:project:A1:0');
     expect(first.data.content).toContain('Rolled **3**');
-    expect(first.data.components?.[0].components.map((b) => b.custom_id)).toEqual(['san:bond:A1:0']);
-    const again = await press('san:project:A1'); // a double click shows the same roll, never a new one
+    expect(first.data.components?.[0].components.map((b) => b.custom_id)).toEqual(['san:bond:A1:0:0']);
+    const again = await press('san:project:A1:0'); // a double click shows the same roll, never a new one
     expect(again.data.content).toContain('Rolled **3**');
     expect(store.get('discordPending/A1')!.n).toBe(3);
 
-    const done = await press('san:bond:A1:0');
+    const done = await press('san:bond:A1:0:0');
     expect(done.data.content).toContain('loses **3** SAN');
     expect(done.data.content).toContain('Mom 10 → 7');
     expect(live()).toMatchObject({ san: 47, wp: 7, bonds: [7] });
@@ -172,29 +172,47 @@ describe('/dg san projection buttons', () => {
 
   it('a projection that would leave 0 WP spends it and the loss stands', async () => {
     store.get('games/g/agents/A1')!.live = { ...live(), wp: 2 };
-    const r = await press('san:project:A1');
+    const r = await press('san:project:A1:0');
     expect(r.data.content).toContain('none is left: the loss stands');
     expect(live()).toMatchObject({ san: 44, wp: 0, bonds: [10] });
   });
 
   it('settling twice applies it once', async () => {
-    await press('san:take:A1');
-    const second = await press('san:take:A1');
+    await press('san:take:A1:0');
+    const second = await press('san:take:A1:0');
     expect(second.data.content).toBe('This SAN loss is already settled.');
     expect(live().san).toBe(44);
     expect(rolls()).toHaveLength(1);
   });
 
+  it('a button from an earlier loss never settles a newer one', async () => {
+    const first = { ...store.get('discordPending/A1')! };
+    await press('san:take:A1:0'); // loss 0 is settled; its prompt is still on screen somewhere
+    store.set('discordPending/A1', { ...first, amount: 9, createdAt: 5 }); // a new /dg san
+    const stale = await press('san:take:A1:0');
+    expect(stale.data.content).toContain('from an earlier SAN loss');
+    expect(live().san).toBe(44);
+    expect(store.has('discordPending/A1')).toBe(true);
+    expect((await press('san:take:A1:5')).data.content).toContain('loses **9** SAN');
+  });
+
+  it('a button posted before ids carried the loss does not settle it, and says why', async () => {
+    const old = await press('san:take:A1');
+    expect(old.data.content).toContain('from an earlier SAN loss');
+    expect(live().san).toBe(50);
+    expect(store.has('discordPending/A1')).toBe(true);
+  });
+
   it('only the player, whoever claims the Agent now, or Manage Channels may decide', async () => {
-    const stranger = await press('san:take:A1', KYLE);
+    const stranger = await press('san:take:A1:0', KYLE);
     expect(stranger).toMatchObject({ type: 4, data: { flags: 64 } });
     expect(live().san).toBe(50);
 
     store.set('discordClaims/g_222', { agentId: 'A1' }); // Kyle took over Drew Rook
-    expect((await press('san:project:A1', KYLE)).data.content).toContain('Rolled');
+    expect((await press('san:project:A1:0', KYLE)).data.content).toContain('Rolled');
 
     store.set('discordPending/A1', { ...store.get('discordPending/A1')!, n: undefined });
-    expect((await press('san:take:A1', '333', String(1 << 4))).data.content).toContain('loses **6** SAN'); // the Handler
+    expect((await press('san:take:A1:0', '333', String(1 << 4))).data.content).toContain('loses **6** SAN'); // the Handler
   });
 
   let clock = Date.now(); // each command 10 s apart, so the 2 s cooldown never trips

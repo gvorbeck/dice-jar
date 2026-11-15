@@ -167,7 +167,8 @@ const rollsOf = (gameId: string) => db().collection(rollsPath(gameId));
 /**
  * The one transaction for `/dg damage` and `/dg san`: apply `rule` to the stored agent doc, write only the leaves it
  * changed (an open sheet merges them in, pages/Agent.tsx), and log the entry, so two losses landing at once both count.
- * `settles` is a held SAN loss to clear in the same transaction; if it's already gone (a double click), nothing happens.
+ * `settles` is a held SAN loss to clear in the same transaction, named by its `createdAt`; if it's already gone (a double click)
+ * or has been replaced by a newer loss (an old button), nothing happens.
  * `test` is the SAN test that decided the loss, logged with it so one is never on record without the other.
  * Null when the Agent is no longer in the game.
  */
@@ -177,13 +178,13 @@ async function commitLoss(
   viaWebhook: boolean,
   now: number,
   rule: (d: DocumentData, agentName: string) => Loss | { error: string },
-  settles?: DocumentReference,
+  settles?: { ref: DocumentReference; at: number },
   test?: Roll,
 ): Promise<Loss | { error: string } | null> {
   const ref = agentRef(gameId, agentId);
   return db().runTransaction(async (tx) => {
-    const [snap, held] = await Promise.all([tx.get(ref), settles && tx.get(settles)]);
-    if (settles && !held?.exists) return { error: SETTLED };
+    const [snap, held] = await Promise.all([tx.get(ref), settles && tx.get(settles.ref)]);
+    if (settles && held?.get('createdAt') !== settles.at) return { error: SETTLED };
     if (!snap.exists) return null;
     const r = rule(snap.data()!, labelOf(snap));
     if ('error' in r) return r;
@@ -196,7 +197,7 @@ async function commitLoss(
       ...(test && viaWebhook ? { testLine: formatEntry(test) } : {}),
     });
     if (settles) {
-      tx.delete(settles);
+      tx.delete(settles.ref);
       tx.delete(heldCopy(gameId, agentId));
     }
     return r;
@@ -231,8 +232,8 @@ export function sanChoice(h: HeldSan, a: Agent, name: string) {
         `${h.testLine ? `${h.testLine}\n` : ''}${bold(name)} is about to lose **${h.amount} SAN** (${h.kind}) · SAN ${a.l.san} → ${after}.\n` +
         `Project it onto a Bond? You spend 1D4 WP (you have ${a.l.wp}). If you keep at least 1 WP, the loss and one Bond both drop by that much (p. 74).`,
       components: rows([
-        { type: 2, style: 1, label: 'Project onto a Bond (1D4 WP)', custom_id: `san:project:${h.agentId}` },
-        { type: 2, style: 2, label: 'Take the loss', custom_id: `san:take:${h.agentId}` },
+        { type: 2, style: 1, label: 'Project onto a Bond (1D4 WP)', custom_id: `san:project:${h.agentId}:${h.createdAt}` },
+        { type: 2, style: 2, label: 'Take the loss', custom_id: `san:take:${h.agentId}:${h.createdAt}` },
       ]),
     };
   const n = h.n,
@@ -248,7 +249,7 @@ export function sanChoice(h: HeldSan, a: Agent, name: string) {
         type: 2,
         style: 1,
         label: `${b.name} (${b.score} → ${Math.max(0, b.score - n)})`.slice(0, 80),
-        custom_id: `san:bond:${h.agentId}:${b.i}`,
+        custom_id: `san:bond:${h.agentId}:${h.createdAt}:${b.i}`,
       })),
     ),
   };
@@ -272,12 +273,13 @@ const maySettle = (h: { userId: string }, presser: string, claimsAgent: boolean,
 
 /** A press on one of sanChoice's buttons. */
 async function sanButton(i: Interaction, now: number): Promise<object> {
-  const [, action, agentId, bond] = String(i.data?.custom_id ?? '').split(':');
+  const [, action, agentId, at, bond] = String(i.data?.custom_id ?? '').split(':');
   const presser = i.member?.user.id ?? '';
   const ref = heldRef(agentId ?? ''),
     held = agentId ? await ref.get() : null;
   if (!held?.exists) return updateTo(SETTLED);
   const h = held.data() as HeldSan;
+  if (String(h.createdAt) !== at) return updateTo('That button is from an earlier SAN loss. Run `/dg san` to see the one waiting now.'); // also buttons posted before ids carried the loss
   const manage = canManage(i.member);
   const [viaWebhook, claim, doc] = await Promise.all([hasWebhook(h.gameId), claimId(h.gameId, presser), agentRef(h.gameId, agentId).get()]);
   if (!maySettle(h, presser, claim === agentId, manage))
@@ -288,7 +290,10 @@ async function sanButton(i: Interaction, now: number): Promise<object> {
   }
   const settle = async (projection: { bond: number; n: number } | null) =>
     sanSettled(
-      await commitLoss(h.gameId, agentId, viaWebhook, now, (d, name) => finishSan(agentOf(d), h, projection, name, rng), ref),
+      await commitLoss(h.gameId, agentId, viaWebhook, now, (d, name) => finishSan(agentOf(d), h, projection, name, rng), {
+        ref,
+        at: h.createdAt,
+      }),
       h.testLine,
       viaWebhook,
       true,
@@ -300,7 +305,7 @@ async function sanButton(i: Interaction, now: number): Promise<object> {
     // Rolled once, inside a transaction: a double click gets the same roll back, never a second one.
     const n = await db().runTransaction(async (tx) => {
       const s = await tx.get(ref);
-      if (!s.exists) return null;
+      if (s.get('createdAt') !== h.createdAt) return null;
       if (typeof s.get('n') === 'number') return s.get('n') as number;
       const rolled = face(4);
       tx.update(ref, { n: rolled });

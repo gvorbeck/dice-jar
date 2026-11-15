@@ -259,7 +259,7 @@ export function ProfessionStep({ c, up }: StepProps) {
             up((d) => {
               d.bonusPackage = v;
               const pk = PACKAGES.find((k) => k.id === v);
-              if (pk) d.bonus = pk.skills.map((s) => (s === '?' ? '' : s.replace('*', '')));
+              if (pk) d.bonus = pk.skills.map((s) => (s === '?' ? '' : s.replaceAll('*', '')));
             })
           }
         >

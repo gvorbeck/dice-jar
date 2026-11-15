@@ -1,4 +1,5 @@
 import { createRequire } from 'node:module';
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 
 // firebase-admin is installed under functions/; load it from there so the Discord bot and these helpers share one app.
@@ -12,6 +13,14 @@ export const agentDoc = (gameId: string, agentId: string) => getFirestore().doc(
 /** Waits until the server has `hp` for the agent: real players don't act within the second before a sheet saves. */
 export const savedHp = (gameId: string, agentId: string, hp: number) =>
   expect.poll(async () => (await agentDoc(gameId, agentId)).get('live.hp')).toBe(hp);
+
+/** Fails with the list of accessibility violations (axe) on whatever the page shows now. */
+export const expectAccessible = async (page: Page) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' }); // the stamp animation starts at opacity 0, which axe reads as low contrast
+  await expect(page.getByRole('main')).toBeVisible(); // past the loading fallback
+  const { violations } = await new AxeBuilder({ page }).analyze();
+  expect(violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(' | ')}`)).toEqual([]);
+};
 
 // The Discord panel calls a real Cloud Function URL; keep tests offline apart from the local emulator.
 const offline = (context: BrowserContext) => context.route('**/*.cloudfunctions.net/**', (r) => r.abort());
@@ -29,24 +38,27 @@ export async function freshPage(browser: Browser) {
   return context.newPage();
 }
 
-/** Creates a game and a Physician (13 HP) through every creation step but the last; ends on Final details, unnamed. */
-export async function startAgent(page: Page) {
+/** Creates a game and a Physician (13 HP) through every creation step but the last; ends on Final details, unnamed. `atStep` runs on each step's page. */
+export async function startAgent(page: Page, atStep?: (page: Page) => Promise<void>) {
   await page.goto('/');
   await page.getByRole('button', { name: 'Generate game' }).click();
   await page.getByRole('button', { name: 'New agent' }).click();
   await page.waitForURL(/\/g\/[^/]+\/a\/[^/]+$/);
   const [, gameId, agentId] = new URL(page.url()).pathname.match(/^\/g\/([^/]+)\/a\/([^/]+)$/)!;
 
+  await atStep?.(page);
   await choose(page, 'Assignable set');
   await page.getByRole('button', { name: /Well-rounded/ }).click();
   await next(page);
 
+  await atStep?.(page);
   await choose(page, /^Physician/);
   await choose(page, 'Forensics');
   await choose(page, 'Surgery');
   await page.getByLabel('Package (p. 27)').selectOption({ label: 'Nurse, Paramedic, or Pre-Med' });
   await next(page);
 
+  await atStep?.(page);
   for (const [i, b] of ['Sister', 'Old partner', 'Therapist'].entries()) await page.getByLabel(`Bond ${i + 1} — score 11`).fill(b);
   await next(page);
   return { gameId, agentId, gameUrl: `/g/${gameId}` };

@@ -119,6 +119,9 @@ button.mark,
   padding: 0.25rem 1rem;
   flex-wrap: wrap;
 }
+.menubar .dim {
+  color: var(--inv-dim);
+}
 .menubar .grow {
   flex: 1;
   text-align: right;
@@ -255,7 +258,8 @@ html {
   border-bottom-color: currentColor;
 } /* dotted underline marks the one thing under the pointer; row rules in the live sheet are solid */
 .rollable:focus-visible,
-button.mark:focus-visible {
+button.mark:focus-visible,
+.log:focus-visible {
   outline: 2px solid var(--fg);
   outline-offset: 2px;
 } /* keyboard focus needs a ring, not just a hairline */

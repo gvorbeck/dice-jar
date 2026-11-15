@@ -17,7 +17,7 @@ const dg = (guild: string, sub: string, options: Record<string, string> = {}) =>
       options: [{ name: sub, type: 1, options: Object.entries(options).map(([name, value]) => ({ name, type: 3, value })) }],
     },
   };
-  return handle(i, now) as Promise<{ data?: { content?: string } }>;
+  return handle(i, now) as Promise<{ data?: { content?: string; components?: { components: { custom_id: string }[] }[] } }>;
 };
 
 test('damage from Discord lands on an open live sheet and in the roll log', async ({ page }) => {
@@ -58,7 +58,8 @@ test('a SAN loss held in Discord shows on the live sheet and the Handler boxes u
   const guild = `guild-${gameId}`;
   await dg(guild, 'link', { game: gameId });
   await dg(guild, 'claim', { agent: agentId });
-  expect((await dg(guild, 'san', { loss: '1D6', kind: 'unnatural' })).data?.content).toContain('Project it onto a Bond');
+  const choice = (await dg(guild, 'san', { loss: '1D6', kind: 'unnatural' })).data;
+  expect(choice?.content).toContain('Project it onto a Bond');
 
   await expect(page.getByText(/SAN loss \(unnatural\) is waiting on a choice in Discord/)).toBeVisible(); // no reload
   await page.getByRole('link', { name: '< Game' }).click();
@@ -69,7 +70,7 @@ test('a SAN loss held in Discord shows on the live sheet and the Handler boxes u
   await handle(
     {
       type: 3,
-      data: { custom_id: `san:take:${agentId}` },
+      data: { custom_id: choice!.components![0].components.find((b) => b.custom_id.startsWith('san:take:'))!.custom_id },
       guild_id: guild,
       channel_id: 'c1',
       member: { user: { id: `u-${guild}` }, permissions: String(1 << 4) },

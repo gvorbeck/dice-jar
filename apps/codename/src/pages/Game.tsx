@@ -16,6 +16,7 @@ import {
   type RollDoc,
 } from '../lib/games';
 import { forgetSavedAgent, hasSavedAgent, isOpenableId, MIN_ID, rememberGame } from '../lib/gameId';
+import { ScrollRegion } from '../ui/ScrollRegion';
 import { Win } from '../ui/Win';
 import { DiscordPanel } from '../DiscordPanel';
 import GmScreen from '../GmScreen';
@@ -339,7 +340,7 @@ export default function Game() {
           empty="No rolls yet. Rolls made on an agent's live sheet appear here for everyone."
         >
           {(list) => (
-            <div className="log">
+            <ScrollRegion label="Roll log (scrolls)">
               <table>
                 <thead>
                   <tr>
@@ -371,7 +372,7 @@ export default function Game() {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
           )}
         </SubList>
       </Win>
