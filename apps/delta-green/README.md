@@ -4,7 +4,7 @@ A character creator for Delta Green. It's running at [yourcodena.me](https://you
 
 It follows the Agent's Handbook in order: statistics, profession and skills, bonds, details, then a review page where you get the finished sheet. After that you can keep playing from it. A Handler can make a game and everyone's Agents and rolls end up in the same place. There are no accounts.
 
-Rules MCP server: `ttrpg-rules` (Delta Green only); it becomes `rules-delta-green` once the server is split.
+Rules MCP server: `delta-green-rules`.
 
 ## What's in it
 

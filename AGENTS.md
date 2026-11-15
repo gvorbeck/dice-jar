@@ -16,7 +16,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
   - logic: `*.test.ts` next to the file;
   - `firestore.rules`: the app's `test/firestore.rules.test.ts`;
   - anything a player clicks through: the app's `e2e/`.
-- Game rules come from the book. Before writing or changing rules logic or rules data, look it up with that app's rules MCP server (`rules-<game>`; each app's README names its server) and cite the page in the test or comment. Never use another game's server for it. If the app's server isn't connected, stop and say so.
+- Game rules come from the book. Before writing or changing rules logic or rules data, look it up with that app's rules MCP server (`<game>-rules`; each app's README names its server) and cite the page in the test or comment. Never use another game's server for it. If the app's server isn't connected, stop and say so.
 - A known limit gets a comment: `// shortcut: <the limit>, <when to upgrade>`.
 - Comments say why, in one line. No comments that repeat the code.
 - A coverage floor only goes up. A new app starts at or above delta-green's floor (lines 77, statements 74, branches 68, functions 78).
