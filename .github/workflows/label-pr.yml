@@ -19,7 +19,7 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
         run: |
           # shortcut: labels are only added, never removed, so a PR that stops touching an app keeps its label; remove it by hand
-          gh api --paginate "repos/$GH_REPO/pulls/$PR/files" --jq '.[].filename' | sed -n 's#^apps/\([^/]*\)/.*#\1#p' | sort -u | while read -r app; do
+          gh api --paginate "repos/$GH_REPO/pulls/$PR/files" --jq '.[] | select(.status != "removed") | .filename' | sed -n 's#^apps/\([^/]*\)/.*#\1#p' | sort -u | while read -r app; do
             gh label create "$app" --color 5319e7 --description "Changes in apps/$app" 2>/dev/null || true
             gh pr edit "$PR" --add-label "$app"
           done

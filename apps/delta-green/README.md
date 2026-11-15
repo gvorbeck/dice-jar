@@ -104,7 +104,7 @@ When an Agent saves, it only sends the fields that changed since that tab last r
 
 ## Deploying
 
-Pushing to `main` runs [the workflow](.github/workflows/deploy.yml): lint, test, build, deploy Firestore rules, deploy Functions (only when `functions/` or a `src/` file the bot bundles changed, per esbuild's metafile), deploy Hosting to `codename-dg`. A manual run of the workflow always deploys Functions.
+Pushing to `main` runs [the workflow](../../.github/workflows/deploy-delta-green.yml): lint, test, build, deploy Firestore rules, deploy Functions (only when `functions/` or a `src/` file the bot bundles changed, per esbuild's metafile), deploy Hosting to `codename-dg`. A manual run of the workflow always deploys Functions.
 
 Rules go out before the new build. Tabs that are already open keep running the old build for a while, so the rules have to accept writes from both versions at once. That means adding a field takes two releases (allow it, then use it) and removing one also takes two (stop writing it, then stop allowing it).
 

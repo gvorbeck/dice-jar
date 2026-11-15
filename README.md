@@ -2,16 +2,16 @@
 
 Tabletop RPG character apps, one per game, sharing their tooling and, once a second app needs it, their code. Package scope: `@dice-jar/*`.
 
-No apps are in yet. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
+Only delta-green is in so far. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
 
 | App         | Game              | Rules MCP server    | Access    |
 | ----------- | ----------------- | ------------------- | --------- |
-| codename    | Delta Green       | `rules-delta-green` | link-only |
+| delta-green | Delta Green       | `rules-delta-green` | link-only |
 | hearthfire  | Stonetop          | `rules-stonetop`    | link-only |
 | codex-quest | Basic Fantasy RPG | `rules-bfrpg`       | accounts  |
 | glyph-quest | Knave             | `rules-knave`       | accounts  |
 
-None of these rules servers exist yet. Today there is one, `ttrpg-rules` (Delta Green only); it is split into one server per game before hearthfire comes in (see "Rules MCP" in the brief). Until then, codename uses `ttrpg-rules`.
+None of these rules servers exist yet. Today there is one, `ttrpg-rules` (Delta Green only); it is split into one server per game before hearthfire comes in (see "Rules MCP" in the brief). Until then, delta-green uses `ttrpg-rules`.
 
 ## Licensing
 
@@ -25,7 +25,7 @@ Game content is different. The rules text, game data, art, names and trademarks 
 | An app's game content (rules text, data, art, names) | the game's own license or the publisher's permission | `apps/<app>/LICENSE` or `NOTICE` |
 | Book text                                            | never committed to this repo                         | the private rules server         |
 
-Where an app has its own `LICENSE` or `NOTICE`, that file governs the app's directory. Codename's Legal section in its README is the model: published by arrangement with the publisher, with the code's own copyright kept apart from the game's.
+Where an app has its own `LICENSE` or `NOTICE`, that file governs the app's directory. delta-green's Legal section in its README is the model: published by arrangement with the publisher, with the code's own copyright kept apart from the game's.
 
 ## Layout
 
