@@ -68,7 +68,7 @@ export function StatsStep({ c, up }: StepProps) {
                 edit((d) => {
                   d.statSet = s.id;
                   STATS.forEach((st, i) => {
-                    d.stats[st] = s.values[i];
+                    d.stats[st] = s.values[i]!;
                   });
                 })
               }

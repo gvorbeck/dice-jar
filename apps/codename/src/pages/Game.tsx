@@ -133,7 +133,10 @@ export default function Game() {
         gameId,
         list.map((a) => a.id),
       );
-      const lines = list.filter((a) => gains[a.id]?.length).map((a) => `${a.label}: ${gainsText(gains[a.id])}`);
+      const lines = list.flatMap((a) => {
+        const g = gains[a.id];
+        return g?.length ? [`${a.label}: ${gainsText(g)}`] : [];
+      });
       const missed = list.filter((a) => failed.includes(a.id)).map((a) => a.label);
       setNotice(
         [

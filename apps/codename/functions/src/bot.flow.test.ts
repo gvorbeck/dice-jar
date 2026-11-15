@@ -159,7 +159,7 @@ describe('/dg san projection buttons', () => {
   it('Project rolls 1D4 once, then the chosen Bond, WP and the loss all drop by it (p. 74)', async () => {
     const first = await press('san:project:A1:0');
     expect(first.data.content).toContain('Rolled **3**');
-    expect(first.data.components?.[0].components.map((b) => b.custom_id)).toEqual(['san:bond:A1:0:0']);
+    expect(first.data.components?.[0]?.components.map((b) => b.custom_id)).toEqual(['san:bond:A1:0:0']);
     const again = await press('san:project:A1:0'); // a double click shows the same roll, never a new one
     expect(again.data.content).toContain('Rolled **3**');
     expect(store.get('discordPending/A1')!.n).toBe(3);
@@ -288,7 +288,7 @@ describe('/dg san projection buttons', () => {
     const [test, loss] = rolls();
     expect(test).toMatchObject({ label: 'SAN (loss)', answered: true }); // not posted on its own
     expect(loss).toMatchObject({ kind: 'loss', testLine: expect.stringContaining('SAN \\(loss\\)') });
-    expect(loss.answered).toBeUndefined();
+    expect(loss?.answered).toBeUndefined();
   });
 
   const rollSkill = (key: string) =>

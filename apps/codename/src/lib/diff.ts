@@ -31,7 +31,8 @@ export function setDelta(prev: unknown, next: unknown) {
 /** `obj` with the leaf at `path` set to `v` (or deleted for REMOVED); untouched branches are shared, not copied. */
 function setPath(obj: unknown, path: string[], v: unknown): unknown {
   if (!path.length) return v;
-  const [k, ...rest] = path,
+  const k = path[0]!, // not empty: checked above
+    rest = path.slice(1),
     o = { ...(isObj(obj) ? obj : {}) };
   if (!rest.length && v === REMOVED) delete o[k];
   else o[k] = setPath(o[k], rest, v);

@@ -29,7 +29,7 @@ const shortCommand = ({ of, name, options }: (typeof SHORT)[number]) => ({
   options: of.options.map((o) => ({
     ...o,
     name: options[o.name] ?? o.name,
-    description: `${o.name[0].toUpperCase()}${o.name.slice(1)}: ${o.description}`,
+    description: `${o.name.charAt(0).toUpperCase()}${o.name.slice(1)}: ${o.description}`,
   })),
 });
 /** Short command name → the full command and its option names, for bot.ts to expand what Discord sends. */
@@ -46,9 +46,9 @@ export const DG = {
   contexts: [0], // server channels only
   options: [
     ROLL,
-    shortCommand(SHORT[0]),
+    shortCommand(SHORT[0]!),
     DAMAGE,
-    shortCommand(SHORT[1]),
+    shortCommand(SHORT[1]!),
     {
       type: 1,
       name: 'san',

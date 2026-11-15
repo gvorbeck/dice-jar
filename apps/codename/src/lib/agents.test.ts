@@ -66,7 +66,7 @@ const allowed = (path: string) => {
   const at = RULES.indexOf(`match /${path}`);
   const list = at < 0 ? null : /hasOnly\((\[[^\]]*\])\)/.exec(RULES.slice(at));
   if (!list) throw new Error(`firestore.rules has no hasOnly list under "match /${path}"; update this test if it moved`);
-  return JSON.parse(list[1].replace(/'/g, '"')) as string[];
+  return JSON.parse(list[1]!.replace(/'/g, '"')) as string[];
 };
 const fieldsOf = (p: Pairs) => [...new Set(Object.keys(p).map((k) => k.split('.')[0]))];
 
@@ -87,10 +87,10 @@ describe('writes stay inside firestore.rules', () => {
     await saveLive('g', 'rules', freshLive(newCharacter()));
     await logRoll('g', { agentId: 'a', agentName: 'Drew', label: 'Firearms', chance: 45, penalty: 0, roll: 12, outcome: 'success' });
 
-    expect(allowed('games/{gameId}')).toEqual(expect.arrayContaining(fieldsOf(writes.tx[0])));
+    expect(allowed('games/{gameId}')).toEqual(expect.arrayContaining(fieldsOf(writes.tx[0]!)));
     for (const p of [...writes.set, ...writes.updates.flat()])
       expect(allowed('agents/{agentId}')).toEqual(expect.arrayContaining(fieldsOf(p)));
-    expect(allowed('rolls/{rollId}')).toEqual(expect.arrayContaining(fieldsOf(writes.add[0])));
+    expect(allowed('rolls/{rollId}')).toEqual(expect.arrayContaining(fieldsOf(writes.add[0]!)));
   });
 
   it('a sheet stays under the rules caps of 30 keys in character and live', () => {
@@ -105,7 +105,7 @@ describe('saveLive sends only what changed', () => {
 
   it('the first save sends the whole sheet, later ones only the changed leaves', async () => {
     await saveLive('g', 'a1', live());
-    expect(Object.keys(writes.updates[0][0])).toEqual(['live', 'updatedAt']);
+    expect(Object.keys(writes.updates[0]![0]!)).toEqual(['live', 'updatedAt']);
     await saveLive('g', 'a1', live({ hp: 3 }));
     expect(writes.updates[1]).toEqual([{ 'live.hp': 3, updatedAt: expect.any(Number) }]);
   });
@@ -157,7 +157,7 @@ describe('advanceAll ends the session for every agent (p. 28)', () => {
     expect(gains).toEqual({ b1: [['Alertness', expect.any(Number)]] });
     expect(failed).toEqual([]);
     expect(writes.updates).toEqual([
-      [{ 'live.checked': { remove: ['Alertness'] } }, { 'live.advance.Alertness': gains.b1[0][1], updatedAt: expect.any(Number) }],
+      [{ 'live.checked': { remove: ['Alertness'] } }, { 'live.advance.Alertness': gains.b1![0]![1], updatedAt: expect.any(Number) }],
     ]);
   });
   it('a failed save is reported for that agent and the others still advance', async () => {

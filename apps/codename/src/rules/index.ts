@@ -28,7 +28,7 @@ export const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' :
 // ---- Statistics (pp. 14, 18–19)
 export const roll4d6dl = (rng = Math.random) => {
   const d = Array.from({ length: 4 }, () => 1 + Math.floor(rng() * 6)).sort((a, b) => a - b);
-  return d[1] + d[2] + d[3];
+  return d[1]! + d[2]! + d[3]!;
 };
 
 // ---- Tests (p. 44): d% at or below the chance succeeds; 01 or matching dice on a success is critical; 00 or matching dice on a failure is a fumble.
@@ -101,8 +101,8 @@ export function rollLoss(expr: string, rng = Math.random): number | null {
 }
 /** SAN loss as printed in the book, "success/failure": "0/1D4". */
 export const parseLoss = (s: string) => {
-  const p = s.split('/').map((x) => x.trim());
-  return p.length === 2 && p.every((x) => rollExpr(x) !== null) ? ([p[0], p[1]] as const) : null;
+  const [a, b, ...rest] = s.split('/').map((x) => x.trim());
+  return a !== undefined && b !== undefined && !rest.length && rollExpr(a) !== null && rollExpr(b) !== null ? ([a, b] as const) : null;
 };
 
 export function featureOf(stat: Stat, score: number): string | null {
@@ -126,7 +126,7 @@ const customKey = (k: string) =>
       .replace(/[()*|]/g, '')
       .trim(),
   );
-const customRating = (c: Character, i: number) => baseRating(c.custom.skills[i]) + c.custom.points[i];
+const customRating = (c: Character, i: number) => baseRating(c.custom.skills[i]!) + c.custom.points[i]!; // both arrays always have one entry per slot
 /** Custom-profession points still to spend (negative when over). */
 export const customLeft = (c: Character) => customBudget(c.custom.bonds) - sum(c.custom.points);
 
@@ -185,7 +185,7 @@ function parseSlot(id: string, src: string): Slot {
     alts: src.split('|').map((s) => {
       const m = ENTRY.exec(s.trim());
       if (!m) throw new Error(`bad skill entry: ${s}`);
-      return { family: m[1], type: m[2], askType: !!m[3], rating: Number(m[4]) };
+      return { family: m[1]!, type: m[2], askType: !!m[3], rating: Number(m[4]) };
     }),
   };
 }
@@ -206,7 +206,7 @@ export interface KitSkill {
 }
 
 function resolve(slot: Slot, c: Character): KitSkill {
-  const alt = slot.alts[c.orPicks[slot.id] ?? 0] ?? slot.alts[0];
+  const alt = slot.alts[c.orPicks[slot.id] ?? 0] ?? slot.alts[0]!;
   const type = alt.type ?? (alt.askType ? c.types[slot.id]?.trim() : undefined);
   const missingType = alt.askType && !type;
   return { slot: slot.id, key: makeKey(alt.family, type), rating: alt.rating, missingType };

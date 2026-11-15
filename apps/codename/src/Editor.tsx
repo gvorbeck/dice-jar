@@ -80,7 +80,7 @@ export function Editor({ agentId, c, issues, setC, gameId, failed, onLive }: Edi
       fn(d);
       return d;
     });
-  const cur = STEPS[step];
+  const cur = STEPS[step]!; // `step` is always an index into STEPS
   const blockers = blocking(issues);
   const open = blockers.length;
   const here = issues.filter((x) => x.step === cur.id);
