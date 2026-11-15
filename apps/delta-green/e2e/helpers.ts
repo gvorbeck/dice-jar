@@ -14,7 +14,6 @@ export const agentDoc = (gameId: string, agentId: string) => getFirestore().doc(
 export const savedHp = (gameId: string, agentId: string, hp: number) =>
   expect.poll(async () => (await agentDoc(gameId, agentId)).get('live.hp')).toBe(hp);
 
-// shortcut: duplicate of packages/e2e-helpers' expectAccessible (stonetop uses that one); switch to it in a delta-green-only PR, see AGENTS.md "Planned work".
 /** Fails with the list of accessibility violations (axe) on whatever the page shows now. */
 export const expectAccessible = async (page: Page) => {
   await page.emulateMedia({ reducedMotion: 'reduce' }); // the stamp animation starts at opacity 0, which axe reads as low contrast
