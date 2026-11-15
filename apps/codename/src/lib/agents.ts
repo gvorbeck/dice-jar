@@ -1,0 +1,168 @@
+import {
+  FieldPath,
+  arrayRemove,
+  arrayUnion,
+  deleteField,
+  doc,
+  getDoc,
+  onSnapshot,
+  setDoc,
+  writeBatch,
+  type Unsubscribe,
+} from 'firebase/firestore';
+import { characterFrom, newCharacter, parseCharacter, type Character } from '../model/character';
+import { advanceSkills, parseLive, type Live } from '../model/live';
+import { professionOf } from '../rules';
+import { REMOVED, at, diffPaths, setDelta } from './diff';
+import { db } from './firebase';
+import { agentRef, agentsCol } from './games';
+
+// Kept apart from games.ts so the game page only loads the sheet model (and its rules) when an agent is created or opened.
+
+/** Denormalized for the game page's list, so it never has to parse a whole sheet. */
+const summary = (c: Character) => ({
+  name: c.details.name.trim(),
+  codename: c.details.codename.trim(),
+  profession: professionOf(c)?.name ?? '',
+});
+
+// shortcut: the write is not awaited (the promise only settles once the server acknowledges it, which never happens offline). The agent page
+// reads it back from the local cache; a write the rules reject shows up there as "no such agent". Add a toast if that proves confusing.
+export const createAgent = (g: string, c: Character = newCharacter(), live: Live | null = null) => {
+  const ref = doc(agentsCol(g));
+  const now = Date.now();
+  setDoc(ref, { ...summary(c), character: c, live, createdAt: now, updatedAt: now }).catch(console.error);
+  return ref.id;
+};
+
+/** A game backup (exportGame), an exported Agent or a Green Agent file → the Agents to add. Throws for anything else, or a backup with no Agents. */
+export function readImport(raw: unknown): { c: Character; live: Live | null }[] {
+  const agents = (raw as { agents?: unknown } | null)?.agents;
+  const found = Array.isArray(agents)
+    ? agents.map((a) => ({ c: parseCharacter(a.character), live: a.live ? parseLive(a.live) : null }))
+    : [{ c: characterFrom(raw), live: null }];
+  if (!found.length) throw new Error('no agents in file');
+  return found;
+}
+
+/**
+ * What this tab last read or wrote, per agent field. Saves send only the leaves that differ from it, so a second
+ * device changing other fields isn't overwritten (the same field still goes to whoever writes last). It moves
+ * forward when a write is sent, so a value put back before the server answers is still sent; a rejected write
+ * moves it back, so its changes go out again with the next diff.
+ */
+const known = new Map<string, unknown>();
+const slot = (g: string, a: string, field: string) => `${g}/${a}/${field}`;
+
+// Arrays in `live` that other writers also add to (the Discord bot checks failed skills): saved and merged as additions and removals, not replaced.
+export const LIVE_SETS = ['checked'];
+type Pairs = (string | FieldPath | unknown)[];
+
+function saveField(g: string, a: string, field: 'character' | 'live', value: unknown, extra: Record<string, unknown> = {}) {
+  const k = slot(g, a, field);
+  const before = known.get(k);
+  // shortcut: with no live sheet on the server yet, the first one is written whole, so if the Discord bot or another device writes
+  // one in the same second, the last write wins (watchLive merges any that arrive first). A transaction would close it, but not offline.
+  const leaves = diffPaths(before, value); // one whole-value leaf when `before` is missing or null
+  const main: Pairs = [],
+    removals: Pairs = [];
+  for (const [path, v] of leaves) {
+    const fp = new FieldPath(field, ...path);
+    if (v !== REMOVED && field === 'live' && LIVE_SETS.includes(path.join('.'))) {
+      // Union and remove can't touch one field in one update, so removals go in a second write of the same batch.
+      const { add, remove } = setDelta(at(before, path), v);
+      if (add.length) main.push(fp, arrayUnion(...add));
+      if (remove.length) removals.push(fp, arrayRemove(...remove));
+    } else main.push(fp, v === REMOVED ? deleteField() : v);
+  }
+  const batch = writeBatch(db);
+  const update = (p: Pairs) => {
+    const [f, v, ...rest] = p as [string | FieldPath, unknown, ...unknown[]];
+    batch.update(agentRef(g, a), f, v, ...rest);
+  };
+  if (removals.length) update(removals);
+  update([...main, 'updatedAt', Date.now(), ...Object.entries(extra).flat()]);
+  known.set(k, value);
+  return batch.commit().catch((e) => {
+    if (known.get(k) === value) known.set(k, before);
+    throw e;
+  });
+}
+
+/**
+ * Calls `onRemote(remote, base)` whenever the agent's `live` on the server differs from what this tab last read or
+ * wrote: someone else saved it (Discord damage, a skill checked from Discord, another device). The caller merges.
+ * Own writes still in flight are skipped; their echo merges harmlessly because those leaves are local changes too.
+ * `base` is null when this tab has no live sheet on the server yet: the remote one is someone else's first (the Discord bot
+ * starts one from the fresh sheet), and remembering it makes this tab's next save send only its own changes, not a whole sheet.
+ */
+export function watchLive(g: string, a: string, onRemote: (remote: Live, base: Live | null) => void): Unsubscribe {
+  const k = slot(g, a, 'live');
+  return onSnapshot(
+    agentRef(g, a),
+    (snap) => {
+      const base = known.get(k) as Live | null | undefined;
+      if (snap.metadata.hasPendingWrites || !snap.exists() || base === undefined) return; // not loaded yet
+      let remote: Live;
+      try {
+        remote = parseLive(snap.get('live'));
+      } catch {
+        return;
+      } // missing or unreadable: keep what's on screen
+      if (base && !diffPaths(base, remote).length) return; // nothing new (key order doesn't matter)
+      known.set(k, remote);
+      onRemote(remote, base);
+    },
+    () => {},
+  ); // offline or denied: the page keeps working from its own state
+}
+
+export const saveCharacter = (g: string, a: string, c: Character) => saveField(g, a, 'character', c, summary(c));
+export const saveLive = (g: string, a: string, live: Live) => saveField(g, a, 'live', live);
+
+/** The stored agent doesn't match the sheet's shape, so reloading won't help. */
+export class DamagedAgent extends Error {}
+
+/** One read, not a subscription: the open page is the source of truth while editing, so a snapshot echo can't clobber typing. */
+export const loadAgent = async (g: string, a: string): Promise<{ c: Character; live: Live | null } | null> => {
+  const snap = await getDoc(agentRef(g, a));
+  if (!snap.exists()) return null;
+  const d = snap.data();
+  let c: Character, live: Live | null;
+  try {
+    c = parseCharacter(d.character);
+    live = d.live ? parseLive(d.live) : null;
+  } catch {
+    throw new DamagedAgent();
+  }
+  known.set(slot(g, a, 'character'), c);
+  known.set(slot(g, a, 'live'), live);
+  return { c, live };
+};
+
+/**
+ * End of session for every agent in the game (p. 28): each checked skill gains 1D4. Returns the gains of agents that had any,
+ * and the agents that failed to load or save; those keep their checks, so running it again is safe.
+ */
+export async function advanceAll(g: string, ids: string[]) {
+  const gains: Record<string, [string, number][]> = {},
+    failed: string[] = [];
+  await Promise.all(
+    ids.map(async (id) => {
+      try {
+        const a = await loadAgent(g, id).catch((e) => {
+          if (e instanceof DamagedAgent) return null;
+          throw e;
+        });
+        if (!a?.live?.checked.length) return;
+        const r = advanceSkills(a.c, a.live);
+        // shortcut: awaited, so offline the button stays busy until the writes reach the server; fine while the Handler runs it online.
+        await saveLive(g, id, r.live); // a diff: checks added from Discord meanwhile survive
+        gains[id] = r.gains;
+      } catch {
+        failed.push(id);
+      }
+    }),
+  );
+  return { gains, failed };
+}
