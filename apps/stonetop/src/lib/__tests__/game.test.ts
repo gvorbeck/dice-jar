@@ -27,7 +27,7 @@ describe('slugifyGameId', () => {
 describe('createGame', () => {
   it('writes a fresh game doc and returns its generated id', async () => {
     const id = await createGame();
-    expect(typeof id).toBe('string');
+    expect(id).toMatch(/^[a-z]+-[a-z]+-[a-z0-9]{6}$/);
     const stored = firestoreStore.get(`games/${id}`);
     expect(stored).toMatchObject({ name: '', characters: [] });
     expect(typeof stored?.createdAt).toBe('number');

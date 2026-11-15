@@ -1,13 +1,10 @@
-import { addDoc, collection, doc, getDoc, runTransaction } from 'firebase/firestore';
+import { doc, getDoc, runTransaction } from 'firebase/firestore';
+import { newGameId } from '@dice-jar/game-id';
 import { db } from './firebase';
 import { GAMES_COLLECTION } from './constants';
+import { GAME_ID_WORDS } from './gameIdWords';
 
 const newGame = () => ({ name: '', createdAt: Date.now(), characters: [] });
-
-export const createGame = async (): Promise<string> => {
-  const ref = await addDoc(collection(db, GAMES_COLLECTION), newGame());
-  return ref.id;
-};
 
 export const gameIdExists = async (id: string): Promise<boolean> => {
   const snap = await getDoc(doc(db, GAMES_COLLECTION, id));
@@ -28,4 +25,10 @@ export const createGameWithId = async (id: string): Promise<void> => {
     if (snap.exists()) throw new Error('Game ID already taken.');
     tx.set(ref, newGame());
   });
+};
+
+export const createGame = async (): Promise<string> => {
+  const id = newGameId(GAME_ID_WORDS); // the transaction refuses an ID that exists, so a collision is an error, not an overwrite
+  await createGameWithId(id);
+  return id;
 };
