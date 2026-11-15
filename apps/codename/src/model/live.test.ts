@@ -25,6 +25,7 @@ import {
   conditionsOf,
   adaptNote,
   gainsText,
+  coreTests,
 } from './live';
 
 it('round-trips a sheet through the URL hash, including non-ASCII', () => {
@@ -356,4 +357,33 @@ it('lists skill gains for the player', () => {
     ]),
   ).toBe('Alertness +3, Foreign Language(Spanish) +1');
   expect(gainsText([])).toBe('');
+});
+
+describe('stat tests use the stat as played, veteran reductions included (p. 38)', () => {
+  const chance = (c: ReturnType<typeof newCharacter>, l: ReturnType<typeof freshLive>, id: string) =>
+    coreTests({ c, l }).find((t) => t.id === id)!.chance;
+  it('Captivity takes 3 off POW, so the POW test is (12 − 3) × 5', () => {
+    const c = newCharacter();
+    c.stats.POW = 12;
+    c.veteran = 'captivity';
+    expect(chance(c, freshLive(c), 'stat:POW')).toBe(45);
+  });
+  it('Extreme Violence takes 3 off CHA, so the CHA test is (12 − 3) × 5', () => {
+    const c = newCharacter();
+    c.stats.CHA = 12;
+    c.veteran = 'violence';
+    expect(chance(c, freshLive(c), 'stat:CHA')).toBe(45);
+  });
+  it('temporary loss comes off once, on top of the veteran reduction', () => {
+    const c = newCharacter();
+    c.stats.POW = 12;
+    c.veteran = 'captivity';
+    expect(chance(c, { ...freshLive(c), statLoss: { POW: 2 } }, 'stat:POW')).toBe(35);
+  });
+  it('stats without a veteran reduction are unchanged', () => {
+    const c = newCharacter();
+    c.stats.STR = 12;
+    c.veteran = 'captivity';
+    expect(chance(c, freshLive(c), 'stat:STR')).toBe(60);
+  });
 });

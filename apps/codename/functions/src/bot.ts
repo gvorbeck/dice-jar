@@ -240,6 +240,12 @@ export function sanChoice(h: HeldSan, a: Agent, name: string) {
     bonds = bondsOf(a),
     fit = bonds.filter((b) => b.score >= n),
     pick = fit.length ? fit : bonds;
+  if (!bonds.length)
+    // spent on another device after the choice was shown: nothing to project onto, so the loss can only be taken
+    return {
+      content: `Rolled **${n}**, but no Bond has points left to project onto. Take the loss: ${h.amount} SAN (${h.kind}) · SAN ${a.l.san} → ${after}.`,
+      components: rows([{ type: 2, style: 2, label: 'Take the loss', custom_id: `san:take:${h.agentId}:${h.createdAt}` }]),
+    };
   return {
     content:
       `Rolled **${n}**: spend ${n} WP (${a.l.wp} → ${a.l.wp - n}) and lose ${n} less SAN (${h.amount} → ${Math.max(0, h.amount - n)}). Which Bond takes ${n}?` +

@@ -41,6 +41,21 @@ test('live sheet changes are saved to the server', async ({ page, browser }) => 
   await expect(hp(other)).toHaveText('11 / 13');
 });
 
+test("a change saved elsewhere is not replayed over the player's own fix when the sheet is reopened", async ({ page }) => {
+  const { gameId, agentId } = await createAgent(page);
+  await savedHp(gameId, agentId, 13);
+  await (await agentDoc(gameId, agentId)).ref.update({ 'live.hp': 10 }); // Discord damage
+  await expect(hp(page)).toHaveText('10 / 13');
+  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Increase HP' }).click(); // healed back to 13
+  await expect(hp(page)).toHaveText('13 / 13');
+  await savedHp(gameId, agentId, 13);
+
+  await page.getByRole('button', { name: 'Edit agent' }).click();
+  await page.getByRole('button', { name: 'Live Sheet' }).click();
+  await expect(hp(page)).toHaveText('13 / 13');
+  await expect.poll(async () => (await agentDoc(gameId, agentId)).get('live.hp')).toBe(13);
+});
+
 test('a roll on the live sheet appears in the game roll log', async ({ page, browser }) => {
   const { gameUrl } = await createAgent(page);
   await page

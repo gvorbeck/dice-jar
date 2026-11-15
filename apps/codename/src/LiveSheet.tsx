@@ -98,8 +98,9 @@ export function LiveSheet({ c, init, game }: { c: Character; init: Live; game?: 
   // Someone else saved (Discord damage, another device): merge it in without an undo step, and drop older undo steps
   // so undo can't revert their change.
   const remote = game?.remote;
+  const mounted = useRef(remote); // already merged into `init` by the page; replaying it would undo what was fixed since
   useEffect(() => {
-    if (!remote) return;
+    if (!remote || remote === mounted.current) return;
     stack.clear();
     show(refreshSpent(remote.merge(latest.current)));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `show` only touches refs, the stack and state setters

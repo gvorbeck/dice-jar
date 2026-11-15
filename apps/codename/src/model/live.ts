@@ -224,8 +224,12 @@ const permStats = (c: Character, l: Live): Character => ({
   ...c,
   stats: Object.fromEntries(STATS.map((s) => [s, c.stats[s] + mod(l, s)])) as Character['stats'],
 });
-/** Score to test against: permanent changes and temporary loss applied. */
-export const effStat = (c: Character, l: Live, s: Stat) => Math.max(0, c.stats[s] + mod(l, s) - (l.statLoss[s] ?? 0));
+/** Score to test against: permanent changes, the Damaged Veteran's POW and CHA reduction (p. 38) and temporary loss applied. */
+export const effStat = (c: Character, l: Live, s: Stat) => {
+  const d = derived(permStats(c, l));
+  const score = s === 'POW' ? d.pow : s === 'CHA' ? d.cha : c.stats[s] + mod(l, s);
+  return Math.max(0, score - (l.statLoss[s] ?? 0));
+};
 /** HP, WP, SAN and Bond maximums as played: derived attributes after permanent stat changes. */
 export const capsOf = (c: Character, l: Live) => derived(permStats(c, l));
 /** Bond `i`'s score as played; a slot the saved list doesn't reach yet (a Bond added on another device) is at full. */

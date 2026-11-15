@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read # the Functions check finds the last successful deploy
   checks: write # the hosting action reports through the job token; same as the original workflow
 # Two deploys at once could interleave rules, Functions and Hosting; the second waits.
 concurrency:
@@ -45,14 +46,16 @@ jobs:
           rm -f "$RUNNER_TEMP/sa.json"
       # The bot bundles shared files from src/ at deploy time, so it must redeploy when they change or Discord shows stale
       # chances. esbuild's metafile lists exactly which ones, so a UI-only change doesn't redeploy every Function.
-      # Manual runs and pushes with no usable "before" commit always deploy.
+      # It diffs against the last deploy that succeeded, not the previous push, so a failed Functions deploy is retried by the next run.
+      # Manual runs and runs with no successful deploy to compare with always deploy.
       - name: Check whether Functions changed
         id: functions
         env:
           EVENT: ${{ github.event_name }}
-          BEFORE: ${{ github.event.before }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [ "$EVENT" != push ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+          BEFORE=$(gh run list --workflow deploy-codename.yml --branch main --status success --limit 1 --json headSha --jq '.[0].headSha // empty') || BEFORE= # an API error falls back to deploying
+          if [ "$EVENT" != push ] || [ -z "$BEFORE" ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
             echo "deploy=true" >> "$GITHUB_OUTPUT"
           elif npx --prefix apps/codename/functions esbuild apps/codename/functions/src/index.ts --bundle --platform=node --format=esm --packages=external \
                  --metafile="$RUNNER_TEMP/meta.json" --outfile="$RUNNER_TEMP/bot.js" --log-level=error \
