@@ -58,6 +58,7 @@ const PortalTooltip = ({
       id={tooltipId}
       aria-hidden={!visible}
       className={tipCx}
+      // shortcut: inline style, the position is measured at runtime so it can't be a class; replace with a React Aria Tooltip/Popover.
       style={
         {
           '--tooltip-top': `${fixedCoords?.top ?? 0}px`,

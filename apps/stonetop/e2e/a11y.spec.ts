@@ -1,6 +1,7 @@
 // Every page, scanned with axe: home, game, GM playbook, steading, a character sheet and the not-found page.
 import { expect, test } from '@playwright/test';
-import { addCharacter, createGame, expectAccessible } from './helpers';
+import { expectAccessible } from '@dice-jar/e2e-helpers';
+import { addCharacter, createGame } from './helpers';
 
 test('every page has no accessibility violations', async ({ page }) => {
   await page.goto('/');

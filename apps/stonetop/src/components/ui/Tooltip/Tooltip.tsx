@@ -31,6 +31,7 @@ export const Tooltip = ({ text, side = 'top', className, noTabStop = false, tool
         id={tooltipId}
         aria-hidden={!visible}
         className={cx}
+        // shortcut: inline style, the position is measured at runtime so it can't be a class; replace with a React Aria Tooltip/Popover.
         style={{ '--nudge-x': `${nudgeX}px`, '--arrow-offset': arrowOffset } as React.CSSProperties}
       >
         {text}

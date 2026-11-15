@@ -32,7 +32,7 @@
     "react-router-dom": "^7.18.5"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.14.0",
+    "@dice-jar/e2e-helpers": "*",
     "@firebase/rules-unit-testing": "^6.0.0",
     "@playwright/test": "^1.65.0",
     "@testing-library/jest-dom": "^6.9.1",

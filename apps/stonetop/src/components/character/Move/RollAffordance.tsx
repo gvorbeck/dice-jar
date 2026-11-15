@@ -271,7 +271,6 @@ export const RollAffordance = ({
               <span
                 key={`die-${i}-${face}`}
                 className={clsx(styles.die, tumbling && styles.dieTumbling, !tumbling && result.dropped === i && styles.dieDropped)}
-                style={{ '--die-delay': `${i * 80}ms` } as React.CSSProperties}
               >
                 {face}
               </span>
