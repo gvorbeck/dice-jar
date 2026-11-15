@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { STATS, STAT_NAMES, type Stat } from './rules/data/creation';
 import { activeBonds, featureOf, isSuccess, liveOutcome, motivationsOf, professionOf, rollD100, testOutcome, type Outcome } from './rules';
@@ -99,19 +99,20 @@ export function LiveSheet({ c, init, game }: { c: Character; init: Live; game?: 
   // so undo can't revert their change.
   const remote = game?.remote;
   const mounted = useRef(remote); // already merged into `init` by the page; replaying it would undo what was fixed since
-  useEffect(() => {
-    if (!remote || remote === mounted.current) return;
+  const mergeRemote = useEffectEvent((r: RemoteLive) => {
     stack.clear();
-    show(refreshSpent(remote.merge(latest.current)));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- `show` only touches refs, the stack and state setters
-  }, [remote, stack]);
+    show(refreshSpent(r.merge(latest.current)));
+  });
+  useEffect(() => {
+    if (remote && remote !== mounted.current) mergeRemote(remote);
+  }, [remote]);
   const sent = useRef(init); // last state handed to game.onChange
   // Runs on state changes only: `game` is a fresh object every render and must not re-send the same state.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const send = useEffectEvent((next: Live) => game?.onChange(next));
   useEffect(() => {
     if (l !== sent.current) {
       sent.current = l;
-      game?.onChange(l);
+      send(l);
     }
   }, [l]);
   const name = nameOf(c);

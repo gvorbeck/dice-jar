@@ -51,12 +51,12 @@ npm run check
 
 `npm ci` also installs the git hooks. One app's script: `npm run dev -w apps/<app>`.
 
-| Root script                                                                     |                                                                                                                             |
-| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `npm run check`                                                                 | `prettier --check .`, `eslint .`, `knip`, the tests for `scripts/`, then `typecheck` and `test:coverage` in every workspace |
-| `npm run format`                                                                | Prettier, writing                                                                                                           |
-| `npm run lint` / `knip`                                                         | ESLint / unused files, exports and dependencies, whole repo                                                                 |
-| `npm run build`, `test`, `typecheck`, `test:coverage`, `test:rules`, `test:e2e` | That script in every workspace that has it. `test:rules` and `test:e2e` need Java 21                                        |
+| Root script                                                                     |                                                                                                                                                    |
+| ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run check`                                                                 | `prettier --check .`, `eslint .` (warnings fail it too), `knip`, the tests for `scripts/`, then `typecheck` and `test:coverage` in every workspace |
+| `npm run format`                                                                | Prettier, writing                                                                                                                                  |
+| `npm run lint` / `knip`                                                         | ESLint / unused files, exports and dependencies, whole repo                                                                                        |
+| `npm run build`, `test`, `typecheck`, `test:coverage`, `test:rules`, `test:e2e` | That script in every workspace that has it. `test:rules` and `test:e2e` need Java 21                                                               |
 
 Every workspace uses the same script names: `dev`, `build`, `test`, `lint`, `typecheck`, `knip`, `test:coverage`, `test:rules`, `test:e2e`, `check`.
 
