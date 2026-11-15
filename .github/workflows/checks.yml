@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  pull-requests: read # the one-app-per-PR step lists the PR's files
 # A new push to a PR cancels its older run; runs on dev and main always finish.
 concurrency:
   group: checks-${{ github.ref }}
@@ -16,6 +17,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20 # shortcut: sized for an empty repo, raise it once apps' rules and e2e tests run here
     steps:
+      # A PR changes one app (AGENTS.md). The release PR from this repo's dev to main carries whatever was merged, so it is exempt.
+      - name: One app per PR
+        if: github.event_name == 'pull_request' && !(github.base_ref == 'main' && github.head_ref == 'dev' && github.event.pull_request.head.repo.full_name == github.repository)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          apps=$(gh api --paginate "repos/$GH_REPO/pulls/$PR/files" --jq '.[].filename' | sed -n 's#^apps/\([^/]*\)/.*#\1#p' | sort -u)
+          if [ "$(printf '%s\n' "$apps" | grep -c .)" -gt 1 ]; then
+            echo "::error::This PR changes more than one app ($(echo $apps)). Split it into one PR per app."
+            exit 1
+          fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with: { persist-credentials: false } # nothing here pushes, so the job token isn't left in .git
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7

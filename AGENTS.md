@@ -5,6 +5,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 ## Rules
 
 - Make the smallest change that fully works. Reuse what's in `packages/` and the app's own `src/lib`, `src/rules`, `src/model` before writing anything new. No abstractions, options, wrappers or "for later" code nobody asked for.
+- A PR changes one app. A change needed in two apps is two PRs, one per app. (A release PR from `dev` to `main` carries whatever was merged, so it is the exception.) The `checks` job fails a PR that touches more than one app, and a workflow labels each PR with the name of every app it touches.
 - An app never imports from another app. Code used by two apps moves to `packages/`; code used by one stays in that app.
 - A change in `packages/` must pass the checks of every app that uses it.
 - UI: React Aria Components, the shared UI components and the CSS tokens. No inline styles, no new hex colors, no other UI or CSS library. Add a token if one is missing.
