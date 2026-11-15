@@ -23,7 +23,7 @@ const roll = (over: Record<string, unknown> = {}) => ({
   penalty: 0,
   roll: 42,
   outcome: 'success',
-  createdAt: 1,
+  createdAt: serverTimestamp(),
   ...over,
 });
 
@@ -152,5 +152,6 @@ describe('rolls', () => {
   it('take the server clock, not a made-up time', async () => {
     await assertSucceeds(add({ createdAt: serverTimestamp() }));
     await assertFails(add({ createdAt: Timestamp.fromMillis(1) }));
+    await assertFails(add({ createdAt: 1 })); // a roll's time is the server's, never a client number
   });
 });
