@@ -121,7 +121,7 @@ describe('SAN loss in steps', () => {
   // Math.random-shaped values in order: the d% SAN test first, then each loss die.
   const seq = (...xs: number[]) => {
     let i = 0;
-    return () => xs[i++];
+    return () => xs[i++]!;
   };
   const agentWith = (live: Partial<Live> = {}, bond = 'Mom') => {
     const c = newCharacter();

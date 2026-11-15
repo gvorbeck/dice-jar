@@ -199,7 +199,7 @@ export class UndoStack {
   }
   /** What the next undo would revert, or null when there is nothing to undo. */
   get label() {
-    return this.snaps.length ? this.snaps[this.snaps.length - 1].label : null;
+    return this.snaps.at(-1)?.label ?? null;
   }
   /** Remember `before` unless the change touched only notes or once-per-event flags. */
   record(before: Live, after: Live, bondNames?: string[]) {

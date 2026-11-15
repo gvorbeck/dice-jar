@@ -22,7 +22,7 @@ export const slugifyGameId = (raw: string) =>
 
 /** Like `kestrel-lantern-7f3k`. ~40 bits (older 4-character IDs still work): an unlisted link, not a secret (the rules deny listing games). */
 export const newGameId = () => {
-  const word = () => CODENAMES[randomInt(CODENAMES.length)].toLowerCase();
+  const word = () => CODENAMES[randomInt(CODENAMES.length)]!.toLowerCase();
   return `${word()}-${word()}-${Array.from({ length: 6 }, () => ALPHABET[randomInt(ALPHABET.length)]).join('')}`;
 };
 

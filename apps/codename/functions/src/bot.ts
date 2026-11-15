@@ -126,7 +126,7 @@ async function myAgent(gameId: string, user: string): Promise<{ id: string; agen
 }
 /** The claimed Agent for autocomplete only (key "gameId user"): a moment-old sheet is fine for suggesting tests; commands read it fresh. */
 const suggestAgent = cached((key) => {
-  const [g, u] = key.split(' ');
+  const [g = '', u = ''] = key.split(' ');
   return myAgent(g, u);
 });
 /** Claimed Agent's id and name, so a sheet that won't parse can't block a dice roll. */
@@ -279,11 +279,12 @@ const maySettle = (h: { userId: string }, presser: string, claimsAgent: boolean,
 
 /** A press on one of sanChoice's buttons. */
 async function sanButton(i: Interaction, now: number): Promise<object> {
-  const [, action, agentId, at, bond] = String(i.data?.custom_id ?? '').split(':');
+  const [, action, agentId = '', at, bond] = String(i.data?.custom_id ?? '').split(':');
   const presser = i.member?.user.id ?? '';
-  const ref = heldRef(agentId ?? ''),
-    held = agentId ? await ref.get() : null;
-  if (!held?.exists) return updateTo(SETTLED);
+  if (!agentId) return updateTo(SETTLED);
+  const ref = heldRef(agentId),
+    held = await ref.get();
+  if (!held.exists) return updateTo(SETTLED);
   const h = held.data() as HeldSan;
   if (String(h.createdAt) !== at) return updateTo('That button is from an earlier SAN loss. Run `/dg san` to see the one waiting now.'); // also buttons posted before ids carried the loss
   const manage = canManage(i.member);
@@ -400,7 +401,7 @@ export async function handle(i: Interaction, now = Date.now()): Promise<object> 
     // A transaction, so two players claiming the same Agent at once can't both win.
     const holder = await db().runTransaction(async (tx) => {
       const others = (await tx.get(claimsQuery(gameId, a.id))).docs.filter((d) => d.get('userId') !== user);
-      if (others.length && !manage) return String(others[0].get('userId'));
+      if (others.length && !manage) return String(others[0]!.get('userId'));
       others.forEach((d) => tx.delete(d.ref));
       tx.set(claimRef(gameId, user), { gameId, userId: user, agentId: a.id, claimedAt: now });
       return null;
@@ -511,7 +512,7 @@ export async function handle(i: Interaction, now = Date.now()): Promise<object> 
   if (!me) return privately("You haven't claimed an Agent in this game. Use `/dg claim` first.");
 
   if (sub.name === 'sheet') {
-    const [name, ...rest] = sheetLines(me.agent);
+    const [name = '', ...rest] = sheetLines(me.agent);
     return privately([bold(name), ...rest.map((l) => plain(l, 1900))].join('\n'));
   }
   if (sub.name === 'roll') {

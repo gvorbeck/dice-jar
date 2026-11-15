@@ -23,6 +23,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 - Never skip a hook (`--no-verify`), disable a lint rule inline, or lower a threshold to get a change through. Fix the cause or ask.
 - Licensing: the root `LICENSE` is MIT and covers everything except a directory with its own `LICENSE` or `NOTICE`. An app's game content follows the game's license, not MIT. Never commit book text or other licensed material to the root or `packages/`; ask the owner what an app's `NOTICE` must say.
 - Never commit, push or merge. The user does that.
+- Never create a git worktree. Do one change at a time on one branch in this checkout. If a second change is ready while the first is uncommitted, finish and report the first, and ask the user to commit before starting the second.
 
 ## Branches and releases
 
@@ -69,8 +70,6 @@ An app is ready when all of these are true:
 
 The owner does not track these. When an import finishes, or the owner asks what is next, say which of them are now due.
 
-- **Right after codename is in:** check that CodeQL now lists JavaScript and TypeScript. Clear the lint warnings the import brings (react-hooks, and codename's inline `eslint-disable` comments, which break the rule against disabling lint inline), then consider `--max-warnings 0`.
-- **After codename is in and green:** move `jsx-a11y` to its `strict` config, and raise TypeScript strictness in `tsconfig.base.json` one flag at a time, `noUncheckedIndexedAccess` first. One PR per change, and only when every app passes. Codename's own config is the floor until then, so none of this may land before it.
+- **After codename is in and green:** raise TypeScript strictness in `tsconfig.base.json` one more flag at a time (`jsx-a11y` is on `strict` and `noUncheckedIndexedAccess` is on). One PR per change, and only when every app passes.
 - **Right after hearthfire is in:** codename and hearthfire share a lot of architecture (hearthfire inspired codename), so look for what to move to `packages/` now that two apps use it. Start with the axe helper (`expectAccessible` in codename's `e2e/helpers.ts`, and `@axe-core/playwright`): hearthfire needs the same check to be ready, so it uses the shared helper from the start and does not copy it. Then the items the brief lists: `src/ui`, the tokens, Firebase init, diff saves, autosave, stale-build reload.
-- **Next release after codename's first:** in `apps/codename/firestore.rules`, drop `|| request.resource.data.createdAt is number` from the `rolls` create rule and its `shortcut:` comment (its date, 2026-11-14, has passed). Add a case in `test/firestore.rules.test.ts` that a numeric `createdAt` is refused, then run `test:rules`.
 - **Before the first app is released:** confirm the GitHub settings in README.md "GitHub settings" are all on, and that the `checks` job is required on `dev` and `main`.

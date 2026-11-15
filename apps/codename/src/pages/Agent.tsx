@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { useLoad } from '../lib/useSub';
 import { gameUrl } from '../lib/paths';
 import { Loading } from '../ui/bits';
@@ -72,9 +72,9 @@ function AgentBody({ gameId, agentId, init }: { gameId: string; agentId: string;
   const issues = validate(c);
   const complete = blocking(issues).length === 0;
   // The live sheet exists as soon as creation is complete, so the game page shows the agent's vitals without anyone pressing a button.
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- `c` is read only at the moment creation becomes complete
+  const startLive = useEffectEvent(() => setLive(freshLive(c))); // reads `c` only at the moment creation becomes complete
   useEffect(() => {
-    if (complete && !live) setLive(freshLive(c));
+    if (complete && !live) startLive();
   }, [complete, live]);
   // Until it has been played, the sheet follows the character: rolling better stats after the last step must not leave HP/SAN at the old values.
   const prevC = useRef(c);

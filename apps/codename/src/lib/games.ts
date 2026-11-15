@@ -85,6 +85,7 @@ const toAgent = (id: string, d: DocumentData): AgentCard => ({
 });
 
 // Older rolls hold a millisecond number, newer ones a Timestamp. Firestore sorts every number before every Timestamp, which is also oldest first.
+// shortcut: the rules no longer allow new numeric times, but stored ones remain; drop the number branch once no game holds one.
 const toRoll = (id: string, d: DocumentData) =>
   ({ ...d, id, createdAt: typeof d.createdAt === 'number' ? d.createdAt : d.createdAt.toMillis() }) as RollDoc;
 
