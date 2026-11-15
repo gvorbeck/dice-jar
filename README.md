@@ -80,7 +80,9 @@ Adding or removing a Firestore field takes two releases, because open tabs keep 
 
 ## CI
 
-[`.github/workflows/checks.yml`](.github/workflows/checks.yml) runs one `checks` job on every PR to `dev` or `main` and every push to `dev` and `main`: `npm ci`, `npm ci` in each app's `functions/`, `npm run check`, `npm run build`, then `test:rules` and `test:e2e`. Work goes to `dev`; `main` deploys. Each app brings its own deploy workflow.
+[`.github/workflows/checks.yml`](.github/workflows/checks.yml) runs one `checks` job on every PR to `dev` or `main` and every push to `dev` and `main`: for a PR, a check that it changes only one app (the release PR from `dev` is exempt), then `npm ci`, `npm ci` in each app's `functions/`, `npm run check`, `npm run build`, then `test:rules` and `test:e2e`. Work goes to `dev`; `main` deploys. Each app brings its own deploy workflow.
+
+[`label-pr.yml`](.github/workflows/label-pr.yml) labels each PR with the name of every app it touches, so PRs can be filtered by app.
 
 Dependabot targets `dev`: npm weekly (minor and patch grouped, each major alone), GitHub Actions monthly. Greptile reviews PRs against [AGENTS.md](AGENTS.md) (`greptile.json`).
 

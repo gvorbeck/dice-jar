@@ -1,0 +1,25 @@
+name: Label PRs by app
+# Adds a label named after each app a PR touches (apps/<app>/), so PRs can be filtered by app.
+# pull_request_target gives Dependabot and fork PRs a token that can label. It is safe here because nothing is checked out
+# and no PR code runs: the job only reads the list of changed file names.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write # creating a label that doesn't exist yet
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          # shortcut: labels are only added, never removed, so a PR that stops touching an app keeps its label; remove it by hand
+          gh api --paginate "repos/$GH_REPO/pulls/$PR/files" --jq '.[].filename' | sed -n 's#^apps/\([^/]*\)/.*#\1#p' | sort -u | while read -r app; do
+            gh label create "$app" --color 5319e7 --description "Changes in apps/$app" 2>/dev/null || true
+            gh pr edit "$PR" --add-label "$app"
+          done
