@@ -1,9 +1,9 @@
-name: Deploy codename
+name: Deploy delta-green
 # Ships to production (codename-dg). The release PR into main already passed the required `checks` job, so it isn't repeated here.
 on:
   push:
     branches: [main]
-    paths: [apps/codename/**, packages/**, package.json, package-lock.json, .nvmrc] # root files too: npm ci runs from the root, so a lockfile-only update must rebuild
+    paths: [apps/delta-green/**, packages/**, package.json, package-lock.json, .nvmrc] # root files too: npm ci runs from the root, so a lockfile-only update must rebuild
   workflow_dispatch:
 permissions:
   contents: read
@@ -11,7 +11,7 @@ permissions:
   checks: write # the hosting action reports through the job token; same as the original workflow
 # Two deploys at once could interleave rules, Functions and Hosting; the second waits.
 concurrency:
-  group: deploy-codename
+  group: deploy-delta-green
   cancel-in-progress: false
 jobs:
   deploy:
@@ -22,8 +22,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with: { node-version-file: .nvmrc, cache: npm, cache-dependency-path: '**/package-lock.json' }
       - run: npm ci
-      - run: npm ci --prefix apps/codename/functions # esbuild for the Functions check, and the Functions deploy
-      - run: npm run build -w apps/codename
+      - run: npm ci --prefix apps/delta-green/functions # esbuild for the Functions check, and the Functions deploy
+      - run: npm run build -w apps/delta-green
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
@@ -37,7 +37,7 @@ jobs:
       # The hosting action ships Hosting only. The service account needs the "Firebase Rules Admin" role for this step.
       # Tools that receive the service account are pinned: bump these by hand.
       - name: Deploy Firestore rules
-        working-directory: apps/codename
+        working-directory: apps/delta-green
         env:
           SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CODENAME_DG }}
         run: |
@@ -54,13 +54,13 @@ jobs:
           EVENT: ${{ github.event_name }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          BEFORE=$(gh run list --workflow deploy-codename.yml --branch main --status success --limit 1 --json headSha --jq '.[0].headSha // empty') || BEFORE= # an API error falls back to deploying
+          BEFORE=$(gh run list --workflow deploy-delta-green.yml --branch main --status success --limit 1 --json headSha --jq '.[0].headSha // empty') || BEFORE= # an API error falls back to deploying
           if [ "$EVENT" != push ] || [ -z "$BEFORE" ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
             echo "deploy=true" >> "$GITHUB_OUTPUT"
-          elif npx --prefix apps/codename/functions esbuild apps/codename/functions/src/index.ts --bundle --platform=node --format=esm --packages=external \
+          elif npx --prefix apps/delta-green/functions esbuild apps/delta-green/functions/src/index.ts --bundle --platform=node --format=esm --packages=external \
                  --metafile="$RUNNER_TEMP/meta.json" --outfile="$RUNNER_TEMP/bot.js" --log-level=error \
-               && SHARED=$(node -e "console.log(Object.keys(require(process.argv[1]).inputs).filter((f) => !f.startsWith('apps/codename/functions/')).join(' '))" "$RUNNER_TEMP/meta.json") \
-               && git diff --quiet "$BEFORE" HEAD -- apps/codename/functions $SHARED; then
+               && SHARED=$(node -e "console.log(Object.keys(require(process.argv[1]).inputs).filter((f) => !f.startsWith('apps/delta-green/functions/')).join(' '))" "$RUNNER_TEMP/meta.json") \
+               && git diff --quiet "$BEFORE" HEAD -- apps/delta-green/functions $SHARED; then
             echo "deploy=false" >> "$GITHUB_OUTPUT"
           else
             echo "deploy=true" >> "$GITHUB_OUTPUT"
@@ -69,7 +69,7 @@ jobs:
       # the code fails the deploy instead of being deleted. The service account needs the roles listed in the README.
       - name: Deploy Functions
         if: steps.functions.outputs.deploy == 'true'
-        working-directory: apps/codename
+        working-directory: apps/delta-green
         env:
           SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CODENAME_DG }}
         run: |
@@ -82,4 +82,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CODENAME_DG }}
           channelId: live
           projectId: codename-dg
-          entryPoint: apps/codename
+          entryPoint: apps/delta-green

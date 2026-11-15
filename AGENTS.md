@@ -19,7 +19,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 - Game rules come from the book. Before writing or changing rules logic or rules data, look it up with that app's rules MCP server (`rules-<game>`; each app's README names its server) and cite the page in the test or comment. Never use another game's server for it. If the app's server isn't connected, stop and say so.
 - A known limit gets a comment: `// shortcut: <the limit>, <when to upgrade>`.
 - Comments say why, in one line. No comments that repeat the code.
-- A coverage floor only goes up. A new app starts at or above codename's floor (lines 77, statements 74, branches 68, functions 78).
+- A coverage floor only goes up. A new app starts at or above delta-green's floor (lines 77, statements 74, branches 68, functions 78).
 - Never skip a hook (`--no-verify`), disable a lint rule inline, or lower a threshold to get a change through. Fix the cause or ask.
 - Licensing: the root `LICENSE` is MIT and covers everything except a directory with its own `LICENSE` or `NOTICE`. An app's game content follows the game's license, not MIT. Never commit book text or other licensed material to the root or `packages/`; ask the owner what an app's `NOTICE` must say.
 - Never commit, push or merge. The user does that.
@@ -40,14 +40,14 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 
 ## Things that trip people up
 
-- An app's `functions/` is deployed by Firebase on its own, so it keeps its own `package.json` and lockfile and is not an npm workspace. It imports shared code by relative path and esbuild bundles it in. See codename's `functions/package.json` and the Functions steps in its deploy workflow.
+- An app's `functions/` is deployed by Firebase on its own, so it keeps its own `package.json` and lockfile and is not an npm workspace. It imports shared code by relative path and esbuild bundles it in. See delta-green's `functions/package.json` and the Functions steps in its deploy workflow.
 - Saves are diffs against what the tab last read. Shared save code takes a document reference from the app and never builds a path. Never write a whole document, or you'll overwrite changes from another device.
 - Firestore rules deploy before the build, and open tabs keep running the old build. Adding or removing a field takes two releases.
 - E2E tests click a radio's or checkbox's `label.choice`; React Aria hides the input itself.
 
 ## Bringing an app in
 
-Copy the app to `apps/<app>/` as it is, without `.git`, `node_modules`, `dist` or `.env`. Then, in this order (rehearsed with codename: every check passed afterwards):
+Copy the app to `apps/<app>/` as it is, without `.git`, `node_modules`, `dist` or `.env`. Then, in this order (rehearsed with delta-green: every check passed afterwards):
 
 1. Delete the app's own `eslint.config.js`, `knip.jsonc`, `AGENTS.md`, `CLAUDE.md`, `.github/` and `package-lock.json`. The root versions replace them. Its deploy workflow is moved into the root `.github/workflows/` by hand, not copied.
 2. Run `npx prettier --write apps/<app>` once. It goes in the same commit as the copy, because the hooks refuse unformatted files.
@@ -59,7 +59,7 @@ An app is ready when all of these are true:
 
 - Its `check`, `test:rules` and `test:e2e` pass.
 - It has a workspace entry in `knip.jsonc` (and one for its `functions/`, if it has one).
-- It has a coverage floor, at or above codename's.
+- It has a coverage floor, at or above delta-green's.
 - Its Dependabot entries exist (its `functions/` directory, if it has one).
 - Nothing in it imports from another app.
 - It has an `apps/<app>/LICENSE` or `NOTICE` stating the terms its game content is under, and its `package.json` `license` field matches (`SEE LICENSE IN LICENSE` if the terms are custom).
@@ -70,6 +70,6 @@ An app is ready when all of these are true:
 
 The owner does not track these. When an import finishes, or the owner asks what is next, say which of them are now due.
 
-- **After codename is in and green:** raise TypeScript strictness in `tsconfig.base.json` one more flag at a time (`jsx-a11y` is on `strict` and `noUncheckedIndexedAccess` is on). One PR per change, and only when every app passes.
-- **Right after hearthfire is in:** codename and hearthfire share a lot of architecture (hearthfire inspired codename), so look for what to move to `packages/` now that two apps use it. Start with the axe helper (`expectAccessible` in codename's `e2e/helpers.ts`, and `@axe-core/playwright`): hearthfire needs the same check to be ready, so it uses the shared helper from the start and does not copy it. Then the items the brief lists: `src/ui`, the tokens, Firebase init, diff saves, autosave, stale-build reload.
+- **Strictness ratchet:** raise TypeScript strictness in `tsconfig.base.json` one more flag at a time (`jsx-a11y` is on `strict` and `noUncheckedIndexedAccess` is on). One PR per change, and only when every app passes.
+- **Right after hearthfire is in:** delta-green and hearthfire share a lot of architecture (hearthfire inspired it), so look for what to move to `packages/` now that two apps use it. Start with the axe helper (`expectAccessible` in delta-green's `e2e/helpers.ts`, and `@axe-core/playwright`): hearthfire needs the same check to be ready, so it uses the shared helper from the start and does not copy it. Then the items the brief lists: `src/ui`, the tokens, Firebase init, diff saves, autosave, stale-build reload.
 - **Before the first app is released:** confirm the GitHub settings in README.md "GitHub settings" are all on, and that the `checks` job is required on `dev` and `main`.

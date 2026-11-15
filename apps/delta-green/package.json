@@ -1,5 +1,5 @@
 {
-  "name": "codename",
+  "name": "delta-green",
   "private": true,
   "license": "SEE LICENSE IN NOTICE",
   "version": "0.1.0",
@@ -12,8 +12,8 @@
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json && npm --prefix functions run typecheck",
     "knip": "knip",
-    "test:rules": "firebase emulators:exec --only firestore --project demo-codename 'vitest run --config vitest.rules.config.ts'",
-    "test:e2e": "firebase emulators:exec --only firestore --project demo-codename 'playwright test'",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-delta-green 'vitest run --config vitest.rules.config.ts'",
+    "test:e2e": "firebase emulators:exec --only firestore --project demo-delta-green 'playwright test'",
     "test:coverage": "vitest run --coverage",
     "check": "npm run lint && npm run typecheck && npm run knip && npm run test:coverage"
   },

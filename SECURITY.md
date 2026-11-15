@@ -12,4 +12,4 @@ In scope: the code in this repo, the Firestore security rules, Cloud Functions, 
 
 ## Not a vulnerability
 
-Link-only apps (such as codename) are unlisted, not secret: anyone with a game's link can read and write that game. That is how they are designed. Rules that let someone read or write a game _without_ its ID, or reach another game, are a vulnerability.
+Link-only apps (such as delta-green) are unlisted, not secret: anyone with a game's link can read and write that game. That is how they are designed. Rules that let someone read or write a game _without_ its ID, or reach another game, are a vulnerability.
