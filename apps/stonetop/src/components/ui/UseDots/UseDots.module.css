@@ -1,0 +1,62 @@
+.useDots {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex-shrink: 0;
+}
+
+.useDot {
+  composes: focusVisible from '@/components/ui/field.module.css';
+  /* WCAG 2.5.8 (Target Size, Minimum): the hit area is ≥24px for all pointer
+     inputs. The visible dot lives in ::before and stays 14px, so the button can
+     grow without resizing the dot. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.useDot::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  background: transparent;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.useDot:hover::before {
+  border-color: var(--color-gold-400);
+}
+
+.useDotFilled::before {
+  background: var(--color-gold-500);
+  border-color: var(--color-gold-500);
+}
+
+.useDotFilled:hover::before {
+  background: var(--color-gold-400);
+  border-color: var(--color-gold-400);
+}
+
+.useDot:focus-visible {
+  border-radius: 50%;
+}
+
+.useDot:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.useDotsLabel {
+  white-space: nowrap;
+}

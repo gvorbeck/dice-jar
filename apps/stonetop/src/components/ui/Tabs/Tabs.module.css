@@ -1,0 +1,272 @@
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+.tablistRow {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* The tab strip scrolls, not the whole row: the add button lives outside this
+   box so overflowing tabs can never slide under it. `min-width: 0` lets the
+   strip shrink past its content, which is what makes the overflow scroll. */
+.tablist {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold-400) transparent;
+}
+
+.tablist::-webkit-scrollbar {
+  height: 3px;
+}
+
+.tablist::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tablist::-webkit-scrollbar-thumb {
+  background: var(--color-gold-400);
+  border-radius: 2px;
+}
+
+.addTabWrapper {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+
+.addTab {
+  composes: focusVisible from '@/components/ui/field.module.css';
+  background: none;
+  border: 1px solid var(--color-gold-400);
+  border-radius: 3px;
+  padding: var(--spacing-1) var(--spacing-3);
+  cursor: pointer;
+  color: var(--text-accent);
+  font-size: var(--text-md);
+  line-height: 1;
+  align-self: center;
+  margin-left: var(--spacing-2);
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.addTab:hover {
+  color: var(--text-accent);
+  border-color: var(--text-accent);
+}
+
+/* Never shrink a tab below its label — the strip scrolls instead. Without this
+   the labels squeeze to min-content and wrap mid-word. */
+.tabSlot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+
+.tab {
+  composes: focusVisible from '@/components/ui/field.module.css';
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: var(--spacing-3) var(--spacing-6);
+  cursor: pointer;
+  user-select: none;
+  color: var(--text-secondary);
+  font-family: var(--font-serif);
+  font-size: var(--text-md);
+  letter-spacing: 0.03em;
+  margin-bottom: -1px;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--text-accent);
+}
+
+.tab.active {
+  color: var(--text-accent);
+  border-bottom-color: var(--border-accent);
+}
+
+.tab:focus-visible {
+  outline-offset: -2px;
+}
+
+/* Reserve room on the right for the absolutely-positioned remove button so it
+   never overlaps the label or badge. */
+.tabHasRemove {
+  padding-right: calc(var(--spacing-6) + 16px);
+}
+
+.tabRemoveWrapper {
+  position: absolute;
+  right: var(--spacing-2);
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+}
+
+.tabRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.tabSlot:hover .tabRemove,
+.tabSlotActive .tabRemove {
+  opacity: 1;
+}
+
+.tabRemove:hover {
+  color: var(--text-danger);
+  background-color: color-mix(in srgb, var(--color-danger) 15%, transparent);
+}
+
+.tabRemove:focus-visible {
+  outline: 2px solid var(--color-danger);
+  outline-offset: 1px;
+  opacity: 1;
+}
+
+.tabBadge {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gold-400);
+  margin-left: var(--spacing-2);
+  vertical-align: middle;
+  flex-shrink: 0;
+  box-shadow:
+    0 0 4px 1px color-mix(in srgb, var(--color-gold-400) 60%, transparent),
+    0 0 10px 2px color-mix(in srgb, var(--color-gold-400) 30%, transparent);
+}
+
+.tabTooltip {
+  position: absolute;
+  z-index: var(--z-tooltip);
+  width: max-content;
+  max-width: 220px;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease,
+    visibility 0s 0.12s;
+  white-space: normal;
+  text-align: center;
+}
+
+.tabTooltip.bottom {
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.tabTooltip.bottom.tabTooltipVisible {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease,
+    visibility 0s 0s;
+  transform: translateX(-50%) translateY(0);
+}
+
+.tabTooltip.top {
+  transform: translateX(-50%) translateY(4px);
+}
+
+.tabTooltip.top.tabTooltipVisible {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease,
+    visibility 0s 0s;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Every tooltip in this file is portalled to <body>, so placement comes from the
+   viewport coordinates useTooltip measures — never from the anchor. The .top /
+   .bottom rules deliberately set no offsets: an anchor-relative `bottom` here
+   would resolve against the viewport and fight this `top`, over-constraining the
+   box until it collapses to half height. They own only the transform and arrow. */
+.tabTooltip.portalFixed {
+  position: fixed;
+  top: var(--tooltip-top);
+  left: var(--tooltip-left);
+}
+
+.tabTooltipArrow {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-strong);
+  transform: rotate(45deg);
+}
+
+.tabTooltip.bottom .tabTooltipArrow {
+  top: -4px;
+  left: var(--arrow-offset, 50%);
+  margin-left: -3px;
+  border-bottom: none;
+  border-right: none;
+}
+
+.tabTooltip.top .tabTooltipArrow {
+  bottom: -4px;
+  left: var(--arrow-offset, 50%);
+  margin-left: -3px;
+  border-top: none;
+  border-left: none;
+}
+
+.panel {
+  padding-top: var(--spacing-6);
+}
+
+.panel[hidden] {
+  display: none;
+}

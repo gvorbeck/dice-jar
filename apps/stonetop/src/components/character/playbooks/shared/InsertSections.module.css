@@ -1,0 +1,27 @@
+.purposeDetail {
+  padding-left: calc(16px + var(--spacing-3));
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.purposeNameInput {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+}
+
+.triggerList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.triggerItem {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}

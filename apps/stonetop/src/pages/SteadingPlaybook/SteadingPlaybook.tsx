@@ -1,0 +1,259 @@
+import { useMemo, useRef, useState } from 'react';
+import { useHashTabs } from '@/hooks/useHashTabs';
+import { useParams } from 'react-router-dom';
+import { PageMeta } from '@/components/app/PageMeta/PageMeta';
+import { useGame } from '@/hooks/useGame';
+import { useNotesActions } from '@/hooks/useNotesActions';
+import { SharedNotes, type NotesActions } from '@/components/playbook/SharedNotes/SharedNotes';
+import { ScrollToTop, Tabs, Dropdown, Button, PlaybookColumns } from '@/components/ui';
+import type { DropdownGroup } from '@/components/ui';
+import { PageLayout } from '@/components/app/PageLayout/PageLayout';
+import { buildGameNav } from '@/components/app/PageHeader/gameNav';
+import {
+  SteadingImprovementList,
+  RESOURCES_CONFIG,
+  FORTIFICATIONS_CONFIG,
+} from '@/components/gm-playbook/sections/SteadingImprovementList';
+import { PlaybookSection } from '@/components/playbook/PlaybookSection';
+import { GameGuard } from '@/components/app/GameGuard/GameGuard';
+import { DEFAULT_GAME_NAME, getPlaybook } from '@/lib/constants';
+import { SteadingStats } from '@/components/gm-playbook/sections/SteadingStats';
+import { SteadingImprovements } from '@/components/gm-playbook/sections/SteadingImprovements';
+import { SteadingAssets } from '@/components/gm-playbook/sections/SteadingAssets';
+import { SteadingNPCs } from '@/components/gm-playbook/sections/SteadingNPCs/SteadingNPCs';
+import { RelationshipGraph } from '@/components/gm-playbook/sections/SteadingNPCs/RelationshipGraph';
+import { PlacesOfInterest, ReferenceNames, NpcTraits } from '@/components/gm-playbook/sections/SteadingReference';
+import type { GameSession, LoggedRoll, SteadingData, SteadingNPC } from '@/types';
+import styles from './SteadingPlaybook.module.css';
+
+interface SteadingContentProps {
+  g: GameSession;
+  id: string;
+  updateSteading: (patch: Partial<SteadingData>) => Promise<void>;
+  logRoll: (roll: LoggedRoll) => Promise<void>;
+  notesActions: NotesActions;
+}
+
+interface NpcFilterRowProps {
+  g: GameSession;
+  npcFilter: string;
+  onFilterChange: (value: string) => void;
+}
+
+const NpcFilterRow = ({ g, npcFilter, onFilterChange }: NpcFilterRowProps) => {
+  const groups = useMemo(() => buildFilterGroups(g), [g]);
+  if (groups.length === 0) return null;
+  return (
+    <div className={styles.npcFilterRow}>
+      <Dropdown
+        id="npc-relationship-filter"
+        aria-label="Filter NPCs by relationship"
+        groups={groups}
+        value={npcFilter}
+        onChange={onFilterChange}
+        placeholder="Filter by relationship…"
+        className={styles.npcFilterDropdown}
+      />
+      {npcFilter && (
+        <Button variant="ghost" size="sm" className={styles.npcFilterClear} onClick={() => onFilterChange('')}>
+          Clear filter
+        </Button>
+      )}
+    </div>
+  );
+};
+
+const buildFilterGroups = (g: GameSession): DropdownGroup<string>[] => {
+  const residents = g.steading?.residents ?? [];
+  const neighbors = g.steading?.neighbors ?? [];
+  const allNpcs: SteadingNPC[] = [...residents, ...neighbors];
+  const referencedIds = new Set(allNpcs.flatMap((n) => (n.relationships ?? []).map((r) => r.targetId).filter(Boolean)));
+
+  const pcs = g.characters
+    .filter((c) => referencedIds.has(c.id))
+    .map((c) => ({ value: c.id, label: `${c.name} (${getPlaybook(c.playbook)?.label ?? c.playbook})` }));
+  const residentOpts = residents.filter((r) => referencedIds.has(r.id)).map((r) => ({ value: r.id, label: r.name }));
+  const neighborOpts = neighbors.filter((n) => referencedIds.has(n.id)).map((n) => ({ value: n.id, label: n.name }));
+
+  const groups: DropdownGroup<string>[] = [];
+  if (pcs.length > 0) groups.push({ label: 'Player Characters', options: pcs });
+  if (residentOpts.length > 0) groups.push({ label: 'Stonetop Residents', options: residentOpts });
+  if (neighborOpts.length > 0) groups.push({ label: 'Notable Neighbors', options: neighborOpts });
+  return groups;
+};
+
+interface SteadingTabProps {
+  steading: Partial<SteadingData>;
+  updateSteading: (patch: Partial<SteadingData>) => Promise<void>;
+}
+
+const SteadingTab = ({ steading, updateSteading }: SteadingTabProps) => (
+  <PlaybookColumns
+    left={
+      <PlaybookSection title="Stats & Debilities">
+        <SteadingStats steading={steading} onSave={updateSteading} />
+      </PlaybookSection>
+    }
+    right={
+      <>
+        <PlaybookSection title="Resources">
+          <SteadingImprovementList
+            config={RESOURCES_CONFIG}
+            items={steading.resources}
+            improvements={steading.improvements}
+            gmImprovements={steading.gmImprovements}
+            removedFixedItems={steading.removedFixedItems}
+            onSave={updateSteading}
+          />
+        </PlaybookSection>
+        <PlaybookSection title="Fortifications">
+          <SteadingImprovementList
+            config={FORTIFICATIONS_CONFIG}
+            items={steading.fortifications}
+            improvements={steading.improvements}
+            gmImprovements={steading.gmImprovements}
+            removedFixedItems={steading.removedFixedItems}
+            onSave={updateSteading}
+          />
+        </PlaybookSection>
+        <PlaybookSection title="Assets">
+          <SteadingAssets steading={steading} onSave={updateSteading} />
+        </PlaybookSection>
+        <PlaybookSection title="Places of interest">
+          <PlacesOfInterest placesOfInterest={steading.placesOfInterest} onSave={updateSteading} />
+        </PlaybookSection>
+      </>
+    }
+  />
+);
+
+const ImprovementsTab = ({ steading, updateSteading }: SteadingTabProps) => (
+  <PlaybookColumns
+    full={
+      <PlaybookSection title="Improvements">
+        <SteadingImprovements improvements={steading.improvements} gmImprovements={steading.gmImprovements} onSave={updateSteading} />
+      </PlaybookSection>
+    }
+  />
+);
+
+interface NpcsTabProps {
+  g: GameSession;
+  steading: Partial<SteadingData>;
+  updateSteading: (patch: Partial<SteadingData>) => Promise<void>;
+  npcFilter: string;
+  onFilterChange: (value: string) => void;
+}
+
+const NpcsTab = ({ g, steading, updateSteading, npcFilter, onFilterChange }: NpcsTabProps) => (
+  <div className={styles.npcsLayout}>
+    <NpcFilterRow g={g} npcFilter={npcFilter} onFilterChange={onFilterChange} />
+    <PlaybookColumns
+      left={
+        <PlaybookSection title="Residents of Stonetop">
+          <SteadingNPCs section="residents" npcs={steading.residents} onSave={updateSteading} game={g} filterTargetId={npcFilter} />
+        </PlaybookSection>
+      }
+      right={
+        <PlaybookSection title="Notable Neighbors">
+          <SteadingNPCs section="neighbors" npcs={steading.neighbors} onSave={updateSteading} game={g} filterTargetId={npcFilter} />
+        </PlaybookSection>
+      }
+    />
+    <PlaybookColumns
+      full={
+        <PlaybookSection title="Relationship map">
+          <RelationshipGraph game={g} focusId={npcFilter || undefined} />
+        </PlaybookSection>
+      }
+    />
+  </div>
+);
+
+const ReferenceTab = () => (
+  <PlaybookColumns
+    left={
+      <PlaybookSection title="Names">
+        <ReferenceNames />
+      </PlaybookSection>
+    }
+    right={
+      <PlaybookSection title="NPC Traits">
+        <NpcTraits />
+      </PlaybookSection>
+    }
+  />
+);
+
+const SteadingContent = ({ g, id, updateSteading, logRoll, notesActions }: SteadingContentProps) => {
+  const headerRef = useRef<HTMLDivElement>(null);
+  const gameName = g.name || DEFAULT_GAME_NAME;
+  const steading = useMemo(() => g.steading ?? {}, [g.steading]);
+  const [npcFilter, setNpcFilter] = useState('');
+
+  const tabs = useMemo(
+    () => [
+      {
+        id: 'steading',
+        label: 'Steading',
+        content: <SteadingTab steading={steading} updateSteading={updateSteading} />,
+      },
+      {
+        id: 'improvements',
+        label: 'Improvements',
+        content: <ImprovementsTab steading={steading} updateSteading={updateSteading} />,
+      },
+      {
+        id: 'npcs',
+        label: 'NPCs',
+        content: <NpcsTab g={g} steading={steading} updateSteading={updateSteading} npcFilter={npcFilter} onFilterChange={setNpcFilter} />,
+      },
+      {
+        id: 'reference',
+        label: 'Reference',
+        content: <ReferenceTab />,
+      },
+    ],
+    [steading, updateSteading, npcFilter, g],
+  );
+
+  const { activeIndex, handleActiveChange } = useHashTabs(tabs);
+  const nav = buildGameNav(g, id, `/game/${id}/steading`);
+
+  return (
+    <PageLayout
+      title="Steading Playbook"
+      gameId={id}
+      nav={nav}
+      diceRoller={{ rollerId: 'steading', rollerName: 'Steading', onRoll: logRoll }}
+    >
+      <PageMeta
+        noindex
+        title={`Steading Playbook — ${gameName} — Hearthfire`}
+        description={`Stonetop steading playbook for ${gameName}. Track stats, improvements, assets, and NPCs.`}
+      />
+      <ScrollToTop sentinelRef={headerRef} />
+      <div ref={headerRef} />
+      <Tabs
+        aria-label="Steading sections"
+        className={styles.tabs}
+        tabs={tabs}
+        activeIndex={activeIndex}
+        onActiveChange={handleActiveChange}
+      />
+      <SharedNotes notesKey="steading" html={g.notes?.steading} lock={g.notesLocks?.steading} actions={notesActions} />
+    </PageLayout>
+  );
+};
+
+export const SteadingPlaybook = () => {
+  const { id = '' } = useParams<{ id: string }>();
+  const { game, loading, error, updateSteading, logRoll, updateNotes, claimNotesLock, refreshNotesLock, releaseNotesLock } = useGame(id);
+  const notesActions = useNotesActions({ updateNotes, claimNotesLock, refreshNotesLock, releaseNotesLock });
+
+  return (
+    <GameGuard loading={loading} error={error} game={game} errorBackTo={`/game/${id}`} errorBackLabel="Back to Game">
+      {(g) => <SteadingContent g={g} id={id} updateSteading={updateSteading} logRoll={logRoll} notesActions={notesActions} />}
+    </GameGuard>
+  );
+};

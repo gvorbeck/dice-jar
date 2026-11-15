@@ -1,0 +1,171 @@
+.base {
+  composes: focusVisible from '../field.module.css';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  /* Pair with white-space: nowrap above — as a flex child the label can't wrap,
+     so without this a sibling would shrink the button below its content width
+     and the label would overflow into the padding/border. */
+  flex-shrink: 0;
+}
+
+.base:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.primary {
+  background-color: var(--color-gold-400);
+  /* Dark ink on the fixed-gold fill — gold doesn't flip by theme, so the ink doesn't either. */
+  color: var(--text-on-gold);
+}
+
+.primary:hover:not(:disabled) {
+  background-color: var(--color-gold-300);
+  box-shadow: var(--glow-gold);
+}
+
+.primary:active:not(:disabled) {
+  background-color: var(--color-gold-500);
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+.secondary {
+  background-color: transparent;
+  color: var(--text-accent);
+  border: 1px solid var(--color-gold-500);
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-gold-400) 12%, transparent);
+  border-color: var(--color-gold-300);
+  color: var(--text-accent-strong);
+}
+
+.secondary:active:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-gold-400) 22%, transparent);
+  border-color: var(--color-gold-400);
+  transform: translateY(1px);
+}
+
+.danger {
+  /* --fill-danger, not the flipping --color-danger: white ink on ember-400
+     (the dark-theme danger) is only ≈3:1; on the fixed fill it's ≈5.2:1. */
+  background-color: var(--fill-danger);
+  /* Fixed-color fill like .primary above — fixed white ink that doesn't flip by theme. */
+  color: var(--text-on-danger);
+}
+
+.danger:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--fill-danger) 80%, #000);
+  box-shadow: var(--glow-danger);
+}
+
+.danger:active:not(:disabled) {
+  background-color: color-mix(in srgb, var(--fill-danger) 70%, #000);
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+.ghost {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.ghost:hover:not(:disabled) {
+  background-color: var(--surface-raised);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.ghost:active:not(:disabled) {
+  background-color: var(--surface-overlay);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+  transform: translateY(1px);
+}
+
+/* Layout */
+.fullWidth {
+  display: flex;
+  width: 100%;
+}
+
+/* Sizes */
+/* min-width keeps short labels ("OK") from collapsing to a cramped pill,
+   so buttons stay visually consistent in a row. Icon-only buttons override
+   this below to stay square. */
+.sm {
+  font-size: var(--text-sm);
+  padding: var(--spacing-2) var(--spacing-3);
+  gap: var(--spacing-1);
+  min-width: 4rem;
+}
+
+.md {
+  font-size: var(--text-sm);
+  padding: var(--spacing-2) var(--spacing-4);
+  gap: var(--spacing-2);
+  min-width: 5rem;
+}
+
+.lg {
+  font-size: var(--text-md);
+  padding: var(--spacing-3) var(--spacing-6);
+  gap: var(--spacing-2);
+  min-width: 6rem;
+}
+
+.xl {
+  font-size: var(--text-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: var(--spacing-4) var(--spacing-8);
+  gap: var(--spacing-3);
+  min-width: 8rem;
+}
+
+/* Icon-only buttons drop the label min-width to stay square. */
+.iconOnly.sm {
+  padding: var(--spacing-2);
+  min-width: 0;
+}
+
+.iconOnly.md {
+  padding: var(--spacing-2);
+  min-width: 0;
+}
+
+.iconOnly.lg {
+  padding: var(--spacing-3);
+  min-width: 0;
+}
+
+.iconOnly.xl {
+  padding: var(--spacing-4);
+  min-width: 0;
+}
+
+/* The pressed-state color shift carries the feedback on its own, so drop the
+   nudge for users who'd rather not see motion. */
+@media (prefers-reduced-motion: reduce) {
+  .base:active:not(:disabled) {
+    transform: none;
+  }
+}

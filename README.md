@@ -2,7 +2,7 @@
 
 Tabletop RPG character apps, one per game, sharing their tooling and, once a second app needs it, their code. Package scope: `@dice-jar/*`.
 
-Only delta-green is in so far. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
+delta-green and stonetop are in so far (stonetop is the app behind hearthfire.camp). The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
 
 | App         | Game              | Rules MCP server    | Access    |
 | ----------- | ----------------- | ------------------- | --------- |
