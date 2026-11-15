@@ -28,7 +28,7 @@ const roll = (over: Record<string, unknown> = {}) => ({
 });
 
 beforeAll(async () => {
-  env = await initializeTestEnvironment({ projectId: 'demo-codename', firestore: { rules: readFileSync('firestore.rules', 'utf8') } });
+  env = await initializeTestEnvironment({ projectId: 'demo-delta-green', firestore: { rules: readFileSync('firestore.rules', 'utf8') } });
 });
 afterAll(() => env.cleanup());
 beforeEach(async () => {

@@ -1,12 +1,12 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  // One entry per app, added when it comes in, e.g. "apps/codename": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "vitest.rules.config.ts"] }.
+  // One entry per app, added when it comes in, e.g. "apps/delta-green": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "vitest.rules.config.ts"] }.
   // An app's functions/ is not an npm workspace, so it gets its own entry: "apps/<app>/functions": { "entry": [..., "src/**/*.test.ts"] }.
   // The test glob is needed: the app's vitest runs those tests, but knip can't see that from inside functions/.
   "workspaces": {
     ".": {},
-    "apps/codename": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "vitest.rules.config.ts"] },
-    "apps/codename/functions": {
+    "apps/delta-green": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "vitest.rules.config.ts"] },
+    "apps/delta-green/functions": {
       "entry": ["src/webhookTest.ts", "src/registerCommands.ts", "src/**/*.test.ts"],
       "ignoreDependencies": ["zod"],
     },

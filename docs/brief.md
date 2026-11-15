@@ -1,5 +1,7 @@
 # Monorepo brief
 
+> **Renamed:** apps are named after the game system, so the app this brief calls `codename` is now `apps/delta-green`. It still deploys to yourcodena.me. The text below keeps the old name.
+>
 > **Status (Nov 2026):** the scaffold described here is done. The rules agents follow now live in [AGENTS.md](../AGENTS.md). "Scope of this work" is history; "Later phases" is still the plan, starting with importing codename.
 
 Repo name: `dice-jar`. Package scope: `@dice-jar/*`.

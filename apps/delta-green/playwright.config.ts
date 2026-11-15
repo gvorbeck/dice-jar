@@ -16,7 +16,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     env: {
       VITE_FIRESTORE_EMULATOR: '127.0.0.1:8080',
-      VITE_FIREBASE_PROJECT_ID: 'demo-codename',
+      VITE_FIREBASE_PROJECT_ID: 'demo-delta-green',
       VITE_FIREBASE_API_KEY: 'demo',
       VITE_FIREBASE_AUTH_DOMAIN: 'demo',
       VITE_FIREBASE_STORAGE_BUCKET: 'demo',

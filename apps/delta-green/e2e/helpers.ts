@@ -6,7 +6,7 @@ import { expect, test, type Browser, type BrowserContext, type Page } from '@pla
 const admin = createRequire(new URL('../functions/package.json', import.meta.url));
 const { getApps, initializeApp } = admin('firebase-admin/app');
 const { getFirestore } = admin('firebase-admin/firestore');
-if (!getApps().length) initializeApp({ projectId: 'demo-codename' }); // FIRESTORE_EMULATOR_HOST is set by `firebase emulators:exec`
+if (!getApps().length) initializeApp({ projectId: 'demo-delta-green' }); // FIRESTORE_EMULATOR_HOST is set by `firebase emulators:exec`
 
 /** The agent document as the server has it, read past every browser cache. */
 export const agentDoc = (gameId: string, agentId: string) => getFirestore().doc(`games/${gameId}/agents/${agentId}`).get();

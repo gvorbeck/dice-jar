@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20 # shortcut: sized for an empty repo, raise it once apps' rules and e2e tests run here
     steps:
+      # Removed files don't count, so renaming an app (a delete under the old name, an add under the new) is still one app.
       # A PR changes one app (AGENTS.md). The release PR from this repo's dev to main carries whatever was merged, so it is exempt.
       - name: One app per PR
         if: github.event_name == 'pull_request' && !(github.base_ref == 'main' && github.head_ref == 'dev' && github.event.pull_request.head.repo.full_name == github.repository)
@@ -25,7 +26,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
         run: |
-          apps=$(gh api --paginate "repos/$GH_REPO/pulls/$PR/files" --jq '.[].filename' | sed -n 's#^apps/\([^/]*\)/.*#\1#p' | sort -u)
+          apps=$(gh api --paginate "repos/$GH_REPO/pulls/$PR/files" --jq '.[] | select(.status != "removed") | .filename' | sed -n 's#^apps/\([^/]*\)/.*#\1#p' | sort -u)
           if [ "$(printf '%s\n' "$apps" | grep -c .)" -gt 1 ]; then
             echo "::error::This PR changes more than one app ($(echo $apps)). Split it into one PR per app."
             exit 1
