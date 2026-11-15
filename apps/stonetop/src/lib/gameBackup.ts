@@ -96,6 +96,9 @@ export const exportGame = async (gameId: string, suffix?: string): Promise<strin
 // Validate an uploaded file before it gets anywhere near a write. Every rejection returns a
 // line the player can act on, because the alternative — a half-written game doc — isn't
 // recoverable from the UI.
+// Same cap as firestore.rules.
+const MAX_CHARACTERS = 20;
+
 export const readImportFile = (text: string): ImportCheck => {
   let raw: unknown;
   try {
@@ -129,6 +132,15 @@ export const readImportFile = (text: string): ImportCheck => {
     return {
       ok: false,
       error: "That backup contains a value the database can't store (an array inside an array). It may have been edited by hand.",
+    };
+  }
+
+  // Mirrors isValidGame in firestore.rules: the parser below fills in defaults, but the stored game must pass the rules as written.
+  if (!isString(game.name) || !isNumber(game.createdAt) || !Array.isArray(game.characters) || game.characters.length > MAX_CHARACTERS) {
+    return {
+      ok: false,
+      error:
+        "That backup can't be restored: its name, creation date or character list is missing or invalid, or it has more than 20 characters.",
     };
   }
 

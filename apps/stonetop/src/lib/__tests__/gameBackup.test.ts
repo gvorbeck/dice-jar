@@ -210,6 +210,15 @@ describe('readImportFile — rejections', () => {
     expect(check).toEqual({ ok: false, error: expect.stringContaining(`format v${EXPORT_VERSION + 1}`) });
   });
 
+  it.each([
+    ['a name that is not a string', { name: 7 }],
+    ['no createdAt', { createdAt: undefined }],
+    ['more than 20 characters', { characters: Array.from({ length: 21 }, (_, i) => ({ id: `c${i}`, playbook: 'blessed' })) }],
+  ])('rejects a backup with %s, which the database rules would refuse', (_label, over) => {
+    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc(over))));
+    expect(check).toEqual({ ok: false, error: expect.stringContaining("can't be restored") });
+  });
+
   it('accepts an older version', () => {
     const check = readImportFile(JSON.stringify(envelopeFor(gameDoc(), { version: 0 })));
     expect(check.ok).toBe(true);
@@ -272,7 +281,7 @@ describe('readImportFile — success', () => {
   });
 
   it('reports zero counts and no steading for a bare game', () => {
-    const check = readImportFile(JSON.stringify(envelopeFor({ name: 'Empty' })));
+    const check = readImportFile(JSON.stringify(envelopeFor({ name: 'Empty', createdAt: 1, characters: [] })));
 
     expect(check.ok).toBe(true);
     if (!check.ok) return;

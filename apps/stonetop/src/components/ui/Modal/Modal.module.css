@@ -23,7 +23,9 @@
   gap: var(--spacing-6);
   box-shadow: var(--shadow-lg);
   position: relative;
-  overflow: hidden;
+  /* Tall content (the NPC form) scrolls inside the panel instead of leaving its controls off screen. */
+  max-height: calc(100dvh - 2 * var(--spacing-4));
+  overflow-y: auto;
 }
 
 .panel:focus:not(:focus-visible) {
