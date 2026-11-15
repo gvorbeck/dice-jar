@@ -12,7 +12,7 @@ export default defineConfig(
   { ignores: ['**/dist', '**/coverage', '**/test-results', '**/playwright-report', '**/node_modules', 'apps/*/functions/lib'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
-  jsxA11y.flatConfigs.recommended,
+  jsxA11y.flatConfigs.strict,
   { rules: { '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^_', ignoreRestSiblings: true }] } },
   {
     files: [
