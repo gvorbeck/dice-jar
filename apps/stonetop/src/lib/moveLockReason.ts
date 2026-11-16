@@ -1,4 +1,4 @@
-import type { MoveDefinition } from '@/types';
+import type { MoveDefinition } from '@/model';
 
 // Returns the fully-formed, still-unmet lock reasons for a move (empty array = unlocked). Either a
 // single "Conflicts with …" reason, or a single "Requires …" reason listing the unmet prerequisites.

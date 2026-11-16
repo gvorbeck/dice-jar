@@ -1,9 +1,9 @@
 import { useState, useCallback, useId, useMemo } from 'react';
-import { Button, Dropdown, Heading, Modal, Text } from '@/components/ui';
-import { useToast } from '@/components/app';
+import { Button, Dropdown, Heading, Modal, Text } from '@/ui';
+import { useToast } from '@/ui/Toast/ToastContext';
 import { PLAYBOOKS, getPlaybook } from '@/lib/constants';
 import { generateId } from '@/lib/id';
-import type { Character, PlaybookType } from '@/types';
+import type { Character, PlaybookType } from '@/model';
 
 interface AddCharacterModalProps {
   open: boolean;
@@ -64,7 +64,7 @@ export const AddCharacterModal = ({ open, onClose, existingPlaybooks, onAdd }: A
           {selectedPlaybook.description}
         </Text>
       )}
-      <div className="add-character-modal-actions">
+      <div className="flex gap-3 end">
         <Button type="button" variant="secondary" onClick={handleClose} size="md" disabled={adding}>
           Cancel
         </Button>

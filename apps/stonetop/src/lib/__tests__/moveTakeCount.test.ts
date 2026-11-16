@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { moveTakeCount } from '../moveTakeCount';
-import type { CharacterData } from '@/types';
+import type { CharacterData } from '@/model';
 
 const data = (typeMoves: Record<string, boolean>, typeMoveTakes: Record<string, number> = {}) =>
   ({ typeMoves, typeMoveTakes }) as CharacterData;

@@ -81,26 +81,20 @@ npm run preview
 
 ```
 src/
-├── components/
-│   ├── ui/               # Design-system atoms (Button, Input, Checkbox, PlaybookColumns, …)
-│   ├── app/              # App chrome (ErrorBoundary, GameGuard, PageHeader, PageLayout, …)
-│   ├── character/        # Character sheet sections and per-playbook overrides
-│   ├── gm-playbook/      # GM playbook sections
-│   └── fields/           # Form field composites (RepeaterField, TagInput)
-├── hooks/
-│   ├── useGame.ts        # Game state: load, update, add characters
-│   └── useDebouncedSave.ts
-├── lib/
-│   ├── firebase.ts       # Firestore client
-│   ├── constants.ts      # Playbook definitions
-│   └── game.ts           # Game creation helpers
+├── ui/                   # Design-system kit and app chrome (Button, Input, Modal, PageLayout, Toast, GameGuard, RepeaterField, …)
+├── character/            # Character sheet sections and per-playbook overrides
+├── gm-playbook/          # GM and steading playbook sections
+├── playbook/             # Parts shared by the playbook pages (notes editor, layout)
 ├── pages/
 │   ├── Home/             # Create or join a game
 │   ├── Game/             # Party roster and session hub
 │   ├── CharacterPlaybook/ # Individual character sheet
-│   └── GmPlaybook/       # GM reference
-└── types/
-    └── index.ts          # Shared TypeScript types
+│   ├── GmPlaybook/       # GM reference
+│   └── SteadingPlaybook/ # Steading reference
+├── lib/                  # Non-visual code: hooks (useGame, useDebouncedSave, …), Firestore access, dice, parsing
+├── model/                # Shared TypeScript types
+├── rules/                # Game data: moves, arcana, character creation
+└── styles/               # tokens.css and app.css, imported once from main.tsx
 ```
 
 ---

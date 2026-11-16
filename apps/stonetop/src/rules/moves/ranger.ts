@@ -1,0 +1,323 @@
+import type { MoveDefinition } from '@/model';
+import { IMPROVED_STAT_BASE, SUPERIOR_STAT_BASE } from './_statMoves';
+
+export const RANGER_MOVES: MoveDefinition[] = [
+  {
+    id: 'ranger-a-safe-place',
+    name: 'A Safe Place',
+    leftControl: 1,
+    rightControl: [{ type: 'dot', number: 2 }],
+    body: [
+      {
+        kind: 'para',
+        text: "When you **select and prepare the party's camp site**, hold 1 Precaution, or 2 Precaution if you are well-versed with this area and its dangers.",
+      },
+      {
+        kind: 'para',
+        text: 'If trouble finds your camp site, you can spend 1 Precaution to reveal a simple defense, warning, or trick that you prepared in advance. If you do, tell us how you knew to make that specific preparation.',
+      },
+    ],
+  },
+  {
+    id: 'col gap-6',
+    name: 'Animal Companion',
+    leftControl: 1,
+    body: [
+      {
+        kind: 'para',
+        text: 'You are accompanied by a beast of uncommon loyalty and cleverness. See the Animal Companion insert for details.',
+      },
+    ],
+  },
+  {
+    id: 'ranger-magnificent-specimen',
+    name: 'Magnificent Specimen',
+    leftControl: 2,
+    requiresLevel: 2,
+    requires: ['col gap-6'],
+    body: [{ kind: 'para', text: 'Each time you take this move, your companion gains 2 additional options of your choice.' }],
+  },
+  {
+    id: 'ranger-big-game-hunter',
+    name: 'Big Game Hunter',
+    leftControl: 1,
+    body: [
+      { kind: 'para', text: 'When you **strike at the weak spot of a** ***large*** **or** ***huge*** **creature**, you deal +2 damage.' },
+    ],
+  },
+  {
+    id: 'ranger-blot-out-the-sun',
+    name: 'Blot Out the Sun',
+    leftControl: 1,
+    body: [
+      {
+        kind: 'para',
+        text: 'When you **Let Fly with a bow**, you can deplete your ammunition (mark the next ammo status after your weapon) before you roll. If you do, choose 1:',
+      },
+      {
+        kind: 'list',
+        items: ['Gain advantage on your damage roll', 'Add the *area* tag to your attack; roll damage separately for each target'],
+      },
+    ],
+  },
+  {
+    id: 'ranger-call-the-shot',
+    name: 'Call the Shot',
+    leftControl: 1,
+    body: [
+      {
+        kind: 'para',
+        text: 'When you **take your time and calmly line up the perfect shot**, either deal your damage or roll +DEX: **on a 10+**, deal your damage and pick 2; **on a 7-9**, deal your damage and pick 1.',
+      },
+      {
+        kind: 'list',
+        items: [
+          'Ignore armor or deal +1d4 damage (your call)',
+          'Stun, hobble, or hinder them',
+          "Make them trip or drop what they're holding",
+          "Do no harm; don't deal your damage after all",
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ranger-expert-tracker',
+    name: 'Expert Tracker',
+    leftControl: 1,
+    body: [
+      {
+        kind: 'para',
+        text: 'When you **Seek Insight by searching for or studying the signs left by passing creatures**, you can ask "What happened here recently?" for free, even on a 6-. When you *follow a creature\'s trail*, roll +WIS: **on a 7+** you follow it to a significant change in terrain or activity; **on a 10+**, you can ask the GM a reasonable question about your quarry and get a useful answer.',
+      },
+    ],
+  },
+  {
+    id: 'ranger-home-on-the-range',
+    name: 'Home on the Range',
+    leftControl: 1,
+    startingMove: true,
+    body: [{ kind: 'para', text: 'When ***a journey requires you to Defy Danger or Struggle as One***, treat a 6- as a 7-9.' }],
+  },
+  { ...IMPROVED_STAT_BASE, id: 'ranger-improved-stat' },
+  {
+    id: 'ranger-mental-map',
+    name: 'Mental Map',
+    leftControl: 1,
+    body: [
+      {
+        kind: 'para',
+        text: "You can always retrace your steps and can accurately gauge distances and directions. You might not know the way forward but can always find your way back. When you **think back on a place you've been**, you can Seek Insight retroactively, as if you were still there.",
+      },
+    ],
+  },
+  {
+    id: 'ranger-naturalist',
+    name: 'Naturalist',
+    leftControl: 1,
+    body: [{ kind: 'para', text: 'When you **Know Things about beasts, natural environs, or spirits of the wild**, you have advantage.' }],
+  },
+  {
+    id: 'ranger-on-the-hoof',
+    name: 'On the Hoof',
+    leftControl: 1,
+    body: [
+      {
+        kind: 'para',
+        text: 'When you **travel through the wilderness**, you can procure 1d6 uses of ◊ provisions each day (roll with disadvantage in winter or barren terrain). Provisions can substitute for supplies when you Make Camp.',
+      },
+    ],
+  },
+  {
+    id: 'ranger-pack-horse',
+    name: 'Pack Horse',
+    leftControl: 1,
+    body: [{ kind: 'para', text: 'You can carry up to 4◈ with a light load, 7◈ with a normal load, and 10◈ with a heavy load.' }],
+  },
+  {
+    id: 'ranger-pathfinder',
+    name: 'Pathfinder',
+    leftControl: 1,
+    body: [{ kind: 'para', text: 'When you **lead your people to Pull Together or Deploy beyond sight of home**, you have advantage.' }],
+  },
+  {
+    id: 'ranger-predator',
+    name: 'Predator',
+    leftControl: 1,
+    body: [
+      {
+        kind: 'para',
+        text: 'When you **Seek Insight**, add the following to the list of questions you can ask. When *acting on the answer to either question*, deal an extra 1d4 damage.',
+      },
+      { kind: 'list', items: ['Who or what here is the easiest prey?', 'How is ________ weak or vulnerable?'] },
+    ],
+  },
+  {
+    id: 'ranger-sniff-out-corruption',
+    name: 'Sniff Out Corruption',
+    leftControl: 1,
+    body: [{ kind: 'para', text: 'When you **Seek Insight**, you can ask, "What here stinks of the unnatural?" for free, even on a 6-.' }],
+  },
+  {
+    id: 'ranger-stalker',
+    name: 'Stalker',
+    leftControl: 1,
+    body: [
+      {
+        kind: 'para',
+        text: 'When you **carry a normal or light load and move with care**, you make no noise and leave no sign of your passing. When you **hide yourself in a natural environment**, you remain unseen until you draw attention to yourself, move positions, or attack.',
+      },
+    ],
+  },
+  {
+    id: 'ranger-survivalist',
+    name: 'Survivalist',
+    leftControl: 1,
+    body: [
+      {
+        kind: 'para',
+        text: 'When you **Forage**, pick 1 extra choice (even on a 6-, pick 1) and add "Find or fashion some useful item or supply (GM can veto)" to the list of options.',
+      },
+    ],
+  },
+  {
+    id: 'ranger-warden-of-the-wild',
+    name: 'Warden of the Wild',
+    leftControl: 1,
+    body: [
+      { kind: 'para', text: 'When you **defeat a perversion of nature**, you can ask the GM 2 of the following and get a useful answer:' },
+      {
+        kind: 'list',
+        items: [
+          'Will it come back? If so, how can I stop it?',
+          'Will its taint spread? If so, how can I contain it?',
+          'What useful (but grisly) bits can I harvest?',
+          'What else can I learn about it or its ilk?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ranger-wild-speech',
+    name: 'Wild Speech',
+    leftControl: 1,
+    body: [
+      {
+        kind: 'para',
+        text: 'The grunts, barks, chirps, and calls of natural beasts are as a language to you. You can understand their intentions and communicate basic ideas. When you **Persuade a beast**, you can choose to roll +WIS.',
+      },
+    ],
+  },
+  {
+    id: 'ranger-worldly',
+    name: 'Worldly',
+    leftControl: 2,
+    requiresLevel: 2,
+    requires: ['ranger-home-on-the-range'],
+    body: [
+      {
+        kind: 'para',
+        text: "Take a move from the Blessed, Fox, Heavy, Marshal, or Seeker playbooks, for which you otherwise qualify. You can pick from a different playbook each time. You can't pick Improved Stat or Superior Stat.",
+      },
+    ],
+  },
+  {
+    id: 'ranger-alpha',
+    name: 'Alpha',
+    leftControl: 1,
+    requiresLevel: 6,
+    requires: ['col gap-6', 'ranger-wild-speech'],
+    body: [
+      {
+        kind: 'para',
+        text: 'When you **assert dominance over another (beast, spirit, Fae, or person)**, roll +WIS: **on a 7+**, they must pick 1 from the list below; **on a 10+**, you also have advantage on your next roll against them.',
+      },
+      {
+        kind: 'list',
+        items: ['Accept your authority, at least for now', 'Slink away or flee, then avoid you', 'Fight you for dominance'],
+      },
+    ],
+  },
+  {
+    id: 'ranger-beast-of-legend',
+    name: 'Beast of Legend',
+    leftControl: 2,
+    requiresLevel: 6,
+    requires: ['ranger-magnificent-specimen'],
+    body: [
+      { kind: 'para', text: 'Each time you take this move, pick 1:' },
+      {
+        kind: 'list',
+        items: [
+          'They are *exceptional* (and roll +2 instead of +1)',
+          'They get +4 HP and +1 armor',
+          'They develop some unique ability or trait',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ranger-constant-vigilance',
+    name: 'Constant Vigilance',
+    leftControl: 1,
+    requiresLevel: 6,
+    body: [
+      {
+        kind: 'para',
+        text: "Unless you're *dazed*, you're never caught off guard—not even when asleep or if you roll a 6-. When you **intercept a sudden threat** (to yourself or an ally), you have advantage on whatever move you make.",
+      },
+    ],
+  },
+  {
+    id: 'ranger-giant-slayer',
+    name: 'Giant Slayer',
+    leftControl: 1,
+    requiresLevel: 6,
+    requires: ['ranger-big-game-hunter'],
+    body: [
+      {
+        kind: 'para',
+        text: 'When you **strike at a weak spot of a** ***large*** **or** ***huge*** **creature**, you deal another +2 damage (+4 total).',
+      },
+    ],
+  },
+  { ...SUPERIOR_STAT_BASE, id: 'ranger-superior-stat' },
+  {
+    id: 'ranger-trailblazer',
+    name: 'Trailblazer',
+    leftControl: 1,
+    requiresLevel: 6,
+    requires: ['ranger-home-on-the-range'],
+    body: [
+      {
+        kind: 'para',
+        text: 'When ***a journey causes you to Defy Danger or Struggle as One***, **on a 10+**, you also learn or discover something interesting and useful—ask the GM what.',
+      },
+    ],
+  },
+  {
+    id: 'ranger-walk-it-off',
+    name: 'Walk it Off',
+    leftControl: 1,
+    requiresLevel: 6,
+    rightControl: [{ type: 'dot', number: 1 }],
+    body: [
+      {
+        kind: 'para',
+        text: "When you'd **mark a debility**, you can mark this move instead to no ill effect. Clear it as you would a debility.",
+      },
+    ],
+  },
+];
+
+// The Animal Companion insert's own move, always in play (Book 1, p. 143). Not a pickable playbook move.
+export const LOYAL_TO_THE_END: MoveDefinition = {
+  id: 'ranger-loyal-to-the-end',
+  name: 'Loyal to the End',
+  body: [
+    {
+      kind: 'para',
+      text: "When **your companion is at 0 HP**, roll +0, with advantage if it holds Loyalty: **on a 10+**, it'll be fine once it regains any HP; **on a 7-9**, it gets the injured tag; **on a 6-**, it's injured and will die soon unless someone saves it.",
+    },
+  ],
+  citation: 'Book 1, p. 143',
+};

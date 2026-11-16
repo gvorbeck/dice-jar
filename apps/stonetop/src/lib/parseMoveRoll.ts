@@ -1,4 +1,4 @@
-import type { MoveDefinition, MoveRoll, RollBand, RollStat } from '@/types';
+import type { MoveDefinition, MoveRoll, RollBand, RollStat } from '@/model';
 import { STAT_ABBRS } from './constants';
 
 // Whatever the prose says to roll against: one of the six PC stats, `nothing` (a bare 2d6), or a

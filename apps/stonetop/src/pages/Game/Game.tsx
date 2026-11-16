@@ -2,18 +2,18 @@ import { useState, useCallback, useMemo, useEffect, useRef, memo } from 'react';
 import { Button as AriaButton, GridList, GridListItem, useDragAndDrop } from 'react-aria-components';
 import { cn } from '@dice-jar/cn';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { PageMeta } from '@/components/app/PageMeta/PageMeta';
-import { useGame } from '@/hooks/useGame';
+import { useTitle } from '@/lib/useTitle';
+import { useGame } from '@/lib/useGame';
 import { DEFAULT_GAME_NAME, getPlaybook, PLAYBOOKS } from '@/lib/constants';
-import { Button, Heading, Icon, Text } from '@/components/ui';
+import { Button, Heading, Icon, Text } from '@/ui';
 import { GameIdModal } from './modals/GameIdModal';
 import { AddCharacterModal } from './modals/AddCharacterModal';
 import { RemoveCharacterModal } from './modals/RemoveCharacterModal';
-import { GameGuard } from '@/components/app/GameGuard/GameGuard';
-import { PageLayout } from '@/components/app/PageLayout/PageLayout';
-import { RollLog } from '@/components/character/RollLog/RollLog';
+import { GameGuard } from '@/ui/GameGuard/GameGuard';
+import { PageLayout } from '@/ui/PageLayout/PageLayout';
+import { RollLog } from '@/character/RollLog/RollLog';
 import { GameDataActions } from './GameDataActions';
-import type { Character, GameSession } from '@/types';
+import type { Character, GameSession } from '@/model';
 
 interface LocationState {
   isNew?: boolean;
@@ -37,7 +37,7 @@ const CharacterRow = memo(({ character, gameId, showGrip, canMoveUp, canMoveDown
   const handleRemove = useCallback(() => onRemove(character), [onRemove, character]);
   const handleMoveUp = useCallback(() => onMove(character.id, -1), [onMove, character.id]);
   const handleMoveDown = useCallback(() => onMove(character.id, 1), [onMove, character.id]);
-  const linkCx = cn('game-character-link', 'game-character-link-btn');
+  const linkCx = cn('game-character-link', 'grow');
 
   return (
     <GridListItem id={character.id} textValue={buttonLabel} className="game-character-row">
@@ -114,6 +114,7 @@ const GameContent = ({
   onReplaceGameData,
 }: GameContentProps) => {
   const gameName = g.name || DEFAULT_GAME_NAME;
+  useTitle(`${gameName} — Hearthfire`);
   const [removingCharacter, setRemovingCharacter] = useState<Character | null>(null);
   const [orderedCharacters, setOrderedCharacters] = useState<Character[]>(g.characters);
   const [moveAnnouncement, setMoveAnnouncement] = useState('');
@@ -193,11 +194,6 @@ const GameContent = ({
 
   return (
     <>
-      <PageMeta
-        noindex
-        title={`${gameName} — Hearthfire`}
-        description={`Party tracker for ${gameName}. Manage characters and GM playbook.`}
-      />
       {/* Mounted only while open so per-open UI state (spinners, copy feedback)
           resets on each open without a reset effect. */}
       {showIdModal && <GameIdModal gameId={id} open={showIdModal} onClose={onCloseIdModal} />}
@@ -237,12 +233,7 @@ const GameContent = ({
                 <Text color="muted">Your party roster is empty. Add a character to get started.</Text>
               </div>
             ) : (
-              <GridList
-                aria-label="Characters"
-                items={orderedCharacters}
-                dragAndDropHooks={dragAndDropHooks}
-                className="game-character-list"
-              >
+              <GridList aria-label="Characters" items={orderedCharacters} dragAndDropHooks={dragAndDropHooks} className="col gap-3">
                 {(character) => (
                   <CharacterRow
                     character={character}

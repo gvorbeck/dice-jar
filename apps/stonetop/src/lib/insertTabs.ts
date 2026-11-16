@@ -1,5 +1,5 @@
 import { lazy, type ComponentType } from 'react';
-import type { PlaybookFeatures, PlaybookSectionProps } from '@/types';
+import type { PlaybookFeatures, PlaybookSectionProps } from '@/model';
 
 // A user-addable "insert": an optional sheet section a player can attach to any character
 // (Revenant, Ghost, …). Distinct from the playbook-specific sections and tabs in
@@ -28,24 +28,22 @@ export const INSERT_TABS = [
   {
     id: 'Revenant',
     label: 'Revenant',
-    Component: lazy(() => import('@/components/character/playbooks/revenant/RevenantInsert').then((m) => ({ default: m.RevenantInsert }))),
+    Component: lazy(() => import('@/character/playbooks/revenant/RevenantInsert').then((m) => ({ default: m.RevenantInsert }))),
   },
   {
     id: 'Ghost',
     label: 'Ghost',
-    Component: lazy(() => import('@/components/character/playbooks/ghost/GhostInsert').then((m) => ({ default: m.GhostInsert }))),
+    Component: lazy(() => import('@/character/playbooks/ghost/GhostInsert').then((m) => ({ default: m.GhostInsert }))),
   },
   {
     id: 'Thrall',
     label: 'Thrall',
-    Component: lazy(() => import('@/components/character/playbooks/thrall/ThrallInsert').then((m) => ({ default: m.ThrallInsert }))),
+    Component: lazy(() => import('@/character/playbooks/thrall/ThrallInsert').then((m) => ({ default: m.ThrallInsert }))),
   },
   {
     id: 'Followers',
     label: 'Followers',
-    Component: lazy(() =>
-      import('@/components/character/playbooks/followers/FollowersInsert').then((m) => ({ default: m.FollowersInsert })),
-    ),
+    Component: lazy(() => import('@/character/playbooks/followers/FollowersInsert').then((m) => ({ default: m.FollowersInsert }))),
     deleteFeatureKeys: ['followers'],
     removeWarning: 'All followers and their data will be permanently lost.',
   },

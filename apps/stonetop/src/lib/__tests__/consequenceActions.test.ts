@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import type { ArcanaMajorEntry, CharacterData } from '@/types';
+import type { ArcanaMajorEntry, CharacterData } from '@/model';
 import { applyConsequenceActions, getMarkedInstinctOverride, getMarkedFollowerCost } from '../consequenceActions';
-import { MAJOR_ARCANA } from '../arcana/major';
+import { MAJOR_ARCANA } from '../../rules/arcana/major';
 
 const HLAD = MAJOR_ARCANA.find((m) => m.id === 'hungering-maw-of-hlad')!;
 const CODEX = MAJOR_ARCANA.find((m) => m.id === 'hectumel-codex')!;

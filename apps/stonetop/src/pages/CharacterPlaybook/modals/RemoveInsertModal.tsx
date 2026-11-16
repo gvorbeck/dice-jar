@@ -1,6 +1,6 @@
 import { useId, useState, useCallback } from 'react';
-import { Button, Heading, Modal, Text } from '@/components/ui';
-import { useToast } from '@/components/app';
+import { Button, Heading, Modal, Text } from '@/ui';
+import { useToast } from '@/ui/Toast/ToastContext';
 import { getInsertTab, type InsertOption } from '@/lib/insertTabs';
 
 interface RemoveInsertModalProps {
@@ -46,7 +46,7 @@ export const RemoveInsertModal = ({ open, insert, onClose, onConfirm }: RemoveIn
           className="remove-insert-modal-warning"
         >{`This will remove the **${label}** tab from this character sheet.${warning ? ` ${warning}` : ''}`}</Text>
       )}
-      <div className="remove-insert-modal-actions">
+      <div className="flex gap-3 end">
         <Button variant="secondary" onClick={onClose} disabled={removing}>
           Cancel
         </Button>

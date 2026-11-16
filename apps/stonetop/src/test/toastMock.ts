@@ -4,8 +4,8 @@ import { vi } from 'vitest';
 // auto-dismiss setTimeout would never fire (and so hang teardown) under fake
 // timers. Use with:
 //
-//   vi.mock('@/components/app', () => toastModuleMock());
-//   vi.mock('@/components/app/Toast/ToastContext', () => toastModuleMock());
+//   vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+//   vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
 //   import { addToastSpy } from '@/test/toastMock';
 //
 // addToastSpy records every (message, variant) so error-toast paths stay testable.

@@ -24,7 +24,7 @@ import type {
   RollStat,
   SteadingData,
   SteadingNPC,
-} from '@/types';
+} from '@/model';
 
 // Derived from the canonical PLAYBOOKS list, not hand-copied: a character whose
 // playbook isn't recognized gets filtered out of the array we write back (see

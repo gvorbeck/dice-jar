@@ -1,8 +1,8 @@
 import { useState, useId, useCallback } from 'react';
-import { Button, Heading, Modal, Text } from '@/components/ui';
-import { useToast } from '@/components/app';
+import { Button, Heading, Modal, Text } from '@/ui';
+import { useToast } from '@/ui/Toast/ToastContext';
 import { getPlaybook } from '@/lib/constants';
-import type { Character } from '@/types';
+import type { Character } from '@/model';
 
 interface RemoveCharacterModalProps {
   open: boolean;
@@ -46,7 +46,7 @@ export const RemoveCharacterModal = ({ open, character, onClose, onConfirm }: Re
           color="muted"
         >{`**${displayName}** will be permanently removed from this game. All character data will be lost and cannot be recovered.`}</Text>
       )}
-      <div className="remove-character-modal-actions">
+      <div className="flex gap-3 end">
         <Button variant="ghost" size="md" onClick={onClose} disabled={removing}>
           Cancel
         </Button>

@@ -1,5 +1,5 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { ToastProvider } from '@/components/app';
+import { ToastProvider } from '@/ui/Toast/Toast';
 import { render } from '@testing-library/react';
 import type { RenderResult } from '@testing-library/react';
 

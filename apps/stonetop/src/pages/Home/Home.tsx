@@ -1,12 +1,12 @@
 import { useState, useCallback, useId } from 'react';
 import { cn } from '@dice-jar/cn';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { PageMeta } from '@/components/app/PageMeta/PageMeta';
-import { PageLayout } from '@/components/app/PageLayout/PageLayout';
+import { useNavigate } from 'react-router-dom';
+import { useTitle } from '@/lib/useTitle';
+import { PageLayout } from '@/ui/PageLayout/PageLayout';
 import { createGame, createGameWithId } from '@/lib/game';
-import { useGameIdCheck } from '@/hooks/useGameIdCheck';
-import { useJoinIdCheck } from '@/hooks/useJoinIdCheck';
-import { Button, Heading, Icon, Input, RuleDivider, Stack, Text } from '@/components/ui';
+import { useGameIdCheck } from '@/lib/useGameIdCheck';
+import { useJoinIdCheck } from '@/lib/useJoinIdCheck';
+import { Button, Heading, Icon, Input, RuleDivider, Stack, Text } from '@/ui';
 
 const STATUS_MESSAGES = {
   idle: '',
@@ -26,7 +26,6 @@ const JOIN_STATUS_MESSAGES = {
 
 export const Home = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const customIdHintId = useId();
   const joinHintId = useId();
 
@@ -102,13 +101,10 @@ export const Home = () => {
     joinStatus === 'checking' && 'home-id-hint-checking',
   );
 
+  useTitle();
+
   return (
     <PageLayout simple>
-      <PageMeta
-        title="Hearthfire — Stonetop Party Tracker"
-        description="Track your Stonetop TTRPG campaign — manage characters, GM playbook, and game sessions."
-        url={`${window.location.origin}${location.pathname}`}
-      />
       <div className="home-page">
         <div className="home-hero">
           <div className="home-logo-wrap">

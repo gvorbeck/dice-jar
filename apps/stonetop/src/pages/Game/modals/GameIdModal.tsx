@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { Button, Heading, Modal, Text } from '@/components/ui';
+import { Button, Heading, Modal, Text } from '@/ui';
 
 interface GameIdModalProps {
   gameId: string;

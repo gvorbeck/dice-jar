@@ -49,12 +49,6 @@ a {
 }
 
 /* ── ui/field ── */
-.field-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
-}
-
 .field-label {
   font-family: var(--font-sans);
   font-size: var(--text-xs);
@@ -66,7 +60,7 @@ a {
 
 /* Standard keyboard-focus ring. Put this class on the element — the rule carries its own :focus-visible selector, so the outline applies
    natively once the class is present. Do not use for sibling-combinator
-   patterns (`.input:focus-visible + .indicator`) where the focused element
+   patterns (`.input-input:focus-visible + .indicator`) where the focused element
    and the styled element differ from one another. */
 .field-focus-visible:focus-visible {
   outline: 2px solid var(--color-gold-400);
@@ -834,10 +828,6 @@ a {
   color: var(--text-accent);
 }
 
-.collapse-label {
-  flex: 1;
-}
-
 .collapse-action {
   flex-shrink: 0;
   display: flex;
@@ -1297,11 +1287,6 @@ textarea.input-input {
 }
 
 /* ── ui/Tabs/Tabs ── */
-.tabs {
-  display: flex;
-  flex-direction: column;
-}
-
 .tabs-tablist-row {
   display: flex;
   align-items: center;
@@ -1536,23 +1521,7 @@ textarea.input-input {
   cursor: not-allowed;
 }
 
-.use-dots-use-dots-label {
-  white-space: nowrap;
-}
-
 /* ── ui/CheckboxGroup/CheckboxGroup ── */
-.checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.checkbox-group-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .checkbox-group-gap-md {
   gap: var(--spacing-3);
 }
@@ -1708,10 +1677,6 @@ textarea.input-input {
   min-width: 0;
 }
 
-.playbook-columns-full {
-  width: 100%;
-}
-
 /* ── ui/CreatureCard/CreatureCard ── */
 .creature-card-card {
   display: flex;
@@ -1764,10 +1729,6 @@ textarea.input-input {
   gap: var(--spacing-1);
 }
 
-.creature-card-stat-box-label {
-  white-space: nowrap;
-}
-
 /* Bordered number box borrowed from the PC Playbook Stats section (InfoBox). */
 .creature-card-stat-input {
   width: 80px;
@@ -1800,16 +1761,6 @@ textarea.input-input {
   background-color: var(--surface-overlay);
 }
 
-.creature-card-stat-box-note {
-  white-space: nowrap;
-}
-
-.creature-card-qualities {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
-}
-
 .creature-card-field-label {
   white-space: nowrap;
   flex-shrink: 0;
@@ -1822,13 +1773,7 @@ textarea.input-input {
   flex-shrink: 0;
 }
 
-.creature-card-moves {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
-}
-
-/* ── app/ErrorBoundary/ErrorBoundary ── */
+/* ── ui/ErrorBoundary/ErrorBoundary ── */
 .error-boundary-page {
   position: relative;
   min-height: 100dvh;
@@ -1871,7 +1816,7 @@ textarea.input-input {
   line-height: 1;
 }
 
-/* ── app/Toast/Toast ── */
+/* ── ui/Toast/Toast ── */
 .toast-region {
   position: fixed;
   bottom: var(--spacing-6);
@@ -1980,7 +1925,7 @@ textarea.input-input {
   }
 }
 
-/* ── app/SaveStatus/SaveStatus ── */
+/* ── ui/SaveStatus/SaveStatus ── */
 /*
  * .root — a sticky, pill-shaped save-status indicator. Fixed to the bottom-left
  * so it stays glanceable no matter how far down a long character sheet the user
@@ -2073,7 +2018,7 @@ textarea.input-input {
   min-height: 50vh;
 }
 
-/* ── app/PageFooter/PageFooter ── */
+/* ── ui/PageFooter/PageFooter ── */
 /* The footer that appears at the bottom of every page. */
 .page-footer-footer {
   padding: var(--spacing-4) var(--spacing-6);
@@ -2100,7 +2045,7 @@ textarea.input-input {
   border-radius: var(--radius-sm);
 }
 
-/* ── app/PageHeader/PageNav ── */
+/* ── ui/PageHeader/PageNav ── */
 /*
  * Mobile-first: the grouped <Dropdown> is the default affordance, and the pill
  * bar is hidden. At the 768px breakpoint they swap — the pills become the
@@ -2169,7 +2114,7 @@ a.page-nav-pill:hover {
   }
 }
 
-/* ── app/PageHeader/ThemeToggle ── */
+/* ── ui/PageHeader/ThemeToggle ── */
 .theme-toggle-wrapper {
   display: flex;
   align-items: center;
@@ -2181,7 +2126,7 @@ a.page-nav-pill:hover {
   color: var(--text-accent);
 }
 
-/* ── app/SiteBanner/SiteBanner ── */
+/* ── ui/SiteBanner/SiteBanner ── */
 .site-banner-banner {
   width: 100%;
   background-color: color-mix(in srgb, var(--color-ember-400) 12%, transparent);
@@ -2200,7 +2145,7 @@ a.page-nav-pill:hover {
   opacity: 0.8;
 }
 
-/* ── app/PageHeader/PageHeader ── */
+/* ── ui/PageHeader/PageHeader ── */
 /*
  * .header — the semantic <header> landmark that wraps the entire top-of-page
  * block: SiteBanner, wordmark strip, and page identity section.
@@ -2272,12 +2217,6 @@ a.page-nav-pill:hover {
   margin-bottom: var(--spacing-6);
 }
 
-.page-header-title-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-}
-
 .page-header-title-icon {
   display: flex;
   align-items: center;
@@ -2317,10 +2256,6 @@ a.page-nav-pill:hover {
   border: none;
 }
 
-.page-header-subtitle {
-  margin-top: var(--spacing-1);
-}
-
 .page-header-game-id {
   display: flex;
   align-items: center;
@@ -2351,11 +2286,7 @@ a.page-nav-pill:hover {
   border: none;
 }
 
-.page-header-rule {
-  margin-top: var(--spacing-6);
-}
-
-/* ── app/DiceRoller/DiceRoller ── */
+/* ── ui/DiceRoller/DiceRoller ── */
 /* One drawer anchored bottom-right, flush with the right edge and just above the scroll-to-top button.
    The tab is the drawer's left edge, so it slides with the panel: closed, only the tab peeks out;
    open, the panel extends from it. */
@@ -2457,18 +2388,6 @@ a.page-nav-pill:hover {
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.dice-roller-title {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-}
-
-.dice-roller-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
 .dice-roller-dice {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -2489,10 +2408,6 @@ a.page-nav-pill:hover {
 .dice-roller-actions {
   display: flex;
   gap: var(--spacing-2);
-}
-
-.dice-roller-roll-btn {
-  flex: 1;
 }
 
 .dice-roller-result {
@@ -2556,12 +2471,6 @@ a.page-nav-pill:hover {
   font-variant-numeric: tabular-nums;
 }
 
-.dice-roller-history {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .dice-roller-history-list {
   display: flex;
   flex-direction: column;
@@ -2601,7 +2510,7 @@ a.page-nav-pill:hover {
   color: var(--text-accent);
 }
 
-/* ── app/PageLayout/PageLayout ── */
+/* ── ui/PageLayout/PageLayout ── */
 /*
  * .main — the <main> element for inner pages (Game, GM Playbook, etc.).
  * Grows to fill remaining vertical space (keeps footer pinned to bottom).
@@ -2824,20 +2733,8 @@ a.page-nav-pill:hover {
   text-align: center;
 }
 
-.add-character-modal-actions {
-  display: flex;
-  gap: var(--spacing-3);
-  justify-content: flex-end;
-}
-
 /* ── pages/Game/modals/RemoveCharacterModal ── */
-.remove-character-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-3);
-}
-
-/* ── app/GameGuard/GameGuard ── */
+/* ── ui/GameGuard/GameGuard ── */
 .game-guard-centered {
   flex: 1;
   display: flex;
@@ -2905,12 +2802,6 @@ a.page-nav-pill:hover {
 /* ── pages/Game/modals/ImportGameModal ── */
 /* The Modal panel spaces its children at --spacing-6, which is too airy for the four
    stacked blocks below — group them so the panel sees one child and sets the rhythm here. */
-.import-game-modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
-}
-
 .import-game-modal-details {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -2942,12 +2833,6 @@ a.page-nav-pill:hover {
 .import-game-modal-warning-label {
   color: var(--text-danger);
   font-weight: 600;
-}
-
-.import-game-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-3);
 }
 
 /* ── pages/Game/GameDataActions ── */
@@ -3099,10 +2984,6 @@ a.page-nav-pill:hover {
   display: flex;
 }
 
-.game-character-link-btn {
-  flex: 1;
-}
-
 .game-remove-character-btn {
   flex-shrink: 0;
   display: flex;
@@ -3133,12 +3014,6 @@ a.page-nav-pill:hover {
   padding: var(--spacing-6);
   text-align: center;
   flex: 1;
-}
-
-.game-character-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
 }
 
 .game-character-row[data-dragging] {
@@ -3263,10 +3138,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── playbook/SharedNotes/SharedNotes ── */
-.shared-notes {
-  margin-top: var(--spacing-6);
-}
-
 /* ── GM visibility warning ───────────────────────────── */
 .shared-notes-warning {
   display: flex;
@@ -3276,10 +3147,6 @@ a.page-nav-pill:hover {
   color: var(--text-warning);
 }
 
-.shared-notes-warning-icon {
-  flex-shrink: 0;
-}
-
 .shared-notes-loading {
   display: flex;
   justify-content: center;
@@ -3287,12 +3154,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── Editor shell ────────────────────────────────────── */
-.shared-notes-editor {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 /* Read-only while another tab holds the lock. The status line stays full-strength so the reason is legible. */
 .shared-notes-editor-locked > :not(.shared-notes-status) {
   opacity: 0.6;
@@ -3303,12 +3164,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── Toolbar ─────────────────────────────────────────── */
-.shared-notes-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-1);
-}
-
 /* Plain buttons rather than <Button size="sm">, whose min-width is too wide for single glyphs. */
 .shared-notes-tool-button {
   min-width: 2.25em;
@@ -3491,26 +3346,8 @@ a.page-nav-pill:hover {
 }
 
 /* ── Content form (intro text + stacked inputs) ──────────── */
-.gm-playbook-content-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
-}
-
 /* ── Content rules block (instructional text above inputs) ── */
-.gm-playbook-content-rules {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
 /* ── Season heading with icon ──────────────────────────── */
-.gm-playbook-season-heading {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-}
-
 .gm-playbook-season-icon {
   color: var(--text-secondary);
   flex-shrink: 0;
@@ -3519,19 +3356,11 @@ a.page-nav-pill:hover {
 /* ── Section divider ─────────────────────────────────────── */
 
 /* ── Threats: threat-type move grid ──────────────────────── */
-.gm-playbook-threat-moves-grid {
-  margin-top: var(--spacing-2);
-}
-
 .gm-playbook-threat-type {
   margin-bottom: var(--spacing-1);
 }
 
 /* ── Expeditions: weather tables grid ───────────────────── */
-.gm-playbook-weather-grid {
-  margin-top: var(--spacing-2);
-}
-
 /* ── gm-playbook/Playbook ── */
 /* ── Inline muted label ─────────────────────────────── */
 .playbook-muted {
@@ -3542,10 +3371,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── Spacing ────────────────────────────────────────── */
-.playbook-spacer-top {
-  margin-top: var(--spacing-6);
-}
-
 /* ── gm-playbook/sections/FlowOfPlay ── */
 .flow-of-play-flow {
   display: flex;
@@ -3556,12 +3381,6 @@ a.page-nav-pill:hover {
 
 .flow-of-play-intro {
   line-height: 1.6;
-}
-
-.flow-of-play-nodes {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
 }
 
 /* ── Node box ───────────────────────────────────────── */
@@ -3694,12 +3513,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── Multi-stat picker row (Defy Danger, Interfere) ──── */
-.roll-affordance-stat-picker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-1);
-}
-
 /* The active stat's button gets an accent border + inset ring so it stands out from a mere hover. */
 .roll-affordance-stat-trigger-active {
   border-color: var(--border-accent);
@@ -3993,16 +3806,6 @@ a.page-nav-pill:hover {
   gap: var(--spacing-2);
 }
 
-.move-header-action {
-  flex-shrink: 0;
-}
-
-.move-move-header-left {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-}
-
 /* ── Move name ───────────────────────────────────────── */
 .move-move-name {
   font-family: var(--font-serif);
@@ -4019,12 +3822,6 @@ a.page-nav-pill:hover {
 /* ── Trigger + body text ─────────────────────────────── */
 
 /* ── Body with icon ──────────────────────────────────── */
-.move-move-body-with-icon {
-  display: flex;
-  gap: var(--spacing-2);
-  align-items: flex-start;
-}
-
 .move-move-body-icon {
   color: var(--text-accent);
   flex-shrink: 0;
@@ -4074,22 +3871,8 @@ a.page-nav-pill:hover {
 }
 
 /* ── gm-playbook/sections/MoveSearch/MoveSearch ── */
-.move-search {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
-.move-search-input {
-  width: 100%;
-}
-
 .move-search-empty {
   padding: var(--spacing-2) 0;
-}
-
-.move-search-results {
-  margin-top: var(--spacing-3);
 }
 
 .move-search-list {
@@ -4111,7 +3894,7 @@ a.page-nav-pill:hover {
   padding-bottom: 0;
 }
 
-/* ── fields/RepeaterField/RepeaterField ── */
+/* ── ui/RepeaterField/RepeaterField ── */
 .repeater-field-list {
   list-style: none;
   margin: 0;
@@ -4251,17 +4034,7 @@ a.page-nav-pill:hover {
   color: var(--text-secondary);
 }
 
-.repeater-field-add-btn-offset {
-  margin-top: var(--spacing-3);
-}
-
-/* ── fields/TagInput/TagInput ── */
-.tag-input {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
-}
-
+/* ── ui/TagInput/TagInput ── */
 .tag-input-field-row {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -4406,14 +4179,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── gm-playbook/sections/ImprovementList ── */
-.improvement-list {
-  display: flex;
-  flex-direction: column;
-  /* Match the intra-list row gap so the last bullet and the first custom row
-     don't touch where the two stacked lists meet. */
-  gap: var(--spacing-1);
-}
-
 .improvement-list-fixed-item {
   display: inline-flex;
   align-items: center;
@@ -4467,12 +4232,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── gm-playbook/sections/SteadingStats ── */
-.steading-stats {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-}
-
 /* ── Size ─────────────────────────────────────────────── */
 .steading-stats-size-options {
   display: grid;
@@ -4583,18 +4342,6 @@ a.page-nav-pill:hover {
   padding-top: var(--spacing-4);
 }
 
-.steading-stats-debility-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
-}
-
-.steading-stats-debility {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
-}
-
 /* ── gm-playbook/sections/improvementCard ── */
 @media (min-width: 768px) {
   .improvement-card-item {
@@ -4656,19 +4403,7 @@ a.page-nav-pill:hover {
 /* ── Shared card rules → improvementCard.css ──── */
 
 /* ── Requirements / Benefits sections ────────────────── */
-.predefined-improvements-list-requirement-blocks {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
 /* ── Checkbox list within a requirement block ─────────── */
-.predefined-improvements-list-check-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .predefined-improvements-list-check-row {
   display: flex;
   align-items: baseline;
@@ -4770,18 +4505,7 @@ a.page-nav-pill:hover {
 }
 
 /* ── gm-playbook/sections/SteadingImprovements ── */
-.steading-improvements {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-}
-
 /* ── gm-playbook/sections/SteadingAssets ── */
-.steading-assets {
-  display: flex;
-  flex-direction: column;
-}
-
 .steading-assets-description {
   margin-bottom: var(--spacing-3);
 }
@@ -4802,22 +4526,11 @@ a.page-nav-pill:hover {
   gap: var(--spacing-3);
 }
 
-.steading-assets-denomination {
-  display: flex;
-  flex-direction: column;
-}
-
 .steading-assets-currency-input {
   text-align: center;
 }
 
 /* ── gm-playbook/sections/SteadingNPCs/RelationshipRepeater ── */
-.relationship-repeater-rel-repeater {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 /* label-free cells keep equal heights — do not add labels inside .relRow */
 .relationship-repeater-rel-row {
   display: grid;
@@ -4826,25 +4539,11 @@ a.page-nav-pill:hover {
   gap: var(--spacing-2);
 }
 
-.relationship-repeater-rel-dropdown {
-  width: 100%;
-}
-
-.relationship-repeater-rel-remove-btn {
-  flex-shrink: 0;
-}
-
 .relationship-repeater-rel-add-btn {
   align-self: flex-start;
 }
 
 /* ── gm-playbook/sections/SteadingNPCs/NpcModal ── */
-.npc-modal-rel-fieldset {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .npc-modal-name-row {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -4902,12 +4601,6 @@ a.page-nav-pill:hover {
   margin-left: var(--spacing-1);
 }
 
-.npc-row-npc-traits {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-1);
-}
-
 .npc-row-npc-pill {
   display: inline-flex;
   align-items: center;
@@ -4922,12 +4615,6 @@ a.page-nav-pill:hover {
   background: var(--surface-raised);
   border: 1px solid var(--border-subtle);
   color: var(--text-primary);
-}
-
-.npc-row-npc-rel-traits {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-1);
 }
 
 .npc-row-npc-rel-trait {
@@ -4965,23 +4652,11 @@ a.page-nav-pill:hover {
 }
 
 /* ── gm-playbook/sections/SteadingNPCs/SteadingNPCs ── */
-.steading-npcs-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
 .steading-npcs-add-row {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--spacing-4);
-}
-
-.steading-npcs-npc-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
 }
 
 /* ── gm-playbook/sections/SteadingNPCs/RelationshipGraph ── */
@@ -5098,12 +4773,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── gm-playbook/sections/SteadingReference ── */
-.steading-reference-places {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
 /* ── Traits grid ──────────────────────────────────────── */
 .steading-reference-traits-grid {
   /* Tighter row gap than the shared default; the shared rule sets the columns
@@ -5134,18 +4803,6 @@ a.page-nav-pill:hover {
   margin-top: 0;
 }
 
-.steading-playbook-npcs-layout {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-}
-
-.steading-playbook-npc-filter-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-}
-
 .steading-playbook-npc-filter-dropdown {
   max-width: 18rem;
 }
@@ -5170,35 +4827,12 @@ a.page-nav-pill:hover {
 }
 
 /* ── pages/CharacterPlaybook/modals/AddInsertModal ── */
-.add-insert-modal-options {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
-.add-insert-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-3);
-}
-
 /* ── pages/CharacterPlaybook/modals/RemoveInsertModal ── */
 .remove-insert-modal-warning {
   margin: var(--spacing-4) 0;
 }
 
-.remove-insert-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-3);
-}
-
 /* ── character/sections/Background ── */
-.background-options {
-  display: flex;
-  flex-direction: column;
-}
-
 .background-option {
   display: flex;
   flex-direction: column;
@@ -5290,11 +4924,6 @@ a.page-nav-pill:hover {
   margin-bottom: var(--spacing-4);
 }
 
-.option-select-options {
-  display: flex;
-  flex-direction: column;
-}
-
 .option-select-option {
   display: flex;
   flex-direction: column;
@@ -5310,12 +4939,6 @@ a.page-nav-pill:hover {
 
 .option-select-option:first-child {
   padding-top: 0;
-}
-
-.option-select-option-label {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
 }
 
 .option-select-option-title {
@@ -5341,11 +4964,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/sections/Appearance ── */
-.appearance-rows {
-  display: flex;
-  flex-direction: column;
-}
-
 .appearance-row {
   display: flex;
   flex-direction: column;
@@ -5391,10 +5009,6 @@ a.page-nav-pill:hover {
 
 .appearance-custom-checkbox > span:first-of-type {
   margin-top: 0;
-}
-
-.appearance-custom-input {
-  flex: 1;
 }
 
 /* ── character/sections/Stats ── */
@@ -5536,10 +5150,6 @@ a.page-nav-pill:hover {
   font-weight: 700;
 }
 
-.stats-info-label {
-  white-space: nowrap;
-}
-
 .stats-level-up-hint {
   text-align: center;
   font-size: var(--text-sm);
@@ -5567,34 +5177,12 @@ a.page-nav-pill:hover {
   margin-bottom: 0;
 }
 
-.moves-collapse-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .moves-helper-text {
   margin: 0 0 var(--spacing-4);
   line-height: 1.5;
 }
 
-.moves-custom-form {
-  margin-top: var(--spacing-4);
-}
-
 /* ── character/sections/SpecialPossessions ── */
-.special-possessions-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
-.special-possessions-possession-row {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .special-possessions-checkbox {
   min-width: 0;
   align-items: flex-start;
@@ -5627,12 +5215,6 @@ a.page-nav-pill:hover {
   min-width: 0;
 }
 
-.special-possessions-stock-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-}
-
 .special-possessions-stock-label {
   font-family: var(--font-serif);
   font-size: var(--text-sm);
@@ -5659,12 +5241,6 @@ a.page-nav-pill:hover {
   font-size: var(--text-sm);
   color: var(--text-secondary);
   line-height: 1.45;
-}
-
-.special-possessions-sub-item-with-uses {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
 }
 
 .special-possessions-sub-item-dots {
@@ -5714,12 +5290,6 @@ a.page-nav-pill:hover {
   line-height: 1.5;
 }
 
-.introductions-step {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .introductions-question-list {
   display: flex;
   flex-direction: column;
@@ -5728,17 +5298,7 @@ a.page-nav-pill:hover {
   line-height: 1.45;
 }
 
-.introductions-answer {
-  margin-top: var(--spacing-1);
-}
-
 /* ── character/sections/Inventory/UndefinedProvisions ── */
-.undefined-provisions-undefined-boxes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-1);
-}
-
 /* ── character/sections/Inventory/inventoryItem ── */
 .inventory-item-item-label {
   font-family: var(--font-serif);
@@ -5756,10 +5316,6 @@ a.page-nav-pill:hover {
 
 /* ── character/sections/Inventory/MainInventorySection ── */
 /* Load indicator */
-.main-inventory-section-load-row {
-  margin-top: var(--spacing-3);
-}
-
 .main-inventory-section-load-badge {
   display: inline-flex;
   align-items: center;
@@ -5851,16 +5407,6 @@ a.page-nav-pill:hover {
   text-align: center;
 }
 
-.character-playbook-tabs {
-  margin-top: var(--spacing-8);
-}
-
-.character-playbook-layout {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-}
-
 .character-playbook-centered {
   flex: 1;
   display: flex;
@@ -5947,12 +5493,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/playbooks/shared/InsertLayout ── */
-.insert-layout {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-}
-
 .insert-layout-move-list {
   display: flex;
   flex-direction: column;
@@ -5968,12 +5508,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/playbooks/thrall/ThrallInsert ── */
-.thrall-insert {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-}
-
 .thrall-insert-master-input {
   margin-top: var(--spacing-3);
   font-family: var(--font-serif);
@@ -5985,12 +5519,6 @@ a.page-nav-pill:hover {
   flex-direction: column;
   gap: var(--spacing-3);
   margin-top: var(--spacing-2);
-}
-
-.thrall-insert-mark-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
 }
 
 .thrall-insert-mark-entry {
@@ -6108,12 +5636,6 @@ a.page-nav-pill:hover {
   gap: var(--spacing-1);
 }
 
-.crew-widgets-loyalty-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-}
-
 .crew-widgets-gear-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -6124,18 +5646,6 @@ a.page-nav-pill:hover {
   .crew-widgets-gear-columns {
     grid-template-columns: 1fr;
   }
-}
-
-.crew-widgets-gear-col {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.crew-widgets-gear-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
 }
 
 .crew-widgets-gear-input {
@@ -6162,12 +5672,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/playbooks/followers/FollowersInsert ── */
-.followers-insert {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-}
-
 .followers-insert-empty {
   margin: 0 0 var(--spacing-4);
 }
@@ -6185,12 +5689,6 @@ a.page-nav-pill:hover {
 
 .followers-insert-card + .followers-insert-card {
   margin-top: 0;
-}
-
-.followers-insert-card-header {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-2);
 }
 
 .followers-insert-name-tag-row {
@@ -6266,12 +5764,6 @@ a.page-nav-pill:hover {
   color: var(--text-primary);
 }
 
-.followers-insert-confirm-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-3);
-}
-
 .followers-insert-field-row {
   display: flex;
   align-items: center;
@@ -6292,21 +5784,11 @@ a.page-nav-pill:hover {
   min-width: 0;
 }
 
-.followers-insert-moves-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .followers-insert-moves-list {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-2);
   padding-left: var(--spacing-4);
-}
-
-.followers-insert-move-input {
-  width: 100%;
 }
 
 .followers-insert-cost-loyalty-row {
@@ -6319,16 +5801,6 @@ a.page-nav-pill:hover {
 .followers-insert-cost-loyalty-row .followers-insert-field-row {
   flex: 1;
   min-width: 0;
-}
-
-.followers-insert-loyalty-label {
-  white-space: nowrap;
-}
-
-.followers-insert-gear-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
 }
 
 /* ── character/sections/Arcana/ArcanaSubTabs ── */
@@ -6466,11 +5938,6 @@ a.page-nav-pill:hover {
   margin: 0;
 }
 
-.blessed-initiates-of-danu-rows {
-  display: flex;
-  flex-direction: column;
-}
-
 .blessed-initiates-of-danu-row {
   display: flex;
   flex-direction: column;
@@ -6544,23 +6011,12 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/playbooks/blessed/BlessedSacredPouch ── */
-.blessed-sacred-pouch-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
 .blessed-sacred-pouch-instruction {
   font-family: var(--font-sans);
   font-size: var(--text-xs);
   color: var(--text-tertiary);
   margin: 0;
   font-style: italic;
-}
-
-.blessed-sacred-pouch-is-lines {
-  display: flex;
-  flex-direction: column;
 }
 
 .blessed-sacred-pouch-is-row {
@@ -6588,12 +6044,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/playbooks/blessed/BlessedEarthMother ── */
-.blessed-earth-mother-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
 .blessed-earth-mother-instruction {
   font-family: var(--font-sans);
   font-size: var(--text-xs);
@@ -6602,31 +6052,7 @@ a.page-nav-pill:hover {
   font-style: italic;
 }
 
-.blessed-earth-mother-shrine-options {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 /* ── character/playbooks/fox/FoxTallTales ── */
-.fox-tall-tales-tale-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.fox-tall-tales-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.fox-tall-tales-lost-row {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .fox-tall-tales-location-sub {
   padding-left: calc(16px + var(--spacing-3));
 }
@@ -6666,20 +6092,10 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/playbooks/marshal/MarshalCrew ── */
-.marshal-crew {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-}
-
 .marshal-crew-info-boxes {
   display: flex;
   gap: var(--spacing-4);
   align-items: flex-start;
-}
-
-.marshal-crew-exceptional-row {
-  margin-top: var(--spacing-2);
 }
 
 .marshal-crew-custom-tags-row {
@@ -6737,12 +6153,6 @@ a.page-nav-pill:hover {
   flex-wrap: wrap;
   gap: var(--spacing-2) var(--spacing-4);
   padding-left: var(--spacing-6);
-}
-
-.marshal-crew-inventory-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
 }
 
 .marshal-crew-inventory-item {
@@ -6834,12 +6244,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/playbooks/ranger/RangerAnimalCompanion ── */
-.ranger-animal-companion {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-}
-
 .ranger-animal-companion-header-row {
   display: flex;
   flex-wrap: wrap;
@@ -6916,23 +6320,11 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/sections/Arcana/ArcanaCardHeader ── */
-.arcana-card-header-header {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-2);
-}
-
 .arcana-card-header-header-text {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-1);
-}
-
-.arcana-card-header-meta {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
 }
 
 .arcana-card-header-provisions {
@@ -6956,12 +6348,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/sections/Arcana/ArcanaTrackerRow ── */
-.arcana-tracker-row-tracker {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-}
-
 .arcana-tracker-row-tracker-label {
   min-width: 4rem;
 }
@@ -6983,20 +6369,10 @@ a.page-nav-pill:hover {
   opacity: 0.55;
 }
 
-.arcana-follower-block-follower-activation {
-  margin-top: var(--spacing-1);
-}
-
 .arcana-follower-block-follower-header {
   display: flex;
   flex-direction: column;
   gap: 2px;
-}
-
-.arcana-follower-block-follower-stats {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
 }
 
 .arcana-follower-block-follower-hp-row {
@@ -7004,12 +6380,6 @@ a.page-nav-pill:hover {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-3);
-}
-
-.arcana-follower-block-follower-hp-label {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-1);
 }
 
 .arcana-follower-block-follower-hp-input {
@@ -7040,12 +6410,6 @@ a.page-nav-pill:hover {
   outline-offset: 1px;
 }
 
-.arcana-follower-block-follower-stat {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-1);
-}
-
 .arcana-follower-block-follower-instinct {
   display: flex;
   flex-wrap: wrap;
@@ -7058,31 +6422,7 @@ a.page-nav-pill:hover {
   gap: 2px;
 }
 
-.arcana-follower-block-follower-moves {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
-}
-
 /* ── Rolled aspects (Servant of Daagon's d4 assignments) ── */
-.arcana-follower-block-aspects {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.arcana-follower-block-aspect-rows {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.arcana-follower-block-aspect-row {
-  display: flex;
-  gap: var(--spacing-2);
-  align-items: flex-start;
-}
-
 .arcana-follower-block-aspect-die {
   flex-shrink: 0;
   width: 2.5rem;
@@ -7145,18 +6485,6 @@ a.page-nav-pill:hover {
   border-color: var(--border-accent);
 }
 
-.minor-arcana-card-description {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.minor-arcana-card-requirements {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .minor-arcana-card-req-row {
   display: flex;
   align-items: center;
@@ -7184,18 +6512,6 @@ a.page-nav-pill:hover {
   gap: var(--spacing-3);
   padding-top: var(--spacing-3);
   border-top: 1px solid var(--border-subtle);
-}
-
-.minor-arcana-card-move-header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-1);
-}
-
-.minor-arcana-card-move-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
 }
 
 /* ── character/sections/Arcana/AddArcanaModal ── */
@@ -7271,24 +6587,6 @@ a.page-nav-pill:hover {
 }
 
 /* ── character/sections/Arcana/ArcanaPanel ── */
-.arcana-panel-panel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
-}
-
-.arcana-panel-panel-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-}
-
-.arcana-panel-card-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
-}
-
 .arcana-panel-empty {
   color: var(--text-secondary);
 }
@@ -7314,12 +6612,6 @@ a.page-nav-pill:hover {
   box-shadow:
     0 0 0 1px var(--color-gold-500),
     var(--glow-gold);
-}
-
-.arcana-card-description {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
 }
 
 .arcana-card-base-moves {
@@ -7376,10 +6668,6 @@ a.page-nav-pill:hover {
   padding-top: 2px;
 }
 
-.arcana-card-task-count {
-  margin-top: var(--spacing-1);
-}
-
 .arcana-card-mysteries {
   display: flex;
   flex-direction: column;
@@ -7417,12 +6705,6 @@ label.arcana-card-mystery-move-header {
   gap: 2px;
 }
 
-.arcana-card-consequences {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
 .arcana-card-consequences-label {
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -7443,12 +6725,6 @@ label.arcana-card-mystery-move-header {
 
 .arcana-card-move-grid > *:last-child {
   margin-bottom: 0;
-}
-
-.arcana-card-consequence-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
 }
 
 .arcana-card-consequence-row {
@@ -7492,4 +6768,91 @@ label.arcana-card-mystery-move-header {
 
 .arcana-card-consequence-table {
   padding-left: var(--spacing-6);
+}
+
+/* ── Layout helpers: put them on the element next to its own class ── */
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.end {
+  justify-content: flex-end;
+}
+
+.flex {
+  display: flex;
+}
+
+.gap-1 {
+  gap: var(--spacing-1);
+}
+
+.gap-2 {
+  gap: var(--spacing-2);
+}
+
+.gap-3 {
+  gap: var(--spacing-3);
+}
+
+.gap-4 {
+  gap: var(--spacing-4);
+}
+
+.gap-6 {
+  gap: var(--spacing-6);
+}
+
+.grow {
+  flex: 1;
+}
+
+.mt-1 {
+  margin-top: var(--spacing-1);
+}
+
+.mt-2 {
+  margin-top: var(--spacing-2);
+}
+
+.mt-3 {
+  margin-top: var(--spacing-3);
+}
+
+.mt-4 {
+  margin-top: var(--spacing-4);
+}
+
+.mt-6 {
+  margin-top: var(--spacing-6);
+}
+
+.mt-8 {
+  margin-top: var(--spacing-8);
+}
+
+.no-shrink {
+  flex-shrink: 0;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.start {
+  align-items: flex-start;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.wrap {
+  flex-wrap: wrap;
 }

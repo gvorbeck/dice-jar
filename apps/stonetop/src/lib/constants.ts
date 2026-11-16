@@ -1,5 +1,5 @@
-import type { CharacterData, RollStat } from '@/types';
-import type { PlaybookType } from '@/types';
+import type { CharacterData, RollStat } from '@/model';
+import type { PlaybookType } from '@/model';
 
 export const DEFAULT_GAME_NAME = 'Stonetop Game';
 export const GAMES_COLLECTION = 'games';

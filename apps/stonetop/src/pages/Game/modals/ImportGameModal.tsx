@@ -1,5 +1,5 @@
 import { useCallback, useId, useState } from 'react';
-import { Button, Heading, Modal, Text } from '@/components/ui';
+import { Button, Heading, Modal, Text } from '@/ui';
 import type { GameExportEnvelope, ImportSummary } from '@/lib/gameBackup';
 
 interface ImportGameModalProps {
@@ -60,7 +60,7 @@ export const ImportGameModal = ({ open, gameId, currentName, envelope, summary, 
         Replace this game's data?
       </Heading>
 
-      <div className="import-game-modal-body">
+      <div className="col gap-4">
         <dl className="import-game-modal-details">
           <dt>
             <Text as="span" size="xs" color="muted">
@@ -113,7 +113,7 @@ export const ImportGameModal = ({ open, gameId, currentName, envelope, summary, 
         </Text>
       </div>
 
-      <div className="import-game-modal-actions">
+      <div className="flex gap-3 end">
         <Button variant="ghost" size="md" onClick={onClose} disabled={importing}>
           Cancel
         </Button>

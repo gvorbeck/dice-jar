@@ -1,0 +1,203 @@
+import { useState, useRef, useId, useCallback, useEffect, useMemo, memo } from 'react';
+import { cn } from '@dice-jar/cn';
+import { Button } from '@/ui';
+
+interface TagInputProps {
+  label?: string;
+  value: string[];
+  onChange: (tags: string[]) => void;
+  suggestions?: string[];
+  placeholder?: string;
+  className?: string;
+}
+
+interface TagChipProps {
+  tag: string;
+  onRemove: (tag: string) => void;
+}
+
+const TagChip = memo(({ tag, onRemove }: TagChipProps) => {
+  const handleRemove = useCallback(() => onRemove(tag), [tag, onRemove]);
+  return (
+    <span className="tag-input-tag">
+      {tag}
+      <button type="button" className="tag-input-tag-remove field-focus-visible" onClick={handleRemove} aria-label={`Remove trait: ${tag}`}>
+        ×
+      </button>
+    </span>
+  );
+});
+
+interface SuggestionItemProps {
+  suggestion: string;
+  index: number;
+  isActive: boolean;
+  listboxId: string;
+  onAdd: (tag: string) => void;
+}
+
+const SuggestionItem = memo(({ suggestion, index, isActive, listboxId, onAdd }: SuggestionItemProps) => {
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      onAdd(suggestion);
+    },
+    [suggestion, onAdd],
+  );
+
+  const cx = cn('tag-input-option', isActive && 'tag-input-option-active');
+
+  return (
+    <div id={`${listboxId}-option-${index}`} role="option" aria-selected={isActive} className={cx} onPointerDown={handlePointerDown}>
+      {suggestion}
+    </div>
+  );
+});
+
+export const TagInput = ({ label, value, onChange, suggestions = [], placeholder = 'Add trait…', className }: TagInputProps) => {
+  const inputId = useId();
+  const listboxId = useId();
+  const [inputVal, setInputVal] = useState('');
+  const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dismissedRef = useRef(false);
+
+  const { filtered, unusedCount } = useMemo(() => {
+    const unused = suggestions.filter((s) => !value.includes(s));
+    return {
+      filtered: unused.filter((s) => s.toLowerCase().includes(inputVal.toLowerCase())),
+      unusedCount: unused.length,
+    };
+  }, [suggestions, inputVal, value]);
+
+  const addTag = useCallback(
+    (tag: string) => {
+      const trimmed = tag.trim();
+      if (!trimmed || value.includes(trimmed)) return;
+      onChange([...value, trimmed]);
+      setInputVal('');
+      setOpen(false);
+      setActiveIndex(-1);
+      inputRef.current?.focus();
+    },
+    [value, onChange],
+  );
+
+  const removeTag = useCallback(
+    (tag: string) => {
+      onChange(value.filter((t) => t !== tag));
+    },
+    [value, onChange],
+  );
+
+  const assignRandom = useCallback(() => {
+    const unused = suggestions.filter((s) => !value.includes(s));
+    if (unused.length === 0) return;
+    const pick = unused[Math.floor(Math.random() * unused.length)]!;
+    onChange([...value, pick]);
+  }, [suggestions, value, onChange]);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    dismissedRef.current = false;
+    setInputVal(e.target.value);
+    setOpen(true);
+    setActiveIndex(-1);
+  }, []);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        if (activeIndex >= 0 && filtered[activeIndex]) {
+          addTag(filtered[activeIndex]);
+        } else if (inputVal.trim()) {
+          addTag(inputVal);
+        }
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setOpen(true);
+        setActiveIndex((i) => Math.min(i + 1, filtered.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveIndex((i) => Math.max(i - 1, -1));
+      } else if (e.key === 'Escape') {
+        dismissedRef.current = true;
+        setOpen(false);
+        setActiveIndex(-1);
+      } else if (e.key === 'Backspace' && !inputVal && value.length > 0) {
+        removeTag(value[value.length - 1]!);
+      }
+    },
+    [activeIndex, filtered, inputVal, addTag, removeTag, value],
+  );
+
+  const handleFocus = useCallback(() => {
+    if (!dismissedRef.current) setOpen(true);
+  }, []);
+
+  useEffect(() => {
+    const handlePointerDown = (e: PointerEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, []);
+
+  const showDropdown = open && filtered.length > 0;
+  const cx = cn('col gap-1', className);
+
+  return (
+    <div className={cx} ref={containerRef}>
+      {label && (
+        <label htmlFor={inputId} className="tag-input-label">
+          {label}
+        </label>
+      )}
+      <div className="tag-input-field-row">
+        <div className="tag-input-field">
+          {value.map((tag) => (
+            <TagChip key={tag} tag={tag} onRemove={removeTag} />
+          ))}
+          <input
+            ref={inputRef}
+            id={inputId}
+            type="text"
+            className="tag-input-input field-focus-visible"
+            value={inputVal}
+            placeholder={value.length === 0 ? placeholder : ''}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            autoComplete="off"
+            role="combobox"
+            aria-expanded={open}
+            aria-autocomplete="list"
+            aria-controls={listboxId}
+            aria-activedescendant={activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined}
+          />
+        </div>
+        {suggestions.length > 0 && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            icon="dice"
+            onClick={assignRandom}
+            disabled={unusedCount === 0}
+            aria-label="Assign random trait"
+          />
+        )}
+        <div id={listboxId} role="listbox" aria-label="Trait suggestions" className="tag-input-dropdown" hidden={!showDropdown}>
+          {showDropdown &&
+            filtered.map((s, i) => (
+              <SuggestionItem key={s} suggestion={s} index={i} isActive={i === activeIndex} listboxId={listboxId} onAdd={addTag} />
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+};

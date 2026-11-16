@@ -57,8 +57,8 @@ export default defineConfig({
           // are split into separate chunks so each loads only when its sub-tab
           // panel is viewed (the panels are lazy-loaded in ArcanaTab), and so
           // each caches independently of the main CharacterPlaybook chunk.
-          if (id.includes('/src/lib/arcana/major')) return 'arcana-major-data';
-          if (id.includes('/src/lib/arcana/minor')) return 'arcana-minor-data';
+          if (id.includes('/src/rules/arcana/major')) return 'arcana-major-data';
+          if (id.includes('/src/rules/arcana/minor')) return 'arcana-minor-data';
         },
       },
     },

@@ -1,87 +1,68 @@
 import { useRef, useCallback, useMemo, useInsertionEffect, lazy, Suspense } from 'react';
-import { useHashTabs } from '@/hooks/useHashTabs';
+import { useHashTabs } from '@/lib/useHashTabs';
 import type { ComponentType, ReactNode } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { PageMeta } from '@/components/app/PageMeta/PageMeta';
-import { useGame } from '@/hooks/useGame';
-import { useNotesActions } from '@/hooks/useNotesActions';
-import { SharedNotes, type NotesActions } from '@/components/playbook/SharedNotes/SharedNotes';
-import { PLAYBOOKS, DEFAULT_GAME_NAME, getPlaybook } from '@/lib/constants';
-import { Heading, Button, ScrollToTop, Tabs, tabBadgeClass, Icon, Text, PlaybookColumns, Stack, Spinner } from '@/components/ui';
+import { useTitle } from '@/lib/useTitle';
+import { useGame } from '@/lib/useGame';
+import { useNotesActions } from '@/lib/useNotesActions';
+import { SharedNotes, type NotesActions } from '@/playbook/SharedNotes/SharedNotes';
+import { PLAYBOOKS, getPlaybook } from '@/lib/constants';
+import { Heading, Button, ScrollToTop, Tabs, tabBadgeClass, Icon, Text, PlaybookColumns, Stack, Spinner } from '@/ui';
 import { AddInsertModal } from './modals/AddInsertModal';
 import { RemoveInsertModal } from './modals/RemoveInsertModal';
-import { GameGuard } from '@/components/app/GameGuard/GameGuard';
-import { PageLayout } from '@/components/app/PageLayout/PageLayout';
-import { buildGameNav, type GameNav } from '@/components/app/PageHeader/gameNav';
-import {
-  Background,
-  RadioSelect,
-  Appearance,
-  Stats,
-  Moves,
-  SpecialPossessions,
-  Introductions,
-  Inventory,
-} from '@/components/character/sections';
+import { GameGuard } from '@/ui/GameGuard/GameGuard';
+import { PageLayout } from '@/ui/PageLayout/PageLayout';
+import { buildGameNav, type GameNav } from '@/ui/PageHeader/gameNav';
+import { Background, RadioSelect, Appearance, Stats, Moves, SpecialPossessions, Introductions, Inventory } from '@/character/sections';
 // The Arcana tab pulls in ~2,850 lines of card data plus its panel UI. It's
 // only ever shown when the user opens the Arcana tab, so lazy-load it to keep
 // that weight out of the initial CharacterPlaybook bundle. Tabs already gates
 // mounting on first activation, so the chunk is fetched exactly when needed.
 const ArcanaTab = lazy(() =>
-  import('@/components/character/sections/Arcana/ArcanaTab').then((m) => ({
+  import('@/character/sections/Arcana/ArcanaTab').then((m) => ({
     default: m.ArcanaTab,
   })),
 );
-import { BACKGROUND_OPTIONS, FOX_LIFE_OF_CRIME_BACKGROUND } from '@/lib/characterCreation/backgroundOptions';
-import { INSTINCT_OPTIONS } from '@/lib/characterCreation/instinctOptions';
-import { APPEARANCE_OPTIONS } from '@/lib/characterCreation/appearanceOptions';
-import { PLACE_OF_ORIGIN_OPTIONS } from '@/lib/characterCreation/placeOfOriginOptions';
-import { SPECIAL_POSSESSIONS_OPTIONS } from '@/lib/characterCreation/specialPossessionsOptions';
-import { INTRODUCTIONS_OPTIONS } from '@/lib/characterCreation/introductionsOptions';
+import { BACKGROUND_OPTIONS, FOX_LIFE_OF_CRIME_BACKGROUND } from '@/rules/characterCreation/backgroundOptions';
+import { INSTINCT_OPTIONS } from '@/rules/characterCreation/instinctOptions';
+import { APPEARANCE_OPTIONS } from '@/rules/characterCreation/appearanceOptions';
+import { PLACE_OF_ORIGIN_OPTIONS } from '@/rules/characterCreation/placeOfOriginOptions';
+import { SPECIAL_POSSESSIONS_OPTIONS } from '@/rules/characterCreation/specialPossessionsOptions';
+import { INTRODUCTIONS_OPTIONS } from '@/rules/characterCreation/introductionsOptions';
 import { featurePatch, resolvePlaybookFeatures } from '@/lib/resolvePlaybookFeatures';
 import { getMarkedInstinctOverride } from '@/lib/consequenceActions';
-import { useAutoFollowers } from '@/hooks/useAutoFollowers';
-import { useInsertTabs } from '@/hooks/useInsertTabs';
+import { useAutoFollowers } from '@/lib/useAutoFollowers';
+import { useInsertTabs } from '@/lib/useInsertTabs';
 // User-addable inserts (Revenant, Ghost, …) live in one declarative registry — their ids,
 // labels, lazy components and removal cleanup all come from there.
 import { INSERT_TABS, getInsertTab } from '@/lib/insertTabs';
-import { computeInvocationBadge } from '@/hooks/useInvocationBadge';
+import { computeInvocationBadge } from '@/lib/useInvocationBadge';
 // Each playbook's panel + tab components are lazy-loaded so a character page
 // only downloads the active playbook's chunk, not all nine. Lazy calls that
 // import from the same per-playbook barrel share a single Rollup chunk, so e.g.
 // BlessedSacredPouch and BlessedEarthMother land together in the blessed chunk.
-const BlessedInitiatesOfDanu = lazy(() =>
-  import('@/components/character/playbooks/blessed').then((m) => ({ default: m.BlessedInitiatesOfDanu })),
-);
-const BlessedSacredPouch = lazy(() => import('@/components/character/playbooks/blessed').then((m) => ({ default: m.BlessedSacredPouch })));
-const BlessedEarthMother = lazy(() => import('@/components/character/playbooks/blessed').then((m) => ({ default: m.BlessedEarthMother })));
-const FoxTallTales = lazy(() => import('@/components/character/playbooks/fox').then((m) => ({ default: m.FoxTallTales })));
-const HeavyViolence = lazy(() => import('@/components/character/playbooks/heavy').then((m) => ({ default: m.HeavyViolence })));
-const JudgeChronicle = lazy(() => import('@/components/character/playbooks/judge').then((m) => ({ default: m.JudgeChronicle })));
-const JudgeLawkeeper = lazy(() => import('@/components/character/playbooks/judge').then((m) => ({ default: m.JudgeLawkeeper })));
+const BlessedInitiatesOfDanu = lazy(() => import('@/character/playbooks/blessed').then((m) => ({ default: m.BlessedInitiatesOfDanu })));
+const BlessedSacredPouch = lazy(() => import('@/character/playbooks/blessed').then((m) => ({ default: m.BlessedSacredPouch })));
+const BlessedEarthMother = lazy(() => import('@/character/playbooks/blessed').then((m) => ({ default: m.BlessedEarthMother })));
+const FoxTallTales = lazy(() => import('@/character/playbooks/fox').then((m) => ({ default: m.FoxTallTales })));
+const HeavyViolence = lazy(() => import('@/character/playbooks/heavy').then((m) => ({ default: m.HeavyViolence })));
+const JudgeChronicle = lazy(() => import('@/character/playbooks/judge').then((m) => ({ default: m.JudgeChronicle })));
+const JudgeLawkeeper = lazy(() => import('@/character/playbooks/judge').then((m) => ({ default: m.JudgeLawkeeper })));
 const LightbearerPraiseTheDay = lazy(() =>
-  import('@/components/character/playbooks/lightbearer').then((m) => ({ default: m.LightbearerPraiseTheDay })),
+  import('@/character/playbooks/lightbearer').then((m) => ({ default: m.LightbearerPraiseTheDay })),
 );
-const LightbearerInvocations = lazy(() =>
-  import('@/components/character/playbooks/lightbearer').then((m) => ({ default: m.LightbearerInvocations })),
-);
-const MarshalWarStories = lazy(() => import('@/components/character/playbooks/marshal').then((m) => ({ default: m.MarshalWarStories })));
-const MarshalCrew = lazy(() => import('@/components/character/playbooks/marshal').then((m) => ({ default: m.MarshalCrew })));
-const RangerSomethingWicked = lazy(() =>
-  import('@/components/character/playbooks/ranger').then((m) => ({ default: m.RangerSomethingWicked })),
-);
-const RangerAnimalCompanion = lazy(() =>
-  import('@/components/character/playbooks/ranger').then((m) => ({ default: m.RangerAnimalCompanion })),
-);
-const SeekerCollection = lazy(() => import('@/components/character/playbooks/seeker').then((m) => ({ default: m.SeekerCollection })));
-const WouldBeHeroFearAnger = lazy(() =>
-  import('@/components/character/playbooks/would-be-hero').then((m) => ({ default: m.WouldBeHeroFearAnger })),
-);
+const LightbearerInvocations = lazy(() => import('@/character/playbooks/lightbearer').then((m) => ({ default: m.LightbearerInvocations })));
+const MarshalWarStories = lazy(() => import('@/character/playbooks/marshal').then((m) => ({ default: m.MarshalWarStories })));
+const MarshalCrew = lazy(() => import('@/character/playbooks/marshal').then((m) => ({ default: m.MarshalCrew })));
+const RangerSomethingWicked = lazy(() => import('@/character/playbooks/ranger').then((m) => ({ default: m.RangerSomethingWicked })));
+const RangerAnimalCompanion = lazy(() => import('@/character/playbooks/ranger').then((m) => ({ default: m.RangerAnimalCompanion })));
+const SeekerCollection = lazy(() => import('@/character/playbooks/seeker').then((m) => ({ default: m.SeekerCollection })));
+const WouldBeHeroFearAnger = lazy(() => import('@/character/playbooks/would-be-hero').then((m) => ({ default: m.WouldBeHeroFearAnger })));
 import { BURN_BRIGHTLY_COST, canBurnBrightly, requireBurnBrightly } from '@/lib/burnBrightly';
 import type { SheetGuard } from '@/lib/statDeltas';
-import type { AdditiveStat, Character, CharacterData, GameSession, LoggedRoll, NotesLock, PlaybookType, PlaybookFeatures } from '@/types';
-import type { RollReport } from '@/components/character/Move/RollAffordance';
-import { CharacterRollContext } from '@/components/character/Move/CharacterRollContext';
+import type { AdditiveStat, Character, CharacterData, GameSession, LoggedRoll, NotesLock, PlaybookType, PlaybookFeatures } from '@/model';
+import type { RollReport } from '@/character/Move/RollAffordance';
+import { CharacterRollContext } from '@/character/Move/CharacterRollContext';
 
 type PlaybookSectionComponent = ComponentType<{ data: CharacterData | undefined; onSave: (data: Partial<CharacterData>) => Promise<void> }>;
 type PlaybookSectionEntry = { key: string; Component: PlaybookSectionComponent };
@@ -142,7 +123,7 @@ const PCPlaybookTab = ({
   const hpMax = pfgHpUpgrade ? (playbookOption?.hpMax ?? 0) + 4 : playbookOption?.hpMax;
 
   return (
-    <div className="character-playbook-layout">
+    <div className="col gap-6">
       <PlaybookColumns
         left={
           <>
@@ -220,7 +201,6 @@ interface SheetProps {
   character: Character;
   playbookOption: (typeof PLAYBOOKS)[number];
   id: string;
-  gameName: string;
   prosperity: number;
   nav: GameNav;
   updateCharacterName: (characterId: string, name: string) => Promise<void>;
@@ -286,7 +266,6 @@ const CharacterSheet = ({
   character,
   playbookOption,
   id,
-  gameName,
   prosperity,
   nav,
   updateCharacterName,
@@ -362,8 +341,6 @@ const CharacterSheet = ({
   const characterName = character.name?.trim();
   const playbookLabel = `${playbookOption.label} Playbook`;
 
-  const pageTitle = characterName ? `${characterName} — ${playbookLabel} — Hearthfire` : `${playbookLabel} — Hearthfire`;
-
   const playbookTabs = getPlaybookTabs(playbook, characterData);
 
   const level = getCharacterLevel(character);
@@ -384,7 +361,7 @@ const CharacterSheet = ({
   const setActiveIndexRef = useRef<(i: number) => void>(() => {});
 
   // Every tab that precedes the inserts: the three static tabs plus this playbook's own. Built
-  // separately from `tabs` so useInsertTabs can be handed the count — it needs it before the
+  // separately from `col` so useInsertTabs can be handed the count — it needs it before the
   // insert tabs, which depend on the hook's own remove handlers, can be built.
   const nonInsertTabs = useMemo(
     () => [
@@ -510,7 +487,6 @@ const CharacterSheet = ({
         onSaveTitle={handleSaveCharacterName}
         diceRoller={{ rollerId: character.id, rollerName: characterName || '', onRoll: logRoll }}
       >
-        <PageMeta noindex title={pageTitle} description={`${playbookLabel} for ${gameName}. Track background, stats, moves, and more.`} />
         <ScrollToTop sentinelRef={headerRef} />
         <div ref={headerRef} />
         {playbookOption.description && (
@@ -520,7 +496,7 @@ const CharacterSheet = ({
         )}
         <Tabs
           aria-label="Character sections"
-          className="character-playbook-tabs"
+          className="mt-8"
           tabs={tabs}
           activeIndex={activeIndex}
           onActiveChange={handleActiveChange}
@@ -571,6 +547,14 @@ const CharacterPlaybookContent = ({
   const prosperity = g.steading?.prosperity ?? 0;
   const playbookOption = getPlaybook(playbook);
   const character = g.characters.find((c) => c.playbook === playbook);
+  const characterName = character?.name?.trim();
+  useTitle(
+    !playbookOption
+      ? undefined
+      : !character
+        ? 'Character not found — Hearthfire'
+        : `${characterName ? `${characterName} — ` : ''}${playbookOption.label} Playbook — Hearthfire`,
+  );
 
   if (!playbookOption) {
     return (
@@ -590,7 +574,6 @@ const CharacterPlaybookContent = ({
   if (!character) {
     return (
       <PageLayout simple>
-        <PageMeta noindex title="Character not found — Hearthfire" description="This game has no character with that playbook." />
         <div className="character-playbook-centered">
           <Heading as="h2" size="md">
             Character not found
@@ -616,7 +599,6 @@ const CharacterPlaybookContent = ({
       character={character}
       playbookOption={playbookOption}
       id={id}
-      gameName={g.name || DEFAULT_GAME_NAME}
       prosperity={prosperity}
       nav={nav}
       updateCharacterName={updateCharacterName}

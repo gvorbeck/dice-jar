@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyStatDeltas } from './statDeltas';
-import type { CharacterData } from '@/types';
+import type { CharacterData } from '@/model';
 
 const sheet = (over: Partial<CharacterData>) => ({ statHp: '10', statArmor: '1', statXp: '3', ...over }) as CharacterData;
 

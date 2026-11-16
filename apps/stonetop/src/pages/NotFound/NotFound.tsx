@@ -1,15 +1,15 @@
 import { useNavigate } from 'react-router-dom';
-import { PageMeta } from '@/components/app/PageMeta/PageMeta';
-import { PageLayout } from '@/components/app/PageLayout/PageLayout';
-import { Button, Heading, Text } from '@/components/ui';
+import { useTitle } from '@/lib/useTitle';
+import { PageLayout } from '@/ui/PageLayout/PageLayout';
+import { Button, Heading, Text } from '@/ui';
 
 export const NotFound = () => {
   const navigate = useNavigate();
+  useTitle('404 — Lost | Hearthfire');
   const handleReturnHome = () => navigate('/');
 
   return (
     <PageLayout simple>
-      <PageMeta title="404 — Lost | Hearthfire" description="You've wandered off the path." />
       <div className="not-found-page">
         <div className="not-found-content">
           <Text aria-label="404 error" className="not-found-code">
