@@ -67,7 +67,7 @@ export const NpcRow = ({ npc, onEdit, onRemove, onToggleDead, resolveTarget }: N
         <Button variant="ghost" size="sm" onClick={handleEdit} aria-label={`Edit ${npc.name}`}>
           Edit
         </Button>
-        <Tooltip text={npc.dead ? 'Mark as alive' : 'Mark as dead'} noTabStop>
+        <Tooltip text={npc.dead ? 'Mark as alive' : 'Mark as dead'}>
           <Button
             variant="ghost"
             size="sm"
@@ -77,7 +77,7 @@ export const NpcRow = ({ npc, onEdit, onRemove, onToggleDead, resolveTarget }: N
             className={tombstoneCx}
           />
         </Tooltip>
-        <Tooltip text="Remove NPC" noTabStop>
+        <Tooltip text="Remove NPC">
           <Button variant="ghost" size="sm" icon="trash" onClick={handleRemove} aria-label={`Remove ${npc.name}`} />
         </Tooltip>
       </div>

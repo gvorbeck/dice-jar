@@ -99,7 +99,6 @@ const FollowerCard = memo(
     onRemove,
   }: FollowerCardProps) => {
     const headingId = useId();
-    const removeTipId = useId();
     const confirmHeadingId = useId();
     const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -197,14 +196,13 @@ const FollowerCard = memo(
               onBlur={onBlur}
             />
           </div>
-          <Tooltip text="Remove follower" side="left" noTabStop tooltipId={removeTipId}>
+          <Tooltip text="Remove follower" side="left">
             <Button
               variant="ghost"
 
               icon="close"
               onClick={handleRequestRemove}
               aria-label={`Remove ${followerLabel}`}
-              aria-describedby={removeTipId}
             />
           </Tooltip>
         </div>

@@ -59,7 +59,7 @@ export const PlaybookSection = ({
               {choose !== undefined ? `(Choose ${choose}${chooseNote ? `, ${chooseNote}` : ''})` : `(${chooseNote})`}
             </Text>
           )}
-          <Tooltip text={warnText} side="top" noTabStop={!warn || !!overrideNote} className={warnCx}>
+          <Tooltip text={warnText} side="top" plain noTabStop={!warn || !!overrideNote} className={warnCx}>
             <Icon name="warning" size="small" role="img" aria-label="Warning" aria-hidden={undefined} />
           </Tooltip>
         </Heading>

@@ -54,7 +54,7 @@ export const ImprovementList = ({
     <span key={id} className={styles.fixedItem}>
       <Text as="span">{label}</Text>
       {fromImprovement && (
-        <Tooltip text="Added by a completed improvement" side="top">
+        <Tooltip text="Added by a completed improvement" side="top" plain>
           <Icon name="info" size="small" className={styles.infoIcon} />
         </Tooltip>
       )}

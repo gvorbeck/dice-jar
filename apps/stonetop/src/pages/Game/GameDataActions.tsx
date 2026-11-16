@@ -1,4 +1,4 @@
-import { useCallback, useId, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Button, Tooltip } from '@/components/ui';
 import { useToast } from '@/components/app';
 import { exportGame, readImportFile, type GameExportEnvelope, type ImportSummary } from '@/lib/gameBackup';
@@ -18,8 +18,6 @@ interface PendingImport {
 
 export const GameDataActions = ({ gameId, gameName, onReplaceGameData }: GameDataActionsProps) => {
   const { addToast } = useToast();
-  const exportTooltipId = useId();
-  const importTooltipId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [exporting, setExporting] = useState(false);
   const [pending, setPending] = useState<PendingImport | null>(null);
@@ -92,7 +90,7 @@ export const GameDataActions = ({ gameId, gameName, onReplaceGameData }: GameDat
 
   return (
     <>
-      <Tooltip text="Export game" side="top" noTabStop tooltipId={exportTooltipId}>
+      <Tooltip text="Export game" side="top">
         <Button
           variant="ghost"
           icon="download"
@@ -101,11 +99,10 @@ export const GameDataActions = ({ gameId, gameName, onReplaceGameData }: GameDat
           onClick={handleExport}
           disabled={exporting}
           aria-label="Export game data"
-          aria-describedby={exportTooltipId}
         />
       </Tooltip>
 
-      <Tooltip text="Import game" side="top" noTabStop tooltipId={importTooltipId}>
+      <Tooltip text="Import game" side="top">
         <Button
           variant="ghost"
           icon="upload"
@@ -113,7 +110,6 @@ export const GameDataActions = ({ gameId, gameName, onReplaceGameData }: GameDat
           className={styles.actionBtn}
           onClick={handleImportClick}
           aria-label="Import game data from a backup file"
-          aria-describedby={importTooltipId}
         />
       </Tooltip>
 

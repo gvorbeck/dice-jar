@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Tabs } from '../Tabs';
 
 const TABS = [
@@ -54,15 +55,16 @@ describe('Tabs', () => {
     expect(getTab('One').contains(removeButton)).toBe(false);
   });
 
-  it('portals the badge tooltip out of the tab strip', () => {
+  it('shows the badge tooltip outside the tab strip, which clips overflow', async () => {
     const withBadge = [{ ...TABS[0]!, badgeTooltip: 'New invocations available' }, TABS[1]!];
     render(<Tabs tabs={withBadge} aria-label="Example" />);
 
-    const tip = screen.getByText('New invocations available');
-    // The strip is an overflow container, so a tooltip rendered inside it is
-    // clipped and never visible. It has to live outside the tablist entirely.
+    await userEvent.hover(getTab('One'));
+    await userEvent.unhover(getTab('One'));
+    fireEvent.pointerEnter(getTab('One'), { pointerType: 'mouse' });
+    fireEvent.pointerMove(getTab('One'), { pointerType: 'mouse' });
+    const tip = await screen.findByText('New invocations available');
     expect(screen.getByRole('tablist').contains(tip)).toBe(false);
-    expect(tip.closest('[role="tab"]')).toBeNull();
   });
 
   it('clicking remove fires onRemove without activating the tab', () => {

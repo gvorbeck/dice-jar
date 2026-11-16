@@ -74,8 +74,6 @@ export const PageHeader = (props: Props) => {
   // for Enter, not for a blur caused by clicking or tabbing to another element — otherwise we'd
   // steal focus from wherever the user was headed.
   const committingViaKeyboardRef = useRef(false);
-  const editTooltipId = useId();
-  const copyTooltipId = useId();
   const navDropdownId = useId();
 
   useEffect(() => {
@@ -182,7 +180,7 @@ export const PageHeader = (props: Props) => {
                 {title}
               </Heading>
               {onSaveTitle && (
-                <Tooltip text="Edit name" side="top" noTabStop tooltipId={editTooltipId}>
+                <Tooltip text="Edit name" side="top">
                   <Button
                     ref={editBtnRef}
                     variant="ghost"
@@ -191,7 +189,6 @@ export const PageHeader = (props: Props) => {
                     className={styles.editBtn}
                     onClick={startEditing}
                     aria-label={titleLabel!}
-                    aria-describedby={editTooltipId}
                   />
                 </Tooltip>
               )}
@@ -210,7 +207,7 @@ export const PageHeader = (props: Props) => {
               {gameId}
             </Text>
           </Text>
-          <Tooltip text={copyLabel} side="top" noTabStop tooltipId={copyTooltipId}>
+          <Tooltip text={copyLabel} side="top">
             <Button
               variant="ghost"
               icon={copied ? 'check' : 'copy'}
@@ -218,7 +215,6 @@ export const PageHeader = (props: Props) => {
               className={styles.copyBtn}
               onClick={copyGameId}
               aria-label={copyLabel}
-              aria-describedby={copyTooltipId}
             />
           </Tooltip>
           {actions && <div className={styles.actions}>{actions}</div>}

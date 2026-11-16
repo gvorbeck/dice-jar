@@ -1,42 +1,37 @@
 import clsx from 'clsx';
-import { useTooltip } from './useTooltip';
+import { Focusable, OverlayArrow, Tooltip as AriaTooltip, TooltipTrigger } from 'react-aria-components';
 import styles from './Tooltip.module.css';
-
-type TooltipSide = 'top' | 'bottom' | 'left' | 'right';
 
 interface TooltipProps {
   text: string;
-  side?: TooltipSide;
-  className?: string;
+  side?: 'top' | 'bottom' | 'left' | 'right';
+  /** Wrap non-interactive content (an icon) in a focusable image named by the tooltip; otherwise the child itself must be focusable and pass its ref and props on. */
+  plain?: boolean;
+  /** With `plain`: keep the wrapper out of the tab order. */
   noTabStop?: boolean;
-  tooltipId?: string;
-  children: React.ReactNode;
+  className?: string;
+  children: React.ReactElement;
 }
 
-export const Tooltip = ({ text, side = 'top', className, noTabStop = false, tooltipId: externalId, children }: TooltipProps) => {
-  const { tooltipId, visible, resolvedSide, nudgeX, arrowOffset, anchorRef, tooltipRef, anchorProps } = useTooltip({
-    side,
-    tooltipId: externalId,
-  });
-
-  const wrapperCx = clsx(styles.wrapper, className);
-  const cx = clsx(styles.tooltip, styles[resolvedSide], visible && styles.visible);
-
-  return (
-    <span ref={anchorRef} className={wrapperCx} aria-describedby={tooltipId} tabIndex={noTabStop ? undefined : 0} {...anchorProps}>
-      {children}
-      <span
-        ref={tooltipRef}
-        role="tooltip"
-        id={tooltipId}
-        aria-hidden={!visible}
-        className={cx}
-        // shortcut: inline style, the position is measured at runtime so it can't be a class; replace with a React Aria Tooltip/Popover.
-        style={{ '--nudge-x': `${nudgeX}px`, '--arrow-offset': arrowOffset } as React.CSSProperties}
-      >
-        {text}
-        <span className={styles.arrow} />
-      </span>
-    </span>
-  );
-};
+// React Aria shows it on hover and keyboard focus, flips it at the screen edge, and keeps it inside the viewport.
+export const Tooltip = ({ text, side = 'top', plain = false, noTabStop = false, className, children }: TooltipProps) => (
+  <TooltipTrigger delay={0} closeDelay={100}>
+    <Focusable excludeFromTabOrder={plain && noTabStop}>
+      {plain ? (
+        <span role="img" aria-label={text} className={clsx(styles.wrapper, className)}>
+          {children}
+        </span>
+      ) : (
+        children
+      )}
+    </Focusable>
+    <AriaTooltip placement={side} offset={8} className={styles.tooltip}>
+      <OverlayArrow className={styles.arrow}>
+        <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true">
+          <path d="M0 0 L4 4 L8 0" />
+        </svg>
+      </OverlayArrow>
+      {text}
+    </AriaTooltip>
+  </TooltipTrigger>
+);

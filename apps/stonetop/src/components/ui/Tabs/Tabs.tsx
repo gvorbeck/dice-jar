@@ -1,7 +1,6 @@
 import { useState, useId, useRef, useEffect, useCallback, useMemo, type ReactNode, type KeyboardEvent } from 'react';
-import { createPortal } from 'react-dom';
 import clsx from 'clsx';
-import { useTooltip } from '../Tooltip/useTooltip';
+import { Tooltip } from '../Tooltip/Tooltip';
 import { Button } from '../Button/Button';
 import { Icon } from '../Icon/Icon';
 import styles from './Tabs.module.css';
@@ -28,121 +27,23 @@ interface TabsProps {
 
 export const tabBadgeClass = styles.tabBadge;
 
-const portalTarget = typeof document !== 'undefined' ? document.body : null;
-
-const PortalTooltip = ({
-  tooltipRef,
-  tooltipId,
-  visible,
-  fixedCoords,
-  arrowOffset,
-  resolvedSide,
-  children,
-}: {
-  tooltipRef: React.RefObject<HTMLSpanElement | null>;
-  tooltipId: string;
-  visible: boolean;
-  fixedCoords: { top: number; left: number } | null;
-  arrowOffset: string;
-  resolvedSide: string;
-  children: ReactNode;
-}) => {
-  if (!portalTarget) return null;
-
-  const tipCx = clsx(styles.tabTooltip, styles.portalFixed, styles[resolvedSide], visible && styles.tabTooltipVisible);
-
-  return createPortal(
-    <span
-      ref={tooltipRef}
-      role="tooltip"
-      id={tooltipId}
-      aria-hidden={!visible}
-      className={tipCx}
-      // shortcut: inline style, the position is measured at runtime so it can't be a class; replace with a React Aria Tooltip/Popover.
-      style={
-        {
-          '--tooltip-top': `${fixedCoords?.top ?? 0}px`,
-          '--tooltip-left': `${fixedCoords?.left ?? 0}px`,
-          '--arrow-offset': arrowOffset,
-        } as React.CSSProperties
-      }
-    >
-      {children}
-      <span className={styles.tabTooltipArrow} />
-    </span>,
-    portalTarget,
-  );
-};
-
-const TabRemoveButton = ({ tab, slotId, baseId, onRemove }: { tab: Tab; slotId: string; baseId: string; onRemove: () => void }) => {
-  const { anchorRef, tooltipId, anchorProps, tooltipRef, visible, fixedCoords, arrowOffset, resolvedSide } = useTooltip({
-    side: 'bottom',
-    tooltipId: `${baseId}-tab-${slotId}-remove-tooltip`,
-    portal: true,
-  });
-
-  const handleClick = () => onRemove();
-
-  return (
-    <span className={styles.tabRemoveWrapper}>
-      <button
-        ref={anchorRef}
-        type="button"
-        className={styles.tabRemove}
-        aria-label={tab.removeTooltip ?? `Remove ${tab.label} tab`}
-        aria-describedby={tooltipId}
-        onClick={handleClick}
-        {...anchorProps}
-      >
+const TabRemoveButton = ({ tab, onRemove }: { tab: Tab; onRemove: () => void }) => (
+  <span className={styles.tabRemoveWrapper}>
+    <Tooltip text={tab.removeTooltip ?? `Remove ${tab.label}`} side="bottom">
+      <button type="button" className={styles.tabRemove} aria-label={tab.removeTooltip ?? `Remove ${tab.label} tab`} onClick={onRemove}>
         <Icon name="close" aria-hidden size="small" />
       </button>
-      <PortalTooltip
-        tooltipRef={tooltipRef}
-        tooltipId={tooltipId}
-        visible={visible}
-        fixedCoords={fixedCoords}
-        arrowOffset={arrowOffset}
-        resolvedSide={resolvedSide}
-      >
-        {tab.removeTooltip ?? `Remove ${tab.label}`}
-      </PortalTooltip>
-    </span>
-  );
-};
+    </Tooltip>
+  </span>
+);
 
-const AddTabButton = ({ baseId, onAdd }: { baseId: string; onAdd: () => void }) => {
-  const { anchorRef, tooltipId, anchorProps, tooltipRef, visible, fixedCoords, arrowOffset, resolvedSide } = useTooltip({
-    side: 'bottom',
-    tooltipId: `${baseId}-add-tooltip`,
-    portal: true,
-  });
-
-  return (
-    <>
-      <span ref={anchorRef} className={styles.addTabWrapper} {...anchorProps}>
-        <Button
-          variant="ghost"
-          size="sm"
-          icon="plus"
-          onClick={onAdd}
-          aria-label="Add an insert"
-          aria-describedby={tooltipId}
-          className={styles.addTab}
-        />
-      </span>
-      <PortalTooltip
-        tooltipRef={tooltipRef}
-        tooltipId={tooltipId}
-        visible={visible}
-        fixedCoords={fixedCoords}
-        arrowOffset={arrowOffset}
-        resolvedSide={resolvedSide}
-      >
-        Add an Insert
-      </PortalTooltip>
-    </>
-  );
-};
+const AddTabButton = ({ onAdd }: { onAdd: () => void }) => (
+  <span className={styles.addTabWrapper}>
+    <Tooltip text="Add an Insert" side="bottom">
+      <Button variant="ghost" size="sm" icon="plus" onClick={onAdd} aria-label="Add an insert" className={styles.addTab} />
+    </Tooltip>
+  </span>
+);
 
 const TabButton = ({
   tab,
@@ -165,9 +66,6 @@ const TabButton = ({
   tabRefs: React.MutableRefObject<(HTMLDivElement | null)[]>;
   onRemove?: () => void;
 }) => {
-  // Collect this tab's DOM node into the parent's ref array as the anchor mounts.
-  // The tooltip hook owns the write to its own anchor storage and forwards here,
-  // so we never mutate a hook-owned ref by hand.
   const collectTabNode = useCallback(
     (el: HTMLElement | null) => {
       // Collecting child DOM nodes into the parent's ref array is the standard
@@ -178,12 +76,6 @@ const TabButton = ({
     },
     [tabRefs, index],
   );
-  const { anchorRef, tooltipId, anchorProps, tooltipRef, visible, fixedCoords, arrowOffset, resolvedSide } = useTooltip({
-    side: 'bottom',
-    tooltipId: tab.badgeTooltip ? `${baseId}-tab-${slotId}-tooltip` : undefined,
-    portal: true,
-    externalRef: collectTabNode,
-  });
   const cx = clsx(styles.tab, isActive && styles.active, onRemove && styles.tabHasRemove);
   const slotCx = clsx(styles.tabSlot, isActive && styles.tabSlotActive);
 
@@ -202,44 +94,36 @@ const TabButton = ({
     [onActivate, onKeyDown, index],
   );
 
-  // Portalled like the add/remove tooltips: the tab strip is an overflow
-  // container, so a tooltip rendered below the tab in flow gets clipped away.
-  const badgeTooltipEl = tab.badgeTooltip ? (
-    <PortalTooltip
-      tooltipRef={tooltipRef}
-      tooltipId={tooltipId}
-      visible={visible}
-      fixedCoords={fixedCoords}
-      arrowOffset={arrowOffset}
-      resolvedSide={resolvedSide}
+  const tabEl = (
+    <div
+      ref={collectTabNode}
+      role="tab"
+      id={`${baseId}-tab-${slotId}`}
+      aria-controls={`${baseId}-panel-${slotId}`}
+      aria-selected={isActive}
+      tabIndex={isActive ? 0 : -1}
+      className={cx}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
     >
-      {tab.badgeTooltip}
-    </PortalTooltip>
-  ) : null;
+      {tab.label}
+      {tab.badge}
+    </div>
+  );
 
   // The remove control is a real <button>; render it as a sibling of the
   // role="tab" element (which is itself interactive) rather than a child, so the
   // tab never contains an interactive descendant.
   return (
     <div className={slotCx}>
-      <div
-        ref={anchorRef}
-        role="tab"
-        id={`${baseId}-tab-${slotId}`}
-        aria-controls={`${baseId}-panel-${slotId}`}
-        aria-selected={isActive}
-        aria-describedby={tab.badgeTooltip ? tooltipId : undefined}
-        tabIndex={isActive ? 0 : -1}
-        className={cx}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        {...(tab.badgeTooltip ? anchorProps : {})}
-      >
-        {tab.label}
-        {tab.badge}
-      </div>
-      {badgeTooltipEl}
-      {onRemove && <TabRemoveButton tab={tab} slotId={slotId} baseId={baseId} onRemove={onRemove} />}
+      {tab.badgeTooltip ? (
+        <Tooltip text={tab.badgeTooltip} side="bottom">
+          {tabEl}
+        </Tooltip>
+      ) : (
+        tabEl
+      )}
+      {onRemove && <TabRemoveButton tab={tab} onRemove={onRemove} />}
     </div>
   );
 };
@@ -351,7 +235,7 @@ export const Tabs = ({ tabs, defaultIndex = 0, activeIndex, onActiveChange, clas
             />
           ))}
         </div>
-        {onAdd && <AddTabButton baseId={baseId} onAdd={onAdd} />}
+        {onAdd && <AddTabButton onAdd={onAdd} />}
       </div>
       {resolvedTabs.map((tab, i) => (
         <div

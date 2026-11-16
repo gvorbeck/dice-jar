@@ -189,7 +189,7 @@ export const MinorArcanaPanel = ({ arcanaMinor, arcanaMinorRef, saveMinor }: Min
           <Button variant="secondary" size="sm" icon="plus" onClick={handleOpenMinorModal}>
             Add Minor Arcanum
           </Button>
-          <Tooltip text="Add a random minor arcanum" side="right" noTabStop>
+          <Tooltip text="Add a random minor arcanum" side="right">
             <Button variant="secondary" size="sm" icon="dice" onClick={handleRandomMinor} aria-label="Add random minor arcanum" />
           </Tooltip>
         </div>

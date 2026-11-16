@@ -1,9 +1,7 @@
 .wrapper {
   composes: focusVisible from '../field.module.css';
-  position: relative;
   display: inline-flex;
   align-items: center;
-  contain: layout;
 }
 
 .wrapper:focus-visible {
@@ -11,9 +9,7 @@
 }
 
 .tooltip {
-  position: absolute;
   z-index: var(--z-tooltip);
-  width: max-content;
   max-width: 220px;
   padding: var(--spacing-2) var(--spacing-3);
   border-radius: var(--radius-md);
@@ -26,121 +22,58 @@
   line-height: 1.4;
   letter-spacing: 0.01em;
   text-transform: none;
-  pointer-events: none;
-  /* opacity:0 not display:none — JS measures offsetWidth/offsetHeight while hidden to compute clamped position before reveal */
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.12s ease,
-    transform 0.12s ease,
-    visibility 0s 0.12s;
-  white-space: normal;
   text-align: center;
-}
-
-/* Positioning per side */
-.top {
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(calc(-50% + var(--nudge-x, 0px))) translateY(4px);
-}
-
-.top.visible {
-  opacity: 1;
-  visibility: visible;
+  pointer-events: none;
   transition:
     opacity 0.12s ease,
-    transform 0.12s ease,
-    visibility 0s 0s;
-  transform: translateX(calc(-50% + var(--nudge-x, 0px))) translateY(0);
+    transform 0.12s ease;
 }
 
-.bottom {
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(calc(-50% + var(--nudge-x, 0px))) translateY(-4px);
+.tooltip[data-entering],
+.tooltip[data-exiting] {
+  opacity: 0;
+}
+.tooltip[data-placement='top'][data-entering],
+.tooltip[data-placement='top'][data-exiting] {
+  transform: translateY(4px);
+}
+.tooltip[data-placement='bottom'][data-entering],
+.tooltip[data-placement='bottom'][data-exiting] {
+  transform: translateY(-4px);
+}
+.tooltip[data-placement='left'][data-entering],
+.tooltip[data-placement='left'][data-exiting] {
+  transform: translateX(4px);
+}
+.tooltip[data-placement='right'][data-entering],
+.tooltip[data-placement='right'][data-exiting] {
+  transform: translateX(-4px);
 }
 
-.bottom.visible {
-  opacity: 1;
-  visibility: visible;
-  transition:
-    opacity 0.12s ease,
-    transform 0.12s ease,
-    visibility 0s 0s;
-  transform: translateX(calc(-50% + var(--nudge-x, 0px))) translateY(0);
+/* React Aria sets the arrow's position along the edge; these set which edge and which way it points. */
+.arrow svg {
+  display: block;
+  fill: var(--surface-overlay);
+  stroke: var(--border-strong);
 }
-
-.left {
-  right: calc(100% + 8px);
-  top: 50%;
-  transform: translateY(-50%) translateX(4px);
+.tooltip[data-placement='top'] .arrow {
+  top: 100%;
 }
-
-.left.visible {
-  opacity: 1;
-  visibility: visible;
-  transition:
-    opacity 0.12s ease,
-    transform 0.12s ease,
-    visibility 0s 0s;
-  transform: translateY(-50%) translateX(0);
+.tooltip[data-placement='bottom'] .arrow {
+  bottom: 100%;
 }
-
-.right {
-  left: calc(100% + 8px);
-  top: 50%;
-  transform: translateY(-50%) translateX(-4px);
+.tooltip[data-placement='bottom'] .arrow svg {
+  transform: rotate(180deg);
 }
-
-.right.visible {
-  opacity: 1;
-  visibility: visible;
-  transition:
-    opacity 0.12s ease,
-    transform 0.12s ease,
-    visibility 0s 0s;
-  transform: translateY(-50%) translateX(0);
+.tooltip[data-placement='left'] .arrow {
+  left: 100%;
 }
-
-/* Arrow */
-.arrow {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: var(--surface-overlay);
-  border: 1px solid var(--border-strong);
-  transform: rotate(45deg);
+.tooltip[data-placement='left'] .arrow svg {
+  transform: rotate(-90deg);
 }
-
-.top .arrow {
-  bottom: -4px;
-  left: var(--arrow-offset, 50%);
-  margin-left: -3px;
-  border-top: none;
-  border-left: none;
+.tooltip[data-placement='right'] .arrow {
+  right: 100%;
 }
-
-.bottom .arrow {
-  top: -4px;
-  left: var(--arrow-offset, 50%);
-  margin-left: -3px;
-  border-bottom: none;
-  border-right: none;
-}
-
-.left .arrow {
-  right: -4px;
-  top: 50%;
-  margin-top: -3px;
-  border-left: none;
-  border-bottom: none;
-}
-
-.right .arrow {
-  left: -4px;
-  top: 50%;
-  margin-top: -3px;
-  border-right: none;
-  border-top: none;
+.tooltip[data-placement='right'] .arrow svg {
+  transform: rotate(90deg);
 }
