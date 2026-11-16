@@ -17,7 +17,7 @@ import {
   stripUndefined,
   withCharacters,
 } from '@/lib/gameMutations';
-import type { Character, CharacterData, ContentLists, GameSession, LoggedRoll, SteadingData } from '@/types';
+import type { AdditiveStat, Character, CharacterData, ContentLists, GameSession, LoggedRoll, SteadingData } from '@/types';
 
 // Re-exported from their new home in lib/gameParsing so existing consumers and tests
 // that import them from this hook keep working.
@@ -30,7 +30,7 @@ export interface UseGameResult {
   updateGameName: (name: string) => Promise<void>;
   updateCharacterName: (characterId: string, name: string) => Promise<void>;
   updateCharacterData: (characterId: string, data: Partial<CharacterData>) => Promise<void>;
-  adjustCharacterStats: (characterId: string, deltas: Partial<Record<'statArmor' | 'statHp', number>>) => Promise<void>;
+  adjustCharacterStats: (characterId: string, deltas: Partial<Record<AdditiveStat, number>>) => Promise<void>;
   updateContent: (field: keyof ContentLists, value: string) => Promise<void>;
   updateField: (field: keyof Pick<GameSession, 'threats' | 'iWonder'>, value: string) => Promise<void>;
   updateSteading: (patch: Partial<SteadingData>) => Promise<void>;
@@ -241,13 +241,13 @@ export const useGame = (gameId: string): UseGameResult => {
   // rapid check-then-uncheck (or a snapshot that hasn't echoed the last edit) can't compute the new
   // value from a stale number and strand the stat on the wrong total.
   const adjustCharacterStats = useCallback(
-    async (characterId: string, deltas: Partial<Record<'statArmor' | 'statHp', number>>) => {
+    async (characterId: string, deltas: Partial<Record<AdditiveStat, number>>) => {
       await reportSave(() =>
         withCharacters(gameRef, (chars) =>
           chars.map((c) => {
             if (c.id !== characterId) return c;
             const next = { ...c.data };
-            for (const [field, delta] of Object.entries(deltas) as ['statArmor' | 'statHp', number][]) {
+            for (const [field, delta] of Object.entries(deltas) as [AdditiveStat, number][]) {
               next[field] = String((Number(next[field]) || 0) + delta);
             }
             return { ...c, data: next };

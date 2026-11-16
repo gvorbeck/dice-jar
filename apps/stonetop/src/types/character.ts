@@ -279,3 +279,6 @@ export interface Character {
   level: number;
   data?: CharacterData;
 }
+
+// Numeric sheet fields that change by a delta, read-modify-written in one transaction so concurrent edits add up.
+export type AdditiveStat = 'statArmor' | 'statHp' | 'statXp';

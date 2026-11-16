@@ -10,6 +10,8 @@ import { AnimalStats } from './AnimalStats';
 import { OptionSelect, toCustomSentinel } from '../../sections/OptionSelect';
 import { BeastOfLegend } from './BeastOfLegend';
 import { Text } from '@/components/ui';
+import { Move } from '../../Move';
+import { LOYAL_TO_THE_END } from '@/lib/moves/ranger';
 import { LoyaltyRow } from '../shared/CrewWidgets';
 import { useToast } from '@/components/app';
 import type { PlaybookSectionProps, RadioOption } from '@/types';
@@ -281,6 +283,7 @@ export const RangerAnimalCompanion = ({ data, onSave }: RangerAnimalCompanionPro
           header={loyaltyHeader}
         />
       </div>
+      <Move title={LOYAL_TO_THE_END.name} move={LOYAL_TO_THE_END} />
       <BeastOfLegend beastOfLegend={beastOfLegend} onBeastOfLegendChange={handleBeastOfLegendChange} />
     </div>
   );

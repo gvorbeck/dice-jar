@@ -72,3 +72,26 @@ test('game pages ask search engines to skip them, and the home page does not', a
   await createGame(page);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
 });
+
+test('Burn Brightly spends 2 XP for +1 once the character can level up, and the XP is saved', async ({ page, browser }) => {
+  const id = await createGame(page);
+  await addCharacter(page, 'The Blessed');
+  await page.goto(`/game/${id}/blessed`);
+  const xp = page.getByLabel('XP', { exact: true });
+  await xp.fill('3');
+  await xp.blur();
+
+  await page.getByRole('button', { name: 'Basic Moves' }).click();
+  await page.getByRole('button', { name: 'Roll +STR' }).first().click();
+  await expect(page.getByRole('button', { name: /Burn Brightly/ })).toBeHidden(); // 3 XP is short of the 8 needed at level 1
+
+  await xp.fill('8');
+  await xp.blur();
+  await page.getByRole('button', { name: 'Roll +STR' }).first().click();
+  await page.getByRole('button', { name: /Burn Brightly/ }).click();
+  await expect(xp).toHaveValue('6');
+
+  const other = await freshPage(browser);
+  await other.goto(`/game/${id}/blessed`);
+  await expect(other.getByLabel('XP', { exact: true })).toHaveValue('6');
+});

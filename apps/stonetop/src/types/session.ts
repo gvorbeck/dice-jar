@@ -99,6 +99,7 @@ export interface LoggedRoll {
   mod: number;
   total: number;
   mode: 'normal' | 'adv' | 'dis';
+  burned?: boolean; // the player spent 2 XP to Burn Brightly: `mod` and `total` already include the +1
   band: string | null; // the outcome band label the total landed in, e.g. '7-9'
   // Set on free-form rolls from the dice roller drawer (any dice notation) instead of a move roll:
   // `notation` is what was rolled ("4d6kh3+2"), `breakdown` the working ("[6, 5, 3, (1)] + 2"). On

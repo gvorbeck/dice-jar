@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { Checkbox, Divider, Heading, Icon, List, Stack, Text, UseDots } from '@/components/ui';
 import { RepeaterField } from '@/components/fields';
 import type { ArcanaMinorEntry, ArcanaMajorEntry } from '@/types';
-import { MAIN_ITEMS, UNDEFINED_MAIN_COUNT, type MainItem } from './inventoryData';
+import { MAIN_ITEMS, UNDEFINED_MAIN_COUNT, loadBand, type MainItem } from './inventoryData';
 import type { ArcanaWeights } from './useArcanaWeights';
 import { UndefinedProvisions } from './UndefinedProvisions';
 import shared from './inventoryItem.module.css';
@@ -120,12 +120,14 @@ export const MainInventorySection = ({
   // totalLoad is null until the lazily-loaded arcana weights arrive; show a neutral pending
   // badge meanwhile so we never flash a total that omits a carried arcanum's weight.
   const isLoading = totalLoad === null;
-  const loadLabel = isLoading ? 'calculating load…' : totalLoad <= 3 ? 'light load' : totalLoad <= 6 ? 'normal load' : 'heavy load';
+  const band = isLoading ? null : loadBand(totalLoad);
+  const loadLabel =
+    band === null ? 'calculating load…' : band === 'overloaded' ? 'overloaded (slow, noisy, risk of injury)' : `${band} load`;
   const loadCx = clsx(
     styles.loadBadge,
-    !isLoading && totalLoad <= 3 && styles.loadLight,
-    !isLoading && totalLoad > 3 && totalLoad <= 6 && styles.loadNormal,
-    !isLoading && totalLoad > 6 && styles.loadHeavy,
+    band === 'light' && styles.loadLight,
+    band === 'normal' && styles.loadNormal,
+    (band === 'heavy' || band === 'overloaded') && styles.loadHeavy,
   );
 
   return (

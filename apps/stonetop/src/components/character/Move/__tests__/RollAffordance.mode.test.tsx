@@ -38,9 +38,35 @@ describe('RollAffordance advantage / disadvantage', () => {
     expect(screen.getByText('= 11')).toBeInTheDocument(); // 5 + 6, dropping the 2
   });
 
-  it('pre-selects disadvantage when the stat carries a marked debility', () => {
+  // Book 1, pp. 40, 230: a marked debility is disadvantage, and advantage and disadvantage cancel.
+  it('rolls with disadvantage for a marked debility, and says so', async () => {
+    seedDice([2, 5, 6]);
+    const user = userEvent.setup();
     render(<RollAffordance stat="WIS" bands={BANDS} mod={0} debilityDisadvantage />);
-    expect(screen.getByRole('button', { name: 'Dis' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Debility: disadvantage.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Roll +WIS' }));
+    expect(screen.getByText('= 7')).toBeInTheDocument(); // 2 + 5, dropping the 6
+  });
+
+  it('rolls normally when advantage cancels a marked debility', async () => {
+    seedDice([2, 5, 6]);
+    const onRoll = vi.fn();
+    const user = userEvent.setup();
+    render(<RollAffordance stat="WIS" bands={BANDS} mod={0} debilityDisadvantage onRoll={onRoll} />);
+    await user.click(screen.getByRole('button', { name: 'Adv' }));
+    expect(screen.getByText('Advantage cancels your debility.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Roll +WIS' }));
+    expect(onRoll.mock.calls[0]![0]!).toMatchObject({ mode: 'normal', dice: [2, 5] });
+  });
+
+  it('does not stack a chosen disadvantage on a marked debility', async () => {
+    seedDice([2, 5, 6]);
+    const onRoll = vi.fn();
+    const user = userEvent.setup();
+    render(<RollAffordance stat="WIS" bands={BANDS} mod={0} debilityDisadvantage onRoll={onRoll} />);
+    await user.click(screen.getByRole('button', { name: 'Dis' }));
+    await user.click(screen.getByRole('button', { name: 'Roll +WIS' }));
+    expect(onRoll.mock.calls[0]![0]!).toMatchObject({ mode: 'dis' });
   });
 
   // The heart of the issue: choosing advantage after the dice land must keep those dice.

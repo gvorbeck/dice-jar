@@ -135,7 +135,7 @@ export const MARSHAL_MOVES: MoveDefinition[] = [
     body: [
       {
         kind: 'para',
-        text: "When you **order an ally to overcome fear, pain, doubt, or delusion**, roll +CHA: **on a 10+**, they do it; **on a 7-9**, a PC gets advantage on their next roll to do it; an NPC will do it, but they'll need time, they'll resent you, or they'll feel humiliated (GM decides).",
+        text: "When you **order an ally to overcome fear, pain, doubt, or delusion**, roll +CHA: **on a 10+**, they do it; **on a 7-9**, a PC gets advantage to do it; an NPC will do it, but they'll need time, they'll resent you, or they'll feel humiliated (GM decides).",
       },
     ],
   },

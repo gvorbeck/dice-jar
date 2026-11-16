@@ -15,7 +15,11 @@ const rollableMove: MoveDefinition = {
 };
 
 const renderInSheet = (ui: ReactElement) =>
-  render(<CharacterRollContext.Provider value={{ data: {} as CharacterData, onRoll: vi.fn() }}>{ui}</CharacterRollContext.Provider>);
+  render(
+    <CharacterRollContext.Provider value={{ data: {} as CharacterData, onRoll: vi.fn(), burn: { available: false, onBurn: vi.fn() } }}>
+      {ui}
+    </CharacterRollContext.Provider>,
+  );
 
 const noop = () => {};
 

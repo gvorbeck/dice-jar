@@ -88,7 +88,7 @@ export const REVENANT_CONSEQUENCE_LABELS: { id: string; label: string }[] = [
   {
     id: 'nightkin',
     label:
-      '**NIGHTKIN** — You can see clearly in even absolute darkness, though you see only in black and white and red. Sunlight blinds you, and direct sunlight burns your skin.',
+      '**NIGHTKIN** — You can see clearly in even absolute darkness, though you see only in black and white and red. Sunlight, alas, blinds you, and direct sunlight burns your skin.',
   },
   {
     id: 'quarry',
@@ -187,7 +187,7 @@ export const GHOST_CONSEQUENCE_LABELS: { id: string; label: string }[] = [
   {
     id: 'poltergeist',
     label:
-      '**POLTERGEIST** — When you *get angry*, lose 1d4 HP and hold that much Fury. Spend Fury, 1-for-1, to shatter objects, hurl things, or attack with telekinetic force.',
+      '**POLTERGEIST** — When you *get angry*, lose 1d4 HP and hold that much Fury. Spend Fury, 1-for-1, to: shatter, break, or destroy a number of small mundane objects, or one big object; hurl an object at someone and roll +DEX (**on a 10+**, deal your damage (forceful); **on a 7-9**, deal your damage (forceful) but lose 1d4 HP); or attack someone with telekinetic force and roll +INT (**on a 10+**, fling them to a place you can see and pin them there, spending 1 HP each time they make a committed effort to break free; **on a 7-9**, as 10+, but you also lose 1d4 HP).',
   },
   {
     id: 'quarry',

@@ -5,7 +5,8 @@ import clsx from 'clsx';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 import { Checkbox, Input, Text, Stack } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
-import { STAT_GROUPS } from '@/lib/constants';
+import { STAT_GROUPS, STATS } from '@/lib/constants';
+import { statCap } from '@/lib/statCap';
 import type { CharacterData } from '@/types';
 import styles from './Stats.module.css';
 
@@ -14,13 +15,14 @@ interface StatBoxProps {
   abbr: string;
   statKey: keyof StatsState;
   value: string;
+  cap: number;
   onChange: (key: keyof StatsState, val: string) => void;
   onBlur: () => void;
 }
 
 const handleStatWheel = (e: React.WheelEvent<HTMLInputElement>) => e.currentTarget.blur();
 
-const StatBox = ({ label, abbr, statKey, value, onChange, onBlur }: StatBoxProps) => {
+const StatBox = ({ label, abbr, statKey, value, cap, onChange, onBlur }: StatBoxProps) => {
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value;
@@ -29,9 +31,9 @@ const StatBox = ({ label, abbr, statKey, value, onChange, onBlur }: StatBoxProps
         return;
       }
       const n = parseInt(raw, 10);
-      if (!isNaN(n)) onChange(statKey, String(Math.min(n, 3)));
+      if (!isNaN(n)) onChange(statKey, String(Math.min(n, cap)));
     },
-    [onChange, statKey],
+    [onChange, statKey, cap],
   );
 
   return (
@@ -44,7 +46,8 @@ const StatBox = ({ label, abbr, statKey, value, onChange, onBlur }: StatBoxProps
         className={styles.statInput}
         type="number"
         value={value}
-        max={3}
+        max={cap}
+        aria-invalid={Number(value) > cap || undefined}
         onChange={handleChange}
         onBlur={onBlur}
         onWheel={handleStatWheel}
@@ -281,6 +284,8 @@ export const Stats = ({ data, onSave, hpMax, damage = 'd6', scoreInstruction = D
 
   if (!data || hpMax === undefined) return <PlaybookSection title="Stats" />;
 
+  const cap = statCap(data.typeMoveTakes);
+  const overCap = STATS.some((st) => Number(stats[st.field]) > cap);
   const warn = REQUIRED_STAT_KEYS.some((k) => stats[k] === '');
   const hpLabel = `HP (max ${hpMax})`;
 
@@ -303,6 +308,11 @@ export const Stats = ({ data, onSave, hpMax, damage = 'd6', scoreInstruction = D
       <Text color="muted" className={styles.statsInstruction}>
         {scoreInstruction}
       </Text>
+      {overCap && (
+        <Text color="muted" role="status">
+          A stat is above +{cap}. Improved Stat stops at +2; Superior Stat (level 6) allows +3.
+        </Text>
+      )}
       <Stack gap={4}>
         <div className={styles.statRow}>
           {STAT_GROUPS.map((group) => (
@@ -315,6 +325,7 @@ export const Stats = ({ data, onSave, hpMax, damage = 'd6', scoreInstruction = D
                     abbr={f.abbr}
                     statKey={f.field}
                     value={stats[f.field]}
+                    cap={cap}
                     onChange={handleStatChange}
                     onBlur={handleFlush}
                   />

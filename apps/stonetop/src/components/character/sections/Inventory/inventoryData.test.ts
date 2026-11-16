@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeTotalLoad, getShieldWeight } from './inventoryData';
+import { computeTotalLoad, getShieldWeight, loadBand } from './inventoryData';
 import type { CharacterData } from '@/types';
 import type { ArcanaWeights } from './useArcanaWeights';
 
@@ -74,5 +74,21 @@ describe('computeTotalLoad', () => {
       arcanaMajor: [{ id: 'M1', carried: true }],
     } as unknown as CharacterData;
     expect(computeTotalLoad(data, NO_ARCANA, NO_ARCANA)).toBe(1);
+  });
+});
+
+// Book 1, pp. 77 and 326-327: up to 3 is a light load, 4-6 normal, 7-9 heavy; 10 or more is beyond heavy (slow, noisy, risk of exhaustion or injury).
+describe('loadBand', () => {
+  it.each([
+    [0, 'light'],
+    [3, 'light'],
+    [4, 'normal'],
+    [6, 'normal'],
+    [7, 'heavy'],
+    [9, 'heavy'],
+    [10, 'overloaded'],
+    [14, 'overloaded'],
+  ] as const)('puts a load of %i in the %s band', (load, band) => {
+    expect(loadBand(load)).toBe(band);
   });
 });
