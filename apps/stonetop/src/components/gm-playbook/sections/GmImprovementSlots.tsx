@@ -161,9 +161,10 @@ export const GmImprovementSlots = ({ gmImprovements, onSave }: GmImprovementSlot
     save: saveSlots,
   } = useOptimisticField<GmImprovement[], [removedId?: string]>(
     gmImprovements ?? [],
+    // Diff against the stored list, not the local ref: typing updates the ref before blur saves.
     (slots, removedId): Promise<void> =>
       onSave({
-        gmImprovements: changedById(localSlotsRef.current, slots),
+        gmImprovements: changedById(gmImprovements ?? [], slots),
         ...(removedId ? { removedGmImprovementIds: [removedId] } : {}),
       }),
     undefined,
