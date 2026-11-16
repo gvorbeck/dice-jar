@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react';
 import clsx from 'clsx';
 import { Button, Heading, Text, Checkbox, Input, Radio, RadioGroup } from '@/components/ui';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
+import { changedById } from '@/lib/gameMutations';
 import type { SteadingData, GmImprovement } from '@/types';
 import { makeEmptyGmImprovement } from './steadingImprovementsData';
 import card from './improvementCard.module.css';
@@ -160,9 +161,9 @@ export const GmImprovementSlots = ({ gmImprovements, onSave }: GmImprovementSlot
     save: saveSlots,
   } = useOptimisticField<GmImprovement[], [removedId?: string]>(
     gmImprovements ?? [],
-    (slots, removedId) =>
+    (slots, removedId): Promise<void> =>
       onSave({
-        gmImprovements: slots,
+        gmImprovements: changedById(localSlotsRef.current, slots),
         ...(removedId ? { removedGmImprovementIds: [removedId] } : {}),
       }),
     undefined,

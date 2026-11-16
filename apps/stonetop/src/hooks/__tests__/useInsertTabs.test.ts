@@ -72,6 +72,7 @@ describe('useInsertTabs — handleAddInsert', () => {
     expect(onSave).toHaveBeenCalledWith({ inserts: ['Ghost', 'Thrall'] });
     // 3 fixed + 2 playbook = 5 tabs precede the inserts; next has 2 inserts → last index 6.
     expect(setActiveIndex).toHaveBeenCalledWith(6);
+    expect(window.location.hash).toBe('#Thrall'); // the URL follows the visible tab
     expect(hook.result.current.addTabOpen).toBe(false);
   });
 

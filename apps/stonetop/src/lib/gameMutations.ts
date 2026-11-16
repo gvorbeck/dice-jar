@@ -28,17 +28,25 @@ export const friendlyFirestoreError = (err: FirestoreError): string =>
 // A FirestoreError carries a string `code`; other throws (network, mock) don't.
 export const isFirestoreError = (err: unknown): err is FirestoreError => isRecord(err) && isString(err.code);
 
-// Merge an id-keyed array against the freshly-read doc's version so a save built from a
-// (possibly stale) snapshot only touches the entries it actually changed. `incoming` wins
-// for ids it knows about (including ones it added or edited); an id present only in
-// `existing` was added concurrently by someone else and is kept, UNLESS it's named in
-// `removedIds` — the explicit sentinel for intentional removal (mirrors deleteFeatureKeys),
-// since omitting an id from `incoming` alone is ambiguous between "removed" and "never seen".
+// Merge an id-keyed array against the freshly-read doc's version so a save only touches the
+// entries it names. `incoming` wins for ids it names (edited or added); every other stored entry
+// is kept as stored, UNLESS it's named in `removedIds` — the explicit sentinel for intentional
+// removal (mirrors deleteFeatureKeys), since omitting an id from `incoming` alone is ambiguous
+// between "removed" and "never seen". Stored order is kept, and new ids go on the end, so an edit
+// never reshuffles the list.
 export const mergeById = <T extends { id: string }>(existing: T[] | undefined, incoming: T[], removedIds?: string[]): T[] => {
-  const incomingIds = new Set(incoming.map((e) => e.id));
   const removed = new Set(removedIds ?? []);
-  const onlyInExisting = (existing ?? []).filter((e) => !incomingIds.has(e.id) && !removed.has(e.id));
-  return [...incoming, ...onlyInExisting];
+  const incomingById = new Map(incoming.map((e) => [e.id, e]));
+  const kept = (existing ?? []).filter((e) => !removed.has(e.id)).map((e) => incomingById.get(e.id) ?? e);
+  const keptIds = new Set(kept.map((e) => e.id));
+  return [...kept, ...incoming.filter((e) => !keptIds.has(e.id) && !removed.has(e.id))];
+};
+
+// The entries of `next` that are new or differ from the same id in `prev` (what this tab last read).
+// Send these, not the whole list, to a save that id-merges: the rest of the list is other tabs' to change.
+export const changedById = <T extends { id: string }>(prev: T[], next: T[]): T[] => {
+  const before = new Map(prev.map((e) => [e.id, JSON.stringify(e)]));
+  return next.filter((e) => before.get(e.id) !== JSON.stringify(e));
 };
 
 // Strip undefined-valued keys (e.g. parsed NPCs' optional fields, or debilities'

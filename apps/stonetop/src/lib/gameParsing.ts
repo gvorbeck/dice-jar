@@ -45,6 +45,9 @@ const isCharacter = (v: unknown): v is Omit<Character, 'level'> & { level?: unkn
 // Only the id is required; every other field on an arcana entry is optional and read
 // defensively by its own components, so we don't gate on them here — this just guarantees
 // the entry itself is a record an id-merge (mergeById) can key on.
+const isCustomMove = (v: unknown): v is { id: string; name: string; text: string } =>
+  isRecord(v) && isString(v.id) && isString(v.name) && isString(v.text);
+
 const isArcanaEntry = (v: unknown): v is (ArcanaMinorEntry | ArcanaMajorEntry) & Record<string, unknown> => isRecord(v) && isString(v.id);
 
 // `playbookFeatures` is a flat bag of per-playbook Record<string, boolean|string|number> fields
@@ -125,6 +128,7 @@ export const parseCharacterData = (v: unknown): CharacterData | undefined => {
     introductionQuestions: filterRecordByType(r.introductionQuestions, isBoolean),
     introductionAnswers: filterRecordByType(r.introductionAnswers, isString),
     inserts: filterByType(r.inserts, isString),
+    customMoves: filterByType(r.customMoves, isCustomMove),
     playbookFeatures: parsePlaybookFeatures(r.playbookFeatures),
     arcanaMinor: filterByType(r.arcanaMinor, isArcanaEntry) as ArcanaMinorEntry[] | undefined,
     arcanaMajor: filterByType(r.arcanaMajor, isArcanaEntry) as ArcanaMajorEntry[] | undefined,

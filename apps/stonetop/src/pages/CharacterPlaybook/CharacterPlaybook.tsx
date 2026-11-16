@@ -591,6 +591,7 @@ const CharacterPlaybookContent = ({
   if (!character) {
     return (
       <PageLayout simple>
+        <PageMeta noindex title="Character not found — Hearthfire" description="This game has no character with that playbook." />
         <div className={styles.centered}>
           <Heading as="h2" size="md">
             Character not found

@@ -334,6 +334,31 @@ describe('useDebouncedSave', () => {
     expect(onSave).toHaveBeenCalledTimes(2);
   });
 
+  it('does not retry an older value that failed after a newer one was already handed in', async () => {
+    let failA: (e: Error) => void = () => {};
+    const onSave = vi
+      .fn()
+      .mockImplementationOnce(() => new Promise<void>((_, reject) => (failA = reject)))
+      .mockResolvedValue(undefined);
+    const { result } = renderHook(() => useDebouncedSave(onSave, 1500));
+
+    await act(async () => {
+      result.current.onChange('A');
+      vi.advanceTimersByTime(1500); // A is now in flight
+    });
+    let flushB: Promise<void> = Promise.resolve();
+    act(() => {
+      flushB = result.current.flush('B'); // B queues behind A
+    });
+    await act(async () => failA(new Error('network error'))); // A fails only now: its retry timer must not be set
+    await act(async () => {
+      await flushB;
+      vi.advanceTimersByTime(60000);
+    });
+
+    expect(onSave.mock.calls.map((c) => c[0])).toEqual(['A', 'B']); // A's old text never goes out again after B
+  });
+
   it('re-saves a value another client overwrote after noteRemoteValue clears the dedupe (#254)', async () => {
     const onSave = vi.fn().mockResolvedValue(undefined);
     const { result } = renderHook(() => useDebouncedSave(onSave, 1500));

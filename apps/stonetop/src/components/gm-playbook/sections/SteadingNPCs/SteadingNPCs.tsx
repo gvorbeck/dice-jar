@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { Text, Button } from '@/components/ui';
 import type { DropdownGroup } from '@/components/ui';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
+import { changedById } from '@/lib/gameMutations';
 import type { SteadingData, SteadingNPC, NpcRelationship, GameSession } from '@/types';
 import { generateId } from '@/lib/id';
 import { NPC_CONFIG, buildGroups, buildNameMap } from './npcData';
@@ -131,9 +132,13 @@ const REMOVED_IDS_FIELD = {
 
 export const SteadingNPCs = ({ section, npcs = [], onSave, game, filterTargetId }: SteadingNPCsProps) => {
   const { title, description } = NPC_CONFIG[section];
-  const { value: localNpcs, save: saveNpcs } = useOptimisticField<SteadingNPC[], [removedId?: string]>(npcs, (next, removedId) =>
+  const {
+    value: localNpcs,
+    ref: localNpcsRef,
+    save: saveNpcs,
+  } = useOptimisticField<SteadingNPC[], [removedId?: string]>(npcs, (next, removedId): Promise<void> =>
     onSave({
-      [section]: next,
+      [section]: changedById(localNpcsRef.current, next),
       ...(removedId ? { [REMOVED_IDS_FIELD[section]]: [removedId] } : {}),
     }),
   );

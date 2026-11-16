@@ -62,14 +62,16 @@ describe('SteadingNPCs mutations', () => {
     expect(onSave).not.toHaveBeenCalled();
   });
 
-  it('removes only the targeted NPC and preserves the rest', async () => {
+  // A save sends only what this tab changed, so a removal is the explicit sentinel and no other NPC rides along.
+  it('removes only the targeted NPC, by id, and sends no other NPC', async () => {
     renderSection([npc('a', { name: 'Alda' }), npc('b', { name: 'Bram' })]);
 
     await userEvent.click(screen.getByRole('button', { name: /remove Alda/i }));
 
     await waitFor(() => expect(onSave).toHaveBeenCalled());
-    const residents = residentsFrom(onSave);
-    expect(residents.map((n) => n.name)).toEqual(['Bram']);
+    const patch = onSave.mock.calls.at(-1)![0]!;
+    expect(patch.removedResidentIds).toEqual(['a']);
+    expect(patch.residents).toEqual([]);
   });
 
   it('toggles an NPC dead, writing the dead flag without dropping the NPC', async () => {

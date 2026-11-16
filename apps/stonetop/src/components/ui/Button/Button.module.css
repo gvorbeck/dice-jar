@@ -72,12 +72,12 @@
 }
 
 .danger:hover:not(:disabled) {
-  background-color: color-mix(in srgb, var(--fill-danger) 80%, #000);
+  background-color: color-mix(in srgb, var(--fill-danger) 80%, var(--color-black));
   box-shadow: var(--glow-danger);
 }
 
 .danger:active:not(:disabled) {
-  background-color: color-mix(in srgb, var(--fill-danger) 70%, #000);
+  background-color: color-mix(in srgb, var(--fill-danger) 70%, var(--color-black));
   box-shadow: none;
   transform: translateY(1px);
 }

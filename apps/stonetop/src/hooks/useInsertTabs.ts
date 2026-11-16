@@ -42,6 +42,7 @@ export const useInsertTabs = (
     if (deleteFeatureKeys?.length) patch.deleteFeatureKeys = [...deleteFeatureKeys];
     await onSave(patch);
     setActiveIndex(0);
+    window.location.hash = ''; // the removed tab's hash must not survive a reload
   }, [removeInsert, character.data, onSave, setActiveIndex]);
 
   const handleAddInsert = useCallback(
@@ -57,6 +58,7 @@ export const useInsertTabs = (
         // Inserts render after every other tab and the new one is appended last, so its index is
         // the count of everything that precedes it plus its own position in the insert list.
         setActiveIndex(nonInsertTabCount + next.length - 1);
+        window.location.hash = insert; // an insert's tab id is its insert id; keeps reloads and shared links on this tab
         setAddTabOpen(false);
       } catch {
         // Save failed — keep the modal open so the user knows it didn't take.

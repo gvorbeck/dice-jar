@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { TabPanel, Tabs, type Key } from 'react-aria-components';
+import { changedById } from '@/lib/gameMutations';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
 import type { ArcanaMajorEntry, ArcanaMinorEntry, PlaybookSectionProps } from '@/types';
 import { Spinner } from '@/components/ui';
@@ -60,7 +61,8 @@ export const ArcanaTab = ({ data, onSave, adjustCharacterStats }: ArcanaTabProps
     save: saveMinor,
   } = useOptimisticField<ArcanaMinorEntry[], [removedId?: string]>(
     data?.arcanaMinor ?? [],
-    (next, removedId) => onSave({ arcanaMinor: next, ...(removedId ? { removedArcanaMinorIds: [removedId] } : {}) }),
+    (next, removedId): Promise<void> =>
+      onSave({ arcanaMinor: changedById(arcanaMinorRef.current, next), ...(removedId ? { removedArcanaMinorIds: [removedId] } : {}) }),
     'Failed to save.',
   );
   const {
@@ -69,7 +71,8 @@ export const ArcanaTab = ({ data, onSave, adjustCharacterStats }: ArcanaTabProps
     save: saveMajor,
   } = useOptimisticField<ArcanaMajorEntry[], [removedId?: string]>(
     data?.arcanaMajor ?? [],
-    (next, removedId) => onSave({ arcanaMajor: next, ...(removedId ? { removedArcanaMajorIds: [removedId] } : {}) }),
+    (next, removedId): Promise<void> =>
+      onSave({ arcanaMajor: changedById(arcanaMajorRef.current, next), ...(removedId ? { removedArcanaMajorIds: [removedId] } : {}) }),
     'Failed to save.',
   );
   return (

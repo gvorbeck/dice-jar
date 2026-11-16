@@ -41,6 +41,8 @@ export const useDebouncedSave = <T>(
   const activeSavesRef = useRef(0);
   const failedKeyRef = useRef<string | null>(null);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Number of the newest save() call: a failed save only retries while nothing newer has been handed in.
+  const latestSaveRef = useRef(0);
   // The value waiting on the debounce timer, so unmount/pagehide can flush it
   // instead of silently discarding it.
   const queuedRef = useRef<{ value: T } | null>(null);
@@ -70,6 +72,8 @@ export const useDebouncedSave = <T>(
         retryTimerRef.current = null;
       }
       activeSavesRef.current += 1;
+      latestSaveRef.current += 1;
+      const mine = latestSaveRef.current;
       const run = chainRef.current
         .then(async () => {
           const key = JSON.stringify(value);
@@ -97,7 +101,7 @@ export const useDebouncedSave = <T>(
             // strings match the ones useGame's reportSave emits, so the Toast dedupe collapses the
             // two paths to one.
             else addToast?.(isInvalidWrite(error) ? INVALID_WRITE_MESSAGE : SAVE_ERROR_MESSAGE, 'error');
-            if (isFirstFailure) {
+            if (isFirstFailure && mine === latestSaveRef.current) {
               retryTimerRef.current = setTimeout(() => {
                 void saveRef.current(value);
               }, RETRY_DELAY_MS);

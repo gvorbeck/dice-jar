@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseDiceRolls } from '../gameParsing';
+import { parseCharacters, parseDiceRolls } from '../gameParsing';
 
 const base = {
   id: 'r1',
@@ -33,5 +33,19 @@ describe('parseDiceRolls', () => {
     const [roll] = parseDiceRolls([base]) ?? [];
     expect(roll).not.toHaveProperty('notation');
     expect(roll).not.toHaveProperty('breakdown');
+  });
+});
+
+describe('parseCharacters — custom moves', () => {
+  it('keeps a character’s custom moves, so a write-back does not erase them', () => {
+    const customMoves = [{ id: 'm1', name: 'Howl', text: 'When you howl, roll +CHA.' }];
+    const [c] = parseCharacters({ characters: [{ id: 'c1', name: 'A', playbook: 'ranger', level: 1, data: { customMoves } }] });
+    expect(c?.data?.customMoves).toEqual(customMoves);
+  });
+  it('drops malformed custom moves', () => {
+    const [c] = parseCharacters({
+      characters: [{ id: 'c1', name: 'A', playbook: 'ranger', level: 1, data: { customMoves: [{ id: 'm1' }, 'x'] } }],
+    });
+    expect(c?.data?.customMoves).toEqual([]);
   });
 });
