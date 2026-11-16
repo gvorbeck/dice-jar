@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Checkbox, Input, UseDots } from '@/components/ui';
 import styles from './CrewWidgets.module.css';
 

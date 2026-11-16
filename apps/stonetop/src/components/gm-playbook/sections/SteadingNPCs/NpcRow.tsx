@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button, Text, Tooltip } from '@/components/ui';
 import type { SteadingNPC, NpcRelationship } from '@/types';
 import styles from './NpcRow.module.css';

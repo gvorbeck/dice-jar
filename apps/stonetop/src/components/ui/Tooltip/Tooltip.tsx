@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Focusable, OverlayArrow, Tooltip as AriaTooltip, TooltipTrigger } from 'react-aria-components';
 import styles from './Tooltip.module.css';
 

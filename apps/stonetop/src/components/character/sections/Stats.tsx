@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useLatest } from '@/hooks/useLatest';
 import { useFirestoreSync } from '@/hooks/useFirestoreSync';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 import { Checkbox, Input, Text, Stack } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';

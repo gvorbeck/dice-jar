@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button, Input, Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { Move } from '../../Move';

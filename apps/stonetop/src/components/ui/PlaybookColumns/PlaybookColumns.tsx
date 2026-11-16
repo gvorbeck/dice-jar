@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import type { ReactNode } from 'react';
 import styles from './PlaybookColumns.module.css';
 

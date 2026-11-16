@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@dice-jar/e2e-helpers": "*",
+    "@dice-jar/cn": "*",
     "@dice-jar/game-id": "*",
     "@firebase/rules-unit-testing": "^6.0.0",
     "@playwright/test": "^1.65.0",

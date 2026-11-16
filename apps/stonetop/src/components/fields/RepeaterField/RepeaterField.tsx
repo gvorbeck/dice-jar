@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useId, memo } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button } from '@/components/ui';
 import { Icon } from '@/components/ui';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';

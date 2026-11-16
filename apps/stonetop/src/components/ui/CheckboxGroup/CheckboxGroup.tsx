@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Checkbox } from '../Checkbox/Checkbox';
 import { Fieldset } from '../Fieldset/Fieldset';
 import { Text } from '../Text/Text';

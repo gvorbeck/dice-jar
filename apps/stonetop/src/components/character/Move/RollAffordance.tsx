@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Text } from '@/components/ui';
 import type { RollBand, RollStat } from '@/types';

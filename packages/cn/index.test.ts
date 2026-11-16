@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { cn } from '../cn';
+import { cn } from './index';
 
 describe('cn', () => {
   it('joins set names and drops falsy ones', () => {

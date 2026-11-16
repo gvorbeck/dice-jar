@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Dropdown } from '@/components/ui';
 import type { GameNav } from './gameNav';
 import styles from './PageNav.module.css';

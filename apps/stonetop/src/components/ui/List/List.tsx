@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { isValidElement } from 'react';
 import { Text } from '../Text/Text';
 import styles from './List.module.css';

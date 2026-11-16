@@ -1,5 +1,5 @@
 import { useCallback, memo } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Checkbox, Divider, Heading, Icon, List, Stack, Text, UseDots } from '@/components/ui';
 import { RepeaterField } from '@/components/fields';
 import type { ArcanaMinorEntry, ArcanaMajorEntry } from '@/types';

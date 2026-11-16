@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Text } from '@/components/ui';
 import type { LoggedRoll } from '@/types';
 import styles from './RollLog.module.css';

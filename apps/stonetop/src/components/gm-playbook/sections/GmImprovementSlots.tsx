@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button, Heading, Text, Checkbox, Input, Radio, RadioGroup } from '@/components/ui';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { changedById } from '@/lib/gameMutations';

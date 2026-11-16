@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button, Heading, Icon, Text, Tooltip } from '@/components/ui';
 import styles from './PlaybookSection.module.css';
 

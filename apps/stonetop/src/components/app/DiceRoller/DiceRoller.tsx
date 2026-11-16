@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button, Heading, Icon, Input, Text } from '@/components/ui';
 import { rollNotation, type DiceRollOutcome } from '@/lib/diceNotation';
 import { generateId } from '@/lib/id';

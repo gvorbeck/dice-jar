@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Heading, List, Text, Checkbox } from '@/components/ui';
 import { IMPROVEMENTS, type CheckItem } from './steadingImprovementsData';
 import card from './improvementCard.module.css';

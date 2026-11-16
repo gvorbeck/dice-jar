@@ -1,5 +1,5 @@
 import { useState, useRef, useId, useCallback, useEffect, useMemo, memo } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button } from '@/components/ui';
 import styles from './TagInput.module.css';
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button, Icon, Text } from '@/components/ui';
 import { useSaveStatusOptional } from './SaveStatusContext';
 import styles from './SaveStatus.module.css';

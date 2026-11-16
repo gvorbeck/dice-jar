@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { parseInlineMarkdown } from '@/lib/parseMarkdown';
 import styles from './Heading.module.css';
 

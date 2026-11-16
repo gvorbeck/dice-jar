@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { useState, useRef, useCallback, type ReactNode } from 'react';
 import { Checkbox, CheckboxGroup, Divider, Icon, Input, List, Text, UseDots } from '@/components/ui';
 import type { MoveBlock, MoveDefinition, RightControlSpec } from '@/types';

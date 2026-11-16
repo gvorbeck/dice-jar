@@ -1,5 +1,5 @@
 import { useState, useCallback, useId } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PageMeta } from '@/components/app/PageMeta/PageMeta';
 import { PageLayout } from '@/components/app/PageLayout/PageLayout';

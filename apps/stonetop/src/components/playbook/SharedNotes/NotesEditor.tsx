@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { EditorContent, useEditor, useEditorState, type Editor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
 import { useFirestoreSync } from '@/hooks/useFirestoreSync';

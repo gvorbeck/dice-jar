@@ -1,5 +1,5 @@
 import { useState, useId, useRef, useEffect, useCallback, useMemo, type ReactNode, type KeyboardEvent } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Tooltip } from '../Tooltip/Tooltip';
 import { Button } from '../Button/Button';
 import { Icon } from '../Icon/Icon';

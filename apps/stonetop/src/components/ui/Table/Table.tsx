@@ -1,4 +1,4 @@
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Radio } from '../Radio/Radio';
 import styles from './Table.module.css';
 

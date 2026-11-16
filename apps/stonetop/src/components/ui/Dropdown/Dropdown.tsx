@@ -1,5 +1,5 @@
 import { forwardRef, type ForwardedRef, type SelectHTMLAttributes } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import styles from './Dropdown.module.css';
 
 interface DropdownOption<T extends string> {

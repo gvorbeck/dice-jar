@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, memo } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { CheckboxGroup, List, Text } from '@/components/ui';
 import { parseInlineMarkdown } from '@/lib/parseMarkdown';
 import type { ArcanaFollower } from '@/types';

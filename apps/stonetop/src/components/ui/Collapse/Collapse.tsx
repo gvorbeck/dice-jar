@@ -1,5 +1,5 @@
 import { useState, useId, type ReactNode } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Icon } from '../Icon/Icon';
 import styles from './Collapse.module.css';
 

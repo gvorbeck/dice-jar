@@ -1,5 +1,5 @@
 import { useCallback, memo, useId } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Heading } from '../Heading/Heading';
 import { Input } from '../Input/Input';
 import { List } from '../List/List';

@@ -1,5 +1,5 @@
 import { useCallback, useId } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Checkbox, Text } from '@/components/ui';
 import { UseDots } from '@/components/ui/UseDots/UseDots';
 import { consequenceMarkId, parseConsequenceMarks } from '../arcanaParsing';

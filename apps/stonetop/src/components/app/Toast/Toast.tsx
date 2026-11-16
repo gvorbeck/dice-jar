@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Group } from 'react-aria-components';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button } from '@/components/ui';
 import { Icon } from '@/components/ui';
 import { Text } from '@/components/ui';

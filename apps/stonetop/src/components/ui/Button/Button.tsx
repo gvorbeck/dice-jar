@@ -1,5 +1,5 @@
 import { forwardRef, type ReactNode, type ElementType, type ComponentPropsWithoutRef, type Ref } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Icon, type IconName, type IconSize } from '../Icon/Icon';
 import styles from './Button.module.css';
 

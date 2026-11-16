@@ -1,6 +1,6 @@
 import { useState, useId, useMemo, useCallback } from 'react';
 import { ListBox, ListBoxItem, type Key } from 'react-aria-components';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Modal, Heading, Button, Input, Text } from '@/components/ui';
 import styles from './AddArcanaModal.module.css';
 

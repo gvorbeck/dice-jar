@@ -1,5 +1,5 @@
 import { useId, type InputHTMLAttributes } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Icon } from '../Icon/Icon';
 import { Text } from '../Text/Text';
 import styles from './Checkbox.module.css';

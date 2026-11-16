@@ -1,5 +1,5 @@
 import { useId, type InputHTMLAttributes } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import styles from './Toggle.module.css';
 
 interface ToggleWithLabel extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {

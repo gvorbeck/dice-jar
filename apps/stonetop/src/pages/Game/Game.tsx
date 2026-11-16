@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect, useRef, memo } from 'react';
 import { Button as AriaButton, GridList, GridListItem, useDragAndDrop } from 'react-aria-components';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { PageMeta } from '@/components/app/PageMeta/PageMeta';
 import { useGame } from '@/hooks/useGame';

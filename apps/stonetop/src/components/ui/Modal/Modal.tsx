@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Dialog, Modal as AriaModal, ModalOverlay } from 'react-aria-components';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import styles from './Modal.module.css';
 
 interface ModalProps {

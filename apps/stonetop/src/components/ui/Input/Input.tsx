@@ -1,5 +1,5 @@
 import { useId, forwardRef, type InputHTMLAttributes, type TextareaHTMLAttributes } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Text } from '../Text/Text';
 import styles from './Input.module.css';
 

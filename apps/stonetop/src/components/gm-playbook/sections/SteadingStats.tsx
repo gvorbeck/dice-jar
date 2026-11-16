@@ -1,5 +1,5 @@
 import { useCallback, useId } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Heading, Text, Checkbox, Button, Radio } from '@/components/ui';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
 import type { SteadingData, SteadingSize } from '@/types';

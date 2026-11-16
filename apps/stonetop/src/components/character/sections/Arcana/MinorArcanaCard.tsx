@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState, memo } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Checkbox, CheckboxGroup, Input, Text } from '@/components/ui';
 import { parseMarkdown } from '@/lib/parseMarkdown';
 import type { MinorArcanum } from '@/types';

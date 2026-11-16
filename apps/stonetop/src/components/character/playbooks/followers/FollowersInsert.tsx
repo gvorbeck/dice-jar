@@ -1,7 +1,7 @@
 import { useState, useCallback, memo, useId } from 'react';
 import { useLatest } from '@/hooks/useLatest';
 import { useFirestoreSync } from '@/hooks/useFirestoreSync';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button, Checkbox, Heading, Input, Modal, Text, Tooltip } from '@/components/ui';
 
 import { useToast } from '@/components/app';

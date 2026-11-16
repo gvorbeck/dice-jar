@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Text } from '@/components/ui';
 import { UseDots } from '@/components/ui/UseDots/UseDots';
 import { parseMarkdown } from '@/lib/parseMarkdown';

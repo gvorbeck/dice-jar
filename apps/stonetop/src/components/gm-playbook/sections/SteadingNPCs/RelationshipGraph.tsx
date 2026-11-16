@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@dice-jar/cn';
 import { Button, Text } from '@/components/ui';
 import type { GameSession } from '@/types';
 import { useLatest } from '@/hooks/useLatest';
