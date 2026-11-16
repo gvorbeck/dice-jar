@@ -188,7 +188,6 @@ export const RollAffordance = ({
   // mod, so a later switch of advantage/disadvantage keeps it, and the log entry is updated in place.
   const handleBurn = useCallback(async () => {
     if (!result || burnedRef.current || !burn) return;
-    const id = rollId.current;
     burnedRef.current = true;
     setPaying(true);
     try {
@@ -199,7 +198,6 @@ export const RollAffordance = ({
       return;
     }
     setPaying(false);
-    if (rollId.current !== id) return; // re-rolled while paying: the XP is spent, but there is no roll left to improve
     const current = resultRef.current ?? result;
     const next = { ...current, mod: current.mod + 1, total: current.total + 1 };
     setBurned(true);
@@ -238,6 +236,7 @@ export const RollAffordance = ({
                   icon="dice"
                   className={clsx(styles.trigger, isActive && styles.statTriggerActive)}
                   onClick={() => handleStatClick(option)}
+                  disabled={paying}
                   aria-label={`Roll ${optLabel}`.trim()}
                   aria-pressed={isActive}
                 >
@@ -257,6 +256,7 @@ export const RollAffordance = ({
             icon="dice"
             className={triggerCx}
             onClick={handleButton}
+            disabled={paying}
             aria-label={open ? 'Re-roll' : `Roll ${label}`.trim()}
             title={open ? 'Re-roll' : undefined}
           >
@@ -278,6 +278,7 @@ export const RollAffordance = ({
               aria-label={m.value === 'normal' ? m.title : undefined}
               title={m.title}
               onClick={() => handleMode(m.value)}
+              disabled={paying}
             >
               {m.label}
             </button>

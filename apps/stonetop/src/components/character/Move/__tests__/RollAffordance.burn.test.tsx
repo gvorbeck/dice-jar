@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RollAffordance } from '../RollAffordance';
 import { CharacterRollContext } from '../CharacterRollContext';
@@ -64,6 +64,21 @@ describe('RollAffordance — Burn Brightly', () => {
     await userEvent.click(screen.getByRole('button', { name: /Burn Brightly/ }));
     expect(screen.getByText('= 7')).toBeInTheDocument();
     expect(onRoll.mock.calls.at(-1)![0]!).toMatchObject({ burned: true, total: 7 });
+  });
+
+  it('holds the roll triggers still while the XP is being paid, so the bonus cannot be lost', async () => {
+    seedDice([3, 3]);
+    let pay: () => void = () => {};
+    const onBurn = vi.fn().mockReturnValue(new Promise<void>((resolve) => (pay = resolve)));
+    renderRoll(true, vi.fn(), onBurn);
+    await userEvent.click(screen.getByRole('button', { name: 'Roll +WIS' }));
+    await userEvent.click(await screen.findByRole('button', { name: /Burn Brightly/ }));
+    expect(screen.getByRole('button', { name: 'Re-roll' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Adv' })).toBeDisabled();
+
+    await act(async () => pay());
+    expect(screen.getByText('= 7')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Re-roll' })).toBeEnabled();
   });
 
   it('can be done only once per roll, and the next roll offers it again', async () => {
