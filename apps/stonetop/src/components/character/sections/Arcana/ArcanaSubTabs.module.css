@@ -1,0 +1,73 @@
+.tabRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  flex-wrap: wrap;
+}
+
+.subTabBar {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  align-self: flex-start;
+}
+
+.subTab {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 100ms ease,
+    color 100ms ease;
+}
+
+.subTab:last-child {
+  border-right: none;
+}
+
+.subTab:hover {
+  background: var(--surface-raised);
+  color: var(--text-primary);
+}
+
+.subTab[data-focus-visible] {
+  outline: 2px solid var(--border-accent);
+  outline-offset: -1px;
+}
+
+.subTab[data-selected] {
+  background: var(--surface-raised);
+  color: var(--text-primary);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25em;
+  height: 1.25em;
+  padding: 0 var(--spacing-1);
+  margin-left: var(--spacing-2);
+  background: var(--border-accent);
+  /* Fixed-color fill like Button's .primary — gold doesn't flip by theme, so the
+     ink is fixed too. Dark ink, not white: white on gold-500 is only ≈2.6:1,
+     forge-900 clears ≈6.9:1. */
+  color: var(--text-on-gold);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  vertical-align: middle;
+}

@@ -1,0 +1,91 @@
+import { forwardRef, type ForwardedRef, type SelectHTMLAttributes } from 'react';
+import clsx from 'clsx';
+import styles from './Dropdown.module.css';
+
+interface DropdownOption<T extends string> {
+  value: T;
+  label: string;
+}
+
+export interface DropdownGroup<T extends string> {
+  label: string;
+  options: DropdownOption<T>[];
+}
+
+type DropdownBaseProps<T extends string> = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'value' | 'onChange'> & {
+  id: string;
+  value: T | '';
+  onChange: (value: T) => void;
+  placeholder?: string;
+};
+
+type DropdownWithLabel<T extends string> = DropdownBaseProps<T> & {
+  label: string;
+};
+
+type DropdownWithAriaLabel<T extends string> = DropdownBaseProps<T> & {
+  label?: never;
+  'aria-label': string;
+};
+
+type DropdownFlatProps<T extends string> = (DropdownWithLabel<T> | DropdownWithAriaLabel<T>) & {
+  options: DropdownOption<T>[];
+  groups?: never;
+};
+
+type DropdownGroupedProps<T extends string> = (DropdownWithLabel<T> | DropdownWithAriaLabel<T>) & {
+  groups: DropdownGroup<T>[];
+  options?: never;
+};
+
+type DropdownProps<T extends string> = DropdownFlatProps<T> | DropdownGroupedProps<T>;
+
+const DropdownInner = <T extends string>(
+  { label, id, options, groups, value, onChange, placeholder = 'Select…', className, ...props }: DropdownProps<T>,
+  ref: ForwardedRef<HTMLSelectElement>,
+) => {
+  const selectCx = clsx(styles.select, !value && styles.placeholder, className);
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange(e.target.value as T);
+  };
+
+  return (
+    <div className={styles.wrapper}>
+      {label && (
+        <label htmlFor={id} className={styles.label}>
+          {label}
+        </label>
+      )}
+      <div className={styles.selectWrapper}>
+        <select ref={ref} id={id} className={selectCx} value={value} onChange={handleChange} {...props}>
+          <option value="" disabled>
+            {placeholder}
+          </option>
+          {groups
+            ? groups.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))
+            : options.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+        </select>
+        <span className={styles.chevron} aria-hidden="true" />
+      </div>
+    </div>
+  );
+};
+
+// forwardRef erases the generic, so cast back to a generic-preserving signature
+// (the standard pattern for generic forwardRef components).
+export const Dropdown = forwardRef(DropdownInner) as <T extends string>(
+  props: DropdownProps<T> & { ref?: ForwardedRef<HTMLSelectElement> },
+) => ReturnType<typeof DropdownInner>;

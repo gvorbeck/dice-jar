@@ -1,0 +1,157 @@
+/*
+ * .header — the semantic <header> landmark that wraps the entire top-of-page
+ * block: SiteBanner, wordmark strip, and page identity section.
+ * margin-bottom creates breathing room before the page content starts.
+ */
+.header {
+  /* margin-bottom: var(--spacing-10); */
+}
+
+/*
+ * .body — wrapper around the page identity section (breadcrumbs, title,
+ * game ID, rule divider). Uses the same padding formula as .topBar so
+ * the content aligns with the var(--content-width) page content column.
+ */
+.body {
+  padding: 0 max(var(--spacing-6), calc((100% - var(--content-width)) / 2 + var(--spacing-6)));
+}
+
+/*
+ * .topBar — the thin site-wide nav strip at the very top.
+ * Spans the full viewport width; its inner content is constrained
+ * to var(--content-width) via the padding approach so it aligns with page content.
+ */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-3) max(var(--spacing-6), calc((100% - var(--content-width)) / 2 + var(--spacing-6)));
+}
+
+/*
+ * .wordmark — the "Hearthfire" site name text in the top bar.
+ * Slight letter-spacing to match the brand feel.
+ */
+.wordmark {
+  letter-spacing: 0.03em;
+}
+
+/*
+ * The wordmark links home. It inherits the heading's font and color so it reads
+ * as the brand mark, not a default link, and only shifts to the accent color on
+ * hover/focus to signal it's clickable.
+ */
+.wordmarkLink {
+  composes: focusVisible from '@/components/ui/field.module.css';
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.wordmarkLink:hover {
+  color: var(--text-accent);
+}
+
+.wordmarkLink:focus-visible {
+  border-radius: var(--radius-sm);
+}
+
+/*
+ * .navRow — holds the lateral-navigation page switcher on its own line above
+ * the page title. align-items keeps the switcher (pill bar, or the dropdown at
+ * narrow widths) hugging the leading edge; the bottom margin separates it from
+ * the title below.
+ */
+.navRow {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-6);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.titleIcon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: var(--text-3xl);
+  color: var(--text-heading);
+}
+
+.titleIcon svg {
+  height: 100%;
+  width: auto;
+}
+
+.titleInput {
+  composes: focusVisible from '@/components/ui/field.module.css';
+  font-family: var(--font-serif);
+  font-size: var(--text-display);
+  font-weight: normal;
+  color: var(--text-heading);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-accent);
+  outline: none;
+  padding: 0 0 var(--spacing-1);
+  width: 100%;
+  max-width: 560px;
+  line-height: 1.05;
+}
+
+.editBtn {
+  composes: focusVisible from '@/components/ui/field.module.css';
+  color: var(--text-secondary);
+  border: none;
+}
+
+.editBtn:hover {
+  color: var(--text-accent);
+  background: none;
+  border: none;
+}
+
+.subtitle {
+  margin-top: var(--spacing-1);
+}
+
+.gameId {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-3);
+}
+
+/* Page-specific controls sit after the copy button, set apart by a hairline so they
+   read as a separate group rather than more game-ID affordances. */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  margin-left: var(--spacing-1);
+  padding-left: var(--spacing-3);
+  border-left: 1px solid var(--border-subtle);
+}
+
+.copyBtn {
+  composes: focusVisible from '@/components/ui/field.module.css';
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  border: none;
+}
+
+.copyBtn:hover {
+  color: var(--text-accent);
+  background: none;
+  border: none;
+}
+
+.rule {
+  margin-top: var(--spacing-6);
+}

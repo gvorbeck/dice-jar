@@ -1,0 +1,107 @@
+/* ── Section card ───────────────────────────────────── */
+.section {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* Flex row containing the heading and the optional collapse toggle.
+   Both the warn icon and collapse button are always in the DOM when present;
+   each is hidden independently via visibility: hidden, so margin-left: auto works for both. */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  min-height: 44px;
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sectionTitle {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.sectionTitleWarn {
+  margin-left: auto;
+  color: var(--text-accent);
+  flex-shrink: 0;
+}
+
+.collapseToggle {
+  composes: focusVisible from '@/components/ui/field.module.css';
+  color: var(--text-secondary);
+  border: none;
+  flex-shrink: 0;
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.collapseToggleHidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.collapseToggle:hover {
+  color: var(--text-primary);
+  background: none;
+  border: none;
+}
+
+.collapseToggle:focus-visible {
+  border-radius: var(--radius-sm);
+}
+
+.collapseChevron {
+  transition: transform 150ms ease;
+}
+
+.collapseChevronOpen {
+  transform: rotate(180deg);
+}
+
+.sectionTitleWarnHidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sectionTitleChooseHidden {
+  visibility: hidden;
+}
+
+.sectionTitleChoose {
+  font-size: var(--text-2xs);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: none;
+  color: var(--text-secondary);
+}
+
+.sectionOverride {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.sectionOverrideNote {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: var(--text-secondary);
+  font-style: italic;
+  flex-shrink: 0;
+}

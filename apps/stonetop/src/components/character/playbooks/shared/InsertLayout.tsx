@@ -1,0 +1,146 @@
+import { useCallback, useMemo, type ReactNode } from 'react';
+import { CheckboxGroup, Text } from '@/components/ui';
+import { PlaybookSection } from '@/components/playbook/PlaybookSection';
+import { Move } from '../../Move';
+import type { MoveDefinition } from '@/types';
+import { PurposeDetail } from './InsertSections';
+import { OptionSelect } from '../../sections/OptionSelect';
+import { INSERT_INSTINCT_OPTIONS, INSERT_PURPOSE_OPTIONS } from '@/lib/insertSharedData';
+import { useInsertSections } from './useInsertSections';
+import { useConsequenceCheckboxes } from './useConsequenceCheckboxes';
+import type { PlaybookFeatures, PlaybookSectionProps } from '@/types';
+import type { RadioOption } from '@/types';
+import styles from './InsertLayout.module.css';
+
+const INSTINCT_OPTIONS = INSERT_INSTINCT_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label, description: opt.description }));
+
+type ConsequenceKey = Extract<
+  {
+    [K in keyof PlaybookFeatures]: PlaybookFeatures[K] extends Record<string, boolean> | undefined ? K : never;
+  }[keyof PlaybookFeatures],
+  string
+>;
+
+interface ConsequenceLabel {
+  id: string;
+  label: string;
+}
+
+interface InsertSectionKeys {
+  instinct: keyof PlaybookFeatures;
+  purpose: keyof PlaybookFeatures;
+  purposeName: keyof PlaybookFeatures;
+}
+
+interface InsertLayoutProps extends PlaybookSectionProps {
+  playbookName: string;
+  sectionKeys: InsertSectionKeys;
+  moves: MoveDefinition[];
+  consequenceKey: ConsequenceKey;
+  consequenceLabels: ConsequenceLabel[];
+  isConsequenceDisabled?: (id: string, checked: Record<string, boolean>) => boolean;
+  consequenceAddon?: (props: {
+    consequences: Record<string, boolean>;
+    saveImmediate: (patch: Partial<PlaybookFeatures>) => Promise<void>;
+    updateChecked: (updater: (prev: Record<string, boolean>) => Record<string, boolean>) => void;
+  }) => ReactNode;
+  checkboxGroupItemGap?: 'sm' | 'md' | 'lg';
+}
+
+export const InsertLayout = ({
+  playbookName,
+  data,
+  onSave,
+  sectionKeys,
+  moves,
+  consequenceKey,
+  consequenceLabels,
+  isConsequenceDisabled,
+  consequenceAddon,
+  checkboxGroupItemGap,
+}: InsertLayoutProps) => {
+  const { instinct, saveInstinct, purpose, savePurpose, purposeNames, handlePurposeNameChange, handlePurposeNameBlur, saveImmediate } =
+    useInsertSections(data, onSave, sectionKeys);
+
+  const {
+    checked: consequences,
+    items: consequenceCheckboxItems,
+    onChange: handleConsequenceChange,
+    updateChecked,
+  } = useConsequenceCheckboxes(data, saveImmediate, consequenceKey, consequenceLabels, isConsequenceDisabled);
+
+  const handleInstinctSave = useCallback(
+    (value: string) => {
+      saveInstinct(value);
+    },
+    [saveInstinct],
+  );
+
+  const handlePurposeSave = useCallback(
+    (value: string) => {
+      savePurpose(value);
+    },
+    [savePurpose],
+  );
+
+  const purposeOptions = useMemo(
+    () =>
+      INSERT_PURPOSE_OPTIONS.map((opt): RadioOption => ({
+        value: opt.value,
+        label: opt.label,
+        detail: (
+          <PurposeDetail
+            opt={opt}
+            nameValue={purposeNames[opt.value] ?? ''}
+            onNameChange={handlePurposeNameChange}
+            onNameBlur={handlePurposeNameBlur}
+          />
+        ),
+      })),
+    [purposeNames, handlePurposeNameChange, handlePurposeNameBlur],
+  );
+
+  return (
+    <div className={styles.root}>
+      <OptionSelect
+        name={`${playbookName}-instinct`}
+        title="Instinct"
+        options={INSTINCT_OPTIONS}
+        value={instinct}
+        onChange={handleInstinctSave}
+        noCustom
+        chooseNote="replaces playbook instinct"
+      />
+
+      <PlaybookSection title="Moves">
+        <Text size="xs" color="muted" leading="normal">
+          You gain all of the following:
+        </Text>
+        <div className={styles.moveList}>
+          {moves.map((move) => (
+            <Move key={move.id} title={move.name} move={move} />
+          ))}
+        </div>
+      </PlaybookSection>
+
+      <OptionSelect
+        name={`${playbookName}-purpose`}
+        title="Terrible Purpose"
+        options={purposeOptions}
+        value={purpose}
+        onChange={handlePurposeSave}
+        noCustom
+      />
+
+      <PlaybookSection title="Consequences" chooseNote="choose 1 to start; more as play demands">
+        <CheckboxGroup
+          items={consequenceCheckboxItems}
+          checked={consequences}
+          onChange={handleConsequenceChange}
+          itemGap={checkboxGroupItemGap}
+        />
+        {consequenceAddon?.({ consequences, saveImmediate, updateChecked })}
+      </PlaybookSection>
+    </div>
+  );
+};

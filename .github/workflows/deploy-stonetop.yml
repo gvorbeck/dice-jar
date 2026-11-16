@@ -1,0 +1,51 @@
+name: Deploy stonetop
+# Ships to production (stonetop-d76fb, hearthfire.camp). The release PR into main already passed the required `checks` job, so it isn't repeated here.
+on:
+  push:
+    branches: [main]
+    paths: [apps/stonetop/**, packages/**, package.json, package-lock.json, .nvmrc] # root files too: npm ci runs from the root, so a lockfile-only update must rebuild
+  workflow_dispatch:
+permissions:
+  contents: read
+  checks: write # the hosting action reports through the job token
+# Two deploys at once could interleave rules and Hosting; the second waits.
+concurrency:
+  group: deploy-stonetop
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with: { node-version-file: .nvmrc, cache: npm, cache-dependency-path: '**/package-lock.json' }
+      - run: npm ci
+      # The STONETOP_ prefix keeps these apart from delta-green's VITE_FIREBASE_* secrets in the same repository.
+      - run: npm run build -w apps/stonetop
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.STONETOP_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.STONETOP_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.STONETOP_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.STONETOP_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.STONETOP_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.STONETOP_FIREBASE_APP_ID }}
+      # Rules go first, so a new build never runs against old rules that reject its fields. Open tabs keep running the
+      # old build, so rules must accept both builds' writes: add a field in one release, stop allowing it in a later one.
+      # The hosting action ships Hosting only. The service account needs the "Firebase Rules Admin" role for this step.
+      # Tools that receive the service account are pinned: bump these by hand.
+      - name: Deploy Firestore rules
+        working-directory: apps/stonetop
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STONETOP_D76FB }}
+        run: |
+          printf '%s' "$SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json" npx --yes firebase-tools@15.34.1 deploy --only firestore:rules --project stonetop-d76fb
+          rm -f "$RUNNER_TEMP/sa.json"
+      - uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STONETOP_D76FB }}
+          channelId: live
+          projectId: stonetop-d76fb
+          entryPoint: apps/stonetop
