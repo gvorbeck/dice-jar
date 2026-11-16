@@ -143,7 +143,7 @@ describe('Stats — stat cap (Book 1, pp. 52, 106-107)', () => {
   });
 
   it('allows +3 once Superior Stat is taken', async () => {
-    setup({ ...base, typeMoveTakes: { 'judge-superior-stat': 1 } });
+    setup({ ...base, typeMoves: { 'judge-superior-stat': true } });
     const str = screen.getByLabelText('Strength') as HTMLInputElement;
     await userEvent.clear(str);
     await userEvent.type(str, '3');

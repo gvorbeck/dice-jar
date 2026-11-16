@@ -17,6 +17,7 @@ import {
   stripUndefined,
   withCharacters,
 } from '@/lib/gameMutations';
+import { applyStatDeltas } from '@/lib/statDeltas';
 import type { AdditiveStat, Character, CharacterData, ContentLists, GameSession, LoggedRoll, SteadingData } from '@/types';
 
 // Re-exported from their new home in lib/gameParsing so existing consumers and tests
@@ -246,11 +247,7 @@ export const useGame = (gameId: string): UseGameResult => {
         withCharacters(gameRef, (chars) =>
           chars.map((c) => {
             if (c.id !== characterId) return c;
-            const next = { ...c.data };
-            for (const [field, delta] of Object.entries(deltas) as [AdditiveStat, number][]) {
-              next[field] = String((Number(next[field]) || 0) + delta);
-            }
-            return { ...c, data: next };
+            return { ...c, data: applyStatDeltas(c.data ?? {}, deltas) };
           }),
         ),
       );

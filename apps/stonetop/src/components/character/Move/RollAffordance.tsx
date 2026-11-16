@@ -101,6 +101,9 @@ export const RollAffordance = ({
   const [tumbling, setTumbling] = useState(false);
   const [adjust, setAdjust] = useState(0);
   const [burned, setBurned] = useState(false);
+  // The ref is the source of truth for logging and for the once-per-roll guard: state would still be stale in a
+  // second click, or in the report() that doRoll runs in the same handler that clears it.
+  const burnedRef = useRef(false);
   const burn = useCharacterRollOptional()?.burn;
   const tumbleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const rollId = useRef('');
@@ -120,16 +123,17 @@ export const RollAffordance = ({
         total: next.total,
         mode: next.mode,
         band: bandFor(next.total, bands)?.label ?? null,
-        ...(burned ? { burned: true } : {}),
+        ...(burnedRef.current ? { burned: true } : {}),
       });
     },
-    [bands, onRoll, burned],
+    [bands, onRoll],
   );
 
   const doRoll = useCallback(
     (rollMode: RollMode, mod: number, stat: RollStat, resource: string | undefined) => {
       const next = rollAction(mod + adjust, rollMode);
       rollId.current = generateId();
+      burnedRef.current = false;
       setBurned(false);
       spare.current = null;
       setResult(next);
@@ -178,24 +182,14 @@ export const RollAffordance = ({
   // Burn Brightly (Book 1, p. 231): spend 2 XP after the roll for +1, once per roll. The +1 goes into the roll's
   // mod, so a later switch of advantage/disadvantage keeps it, and the log entry is updated in place.
   const handleBurn = useCallback(() => {
-    if (!result || burned || !burn) return;
+    if (!result || burnedRef.current || !burn) return;
     const next = { ...result, mod: result.mod + 1, total: result.total + 1 };
+    burnedRef.current = true;
     setBurned(true);
     setResult(next);
     burn.onBurn();
-    onRoll?.({
-      rollId: rollId.current,
-      stat: activeStat,
-      resource: activeResource,
-      dice: next.dice,
-      dropped: next.dropped,
-      mod: next.mod,
-      total: next.total,
-      mode: next.mode,
-      band: bandFor(next.total, bands)?.label ?? null,
-      burned: true,
-    });
-  }, [result, burned, burn, onRoll, activeStat, activeResource, bands]);
+    report(next, activeStat, activeResource);
+  }, [result, burn, report, activeStat, activeResource]);
 
   const handleAdjust = useCallback((delta: number) => setAdjust((a) => Math.min(ADJUST_MAX, Math.max(ADJUST_MIN, a + delta))), []);
 

@@ -284,7 +284,7 @@ export const Stats = ({ data, onSave, hpMax, damage = 'd6', scoreInstruction = D
 
   if (!data || hpMax === undefined) return <PlaybookSection title="Stats" />;
 
-  const cap = statCap(data.typeMoveTakes);
+  const cap = statCap(data.typeMoves);
   const overCap = STATS.some((st) => Number(stats[st.field]) > cap);
   const warn = REQUIRED_STAT_KEYS.some((k) => stats[k] === '');
   const hpLabel = `HP (max ${hpMax})`;

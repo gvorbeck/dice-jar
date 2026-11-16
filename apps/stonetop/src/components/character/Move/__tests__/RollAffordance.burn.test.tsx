@@ -64,6 +64,21 @@ describe('RollAffordance — Burn Brightly', () => {
     expect(onBurn).toHaveBeenCalledTimes(2);
   });
 
+  it('does not mark the next roll as burned in the log, and a double click spends once', async () => {
+    seedDice([3, 3, 4, 4]);
+    const { onRoll, onBurn } = renderRoll(true);
+    await userEvent.click(screen.getByRole('button', { name: 'Roll +WIS' }));
+    const burnButton = await screen.findByRole('button', { name: /Burn Brightly/ });
+    await userEvent.dblClick(burnButton);
+    expect(onBurn).toHaveBeenCalledTimes(1);
+    expect(onRoll.mock.calls.at(-1)![0]!).toMatchObject({ burned: true });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Re-roll' }));
+    const reroll = onRoll.mock.calls.at(-1)![0]!;
+    expect(reroll).not.toHaveProperty('burned');
+    expect(reroll.rollId).not.toBe(onRoll.mock.calls[0]![0]!.rollId);
+  });
+
   it('keeps the +1 when advantage is chosen afterwards', async () => {
     seedDice([3, 3, 6]);
     const { onRoll } = renderRoll(true);
