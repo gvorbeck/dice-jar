@@ -6,8 +6,6 @@
   "workspaces": {
     ".": {},
     "apps/delta-green": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "vitest.rules.config.ts"] },
-    "packages/e2e-helpers": { "entry": ["index.ts"] },
-    "packages/game-id": { "entry": ["index.test.ts"] },
     "apps/stonetop": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "vitest.rules.config.ts"] },
     "apps/delta-green/functions": {
       "entry": ["src/webhookTest.ts", "src/registerCommands.ts", "src/**/*.test.ts"],
