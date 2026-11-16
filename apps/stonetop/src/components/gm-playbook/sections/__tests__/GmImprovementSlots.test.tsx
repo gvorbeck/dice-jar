@@ -53,4 +53,22 @@ describe('GmImprovementSlots', () => {
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
     expect(onSave.mock.calls[1]![0].gmImprovements).toEqual([expect.objectContaining({ id: 'a', completed: true })]);
   });
+
+  it('resends the entry when it is toggled again while the first save is unresolved', async () => {
+    const slot = { ...makeEmptyGmImprovement(), id: 'a', completed: false };
+    let release!: () => void;
+    const onSave = vi
+      .fn()
+      .mockImplementationOnce(() => new Promise<void>((r) => (release = r)))
+      .mockResolvedValue(undefined);
+    render(<GmImprovementSlots gmImprovements={[slot]} onSave={onSave} />);
+
+    const toggle = () => userEvent.click(screen.getByRole('checkbox').closest('label') ?? screen.getByRole('checkbox'));
+    await toggle();
+    await toggle();
+    release();
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+    expect(onSave.mock.calls[1]![0].gmImprovements).toEqual([expect.objectContaining({ id: 'a', completed: false })]);
+  });
 });

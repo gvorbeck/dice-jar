@@ -156,6 +156,7 @@ export const GmImprovementSlots = ({ gmImprovements, onSave }: GmImprovementSlot
   // The list this tab last read or wrote. Diffs are taken against it, not the latest props: while a
   // field is focused props advance but the local list is frozen, and a stale entry would overwrite another tab's edit.
   const baselineRef = useRef(gmImprovements ?? []);
+  const inFlightRef = useRef<Set<string>[]>([]);
   useEffect(() => {
     if (!focusedRef.current) baselineRef.current = gmImprovements ?? [];
   }, [gmImprovements]);
@@ -167,13 +168,22 @@ export const GmImprovementSlots = ({ gmImprovements, onSave }: GmImprovementSlot
     save: saveSlots,
   } = useOptimisticField<GmImprovement[], [removedId?: string]>(
     gmImprovements ?? [],
-    // The baseline advances only once the write lands; a failed save is rolled back by the hook, so a retry must resend it.
+    // The baseline advances only once the write lands, so a failed save is resent. Entries in a save still in
+    // flight are resent too: a quick second edit (toggle, untoggle) must not diff equal to the old baseline.
     async (slots, removedId): Promise<void> => {
-      await onSave({
-        gmImprovements: changedById(baselineRef.current, slots),
-        ...(removedId ? { removedGmImprovementIds: [removedId] } : {}),
-      });
-      baselineRef.current = slots;
+      const ids = new Set(changedById(baselineRef.current, slots).map((e) => e.id));
+      const inFlight = new Set(inFlightRef.current.flatMap((set) => [...set]));
+      const mine = new Set([...ids, ...inFlight]);
+      inFlightRef.current.push(ids);
+      try {
+        await onSave({
+          gmImprovements: slots.filter((e) => mine.has(e.id)),
+          ...(removedId ? { removedGmImprovementIds: [removedId] } : {}),
+        });
+        baselineRef.current = slots;
+      } finally {
+        inFlightRef.current = inFlightRef.current.filter((set) => set !== ids);
+      }
     },
     undefined,
     focusedRef,
