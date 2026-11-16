@@ -11,3 +11,8 @@ export const canBurnBrightly = (data: CharacterData | undefined): boolean => {
   const level = parseInt(data?.statLevel ?? '', 10);
   return !isNaN(level) && xp >= 6 + 2 * level;
 };
+
+// For the XP payment's transaction: re-checks eligibility against the freshly read sheet, so a stale tab can't burn.
+export const requireBurnBrightly = (data: CharacterData): void => {
+  if (!canBurnBrightly(data)) throw new Error('Not enough XP to Burn Brightly.');
+};

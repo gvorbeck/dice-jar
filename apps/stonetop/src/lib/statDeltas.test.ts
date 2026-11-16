@@ -22,6 +22,13 @@ describe('applyStatDeltas', () => {
     expect(applyStatDeltas(sheet({ statXp: '2' }), { statXp: -2 })).toMatchObject({ statXp: '0' });
     expect(() => applyStatDeltas(sheet({ statXp: '1' }), { statXp: -2 })).toThrow('Not enough XP');
   });
+  it('lets a guard refuse the change against the fresh sheet before anything is applied', () => {
+    const refuse = () => {
+      throw new Error('no');
+    };
+    expect(() => applyStatDeltas(sheet({}), { statXp: -2 }, refuse)).toThrow('no');
+    expect(applyStatDeltas(sheet({}), { statXp: -2 }, () => {})).toMatchObject({ statXp: '1' });
+  });
   it('does not change the sheet it was given', () => {
     const before = sheet({});
     applyStatDeltas(before, { statXp: -2 });

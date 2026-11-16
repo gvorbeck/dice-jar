@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BURN_BRIGHTLY_COST, canBurnBrightly } from './burnBrightly';
+import { BURN_BRIGHTLY_COST, canBurnBrightly, requireBurnBrightly } from './burnBrightly';
 import type { CharacterData } from '@/types';
 
 const at = (statXp: string, statLevel: string, over: Partial<CharacterData> = {}) => ({ statXp, statLevel, ...over }) as CharacterData;
@@ -24,5 +24,12 @@ describe('canBurnBrightly', () => {
     expect(canBurnBrightly(undefined)).toBe(false);
     expect(canBurnBrightly(at('', '1'))).toBe(false);
     expect(canBurnBrightly(at('20', ''))).toBe(false);
+  });
+});
+
+describe('requireBurnBrightly', () => {
+  it('passes an eligible sheet and refuses one that has fallen below the level-up XP', () => {
+    expect(() => requireBurnBrightly(at('8', '1'))).not.toThrow();
+    expect(() => requireBurnBrightly(at('6', '1'))).toThrow('Not enough XP to Burn Brightly');
   });
 });

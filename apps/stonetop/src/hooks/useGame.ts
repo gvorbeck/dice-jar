@@ -17,7 +17,7 @@ import {
   stripUndefined,
   withCharacters,
 } from '@/lib/gameMutations';
-import { applyStatDeltas } from '@/lib/statDeltas';
+import { applyStatDeltas, type SheetGuard } from '@/lib/statDeltas';
 import type { AdditiveStat, Character, CharacterData, ContentLists, GameSession, LoggedRoll, SteadingData } from '@/types';
 
 // Re-exported from their new home in lib/gameParsing so existing consumers and tests
@@ -31,7 +31,7 @@ export interface UseGameResult {
   updateGameName: (name: string) => Promise<void>;
   updateCharacterName: (characterId: string, name: string) => Promise<void>;
   updateCharacterData: (characterId: string, data: Partial<CharacterData>) => Promise<void>;
-  adjustCharacterStats: (characterId: string, deltas: Partial<Record<AdditiveStat, number>>) => Promise<void>;
+  adjustCharacterStats: (characterId: string, deltas: Partial<Record<AdditiveStat, number>>, guard?: SheetGuard) => Promise<void>;
   updateContent: (field: keyof ContentLists, value: string) => Promise<void>;
   updateField: (field: keyof Pick<GameSession, 'threats' | 'iWonder'>, value: string) => Promise<void>;
   updateSteading: (patch: Partial<SteadingData>) => Promise<void>;
@@ -242,12 +242,12 @@ export const useGame = (gameId: string): UseGameResult => {
   // rapid check-then-uncheck (or a snapshot that hasn't echoed the last edit) can't compute the new
   // value from a stale number and strand the stat on the wrong total.
   const adjustCharacterStats = useCallback(
-    async (characterId: string, deltas: Partial<Record<AdditiveStat, number>>) => {
+    async (characterId: string, deltas: Partial<Record<AdditiveStat, number>>, guard?: SheetGuard) => {
       await reportSave(() =>
         withCharacters(gameRef, (chars) =>
           chars.map((c) => {
             if (c.id !== characterId) return c;
-            return { ...c, data: applyStatDeltas(c.data ?? {}, deltas) };
+            return { ...c, data: applyStatDeltas(c.data ?? {}, deltas, guard) };
           }),
         ),
       );

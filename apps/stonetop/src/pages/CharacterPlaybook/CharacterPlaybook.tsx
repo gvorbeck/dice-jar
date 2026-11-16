@@ -77,7 +77,8 @@ const SeekerCollection = lazy(() => import('@/components/character/playbooks/see
 const WouldBeHeroFearAnger = lazy(() =>
   import('@/components/character/playbooks/would-be-hero').then((m) => ({ default: m.WouldBeHeroFearAnger })),
 );
-import { BURN_BRIGHTLY_COST, canBurnBrightly } from '@/lib/burnBrightly';
+import { BURN_BRIGHTLY_COST, canBurnBrightly, requireBurnBrightly } from '@/lib/burnBrightly';
+import type { SheetGuard } from '@/lib/statDeltas';
 import type { AdditiveStat, Character, CharacterData, GameSession, LoggedRoll, NotesLock, PlaybookType, PlaybookFeatures } from '@/types';
 import type { RollReport } from '@/components/character/Move/RollAffordance';
 import { CharacterRollContext } from '@/components/character/Move/CharacterRollContext';
@@ -225,7 +226,7 @@ interface SheetProps {
   nav: GameNav;
   updateCharacterName: (characterId: string, name: string) => Promise<void>;
   updateCharacterData: (characterId: string, data: Partial<CharacterData>) => Promise<void>;
-  adjustCharacterStats: (characterId: string, deltas: Partial<Record<AdditiveStat, number>>) => Promise<void>;
+  adjustCharacterStats: (characterId: string, deltas: Partial<Record<AdditiveStat, number>>, guard?: SheetGuard) => Promise<void>;
   logRoll: (roll: LoggedRoll) => Promise<void>;
   notesHtml: string | undefined;
   notesLock: NotesLock | undefined;
@@ -333,7 +334,7 @@ const CharacterSheet = ({
     () => ({
       available: canBurnBrightly(character.data),
       // Rejects when the XP can't be paid (the save failed, or another device spent it first), and the roll gets no bonus.
-      onBurn: () => adjustCharacterStats(character.id, { statXp: -BURN_BRIGHTLY_COST }),
+      onBurn: () => adjustCharacterStats(character.id, { statXp: -BURN_BRIGHTLY_COST }, requireBurnBrightly),
     }),
     [character.data, character.id, adjustCharacterStats],
   );
@@ -564,7 +565,7 @@ const CharacterPlaybookContent = ({
   playbook: PlaybookType;
   updateCharacterName: (characterId: string, name: string) => Promise<void>;
   updateCharacterData: (characterId: string, data: Partial<CharacterData>) => Promise<void>;
-  adjustCharacterStats: (characterId: string, deltas: Partial<Record<AdditiveStat, number>>) => Promise<void>;
+  adjustCharacterStats: (characterId: string, deltas: Partial<Record<AdditiveStat, number>>, guard?: SheetGuard) => Promise<void>;
   logRoll: (roll: LoggedRoll) => Promise<void>;
   notesActions: NotesActions;
 }) => {
