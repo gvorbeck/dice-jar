@@ -1,0 +1,173 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.empty {
+  margin: 0 0 var(--spacing-4);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-4);
+}
+
+.card + .card {
+  margin-top: 0;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+}
+
+.nameTagRow {
+  display: flex;
+  flex: 1;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.nameInput {
+  flex: 2;
+  min-width: 100px;
+  font-size: var(--text-sm);
+}
+
+.tagInput {
+  flex: 3;
+  min-width: 120px;
+  font-size: var(--text-sm);
+}
+
+.flags {
+  display: flex;
+  gap: var(--spacing-4);
+  flex-wrap: wrap;
+}
+
+.statsRow {
+  display: flex;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+}
+
+.statMaxRow {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.statNote {
+  font-size: var(--text-xs);
+}
+
+.maxHpInput {
+  composes: focusVisible from '@/components/ui/field.module.css';
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
+  padding: 1px 2px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  border-radius: 0;
+  color: var(--text-secondary);
+  font-family: var(--font-serif);
+  font-size: var(--text-xs);
+  font-style: italic;
+  text-align: center;
+  outline: none;
+  transition: none;
+  -moz-appearance: textfield;
+}
+
+.maxHpInput::-webkit-outer-spin-button,
+.maxHpInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.maxHpInput:focus {
+  border: none;
+  border-bottom: 1px solid var(--border-accent);
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+}
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.fieldLabel {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fieldInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.movesSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.movesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding-left: var(--spacing-4);
+}
+
+.moveInput {
+  width: 100%;
+}
+
+.costLoyaltyRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  flex-wrap: wrap;
+}
+
+.costLoyaltyRow .fieldRow {
+  flex: 1;
+  min-width: 0;
+}
+
+.loyaltyLabel {
+  white-space: nowrap;
+}
+
+.gearSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.srOnly {
+  composes: srOnly from '@/components/ui/field.module.css';
+}

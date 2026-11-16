@@ -1,0 +1,203 @@
+.card {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.cardUnlocked {
+  border-color: var(--border-accent);
+  /* Gold ring plus the shared glow token, so an unlocked arcanum reads as
+     charged with magic rather than merely outlined. */
+  box-shadow:
+    0 0 0 1px var(--color-gold-500),
+    var(--glow-gold);
+}
+
+.description {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.baseMoves {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.frontMove {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.moveHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.moveText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.marksRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.taskRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  cursor: pointer;
+}
+
+.taskRow > span {
+  flex: 1;
+  padding-top: 2px;
+}
+
+.taskCount {
+  margin-top: var(--spacing-1);
+}
+
+.mysteries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding-top: var(--spacing-1);
+}
+
+.mysteriesLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.mysteryMoves {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.mysteryMoveHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+}
+
+/* Only the selectable (checkbox) header is clickable; granted moves render a static header. */
+label.mysteryMoveHeader {
+  cursor: pointer;
+}
+
+.mysteryMoveTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.consequences {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.consequencesLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+/* A moves-only section lays its moves out masonry-style — two columns on desktop, one below —
+   matching the PC Playbook's move grid (columns: 2 280px + break-inside: avoid on children). */
+.moveGrid {
+  columns: 2 280px;
+  column-gap: var(--spacing-3);
+}
+
+.moveGrid > * {
+  break-inside: avoid;
+  margin-bottom: var(--spacing-3);
+}
+
+.moveGrid > *:last-child {
+  margin-bottom: 0;
+}
+
+.consequenceGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.consequenceRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  /* A transparent spine holds the padding steady so a row doesn't shift when it gains its border on
+     marking; only a marked consequence shows the danger-tinted spine + wash. */
+  padding: var(--spacing-1) var(--spacing-2);
+  border-left: 2px solid transparent;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.consequenceRowMarked {
+  border-left-color: var(--color-danger);
+  background-color: color-mix(in srgb, var(--color-danger) 8%, transparent);
+}
+
+.consequenceRow > span {
+  flex: 1;
+  padding-top: 2px;
+}
+
+/* The mark boxes sit at the row's start as a tight group, not a growing text column. */
+.consequenceRow > .consequenceMarks {
+  flex: 0 0 auto;
+  display: flex;
+  gap: var(--spacing-1);
+  padding-top: 0;
+}
+
+.srOnly {
+  composes: srOnly from '@/components/ui/field.module.css';
+}
+
+.consequenceChildren {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding-left: var(--spacing-6);
+}
+
+.consequenceTable {
+  padding-left: var(--spacing-6);
+}

@@ -2,16 +2,16 @@
 
 Tabletop RPG character apps, one per game, sharing their tooling and, once a second app needs it, their code. Package scope: `@dice-jar/*`.
 
-Only delta-green is in so far. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
+delta-green and stonetop are in so far (stonetop is the app behind hearthfire.camp). The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
 
 | App         | Game              | Rules MCP server    | Access    |
 | ----------- | ----------------- | ------------------- | --------- |
-| delta-green | Delta Green       | `rules-delta-green` | link-only |
-| hearthfire  | Stonetop          | `rules-stonetop`    | link-only |
-| codex-quest | Basic Fantasy RPG | `rules-bfrpg`       | accounts  |
-| glyph-quest | Knave             | `rules-knave`       | accounts  |
+| delta-green | Delta Green       | `delta-green-rules` | link-only |
+| stonetop    | Stonetop          | `stonetop-rules`    | link-only |
+| codex-quest | Basic Fantasy RPG | `bfrpg-rules`       | accounts  |
+| glyph-quest | Knave             | `knave-rules`       | accounts  |
 
-None of these rules servers exist yet. Today there is one, `ttrpg-rules` (Delta Green only); it is split into one server per game before hearthfire comes in (see "Rules MCP" in the brief). Until then, delta-green uses `ttrpg-rules`.
+Rules servers are named `<game>-rules`. `delta-green-rules` and `stonetop-rules` are connected; the other two are not yet.
 
 ## Licensing
 
@@ -49,7 +49,7 @@ npm ci
 npm run check
 ```
 
-`npm ci` also installs the git hooks. One app's script: `npm run dev -w apps/<app>`.
+`npm ci` also installs the git hooks. One app's script: `npm run dev -w apps/<app>`. To start an app's dev server: `npm run dg` (delta-green) or `npm run st` (stonetop).
 
 | Root script                                                                     |                                                                                                                                                    |
 | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |

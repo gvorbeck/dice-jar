@@ -1,6 +1,6 @@
 # Monorepo brief
 
-> **Renamed:** apps are named after the game system, so the app this brief calls `codename` is now `apps/delta-green`. It still deploys to yourcodena.me. The text below keeps the old name.
+> **Renamed:** apps are named after the game system, so the app this brief calls `codename` is now `apps/delta-green`. It still deploys to yourcodena.me. The Stonetop app, which the brief calls `hearthfire` (source `~/Sites/hearthfire`), will be imported as `apps/stonetop`. The text below keeps the old names.
 >
 > **Status (Nov 2026):** the scaffold described here is done. The rules agents follow now live in [AGENTS.md](../AGENTS.md). "Scope of this work" is history; "Later phases" is still the plan, starting with importing codename.
 
@@ -149,7 +149,7 @@ codename was built with an MCP server that lets the agent search the game's rule
 
 - Repo: `~/Sites/ttrpg-rules-mcp` (private, `gvorbeck/ttrpg-rules-mcp`). Registered today as one server, `ttrpg-rules`, holding Delta Green only. Tools: `search_rules`, `read_rules`, `list_sections`.
 - **It stays a separate, private repo.** It holds text from copyrighted books. Never copy its `data/` or any book text into dice-jar.
-- **One server per game, never mixed.** Same code, one running copy per game, each loading only that game's books and registered under its own name: `rules-delta-green`, `rules-stonetop`, `rules-bfrpg`, `rules-knave`. A server cannot return another game's text, and the tool name says which game it is. Games share terms with different rules (Delta Green and Stonetop both have "Bonds"), so a shared index with an optional filter is not safe enough.
+- **One server per game, never mixed.** Same code, one running copy per game, each loading only that game's books and registered under its own name: `delta-green-rules`, `stonetop-rules`, `bfrpg-rules`, `knave-rules`. A server cannot return another game's text, and the tool name says which game it is. Games share terms with different rules (Delta Green and Stonetop both have "Bonds"), so a shared index with an optional filter is not safe enough.
 - **How:** the server already reads its books from `RULES_DATA_DIR`. Move each game's `.jsonl` files into `rules-server/data/<game>/`, and have `install.sh` register one server per folder with that variable set. The existing `ttrpg-rules` registration is removed.
 - **Adding a game** is the "Add a book" steps in that repo's `README.md`: the owner supplies the PDF, then a settings file in `chunker/books/` and `chunker/build.sh <book>`. Needed before each rebuild: Stonetop (hearthfire), Basic Fantasy RPG (codex-quest), Knave (glyph-quest).
 - **Three bits of Delta Green wording are hard-coded in `rules-server/src/index.ts`** and need to become per-game or neutral before a second game is added: the "Handler only" label for GM-only books, the citation example, and the example search terms.
@@ -168,7 +168,7 @@ Write the monorepo's `AGENTS.md` as part of the scaffold, and a `CLAUDE.md` cont
 - Delete code your change leaves unused. `npm run knip` fails on unused files, exports and dependencies.
 - Bug fix: first write a test that fails, then fix the root cause in the shared code, not at each caller.
 - New logic gets a test. Logic: `*.test.ts` next to the file. `firestore.rules`: the app's `test/firestore.rules.test.ts`. Anything a player clicks through: the app's `e2e/`.
-- Game rules come from the book. Before writing or changing rules logic or rules data, look it up with that app's rules MCP server (`rules-<game>`; each app's README names its server) and cite the page in the test or comment. Never use another game's server for it. If the app's server isn't connected, stop and say so.
+- Game rules come from the book. Before writing or changing rules logic or rules data, look it up with that app's rules MCP server (`<game>-rules`; each app's README names its server) and cite the page in the test or comment. Never use another game's server for it. If the app's server isn't connected, stop and say so.
 - A known limit gets a comment: `// shortcut: <the limit>, <when to upgrade>`.
 - Comments say why, in one line. No comments that repeat the code.
 - A coverage floor only goes up. A new app starts at or above codename's floor (lines 77, statements 74, branches 68, functions 78).

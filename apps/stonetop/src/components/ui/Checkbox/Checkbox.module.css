@@ -1,0 +1,102 @@
+.label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--text-sm);
+  /* Must match the Text atom's body line-height — the indicator's 1lh centering below relies on it. */
+  line-height: 1.6;
+}
+
+.input {
+  composes: srOnly from '@/components/ui/field.module.css';
+}
+
+.indicator {
+  flex-shrink: 0;
+  /* Center within the label's first line; multi-line labels stay first-line aligned. */
+  margin-top: calc((1lh - 16px) / 2);
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+/* Label-less checkboxes (aria-label only, e.g. move take-boxes) have no text line to align to —
+   drop the offset so parent flex rows can center the bare indicator exactly. */
+.indicator:last-child {
+  margin-top: 0;
+}
+
+.check {
+  width: 9px;
+  height: 6px;
+  border-left: 1.5px solid var(--color-gold-400);
+  border-bottom: 1.5px solid var(--color-gold-400);
+  transform: rotate(-45deg) translateY(-1px);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.input:checked + .indicator {
+  border-color: var(--color-gold-500);
+}
+
+.input:checked + .indicator .check {
+  opacity: 1;
+}
+
+.input:focus-visible + .indicator {
+  outline: 2px solid var(--color-gold-400);
+  outline-offset: 2px;
+}
+
+.label:hover .indicator {
+  border-color: var(--color-gold-400);
+}
+
+.input:disabled + .indicator {
+  opacity: 0.5;
+  border-color: var(--border-subtle);
+}
+
+.label:has(.input:disabled) {
+  cursor: not-allowed;
+}
+
+/* ── Provision variant ── */
+.labelProvision {
+  gap: var(--spacing-2);
+}
+
+.provisionIcons {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.provisionIcon {
+  color: var(--text-secondary);
+}
+
+.provisionIconChecked {
+  color: var(--text-accent);
+}
+
+.input:focus-visible ~ .provisionIcons {
+  outline: 2px solid var(--color-gold-400);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.input:disabled ~ .provisionIcons {
+  opacity: 0.5;
+}
