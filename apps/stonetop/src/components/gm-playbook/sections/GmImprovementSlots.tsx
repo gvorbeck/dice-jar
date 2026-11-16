@@ -167,13 +167,13 @@ export const GmImprovementSlots = ({ gmImprovements, onSave }: GmImprovementSlot
     save: saveSlots,
   } = useOptimisticField<GmImprovement[], [removedId?: string]>(
     gmImprovements ?? [],
-    (slots, removedId): Promise<void> => {
-      const changed = changedById(baselineRef.current, slots);
-      baselineRef.current = slots;
-      return onSave({
-        gmImprovements: changed,
+    // The baseline advances only once the write lands; a failed save is rolled back by the hook, so a retry must resend it.
+    async (slots, removedId): Promise<void> => {
+      await onSave({
+        gmImprovements: changedById(baselineRef.current, slots),
         ...(removedId ? { removedGmImprovementIds: [removedId] } : {}),
       });
+      baselineRef.current = slots;
     },
     undefined,
     focusedRef,

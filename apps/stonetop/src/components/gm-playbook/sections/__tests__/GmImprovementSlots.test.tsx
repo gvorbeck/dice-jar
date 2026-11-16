@@ -38,4 +38,19 @@ describe('GmImprovementSlots', () => {
     await waitFor(() => expect(onSave).toHaveBeenCalled());
     expect(onSave.mock.calls.at(-1)![0].gmImprovements).toEqual([expect.objectContaining({ id: 'a', title: 'Mill' })]);
   });
+
+  it('resends a change after its save failed and was rolled back', async () => {
+    const slot = { ...makeEmptyGmImprovement(), id: 'a', completed: false };
+    const onSave = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(undefined);
+    render(<GmImprovementSlots gmImprovements={[slot]} onSave={onSave} />);
+
+    const box = () => screen.getByRole('checkbox');
+    await userEvent.click(box().closest('label') ?? box());
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(box()).not.toBeChecked());
+    await userEvent.click(box().closest('label') ?? box());
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+    expect(onSave.mock.calls[1]![0].gmImprovements).toEqual([expect.objectContaining({ id: 'a', completed: true })]);
+  });
 });
