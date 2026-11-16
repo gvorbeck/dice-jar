@@ -1,5 +1,5 @@
 import { useCallback, useId } from 'react';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Heading, Text, Checkbox, Button, Radio } from '@/components/ui';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
 import type { SteadingData, SteadingSize } from '@/types';
@@ -25,7 +25,7 @@ const StatStepper = ({ label, description, value, min = -1, max = 3, onChange }:
   const descId = useId();
   const handleDecrement = useCallback(() => onChange(Math.max(min, value - 1)), [onChange, min, value]);
   const handleIncrement = useCallback(() => onChange(Math.min(max, value + 1)), [onChange, max, value]);
-  const valueCx = clsx(styles.statValue, value > 0 && styles.statValuePositive, value < 0 && styles.statValueNegative);
+  const valueCx = cn(styles.statValue, value > 0 && styles.statValuePositive, value < 0 && styles.statValueNegative);
   return (
     <div className={styles.stat}>
       <div className={styles.statTop}>

@@ -1,5 +1,5 @@
 import { useState, useId, type ReactNode } from 'react';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Icon } from '../Icon/Icon';
 import styles from './Collapse.module.css';
 
@@ -14,7 +14,7 @@ interface CollapseProps {
 export const Collapse = ({ label, defaultOpen = false, children, className, action }: CollapseProps) => {
   const [open, setOpen] = useState(defaultOpen);
   const id = useId();
-  const cx = clsx(styles.root, open && styles.open, className);
+  const cx = cn(styles.root, open && styles.open, className);
   const handleToggle = () => setOpen((v) => !v);
 
   return (

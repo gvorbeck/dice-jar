@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { isValidElement } from 'react';
 import { Text } from '../Text/Text';
 import styles from './List.module.css';
@@ -28,7 +28,7 @@ const itemFingerprint = (node: React.ReactNode): string => {
 
 export const List = ({ variant, items, keyPrefix, className }: ListProps) => {
   const Tag = variant === 'numbered' ? 'ol' : 'ul';
-  const cx = clsx(styles.list, styles[variant], className);
+  const cx = cn(styles.list, styles[variant], className);
   const prefix = keyPrefix ?? `list-item-${variant}`;
 
   return (

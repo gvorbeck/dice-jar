@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { useState, useRef, useCallback, type ReactNode } from 'react';
 import { Checkbox, CheckboxGroup, Divider, Icon, Input, List, Text, UseDots } from '@/components/ui';
 import type { MoveBlock, MoveDefinition, RightControlSpec } from '@/types';
@@ -197,8 +197,8 @@ export const Move = ({
     console.error(`Move "${move.id}": rightControl persists at most 2 slots, got ${rightControlState.length}.`);
   }
 
-  const moveCx = clsx(styles.move, selected && styles.moveSelected);
-  const nameCx = clsx(styles.moveName, selected && styles.moveNameSelected);
+  const moveCx = cn(styles.move, selected && styles.moveSelected);
+  const nameCx = cn(styles.moveName, selected && styles.moveNameSelected);
   const nameEl = (
     <Text as="span" className={nameCx}>
       {title}
@@ -259,7 +259,7 @@ export const Move = ({
         return <Divider key={key} className={styles.bodyDivider} />;
       case 'para': {
         if (block.icon) {
-          const iconParaCx = clsx(styles.moveBodyWithIcon, block.indent && styles.indent);
+          const iconParaCx = cn(styles.moveBodyWithIcon, block.indent && styles.indent);
           return (
             <div key={key} className={iconParaCx}>
               <Icon name={block.icon} size="small" className={styles.moveBodyIcon} aria-hidden="true" />
@@ -269,7 +269,7 @@ export const Move = ({
             </div>
           );
         }
-        const paraCx = clsx(block.indent && styles.indent);
+        const paraCx = cn(block.indent && styles.indent);
         return (
           <Text key={key} font="serif" color="muted" leading="tight" className={paraCx}>
             {block.text}
@@ -277,7 +277,7 @@ export const Move = ({
         );
       }
       case 'list': {
-        const listCx = clsx(block.indent && styles.indent);
+        const listCx = cn(block.indent && styles.indent);
         return <List key={key} variant="bullet" items={block.items} keyPrefix={key} className={listCx} />;
       }
       case 'checkbox': {
@@ -379,7 +379,7 @@ export const Move = ({
               const count = Math.max(1, spec.number ?? 1);
               // The preceding control's `divider` flag draws a separator before this one, rendered as a
               // left border on this slot rather than a separate element.
-              const dividedCx = clsx(styles.usesSlot, rightSpecs.length > 1 && rightSpecs[i - 1]?.divider && styles.usesSlotDivided);
+              const dividedCx = cn(styles.usesSlot, rightSpecs.length > 1 && rightSpecs[i - 1]?.divider && styles.usesSlotDivided);
               return (
                 <span key={`${move.id}-rc-${i}`} className={dividedCx}>
                   {spec.type === 'dot' ? (

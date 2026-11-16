@@ -1,5 +1,5 @@
 import { forwardRef, type ForwardedRef, type SelectHTMLAttributes } from 'react';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import styles from './Dropdown.module.css';
 
 interface DropdownOption<T extends string> {
@@ -44,7 +44,7 @@ const DropdownInner = <T extends string>(
   { label, id, options, groups, value, onChange, placeholder = 'Select…', className, ...props }: DropdownProps<T>,
   ref: ForwardedRef<HTMLSelectElement>,
 ) => {
-  const selectCx = clsx(styles.select, !value && styles.placeholder, className);
+  const selectCx = cn(styles.select, !value && styles.placeholder, className);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onChange(e.target.value as T);

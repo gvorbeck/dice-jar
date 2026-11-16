@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Radio } from '../Radio/Radio';
 import styles from './Table.module.css';
 
@@ -41,7 +41,7 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
   const columnCount = columnHeaders?.length ?? 2;
   // N-column (cells) tables keep every header left-aligned; only the classic two-column label/value
   // tables right-align the trailing value column.
-  const thClass = clsx(styles.tableTh, hasCells && styles.tableThStart);
+  const thClass = cn(styles.tableTh, hasCells && styles.tableThStart);
 
   const table = (
     <table className={bordered ? styles.tableBordered : styles.table}>
@@ -68,7 +68,7 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
             );
           }
           if (isCells(row)) {
-            const trClass = clsx(
+            const trClass = cn(
               styles.tableCellsRow,
               row.selectable && !row.disabled && styles.tableSelectableRow,
               row.selected && styles.tableSelectedRow,

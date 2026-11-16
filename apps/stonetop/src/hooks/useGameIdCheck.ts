@@ -48,7 +48,7 @@ export const useGameIdCheck = (raw: string) => {
     }, DEBOUNCE_MS);
 
     return () => {
-      clearTimeout(timerRef.current!);
+      clearTimeout(timerRef.current ?? undefined);
       ac.abort();
     };
   }, [raw]);

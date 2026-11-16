@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Text } from '@/components/ui';
 import type { LoggedRoll } from '@/types';
 import styles from './RollLog.module.css';
@@ -54,7 +54,7 @@ export const RollLog = ({ rolls }: RollLogProps) => {
               </>
             )}
           </Text>
-          <Text as="span" size="sm" className={clsx(styles.result, roll.breakdown && styles.resultWrap)}>
+          <Text as="span" size="sm" className={cn(styles.result, roll.breakdown && styles.resultWrap)}>
             {roll.breakdown ?? diceExpr(roll)} = <span className={styles.total}>{roll.total}</span>
             {roll.band && <span className={styles.band}> ({roll.band})</span>}
             {roll.burned && <span className={styles.band}> burned brightly</span>}

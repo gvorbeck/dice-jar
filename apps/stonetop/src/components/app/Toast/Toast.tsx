@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Group } from 'react-aria-components';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Button } from '@/components/ui';
 import { Icon } from '@/components/ui';
 import { Text } from '@/components/ui';
@@ -30,8 +30,8 @@ const ToastEntry = ({
   onPause: (id: string) => void;
   onResume: (id: string) => void;
 }) => {
-  const cx = clsx(styles.toast, styles[item.variant], item.exiting && styles.exiting);
-  const iconCx = clsx(styles.icon, styles[item.variant]);
+  const cx = cn(styles.toast, styles[item.variant], item.exiting && styles.exiting);
+  const iconCx = cn(styles.icon, styles[item.variant]);
   const handleDismissItem = useCallback(() => onDismiss(item.id), [onDismiss, item.id]);
   const handlePause = useCallback(() => onPause(item.id), [onPause, item.id]);
   const handleResume = useCallback(() => onResume(item.id), [onResume, item.id]);

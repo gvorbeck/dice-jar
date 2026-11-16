@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Dropdown } from '@/components/ui';
 import type { GameNav } from './gameNav';
 import styles from './PageNav.module.css';
@@ -43,7 +43,7 @@ export const PageNav = ({ nav, dropdownId }: PageNavProps) => {
         <ul className={styles.pillList}>
           {items.map((item) => {
             const isCurrent = item.value === nav.current;
-            const pillCx = clsx(styles.pill, isCurrent && styles.pillCurrent);
+            const pillCx = cn(styles.pill, isCurrent && styles.pillCurrent);
             return (
               <li key={item.value} className={styles.pillItem}>
                 {isCurrent ? (

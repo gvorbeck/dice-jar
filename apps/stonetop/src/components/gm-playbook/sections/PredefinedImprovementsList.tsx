@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Heading, List, Text, Checkbox } from '@/components/ui';
 import { IMPROVEMENTS, type CheckItem } from './steadingImprovementsData';
 import card from './improvementCard.module.css';
@@ -49,7 +49,7 @@ export const PredefinedImprovementsList = ({ improvements, onToggleKey }: Predef
   <div className={styles.list}>
     {IMPROVEMENTS.map((imp) => {
       const completed = !!improvements[imp.id];
-      const itemCx = clsx(card.item, completed && card.itemCompleted);
+      const itemCx = cn(card.item, completed && card.itemCompleted);
       return (
         <div key={imp.id} className={itemCx}>
           <div className={card.itemHeader}>

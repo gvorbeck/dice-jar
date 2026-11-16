@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Button, Text, Tooltip } from '@/components/ui';
 import type { SteadingNPC, NpcRelationship } from '@/types';
 import styles from './NpcRow.module.css';
@@ -16,9 +16,9 @@ export const NpcRow = ({ npc, onEdit, onRemove, onToggleDead, resolveTarget }: N
   const handleEdit = useCallback(() => onEdit(npc), [onEdit, npc]);
   const handleRemove = useCallback(() => onRemove(npc.id), [onRemove, npc.id]);
   const handleToggleDead = useCallback(() => onToggleDead(npc.id), [onToggleDead, npc.id]);
-  const rowCx = clsx(styles.npcRow, npc.dead && styles.npcRowDead);
-  const nameCx = clsx(npc.dead && styles.npcNameStrike);
-  const tombstoneCx = clsx(npc.dead && styles.tombstoneActive);
+  const rowCx = cn(styles.npcRow, npc.dead && styles.npcRowDead);
+  const nameCx = cn(npc.dead && styles.npcNameStrike);
+  const tombstoneCx = cn(npc.dead && styles.tombstoneActive);
   return (
     <div className={rowCx} role="listitem">
       <div className={styles.npcInfo}>

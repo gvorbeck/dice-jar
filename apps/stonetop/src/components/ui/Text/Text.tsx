@@ -1,5 +1,5 @@
 import { type ComponentPropsWithoutRef } from 'react';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { parseInlineMarkdown } from '@/lib/parseMarkdown';
 import styles from './Text.module.css';
 
@@ -25,7 +25,7 @@ export const Text = ({
   children,
   ...props
 }: TextProps) => {
-  const cx = clsx(
+  const cx = cn(
     styles.base,
     styles[size],
     styles[color],

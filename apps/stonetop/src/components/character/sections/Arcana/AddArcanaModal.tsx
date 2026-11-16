@@ -1,6 +1,6 @@
 import { useState, useId, useMemo, useCallback } from 'react';
 import { ListBox, ListBoxItem, type Key } from 'react-aria-components';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Modal, Heading, Button, Input, Text } from '@/components/ui';
 import styles from './AddArcanaModal.module.css';
 
@@ -80,7 +80,7 @@ export const AddArcanaModal = <T extends ArcanaItem>({
     [results, onAdd],
   );
 
-  const listCx = clsx(styles.list, results.length === 0 && styles.listEmpty);
+  const listCx = cn(styles.list, results.length === 0 && styles.listEmpty);
   const allAdded = existing.size === items.length;
 
   return (

@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect, useRef, memo } from 'react';
 import { Button as AriaButton, GridList, GridListItem, useDragAndDrop } from 'react-aria-components';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { PageMeta } from '@/components/app/PageMeta/PageMeta';
 import { useGame } from '@/hooks/useGame';
@@ -38,7 +38,7 @@ const CharacterRow = memo(({ character, gameId, showGrip, canMoveUp, canMoveDown
   const handleRemove = useCallback(() => onRemove(character), [onRemove, character]);
   const handleMoveUp = useCallback(() => onMove(character.id, -1), [onMove, character.id]);
   const handleMoveDown = useCallback(() => onMove(character.id, 1), [onMove, character.id]);
-  const linkCx = clsx(styles.characterLink, styles.characterLinkBtn);
+  const linkCx = cn(styles.characterLink, styles.characterLinkBtn);
 
   return (
     <GridListItem id={character.id} textValue={buttonLabel} className={styles.characterRow}>

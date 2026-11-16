@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLatest } from '@/hooks/useLatest';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { useDebouncedTextField } from '@/hooks/useDebouncedTextField';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Checkbox, Input, Radio, Text, UseDots } from '@/components/ui';
 import { useToast } from '@/components/app';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
@@ -56,7 +56,7 @@ const SubItem = ({
   onRadioSelect,
   onUses,
 }: SubItemProps) => {
-  const liCx = clsx(styles.subItem, styles.subItemSelectable);
+  const liCx = cn(styles.subItem, styles.subItemSelectable);
 
   if (typeof item === 'string') {
     return (

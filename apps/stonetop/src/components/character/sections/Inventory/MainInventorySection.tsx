@@ -1,5 +1,5 @@
 import { useCallback, memo } from 'react';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Checkbox, Divider, Heading, Icon, List, Stack, Text, UseDots } from '@/components/ui';
 import { RepeaterField } from '@/components/fields';
 import type { ArcanaMinorEntry, ArcanaMajorEntry } from '@/types';
@@ -123,7 +123,7 @@ export const MainInventorySection = ({
   const band = isLoading ? null : loadBand(totalLoad);
   const loadLabel =
     band === null ? 'calculating load…' : band === 'overloaded' ? 'overloaded (slow, noisy, risk of injury)' : `${band} load`;
-  const loadCx = clsx(
+  const loadCx = cn(
     styles.loadBadge,
     band === 'light' && styles.loadLight,
     band === 'normal' && styles.loadNormal,

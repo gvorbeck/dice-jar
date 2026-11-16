@@ -38,6 +38,6 @@ export const db = initializeFirestore(app, {
 // Browser tests (e2e/) point the app at the local emulator, never at production data.
 const emulator = import.meta.env.VITE_FIRESTORE_EMULATOR; // "host:port"
 if (emulator) {
-  const [host, port] = emulator.split(':');
-  connectFirestoreEmulator(db, host!, Number(port));
+  const [host = 'localhost', port] = emulator.split(':');
+  connectFirestoreEmulator(db, host, Number(port));
 }

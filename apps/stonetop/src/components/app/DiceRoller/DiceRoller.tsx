@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Button, Heading, Icon, Input, Text } from '@/components/ui';
 import { rollNotation, type DiceRollOutcome } from '@/lib/diceNotation';
 import { generateId } from '@/lib/id';
@@ -156,7 +156,7 @@ export const DiceRoller = ({ rollerId, rollerName, onRoll }: DiceRollerProps) =>
   const [last, ...earlier] = history;
 
   return (
-    <div className={clsx(styles.root, open && styles.open)}>
+    <div className={cn(styles.root, open && styles.open)}>
       <button ref={tabRef} type="button" className={styles.tab} onClick={handleToggle} aria-expanded={open} aria-controls={panelId}>
         <Icon name="dice" size="small" />
         Dice

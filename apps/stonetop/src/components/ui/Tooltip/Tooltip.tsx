@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Focusable, OverlayArrow, Tooltip as AriaTooltip, TooltipTrigger } from 'react-aria-components';
 import styles from './Tooltip.module.css';
 
@@ -18,7 +18,7 @@ export const Tooltip = ({ text, side = 'top', plain = false, noTabStop = false, 
   <TooltipTrigger delay={0} closeDelay={100}>
     <Focusable excludeFromTabOrder={plain && noTabStop}>
       {plain ? (
-        <span role="img" aria-label={text} className={clsx(styles.wrapper, className)}>
+        <span role="img" aria-label={text} className={cn(styles.wrapper, className)}>
           {children}
         </span>
       ) : (

@@ -1,5 +1,5 @@
 import { useState, useId, useRef, useEffect, useCallback, useMemo, type ReactNode, type KeyboardEvent } from 'react';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Tooltip } from '../Tooltip/Tooltip';
 import { Button } from '../Button/Button';
 import { Icon } from '../Icon/Icon';
@@ -76,8 +76,8 @@ const TabButton = ({
     },
     [tabRefs, index],
   );
-  const cx = clsx(styles.tab, isActive && styles.active, onRemove && styles.tabHasRemove);
-  const slotCx = clsx(styles.tabSlot, isActive && styles.tabSlotActive);
+  const cx = cn(styles.tab, isActive && styles.active, onRemove && styles.tabHasRemove);
+  const slotCx = cn(styles.tabSlot, isActive && styles.tabSlotActive);
 
   const handleClick = useCallback(() => onActivate(index), [onActivate, index]);
   const handleKeyDown = useCallback(
@@ -172,7 +172,7 @@ export const Tabs = ({ tabs, defaultIndex = 0, activeIndex, onActiveChange, clas
     setEverActiveIds((prev) => (prev.has(activeId) ? prev : new Set([...prev, activeId])));
   }
 
-  const cx = clsx(styles.root, className);
+  const cx = cn(styles.root, className);
 
   // Keep the active tab within the scrolled strip. Clicking and keyboard focus
   // scroll it into view on their own, but a controlled `activeIndex` change

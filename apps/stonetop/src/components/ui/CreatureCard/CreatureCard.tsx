@@ -1,5 +1,5 @@
 import { useCallback, memo, useId } from 'react';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Heading } from '../Heading/Heading';
 import { Input } from '../Input/Input';
 import { List } from '../List/List';
@@ -58,7 +58,7 @@ export interface CreatureCardProps {
 
 export const CreatureCard = memo(({ creature, onFieldChange, onBlur, className }: CreatureCardProps) => {
   const headingId = useId();
-  const cx = clsx(styles.card, className);
+  const cx = cn(styles.card, className);
 
   const handleName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onFieldChange('name', e.target.value), [onFieldChange]);
   const handleHp = useCallback((value: string) => onFieldChange('hp', value), [onFieldChange]);

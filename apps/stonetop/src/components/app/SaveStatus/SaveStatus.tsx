@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { Button, Icon, Text } from '@/components/ui';
 import { useSaveStatusOptional } from './SaveStatusContext';
 import styles from './SaveStatus.module.css';
@@ -57,7 +57,7 @@ export const SaveStatus = () => {
   const label = isSaving ? 'Saving…' : lastSavedAt !== null ? `Saved · ${formatRelative(lastSavedAt, now)}` : 'Saved';
   const isDismissed = status === 'saved' && lastSavedAt === dismissedAt;
   const isIdle = !ctx || status === 'idle' || isDismissed;
-  const cx = clsx(styles.root, !isIdle && styles.visible);
+  const cx = cn(styles.root, !isIdle && styles.visible);
 
   // The role="status" live region is always mounted so screen readers announce
   // the first "Saving…" — a region added to the DOM together with its text is
