@@ -1,0 +1,47 @@
+@import '../../components/playbook/playbook.shared.css';
+
+.gm-playbook-tabs {
+  margin-top: 0;
+}
+
+/* ── Content form (intro text + stacked inputs) ──────────── */
+.gm-playbook-content-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* ── Content rules block (instructional text above inputs) ── */
+.gm-playbook-content-rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+/* ── Season heading with icon ──────────────────────────── */
+.gm-playbook-season-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.gm-playbook-season-icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* ── Section divider ─────────────────────────────────────── */
+
+/* ── Threats: threat-type move grid ──────────────────────── */
+.gm-playbook-threat-moves-grid {
+  margin-top: var(--spacing-2);
+}
+
+.gm-playbook-threat-type {
+  margin-bottom: var(--spacing-1);
+}
+
+/* ── Expeditions: weather tables grid ───────────────────── */
+.gm-playbook-weather-grid {
+  margin-top: var(--spacing-2);
+}

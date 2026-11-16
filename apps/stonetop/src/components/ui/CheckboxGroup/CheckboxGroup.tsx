@@ -4,7 +4,7 @@ import { Checkbox } from '../Checkbox/Checkbox';
 import { Fieldset } from '../Fieldset/Fieldset';
 import { Text } from '../Text/Text';
 import type { CheckboxGroupItem } from '@/types';
-import styles from './CheckboxGroup.module.css';
+import './CheckboxGroup.css';
 
 interface CheckboxGroupProps {
   items: CheckboxGroupItem[] | string[];
@@ -38,20 +38,20 @@ export const CheckboxGroup = ({
 
   const gridClass = cn(
     columns === 'responsive-2-4-6'
-      ? styles.gridResponsive246
+      ? 'checkbox-group-grid-responsive246'
       : columns === 6
-        ? styles.grid6
+        ? 'checkbox-group-grid6'
         : columns === 4
-          ? styles.grid4
+          ? 'checkbox-group-grid4'
           : columns === 2
-            ? styles.grid2
-            : styles.list,
-    itemGap === 'md' && styles.gapMd,
-    itemGap === 'lg' && styles.gapLg,
+            ? 'checkbox-group-grid2'
+            : 'checkbox-group-list',
+    itemGap === 'md' && 'checkbox-group-gap-md',
+    itemGap === 'lg' && 'checkbox-group-gap-lg',
   );
 
   return (
-    <Fieldset legend={label ?? 'Options'} legendHidden={!label} className={styles.root}>
+    <Fieldset legend={label ?? 'Options'} legendHidden={!label} className="checkbox-group">
       {pickNote && (
         <Text size="xs" color="tertiary" italic>
           {pickNote}

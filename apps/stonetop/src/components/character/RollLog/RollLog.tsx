@@ -1,7 +1,7 @@
 import { cn } from '@dice-jar/cn';
 import { Text } from '@/components/ui';
 import type { LoggedRoll } from '@/types';
-import styles from './RollLog.module.css';
+import './RollLog.css';
 
 interface RollLogProps {
   rolls: LoggedRoll[];
@@ -40,13 +40,13 @@ export const RollLog = ({ rolls }: RollLogProps) => {
   const newestFirst = [...rolls].reverse();
 
   return (
-    <ul className={styles.list}>
+    <ul className="roll-log-list">
       {newestFirst.map((roll) => (
-        <li key={roll.id} className={styles.row}>
-          <Text as="span" size="sm" weight="semibold" className={styles.who}>
+        <li key={roll.id} className="roll-log-row">
+          <Text as="span" size="sm" weight="semibold" className="roll-log-who">
             {roll.characterName || 'Someone'}
           </Text>
-          <Text as="span" size="sm" color="muted" className={styles.move}>
+          <Text as="span" size="sm" color="muted" className="roll-log-move">
             {roll.notation ?? (
               <>
                 {roll.moveName} {statLabel(roll)}
@@ -54,10 +54,10 @@ export const RollLog = ({ rolls }: RollLogProps) => {
               </>
             )}
           </Text>
-          <Text as="span" size="sm" className={cn(styles.result, roll.breakdown && styles.resultWrap)}>
-            {roll.breakdown ?? diceExpr(roll)} = <span className={styles.total}>{roll.total}</span>
-            {roll.band && <span className={styles.band}> ({roll.band})</span>}
-            {roll.burned && <span className={styles.band}> burned brightly</span>}
+          <Text as="span" size="sm" className={cn('roll-log-result', roll.breakdown && 'roll-log-result-wrap')}>
+            {roll.breakdown ?? diceExpr(roll)} = <span className="roll-log-total">{roll.total}</span>
+            {roll.band && <span className="roll-log-band"> ({roll.band})</span>}
+            {roll.burned && <span className="roll-log-band"> burned brightly</span>}
           </Text>
         </li>
       ))}

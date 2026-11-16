@@ -3,7 +3,7 @@ import { cn } from '@dice-jar/cn';
 import { Checkbox, Text } from '@/components/ui';
 import { UseDots } from '@/components/ui/UseDots/UseDots';
 import { consequenceMarkId, parseConsequenceMarks } from '../arcanaParsing';
-import styles from '../arcanaCard.module.css';
+import '../arcanaCard.css';
 
 interface ConsequenceRowProps {
   id: string;
@@ -42,14 +42,14 @@ export const ConsequenceRow = ({
   const handleTracker = useCallback((v: number) => onTrackerChange?.(id, v), [id, onTrackerChange]);
   // The first box marked means the consequence is in effect: its left spine goes solid and the row
   // takes a faint danger wash.
-  const rowCx = cn(styles.consequenceRow, checkedMarks[0] && styles.consequenceRowMarked);
+  const rowCx = cn('arcana-card-consequence-row', checkedMarks[0] && 'arcana-card-consequence-row-marked');
   // Not a <label>: each box is its own labelable control, so wrapping the shared prose in one label
   // would bind every click to only the first box. Each box is named by the prose instead (via
   // aria-labelledby, so the rendered text—not its markdown markers—is read), plus a hidden position
   // when there is more than one box.
   return (
     <div className={rowCx}>
-      <span className={styles.consequenceMarks}>
+      <span className="arcana-card-consequence-marks">
         {Array.from({ length: markCount }, (_, i) => {
           const markId = consequenceMarkId(id, i);
           const posId = `${proseId}-pos-${i}`;
@@ -65,7 +65,7 @@ export const ConsequenceRow = ({
         })}
         {markCount > 1 &&
           Array.from({ length: markCount }, (_, i) => (
-            <span key={`${proseId}-pos-${i}`} id={`${proseId}-pos-${i}`} className={styles.srOnly}>
+            <span key={`${proseId}-pos-${i}`} id={`${proseId}-pos-${i}`} className="arcana-card-sr-only">
               mark {i + 1} of {markCount}
             </span>
           ))}

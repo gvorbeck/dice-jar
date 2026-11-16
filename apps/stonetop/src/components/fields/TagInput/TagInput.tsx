@@ -1,7 +1,7 @@
 import { useState, useRef, useId, useCallback, useEffect, useMemo, memo } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button } from '@/components/ui';
-import styles from './TagInput.module.css';
+import './TagInput.css';
 
 interface TagInputProps {
   label?: string;
@@ -20,9 +20,9 @@ interface TagChipProps {
 const TagChip = memo(({ tag, onRemove }: TagChipProps) => {
   const handleRemove = useCallback(() => onRemove(tag), [tag, onRemove]);
   return (
-    <span className={styles.tag}>
+    <span className="tag-input-tag">
       {tag}
-      <button type="button" className={styles.tagRemove} onClick={handleRemove} aria-label={`Remove trait: ${tag}`}>
+      <button type="button" className="tag-input-tag-remove" onClick={handleRemove} aria-label={`Remove trait: ${tag}`}>
         ×
       </button>
     </span>
@@ -46,7 +46,7 @@ const SuggestionItem = memo(({ suggestion, index, isActive, listboxId, onAdd }: 
     [suggestion, onAdd],
   );
 
-  const cx = cn(styles.option, isActive && styles.optionActive);
+  const cx = cn('tag-input-option', isActive && 'tag-input-option-active');
 
   return (
     <div id={`${listboxId}-option-${index}`} role="option" aria-selected={isActive} className={cx} onPointerDown={handlePointerDown}>
@@ -149,17 +149,17 @@ export const TagInput = ({ label, value, onChange, suggestions = [], placeholder
   }, []);
 
   const showDropdown = open && filtered.length > 0;
-  const cx = cn(styles.root, className);
+  const cx = cn('tag-input', className);
 
   return (
     <div className={cx} ref={containerRef}>
       {label && (
-        <label htmlFor={inputId} className={styles.label}>
+        <label htmlFor={inputId} className="tag-input-label">
           {label}
         </label>
       )}
-      <div className={styles.fieldRow}>
-        <div className={styles.field}>
+      <div className="tag-input-field-row">
+        <div className="tag-input-field">
           {value.map((tag) => (
             <TagChip key={tag} tag={tag} onRemove={removeTag} />
           ))}
@@ -167,7 +167,7 @@ export const TagInput = ({ label, value, onChange, suggestions = [], placeholder
             ref={inputRef}
             id={inputId}
             type="text"
-            className={styles.input}
+            className="tag-input-input"
             value={inputVal}
             placeholder={value.length === 0 ? placeholder : ''}
             onChange={handleInputChange}
@@ -192,7 +192,7 @@ export const TagInput = ({ label, value, onChange, suggestions = [], placeholder
             aria-label="Assign random trait"
           />
         )}
-        <div id={listboxId} role="listbox" aria-label="Trait suggestions" className={styles.dropdown} hidden={!showDropdown}>
+        <div id={listboxId} role="listbox" aria-label="Trait suggestions" className="tag-input-dropdown" hidden={!showDropdown}>
           {showDropdown &&
             filtered.map((s, i) => (
               <SuggestionItem key={s} suggestion={s} index={i} isActive={i === activeIndex} listboxId={listboxId} onAdd={addTag} />

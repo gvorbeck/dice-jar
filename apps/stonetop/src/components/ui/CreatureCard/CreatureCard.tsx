@@ -6,7 +6,7 @@ import { List } from '../List/List';
 import { Text } from '../Text/Text';
 import { UseDots } from '../UseDots/UseDots';
 import type { Creature } from '@/types';
-import styles from './CreatureCard.module.css';
+import './CreatureCard.css';
 
 const handleNumberWheel = (e: React.WheelEvent<HTMLInputElement>) => e.currentTarget.blur();
 
@@ -24,12 +24,12 @@ interface StatBoxProps {
 const StatBox = memo(({ label, note, value, ariaLabel, onChange, onBlur }: StatBoxProps) => {
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value), [onChange]);
   return (
-    <div className={styles.statBox}>
-      <Text as="span" font="serif" size="sm" weight="bold" className={styles.statBoxLabel}>
+    <div className="creature-card-stat-box">
+      <Text as="span" font="serif" size="sm" weight="bold" className="creature-card-stat-box-label">
         {label}
       </Text>
       <Input
-        className={styles.statInput}
+        className="creature-card-stat-input"
         type="number"
         value={value}
         min={0}
@@ -39,7 +39,7 @@ const StatBox = memo(({ label, note, value, ariaLabel, onChange, onBlur }: StatB
         onWheel={handleNumberWheel}
       />
       {note !== undefined && (
-        <Text as="span" font="serif" size="xs" color="muted" italic className={styles.statBoxNote}>
+        <Text as="span" font="serif" size="xs" color="muted" italic className="creature-card-stat-box-note">
           {note}
         </Text>
       )}
@@ -58,7 +58,7 @@ export interface CreatureCardProps {
 
 export const CreatureCard = memo(({ creature, onFieldChange, onBlur, className }: CreatureCardProps) => {
   const headingId = useId();
-  const cx = cn(styles.card, className);
+  const cx = cn('creature-card-card', className);
 
   const handleName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onFieldChange('name', e.target.value), [onFieldChange]);
   const handleHp = useCallback((value: string) => onFieldChange('hp', value), [onFieldChange]);
@@ -70,13 +70,13 @@ export const CreatureCard = memo(({ creature, onFieldChange, onBlur, className }
 
   return (
     <section className={cx} aria-labelledby={headingId}>
-      <Heading as="h3" id={headingId} className={styles.srOnly}>
+      <Heading as="h3" id={headingId} className="creature-card-sr-only">
         {creatureLabel}
       </Heading>
-      <div className={styles.body}>
-        <div className={styles.main}>
+      <div className="creature-card-body">
+        <div className="creature-card-main">
           <Input
-            className={styles.nameInput}
+            className="creature-card-name-input"
             type="text"
             value={creature.name ?? ''}
             placeholder="Name"
@@ -85,12 +85,12 @@ export const CreatureCard = memo(({ creature, onFieldChange, onBlur, className }
             onBlur={onBlur}
           />
           {creature.tags && (
-            <Text as="span" font="serif" italic color="muted" className={styles.tags}>
+            <Text as="span" font="serif" italic color="muted" className="creature-card-tags">
               {creature.tags}
             </Text>
           )}
           {(creature.qualities ?? []).length > 0 && (
-            <div className={styles.qualities}>
+            <div className="creature-card-qualities">
               {(creature.qualities ?? []).map((quality, i) => (
                 <Text key={`quality-${creature.id}-${i}`} as="span" font="serif">
                   {quality.label && (
@@ -106,16 +106,16 @@ export const CreatureCard = memo(({ creature, onFieldChange, onBlur, className }
             </div>
           )}
           {!creature.hideLoyalty && (
-            <div className={styles.loyalty}>
-              <Text as="span" font="serif" weight="bold" className={styles.fieldLabel}>
+            <div className="creature-card-loyalty">
+              <Text as="span" font="serif" weight="bold" className="creature-card-field-label">
                 Loyalty
               </Text>
               <UseDots total={3} checked={creature.loyalty ?? 0} onChange={handleLoyalty} ariaLabel="Loyalty" />
             </div>
           )}
           {(creature.moves ?? []).length > 0 && (
-            <div className={styles.moves}>
-              <Text as="span" font="serif" weight="bold" className={styles.fieldLabel}>
+            <div className="creature-card-moves">
+              <Text as="span" font="serif" weight="bold" className="creature-card-field-label">
                 Moves
               </Text>
               <List variant="bullet" items={creature.moves ?? []} keyPrefix={`move-${creature.id}`} />
@@ -124,7 +124,7 @@ export const CreatureCard = memo(({ creature, onFieldChange, onBlur, className }
           {creature.notes && <Text font="serif">{creature.notes}</Text>}
         </div>
 
-        <div className={styles.statBoxes}>
+        <div className="creature-card-stat-boxes">
           <StatBox label="HP" note={hpNote} value={creature.hp ?? ''} ariaLabel="Current HP" onChange={handleHp} onBlur={onBlur} />
           <StatBox
             label="Armor"

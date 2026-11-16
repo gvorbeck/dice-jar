@@ -82,7 +82,7 @@ import type { SheetGuard } from '@/lib/statDeltas';
 import type { AdditiveStat, Character, CharacterData, GameSession, LoggedRoll, NotesLock, PlaybookType, PlaybookFeatures } from '@/types';
 import type { RollReport } from '@/components/character/Move/RollAffordance';
 import { CharacterRollContext } from '@/components/character/Move/CharacterRollContext';
-import styles from './CharacterPlaybook.module.css';
+import './CharacterPlaybook.css';
 
 type PlaybookSectionComponent = ComponentType<{ data: CharacterData | undefined; onSave: (data: Partial<CharacterData>) => Promise<void> }>;
 type PlaybookSectionEntry = { key: string; Component: PlaybookSectionComponent };
@@ -143,7 +143,7 @@ const PCPlaybookTab = ({
   const hpMax = pfgHpUpgrade ? (playbookOption?.hpMax ?? 0) + 4 : playbookOption?.hpMax;
 
   return (
-    <div className={styles.layout}>
+    <div className="character-playbook-layout">
       <PlaybookColumns
         left={
           <>
@@ -198,7 +198,7 @@ const PCPlaybookTab = ({
           PLAYBOOK_SECTIONS[playbook] ? (
             <Suspense
               fallback={
-                <div className={styles.centered}>
+                <div className="character-playbook-centered">
                   <Spinner />
                 </div>
               }
@@ -243,7 +243,7 @@ type PlaybookTabConfig = {
 const lazyTab = (node: ReactNode): ReactNode => (
   <Suspense
     fallback={
-      <div className={styles.centered}>
+      <div className="character-playbook-centered">
         <Spinner />
       </div>
     }
@@ -515,13 +515,13 @@ const CharacterSheet = ({
         <ScrollToTop sentinelRef={headerRef} />
         <div ref={headerRef} />
         {playbookOption.description && (
-          <Text font="serif" size="lg" italic className={styles.description}>
+          <Text font="serif" size="lg" italic className="character-playbook-description">
             {playbookOption.description}
           </Text>
         )}
         <Tabs
           aria-label="Character sections"
-          className={styles.tabs}
+          className="character-playbook-tabs"
           tabs={tabs}
           activeIndex={activeIndex}
           onActiveChange={handleActiveChange}
@@ -576,7 +576,7 @@ const CharacterPlaybookContent = ({
   if (!playbookOption) {
     return (
       <PageLayout simple>
-        <div className={styles.centered}>
+        <div className="character-playbook-centered">
           <Heading as="h2" size="md">
             Playbook not found
           </Heading>
@@ -592,7 +592,7 @@ const CharacterPlaybookContent = ({
     return (
       <PageLayout simple>
         <PageMeta noindex title="Character not found — Hearthfire" description="This game has no character with that playbook." />
-        <div className={styles.centered}>
+        <div className="character-playbook-centered">
           <Heading as="h2" size="md">
             Character not found
           </Heading>

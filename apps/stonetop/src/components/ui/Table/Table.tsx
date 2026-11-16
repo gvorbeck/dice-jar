@@ -1,6 +1,6 @@
 import { cn } from '@dice-jar/cn';
 import { Radio } from '../Radio/Radio';
-import styles from './Table.module.css';
+import './Table.css';
 
 type DataRow = { label: string; value: string; indent?: boolean };
 type GroupRow = { group: string };
@@ -41,10 +41,10 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
   const columnCount = columnHeaders?.length ?? 2;
   // N-column (cells) tables keep every header left-aligned; only the classic two-column label/value
   // tables right-align the trailing value column.
-  const thClass = cn(styles.tableTh, hasCells && styles.tableThStart);
+  const thClass = cn('table-table-th', hasCells && 'table-table-th-start');
 
   const table = (
-    <table className={bordered ? styles.tableBordered : styles.table}>
+    <table className={bordered ? 'table-table-bordered' : 'table-table'}>
       {columnHeaders && (
         <thead>
           <tr>
@@ -60,8 +60,8 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
         {rows.map((row, i) => {
           if (isGroup(row)) {
             return (
-              <tr key={`group-${i}-${row.group}`} className={styles.tableGroupRow}>
-                <td colSpan={columnCount} className={styles.tableGroupCell}>
+              <tr key={`group-${i}-${row.group}`} className="table-table-group-row">
+                <td colSpan={columnCount} className="table-table-group-cell">
                   {row.group}
                 </td>
               </tr>
@@ -69,14 +69,14 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
           }
           if (isCells(row)) {
             const trClass = cn(
-              styles.tableCellsRow,
-              row.selectable && !row.disabled && styles.tableSelectableRow,
-              row.selected && styles.tableSelectedRow,
+              'table-table-cells-row',
+              row.selectable && !row.disabled && 'table-table-selectable-row',
+              row.selected && 'table-table-selected-row',
             );
             return (
               <tr key={`cells-${row.id}`} className={trClass}>
                 {row.cells.map((cell, c) => (
-                  <td key={`cell-${row.id}-${c}`} className={styles.tableCell}>
+                  <td key={`cell-${row.id}-${c}`} className="table-table-cell">
                     {row.selectable && c === 0 ? (
                       <Radio
                         checked={!!row.selected}
@@ -95,8 +95,8 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
           }
           return (
             <tr key={`row-${i}-${row.label}`}>
-              <td className={row.indent ? styles.tableCellIndent : styles.tableCell}>{row.label}</td>
-              <td className={styles.tableValue}>{row.value}</td>
+              <td className={row.indent ? 'table-table-cell-indent' : 'table-table-cell'}>{row.label}</td>
+              <td className="table-table-value">{row.value}</td>
             </tr>
           );
         })}
@@ -106,8 +106,8 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
 
   if (bordered) {
     return (
-      <div className={styles.tableWrapper}>
-        {title && <div className={styles.tableTitle}>{title}</div>}
+      <div className="table-table-wrapper">
+        {title && <div className="table-table-title">{title}</div>}
         {table}
       </div>
     );

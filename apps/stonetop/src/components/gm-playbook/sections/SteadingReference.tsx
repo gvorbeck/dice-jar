@@ -10,7 +10,7 @@ import {
   BARRIER_PASS_NAMES_STR,
 } from '@/lib/npcNames';
 import type { SteadingData } from '@/types';
-import styles from './SteadingReference.module.css';
+import './SteadingReference.css';
 
 const TRAITS_COL_A = [
   'all thumbs',
@@ -119,7 +119,7 @@ export const PlacesOfInterest = ({ placesOfInterest, onSave }: PlacesOfInterestP
   const savePlaces = useCallback((items: string[]) => onSave({ placesOfInterest: items }), [onSave]);
 
   return (
-    <div className={styles.places}>
+    <div className="steading-reference-places">
       <Text size="xs" color="muted">
         Key locations on the village map. Add PC homes and notable NPC homes as established in play.
       </Text>
@@ -158,17 +158,17 @@ export const NpcTraits = () => (
     <Text size="xs" color="muted">
       Assign as needed; choose from this list or make up your own.
     </Text>
-    <div className={styles.traitsGrid}>
-      <ul className={styles.traitsList} aria-label="NPC traits (first half)">
+    <div className="steading-reference-traits-grid">
+      <ul className="steading-reference-traits-list" aria-label="NPC traits (first half)">
         {TRAITS_COL_A.map((t) => (
-          <li key={t} className={styles.trait}>
+          <li key={t} className="steading-reference-trait">
             {t}
           </li>
         ))}
       </ul>
-      <ul className={styles.traitsList} aria-label="NPC traits (second half)">
+      <ul className="steading-reference-traits-list" aria-label="NPC traits (second half)">
         {TRAITS_COL_B.map((t) => (
-          <li key={t} className={styles.trait}>
+          <li key={t} className="steading-reference-trait">
             {t}
           </li>
         ))}

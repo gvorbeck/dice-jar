@@ -24,7 +24,7 @@ import { SteadingNPCs } from '@/components/gm-playbook/sections/SteadingNPCs/Ste
 import { RelationshipGraph } from '@/components/gm-playbook/sections/SteadingNPCs/RelationshipGraph';
 import { PlacesOfInterest, ReferenceNames, NpcTraits } from '@/components/gm-playbook/sections/SteadingReference';
 import type { GameSession, LoggedRoll, SteadingData, SteadingNPC } from '@/types';
-import styles from './SteadingPlaybook.module.css';
+import './SteadingPlaybook.css';
 
 interface SteadingContentProps {
   g: GameSession;
@@ -44,7 +44,7 @@ const NpcFilterRow = ({ g, npcFilter, onFilterChange }: NpcFilterRowProps) => {
   const groups = useMemo(() => buildFilterGroups(g), [g]);
   if (groups.length === 0) return null;
   return (
-    <div className={styles.npcFilterRow}>
+    <div className="steading-playbook-npc-filter-row">
       <Dropdown
         id="npc-relationship-filter"
         aria-label="Filter NPCs by relationship"
@@ -52,10 +52,10 @@ const NpcFilterRow = ({ g, npcFilter, onFilterChange }: NpcFilterRowProps) => {
         value={npcFilter}
         onChange={onFilterChange}
         placeholder="Filter by relationship…"
-        className={styles.npcFilterDropdown}
+        className="steading-playbook-npc-filter-dropdown"
       />
       {npcFilter && (
-        <Button variant="ghost" size="sm" className={styles.npcFilterClear} onClick={() => onFilterChange('')}>
+        <Button variant="ghost" size="sm" className="steading-playbook-npc-filter-clear" onClick={() => onFilterChange('')}>
           Clear filter
         </Button>
       )}
@@ -146,7 +146,7 @@ interface NpcsTabProps {
 }
 
 const NpcsTab = ({ g, steading, updateSteading, npcFilter, onFilterChange }: NpcsTabProps) => (
-  <div className={styles.npcsLayout}>
+  <div className="steading-playbook-npcs-layout">
     <NpcFilterRow g={g} npcFilter={npcFilter} onFilterChange={onFilterChange} />
     <PlaybookColumns
       left={
@@ -236,7 +236,7 @@ const SteadingContent = ({ g, id, updateSteading, logRoll, notesActions }: Stead
       <div ref={headerRef} />
       <Tabs
         aria-label="Steading sections"
-        className={styles.tabs}
+        className="steading-playbook-tabs"
         tabs={tabs}
         activeIndex={activeIndex}
         onActiveChange={handleActiveChange}

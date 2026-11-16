@@ -1,7 +1,7 @@
 import { useState, useId, useCallback, useMemo } from 'react';
 import { Button, Heading, Modal, Radio, RadioGroup } from '@/components/ui';
 import { INSERT_TABS, type InsertOption } from '@/lib/insertTabs';
-import styles from './AddInsertModal.module.css';
+import './AddInsertModal.css';
 
 interface AddInsertModalProps {
   open: boolean;
@@ -30,12 +30,12 @@ export const AddInsertModal = ({ open, existingInserts, onClose, onAdd }: AddIns
       <Heading as="h2" size="md" id={headingId}>
         Add an Insert
       </Heading>
-      <RadioGroup legend="Insert type" legendHidden className={styles.options}>
+      <RadioGroup legend="Insert type" legendHidden className="add-insert-modal-options">
         {availableOptions.map(({ id, label }) => (
           <Radio key={id} name="insert-option" value={id} label={label} checked={selected === id} onChange={handleSelectChange} />
         ))}
       </RadioGroup>
-      <div className={styles.actions}>
+      <div className="add-insert-modal-actions">
         <Button variant="secondary" onClick={onClose}>
           Cancel
         </Button>

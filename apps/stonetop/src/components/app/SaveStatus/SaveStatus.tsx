@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button, Icon, Text } from '@/components/ui';
 import { useSaveStatusOptional } from './SaveStatusContext';
-import styles from './SaveStatus.module.css';
+import './SaveStatus.css';
 
 // Coarse buckets are enough for an ambient indicator — under a minute reads as
 // "just now", then minutes, then hours. Avoids second-by-second churn.
@@ -57,7 +57,7 @@ export const SaveStatus = () => {
   const label = isSaving ? 'Saving…' : lastSavedAt !== null ? `Saved · ${formatRelative(lastSavedAt, now)}` : 'Saved';
   const isDismissed = status === 'saved' && lastSavedAt === dismissedAt;
   const isIdle = !ctx || status === 'idle' || isDismissed;
-  const cx = cn(styles.root, !isIdle && styles.visible);
+  const cx = cn('save-status', !isIdle && 'save-status-visible');
 
   // The role="status" live region is always mounted so screen readers announce
   // the first "Saving…" — a region added to the DOM together with its text is
@@ -67,9 +67,9 @@ export const SaveStatus = () => {
       {isIdle ? null : (
         <>
           {isSaving ? (
-            <span className={styles.spinner} aria-hidden="true" />
+            <span className="save-status-spinner" aria-hidden="true" />
           ) : (
-            <Icon name="check" size="small" className={styles.icon} aria-hidden="true" />
+            <Icon name="check" size="small" className="save-status-icon" aria-hidden="true" />
           )}
           <Text as="span" size="xs" color={isSaving ? 'default' : 'muted'}>
             {label}
@@ -78,7 +78,7 @@ export const SaveStatus = () => {
             <Button
               variant="ghost"
               icon="close"
-              className={styles.dismiss}
+              className="save-status-dismiss"
               onClick={() => setDismissedAt(lastSavedAt)}
               aria-label="Dismiss saved indicator"
             />

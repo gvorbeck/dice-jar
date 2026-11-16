@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { cn } from '@dice-jar/cn';
 import { parseInlineMarkdown } from '@/lib/parseMarkdown';
-import styles from './Heading.module.css';
+import './Heading.css';
 
 interface HeadingProps {
   as?: 'h1' | 'h2' | 'h3' | 'h4';
@@ -12,7 +12,7 @@ interface HeadingProps {
 }
 
 export const Heading = ({ as: Tag = 'h2', size = 'lg', className, id, children }: HeadingProps) => {
-  const cx = cn(styles.base, styles[size], className);
+  const cx = cn('heading-base', `heading-${size}`, className);
   const content = typeof children === 'string' ? parseInlineMarkdown(children) : children;
 
   return (

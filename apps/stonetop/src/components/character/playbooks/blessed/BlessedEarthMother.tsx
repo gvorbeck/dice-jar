@@ -4,7 +4,7 @@ import { CheckboxGroup, Divider, Radio, RadioGroup, Text } from '@/components/ui
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { resolvePlaybookFeatures, featurePatch } from '@/lib/resolvePlaybookFeatures';
 import type { PlaybookSectionProps } from '@/types';
-import styles from './BlessedEarthMother.module.css';
+import './BlessedEarthMother.css';
 
 const SHRINE_OPTIONS = [
   '... loved, well-used, dripping with offerings and petitions.',
@@ -53,16 +53,16 @@ export const BlessedEarthMother = ({ data, onSave }: BlessedEarthMotherProps) =>
 
   return (
     <PlaybookSection title="The Earth Mother">
-      <div className={styles.body}>
+      <div className="blessed-earth-mother-body">
         <Text size="xs" color="muted" leading="normal">
           {
             "Danu has long been revered by all peoples, though not always worshipped or served by priests. In Stonetop's Pavilion of the Gods, Danu's shrine is…"
           }
         </Text>
-        <Text size="xs" color="muted" className={styles.instruction}>
+        <Text size="xs" color="muted" className="blessed-earth-mother-instruction">
           (choose 1)
         </Text>
-        <RadioGroup legend="The shrine is…" legendHidden className={styles.shrineOptions}>
+        <RadioGroup legend="The shrine is…" legendHidden className="blessed-earth-mother-shrine-options">
           {SHRINE_OPTIONS.map((opt) => (
             <Radio key={opt} name="earth-mother-shrine" value={opt} checked={shrine === opt} onChange={() => saveShrine(opt)} label={opt} />
           ))}

@@ -4,7 +4,7 @@ import { useToast } from '@/components/app';
 import { PLAYBOOKS, getPlaybook } from '@/lib/constants';
 import { generateId } from '@/lib/id';
 import type { Character, PlaybookType } from '@/types';
-import styles from './AddCharacterModal.module.css';
+import './AddCharacterModal.css';
 
 interface AddCharacterModalProps {
   open: boolean;
@@ -61,11 +61,11 @@ export const AddCharacterModal = ({ open, onClose, existingPlaybooks, onAdd }: A
         disabled={adding}
       />
       {selectedPlaybook && (
-        <Text color="muted" className={styles.description}>
+        <Text color="muted" className="add-character-modal-description">
           {selectedPlaybook.description}
         </Text>
       )}
-      <div className={styles.actions}>
+      <div className="add-character-modal-actions">
         <Button type="button" variant="secondary" onClick={handleClose} size="md" disabled={adding}>
           Cancel
         </Button>

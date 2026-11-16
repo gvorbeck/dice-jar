@@ -1,6 +1,6 @@
 import { forwardRef, type ForwardedRef, type SelectHTMLAttributes } from 'react';
 import { cn } from '@dice-jar/cn';
-import styles from './Dropdown.module.css';
+import './Dropdown.css';
 
 interface DropdownOption<T extends string> {
   value: T;
@@ -44,20 +44,20 @@ const DropdownInner = <T extends string>(
   { label, id, options, groups, value, onChange, placeholder = 'Select…', className, ...props }: DropdownProps<T>,
   ref: ForwardedRef<HTMLSelectElement>,
 ) => {
-  const selectCx = cn(styles.select, !value && styles.placeholder, className);
+  const selectCx = cn('dropdown-select', !value && 'dropdown-placeholder', className);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onChange(e.target.value as T);
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className="dropdown-wrapper">
       {label && (
-        <label htmlFor={id} className={styles.label}>
+        <label htmlFor={id} className="dropdown-label">
           {label}
         </label>
       )}
-      <div className={styles.selectWrapper}>
+      <div className="dropdown-select-wrapper">
         <select ref={ref} id={id} className={selectCx} value={value} onChange={handleChange} {...props}>
           <option value="" disabled>
             {placeholder}
@@ -78,7 +78,7 @@ const DropdownInner = <T extends string>(
                 </option>
               ))}
         </select>
-        <span className={styles.chevron} aria-hidden="true" />
+        <span className="dropdown-chevron" aria-hidden="true" />
       </div>
     </div>
   );

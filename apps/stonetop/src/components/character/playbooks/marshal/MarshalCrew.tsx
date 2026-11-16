@@ -13,7 +13,7 @@ import { useCrewSave } from '../shared/useCrewSave';
 import { useTrackedField } from '../shared/useTrackedField';
 import { StatBox, LoyaltyRow, CustomItemsGrid } from '../shared/CrewWidgets';
 import type { PlaybookSectionProps } from '@/types';
-import styles from './MarshalCrew.module.css';
+import './MarshalCrew.css';
 
 const CREW_HP_BASE = 6;
 const CREW_DAMAGE_DICE = ['d6', 'd8', 'd10'] as const;
@@ -142,14 +142,14 @@ const InventoryRow = memo(({ item, checked, onCheckedChange }: InventoryRowProps
     [item.id, onCheckedChange],
   );
   return (
-    <div className={styles.inventoryItem}>
+    <div className="marshal-crew-inventory-item">
       <Checkbox
         variant="provision"
         weight={item.weight ?? 1}
         checked={checked}
         onChange={handleChecked}
         label={
-          <Text as="span" className={styles.inventoryLabel}>
+          <Text as="span" className="marshal-crew-inventory-label">
             {item.label}
           </Text>
         }
@@ -176,10 +176,10 @@ const IndividualSlot = memo(({ index, name, tag, traits, onChange, onBlur }: Ind
   );
 
   return (
-    <div className={styles.individual}>
-      <div className={styles.individualFields}>
+    <div className="marshal-crew-individual">
+      <div className="marshal-crew-individual-fields">
         <Input
-          className={styles.individualInput}
+          className="marshal-crew-individual-input"
           type="text"
           value={name}
           placeholder="Name"
@@ -188,7 +188,7 @@ const IndividualSlot = memo(({ index, name, tag, traits, onChange, onBlur }: Ind
           onBlur={onBlur}
         />
         <Input
-          className={styles.individualInput}
+          className="marshal-crew-individual-input"
           type="text"
           value={tag}
           placeholder="Tag"
@@ -199,7 +199,7 @@ const IndividualSlot = memo(({ index, name, tag, traits, onChange, onBlur }: Ind
       </div>
       <Input
         multiline
-        className={styles.individualTraits}
+        className="marshal-crew-individual-traits"
         value={traits}
         placeholder="Traits"
         aria-label={`Individual ${index + 1} traits`}
@@ -513,13 +513,13 @@ export const MarshalCrew = ({ data, prosperity, onSave }: MarshalCrewProps) => {
   );
 
   return (
-    <div className={styles.root}>
+    <div className="marshal-crew">
       <PlaybookSection title="Crew">
         <Text font="serif" color="muted" leading="normal">
           Your Crew is a half-dozen strong by default. Treat them as a follower with the *group* tag. All starting values here are subject
           to change in play.
         </Text>
-        <div className={styles.infoBoxes}>
+        <div className="marshal-crew-info-boxes">
           <StatBox
             ariaLabel="Crew HP"
             value={hp}
@@ -577,12 +577,12 @@ export const MarshalCrew = ({ data, prosperity, onSave }: MarshalCrewProps) => {
           </Text>
         )}
         <CheckboxGroup items={tagItemsWithDisable} checked={tagsChecked} onChange={handleTagChange} columns="responsive-2-4-6" />
-        <div className={styles.customTagsRow}>
+        <div className="marshal-crew-custom-tags-row">
           {tagsCustom.map((val, i) => (
             <Input
               key={CUSTOM_TAG_SLOT_IDS[i]}
               data-index={i}
-              className={styles.customTagInput}
+              className="marshal-crew-custom-tag-input"
               type="text"
               value={val}
               placeholder="Custom tag"
@@ -592,7 +592,7 @@ export const MarshalCrew = ({ data, prosperity, onSave }: MarshalCrewProps) => {
             />
           ))}
         </div>
-        <div className={styles.exceptionalRow}>
+        <div className="marshal-crew-exceptional-row">
           <Checkbox
             checked={isExceptional}
             disabled={!hasHeroesToTheLast}
@@ -609,7 +609,7 @@ export const MarshalCrew = ({ data, prosperity, onSave }: MarshalCrewProps) => {
         </div>
       </PlaybookSection>
 
-      <div className={styles.columns}>
+      <div className="marshal-crew-columns">
         <OptionSelect
           name="marshal-crew"
           options={INSTINCT_OPTIONS}
@@ -629,7 +629,7 @@ export const MarshalCrew = ({ data, prosperity, onSave }: MarshalCrewProps) => {
               value={loyalty}
               onChange={handleLoyaltyChange}
               label={
-                <Text as="span" font="serif" color="muted" className={styles.loyaltyLabel}>
+                <Text as="span" font="serif" color="muted" className="marshal-crew-loyalty-label">
                   Loyalty
                 </Text>
               }
@@ -643,7 +643,7 @@ export const MarshalCrew = ({ data, prosperity, onSave }: MarshalCrewProps) => {
           3 ◈ or fewer is a light load; 4-6 ◈ is a normal load; 7-9 ◈ is a heavy load.
         </Text>
         <Divider />
-        <div className={styles.inventoryList}>
+        <div className="marshal-crew-inventory-list">
           {INVENTORY_ITEMS.map((item) => (
             <InventoryRow
               key={item.id}
@@ -653,7 +653,7 @@ export const MarshalCrew = ({ data, prosperity, onSave }: MarshalCrewProps) => {
             />
           ))}
           {inventoryChecked['supplies'] && (
-            <div className={styles.suppliesGrid}>
+            <div className="marshal-crew-supplies-grid">
               {Array.from({ length: CREW_SIZE }, (_, i) => (
                 <SuppliesMemberDots
                   key={`supplies-member-slot-${i}`}
@@ -693,7 +693,7 @@ export const MarshalCrew = ({ data, prosperity, onSave }: MarshalCrewProps) => {
           eye/finger/hand/__, misses their kids, nightmares, recently married, religious, scars, skinny, sharp-tongued, sings, snores, tells
           tall tales, too serious, troubles at home, whistles, whittler
         </Text>
-        <div className={styles.individualsGrid}>
+        <div className="marshal-crew-individuals-grid">
           {individuals.map((ind, i) => (
             <IndividualSlot
               key={`crew-individual-slot-${i}`}

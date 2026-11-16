@@ -1,0 +1,38 @@
+@import '../../../ui/field.css';
+
+.move-search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.move-search-input {
+  width: 100%;
+}
+
+.move-search-empty {
+  padding: var(--spacing-2) 0;
+}
+
+.move-search-results {
+  margin-top: var(--spacing-3);
+}
+
+.move-search-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.move-search-item {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: var(--spacing-3);
+}
+
+.move-search-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}

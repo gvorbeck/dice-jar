@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Text, Input } from '@/components/ui';
 import { useDebouncedTextField } from '@/hooks/useDebouncedTextField';
 import type { ContentLists } from '@/types';
-import styles from '@/pages/GmPlaybook/GmPlaybook.module.css';
+import '@/pages/GmPlaybook/GmPlaybook.css';
 
 interface ContentSectionProps {
   content: ContentLists | undefined;
@@ -19,8 +19,8 @@ export const ContentSection = ({ content, onSave }: ContentSectionProps) => {
   const special = useDebouncedTextField(content?.specialHandling ?? '', saveSpecial);
 
   return (
-    <div className={styles.contentForm}>
-      <div className={styles.contentRules}>
+    <div className="gm-playbook-content-form">
+      <div className="gm-playbook-content-rules">
         <Text size="xs">Keep this in sync with the steading playbook. Review it at the start of each session.</Text>
         <Text size="xs">
           When **anyone calls "time out,"** play stops. Step out of character, check in with each other, maybe take a break. Discuss what's

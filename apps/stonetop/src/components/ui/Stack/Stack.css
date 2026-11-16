@@ -1,0 +1,51 @@
+.stack-base {
+  display: flex;
+}
+
+.stack-column {
+  flex-direction: column;
+}
+
+.stack-row {
+  flex-direction: row;
+}
+
+.stack-align-start {
+  align-items: flex-start;
+}
+
+.stack-align-center {
+  align-items: center;
+}
+
+.stack-align-end {
+  align-items: flex-end;
+}
+
+.stack-align-stretch {
+  align-items: stretch;
+}
+
+.stack-gap-1 {
+  gap: var(--spacing-1);
+}
+
+.stack-gap-2 {
+  gap: var(--spacing-2);
+}
+
+.stack-gap-3 {
+  gap: var(--spacing-3);
+}
+
+.stack-gap-4 {
+  gap: var(--spacing-4);
+}
+
+.stack-gap-6 {
+  gap: var(--spacing-6);
+}
+
+.stack-gap-8 {
+  gap: var(--spacing-8);
+}

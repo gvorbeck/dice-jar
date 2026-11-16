@@ -8,7 +8,7 @@ import { useToast } from '@/components/app';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import type { Possession, PossessionSubItem, PlaybookSpecialPossessions } from '@/lib/characterCreation/specialPossessionsOptions';
 import type { CharacterData } from '@/types';
-import styles from './SpecialPossessions.module.css';
+import './SpecialPossessions.css';
 
 const PICK_COUNT = 2;
 
@@ -56,12 +56,12 @@ const SubItem = ({
   onRadioSelect,
   onUses,
 }: SubItemProps) => {
-  const liCx = cn(styles.subItem, styles.subItemSelectable);
+  const liCx = cn('special-possessions-sub-item', 'special-possessions-sub-item-selectable');
 
   if (typeof item === 'string') {
     return (
-      <li className={styles.subItem}>
-        <Text as="span" className={styles.labelText}>
+      <li className="special-possessions-sub-item">
+        <Text as="span" className="special-possessions-label-text">
           {item}
         </Text>
       </li>
@@ -81,9 +81,9 @@ const SubItem = ({
             checked={subChecked}
             disabled={!parentChecked}
             onChange={() => onRadioSelect(possessionId, key)}
-            className={styles.subItemCheckbox}
+            className="special-possessions-sub-item-checkbox"
             label={
-              <Text as="span" className={styles.labelText}>
+              <Text as="span" className="special-possessions-label-text">
                 {item.label}
               </Text>
             }
@@ -101,15 +101,15 @@ const SubItem = ({
           checked={subChecked}
           disabled={!parentChecked || (!subChecked && atSubMax)}
           onChange={(e) => onToggle(key, e.target.checked)}
-          className={styles.subItemCheckbox}
+          className="special-possessions-sub-item-checkbox"
           label={
-            <Text as="span" className={styles.labelText}>
+            <Text as="span" className="special-possessions-label-text">
               {item.label}
             </Text>
           }
         />
         {item.uses !== undefined && (
-          <span className={styles.subItemDots}>
+          <span className="special-possessions-sub-item-dots">
             <UseDots
               total={item.uses}
               checked={uses[key] ?? 0}
@@ -129,13 +129,13 @@ const SubItem = ({
   }
 
   return (
-    <li className={styles.subItem}>
-      <span className={styles.subItemWithUses}>
-        <Text as="span" className={styles.labelText}>
+    <li className="special-possessions-sub-item">
+      <span className="special-possessions-sub-item-with-uses">
+        <Text as="span" className="special-possessions-label-text">
           {item.label}
         </Text>
         {item.uses !== undefined && (
-          <span className={styles.subItemDots}>
+          <span className="special-possessions-sub-item-dots">
             <UseDots
               total={item.uses}
               checked={uses[key] ?? 0}
@@ -168,11 +168,11 @@ interface PossessionLabelProps {
 
 const PossessionLabel = ({ p, checked, selected, uses, onToggle, onRadioSelect, onUses, renderExtra }: PossessionLabelProps) => {
   const heading = p.isCustom ? (
-    <Text as="span" className={styles.customPlaceholder}>
+    <Text as="span" className="special-possessions-custom-placeholder">
       {p.label}
     </Text>
   ) : (
-    <Text as="span" className={styles.labelText}>
+    <Text as="span" className="special-possessions-label-text">
       {p.label}
     </Text>
   );
@@ -181,10 +181,10 @@ const PossessionLabel = ({ p, checked, selected, uses, onToggle, onRadioSelect, 
     const subSelectedCount = p.maxSubItems ? p.subItems.filter((item, i) => selected[subItemKey(p.id, item, i)]).length : 0;
     const atSubMax = p.maxSubItems !== undefined && subSelectedCount >= p.maxSubItems;
     return (
-      <span className={styles.labelWithSubItems}>
+      <span className="special-possessions-label-with-sub-items">
         {heading}
         <ul
-          className={styles.subItemList}
+          className="special-possessions-sub-item-list"
           {...(p.selectOneSubItem ? { role: 'radiogroup', 'aria-label': p.label.replace(/\*+/g, '') } : {})}
         >
           {p.subItems.map((item, idx) => (
@@ -210,8 +210,8 @@ const PossessionLabel = ({ p, checked, selected, uses, onToggle, onRadioSelect, 
 
   if (renderExtra) {
     return (
-      <span className={styles.labelBody}>
-        <Text as="span" className={styles.labelText}>
+      <span className="special-possessions-label-body">
+        <Text as="span" className="special-possessions-label-text">
           {p.label}
         </Text>
         {renderExtra}
@@ -221,9 +221,9 @@ const PossessionLabel = ({ p, checked, selected, uses, onToggle, onRadioSelect, 
 
   if (p.uses !== undefined) {
     return (
-      <span className={styles.labelWithUses}>
+      <span className="special-possessions-label-with-uses">
         {heading}
-        <span className={styles.subItemDots}>
+        <span className="special-possessions-sub-item-dots">
           <UseDots total={p.uses} checked={uses[p.id] ?? 0} onChange={(n) => onUses(p.id, n)} disabled={!checked} ariaLabel={p.label} />
           {p.usesLabel && (
             <Text as="span" font="serif" size="xs" color="muted">
@@ -333,8 +333,8 @@ export const SpecialPossessions = ({ config, data, onSave, level = 1, chooseOver
       const stock = Math.min(data?.[stockItem.stockKey] ?? 0, capacity);
       const visibleLabel = stockItem.stockLabel ?? 'Stock:';
       map[stockItem.id] = (
-        <span className={styles.stockRow}>
-          <Text as="span" className={styles.stockLabel}>
+        <span className="special-possessions-stock-row">
+          <Text as="span" className="special-possessions-stock-label">
             {visibleLabel}
           </Text>
           <UseDots
@@ -373,12 +373,12 @@ export const SpecialPossessions = ({ config, data, onSave, level = 1, chooseOver
       onToggleCollapse={handleToggleCollapse}
       forceChildren
     >
-      <div className={styles.list}>
+      <div className="special-possessions-list">
         {visibleItems.map((p) => {
           const alwaysSelected = alwaysSelectedIds.has(p.id);
           const checked = alwaysSelected ? true : (selected[p.id] ?? false);
           return (
-            <div key={p.id} className={styles.possessionRow}>
+            <div key={p.id} className="special-possessions-possession-row">
               <Checkbox
                 aria-label={p.name}
                 checked={checked}
@@ -386,7 +386,7 @@ export const SpecialPossessions = ({ config, data, onSave, level = 1, chooseOver
                 aria-disabled={alwaysSelected ? 'true' : undefined}
                 readOnly={alwaysSelected}
                 onChange={alwaysSelected ? undefined : (e) => handleToggle(p.id, e.target.checked)}
-                className={styles.checkbox}
+                className="special-possessions-checkbox"
                 label={
                   <PossessionLabel
                     p={p}
@@ -401,7 +401,7 @@ export const SpecialPossessions = ({ config, data, onSave, level = 1, chooseOver
                 }
               />
               {p.isCustom && checked && (
-                <div className={styles.customInputWrapper}>
+                <div className="special-possessions-custom-input-wrapper">
                   <Input
                     aria-label="Custom possession name"
                     placeholder="Describe possession…"

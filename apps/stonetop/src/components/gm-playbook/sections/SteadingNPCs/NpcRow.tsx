@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button, Text, Tooltip } from '@/components/ui';
 import type { SteadingNPC, NpcRelationship } from '@/types';
-import styles from './NpcRow.module.css';
+import './NpcRow.css';
 
 interface NpcRowProps {
   npc: SteadingNPC;
@@ -16,20 +16,20 @@ export const NpcRow = ({ npc, onEdit, onRemove, onToggleDead, resolveTarget }: N
   const handleEdit = useCallback(() => onEdit(npc), [onEdit, npc]);
   const handleRemove = useCallback(() => onRemove(npc.id), [onRemove, npc.id]);
   const handleToggleDead = useCallback(() => onToggleDead(npc.id), [onToggleDead, npc.id]);
-  const rowCx = cn(styles.npcRow, npc.dead && styles.npcRowDead);
-  const nameCx = cn(npc.dead && styles.npcNameStrike);
-  const tombstoneCx = cn(npc.dead && styles.tombstoneActive);
+  const rowCx = cn('npc-row-npc-row', npc.dead && 'npc-row-npc-row-dead');
+  const nameCx = cn(npc.dead && 'npc-row-npc-name-strike');
+  const tombstoneCx = cn(npc.dead && 'npc-row-tombstone-active');
   return (
     <div className={rowCx} role="listitem">
-      <div className={styles.npcInfo}>
-        <Text as="span" className={styles.npcName}>
+      <div className="npc-row-npc-info">
+        <Text as="span" className="npc-row-npc-name">
           <span className={nameCx}>{npc.name}</span>
           {npc.dead && (
-            <Text as="span" className={styles.npcDeadLabel}>
+            <Text as="span" className="npc-row-npc-dead-label">
               (DEAD)
             </Text>
           )}
-          {npc.pronouns && <span className={styles.npcPronouns}>{npc.pronouns}</span>}
+          {npc.pronouns && <span className="npc-row-npc-pronouns">{npc.pronouns}</span>}
         </Text>
         {npc.occupation && (
           <Text as="span" size="xs" color="muted" italic>
@@ -37,20 +37,20 @@ export const NpcRow = ({ npc, onEdit, onRemove, onToggleDead, resolveTarget }: N
           </Text>
         )}
         {npc.traits && npc.traits.length > 0 && (
-          <div className={styles.npcTraits}>
+          <div className="npc-row-npc-traits">
             {npc.traits.map((t) => (
-              <span key={t} className={styles.npcTrait}>
+              <span key={t} className="npc-row-npc-trait">
                 {t}
               </span>
             ))}
           </div>
         )}
         {npc.relationships && npc.relationships.length > 0 && (
-          <div className={styles.npcRelTraits}>
+          <div className="npc-row-npc-rel-traits">
             {npc.relationships.map((rel) => {
               const label = [rel.type, rel.targetId ? resolveTarget(rel) : ''].filter(Boolean).join(': ');
               return label ? (
-                <span key={rel.id} className={styles.npcRelTrait}>
+                <span key={rel.id} className="npc-row-npc-rel-trait">
                   {label}
                 </span>
               ) : null;
@@ -63,7 +63,7 @@ export const NpcRow = ({ npc, onEdit, onRemove, onToggleDead, resolveTarget }: N
           </Text>
         )}
       </div>
-      <div className={styles.npcActions}>
+      <div className="npc-row-npc-actions">
         <Button variant="ghost" size="sm" onClick={handleEdit} aria-label={`Edit ${npc.name}`}>
           Edit
         </Button>

@@ -10,7 +10,7 @@ import { useInsertSections } from './useInsertSections';
 import { useConsequenceCheckboxes } from './useConsequenceCheckboxes';
 import type { PlaybookFeatures, PlaybookSectionProps } from '@/types';
 import type { RadioOption } from '@/types';
-import styles from './InsertLayout.module.css';
+import './InsertLayout.css';
 
 const INSTINCT_OPTIONS = INSERT_INSTINCT_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label, description: opt.description }));
 
@@ -101,7 +101,7 @@ export const InsertLayout = ({
   );
 
   return (
-    <div className={styles.root}>
+    <div className="insert-layout">
       <OptionSelect
         name={`${playbookName}-instinct`}
         title="Instinct"
@@ -116,7 +116,7 @@ export const InsertLayout = ({
         <Text size="xs" color="muted" leading="normal">
           You gain all of the following:
         </Text>
-        <div className={styles.moveList}>
+        <div className="insert-layout-move-list">
           {moves.map((move) => (
             <Move key={move.id} title={move.name} move={move} />
           ))}

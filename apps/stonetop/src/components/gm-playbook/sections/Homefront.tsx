@@ -1,9 +1,9 @@
 import { Heading, Text, Icon, List, Callout, Stack } from '@/components/ui';
-import styles from '@/pages/GmPlaybook/GmPlaybook.module.css';
+import '@/pages/GmPlaybook/GmPlaybook.css';
 
 const SeasonHeading = ({ icon, label }: { icon: 'spring' | 'summer' | 'autumn' | 'winter'; label: string }) => (
-  <div className={styles.seasonHeading}>
-    <Icon name={icon} size="small" className={styles.seasonIcon} />
+  <div className="gm-playbook-season-heading">
+    <Icon name={icon} size="small" className="gm-playbook-season-icon" />
     <Heading as="h3" size="sm">
       {label}
     </Heading>
@@ -70,7 +70,7 @@ export const Homefront = () => (
       </Stack>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Questions to ask
       </Heading>
@@ -93,7 +93,7 @@ export const Homefront = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <SeasonHeading icon="spring" label="Spring" />
       <List
         variant="bullet"
@@ -112,7 +112,7 @@ export const Homefront = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <SeasonHeading icon="summer" label="Summer" />
       <List
         variant="bullet"
@@ -129,7 +129,7 @@ export const Homefront = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <SeasonHeading icon="autumn" label="Autumn" />
       <List
         variant="bullet"
@@ -147,7 +147,7 @@ export const Homefront = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <SeasonHeading icon="winter" label="Winter" />
       <List
         variant="bullet"
@@ -162,7 +162,7 @@ export const Homefront = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Always
       </Heading>
@@ -181,7 +181,7 @@ export const Homefront = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Aftermath
       </Heading>
@@ -195,7 +195,7 @@ export const Homefront = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Downtime
       </Heading>
@@ -218,7 +218,7 @@ export const Homefront = () => (
       </Text>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Callout title="MAKE A PLAN">
         <Text>
           When you ***wish to accomplish some project but aren't sure how to go about it***, tell the GM what you hope to achieve. They'll
@@ -247,7 +247,7 @@ export const Homefront = () => (
       </Callout>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Relative Value
       </Heading>

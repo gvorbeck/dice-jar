@@ -5,7 +5,7 @@ import { useOptimisticField } from '@/hooks/useOptimisticField';
 import type { ArcanaMajorEntry, ArcanaMinorEntry, PlaybookSectionProps } from '@/types';
 import { Spinner } from '@/components/ui';
 import { ArcanaSubTabs, type ArcanaSubTab } from './ArcanaSubTabs';
-import styles from './ArcanaTab.module.css';
+import './ArcanaTab.css';
 
 // The character tab lives in the first hash segment (e.g. "#arcana", from useHashTabs); the Arcana
 // sub-tab lives in a second "&"-delimited segment ("#arcana&major") so a refresh or shared link keeps
@@ -76,13 +76,13 @@ export const ArcanaTab = ({ data, onSave, adjustCharacterStats }: ArcanaTabProps
     'Failed to save.',
   );
   return (
-    <div className={styles.root}>
+    <div className="arcana-tab">
       <Tabs selectedKey={subTab} onSelectionChange={handleSelectionChange}>
         <ArcanaSubTabs minorCount={arcanaMinor.length} majorCount={arcanaMajor.length} />
 
         <Suspense
           fallback={
-            <div className={styles.loading}>
+            <div className="arcana-tab-loading">
               <Spinner />
             </div>
           }

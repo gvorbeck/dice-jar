@@ -1,0 +1,135 @@
+/* ── Move card — a "forged tablet": recessed header plaque over a prose bay, ──
+   with a spine down the left edge that lights gold when the move is selected. */
+.move-move {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  /* The spine. Rendered as a thick left border so it hugs the rounded corners. */
+  border-left: 3px solid var(--border-strong);
+  box-shadow: var(--shadow-sm);
+  /* Clip the header plaque's band background to the card's rounded corners. */
+  overflow: hidden;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .move-move:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+}
+
+.move-move-selected {
+  border-left-color: var(--border-accent);
+  box-shadow: var(--glow-gold-subtle), var(--shadow-sm);
+}
+
+/* ── Header plaque (name + take/use controls) ────────── */
+.move-move-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-3);
+  /* A touch darker than the body bay, with a hairline beneath — reads as a plate
+     hammered onto the piece. color-mix keeps it theme-aware without a new token. */
+  background: color-mix(in srgb, var(--surface-overlay) 55%, transparent);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* ── Body bay (prose, roll, requirement, citation) ───── */
+.move-move-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+}
+
+.move-move-checkbox {
+  gap: var(--spacing-2);
+}
+
+.move-header-action {
+  flex-shrink: 0;
+}
+
+.move-move-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+/* ── Move name ───────────────────────────────────────── */
+.move-move-name {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: color 0.15s ease;
+}
+
+.move-move-name-selected {
+  color: var(--text-accent);
+}
+
+/* ── Trigger + body text ─────────────────────────────── */
+
+/* ── Body with icon ──────────────────────────────────── */
+.move-move-body-with-icon {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: flex-start;
+}
+
+.move-move-body-icon {
+  color: var(--text-accent);
+  flex-shrink: 0;
+  margin-top: 0.1em;
+}
+
+/* ── Divider between body sections ──────────────────── */
+.move-body-divider {
+  margin: var(--spacing-2) 0;
+}
+
+/* ── Indented block (e.g. winter list + footer in Seasons Change) ── */
+.move-indent {
+  padding-left: var(--spacing-6);
+}
+
+/* ── Citation ────────────────────────────────────────── */
+.move-move-citation {
+  margin-top: var(--spacing-1);
+  text-align: right;
+}
+
+/* ── Take boxes (times taken) ────────────────────────── */
+.move-take-boxes {
+  display: flex;
+  gap: var(--spacing-1);
+  flex-shrink: 0;
+}
+
+/* ── Uses group (one or more control slots, optionally separated) ─── */
+.move-uses-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  flex-shrink: 0;
+}
+
+.move-uses-slot {
+  display: flex;
+  align-items: center;
+}
+
+/* A slot whose preceding control set `divider` gets a vertical rule on its left edge. */
+.move-uses-slot-divided {
+  padding-left: var(--spacing-1);
+  border-left: 1px solid var(--border-subtle);
+}

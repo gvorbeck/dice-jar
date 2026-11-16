@@ -5,7 +5,7 @@ import type { GameSession } from '@/types';
 import { useLatest } from '@/hooks/useLatest';
 import { buildRelationshipGraph, pairKey, reciprocalLabelOffset, reciprocalPairKeys } from './relationshipGraphData';
 import type { GraphNode } from './relationshipGraphData';
-import styles from './RelationshipGraph.module.css';
+import './RelationshipGraph.css';
 
 // Viewport the simulation lays out into. The SVG scales to its container via a
 // viewBox, so these are coordinate-space units, not pixels. Sized to roughly the
@@ -287,7 +287,7 @@ export const RelationshipGraph = ({ game, focusId }: RelationshipGraphProps) => 
 
   if (graph.nodes.length === 0) {
     return (
-      <div className={styles.empty}>
+      <div className="relationship-graph-empty">
         <Text size="sm" color="muted">
           No relationships to map yet. Link NPCs to characters or to each other and they'll appear here.
         </Text>
@@ -300,7 +300,7 @@ export const RelationshipGraph = ({ game, focusId }: RelationshipGraphProps) => 
   // smaller ego network for whatever they choose.
   if (mobile && !focusId) {
     return (
-      <div className={styles.empty}>
+      <div className="relationship-graph-empty">
         <Text size="sm" color="muted">
           Pick a character in the filter above to see their relationships on this screen size.
         </Text>
@@ -309,10 +309,10 @@ export const RelationshipGraph = ({ game, focusId }: RelationshipGraphProps) => 
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className="relationship-graph-wrap">
       <svg
         ref={svgRef}
-        className={styles.svg}
+        className="relationship-graph-svg"
         viewBox={viewBox}
         role="img"
         aria-label={`Relationship map: ${graph.nodes.length} characters, ${graph.edges.length} relationships`}
@@ -323,7 +323,7 @@ export const RelationshipGraph = ({ game, focusId }: RelationshipGraphProps) => 
       >
         <defs>
           <marker id="rel-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" className={styles.arrowHead} />
+            <path d="M 0 0 L 10 5 L 0 10 z" className="relationship-graph-arrow-head" />
           </marker>
         </defs>
 
@@ -354,10 +354,10 @@ export const RelationshipGraph = ({ game, focusId }: RelationshipGraphProps) => 
                 midY += offY;
               }
               return (
-                <g key={edge.id} className={styles.edge}>
-                  <line x1={x1} y1={y1} x2={x2} y2={y2} className={styles.edgeLine} markerEnd="url(#rel-arrow)" />
+                <g key={edge.id} className="relationship-graph-edge">
+                  <line x1={x1} y1={y1} x2={x2} y2={y2} className="relationship-graph-edge-line" markerEnd="url(#rel-arrow)" />
                   {edge.type && (
-                    <text x={midX} y={midY} className={styles.edgeLabel} dy="-2">
+                    <text x={midX} y={midY} className="relationship-graph-edge-label" dy="-2">
                       {edge.type}
                     </text>
                   )}
@@ -368,7 +368,12 @@ export const RelationshipGraph = ({ game, focusId }: RelationshipGraphProps) => 
 
           <g>
             {nodes.map((node) => {
-              const groupCx = cn(styles.node, styles[node.kind], node.dead && styles.dead, drag?.id === node.id && styles.dragging);
+              const groupCx = cn(
+                'relationship-graph-node',
+                `relationship-graph-${node.kind}`,
+                node.dead && 'relationship-graph-dead',
+                drag?.id === node.id && 'relationship-graph-dragging',
+              );
               return (
                 <g
                   key={node.id}
@@ -381,8 +386,8 @@ export const RelationshipGraph = ({ game, focusId }: RelationshipGraphProps) => 
                   onLostPointerCapture={handleNodePointerUp}
                 >
                   <title>{node.label}</title>
-                  <circle r={NODE_RADIUS} className={styles.nodeCircle} />
-                  <text x={NODE_RADIUS + 4} y={4} className={styles.nodeLabel}>
+                  <circle r={NODE_RADIUS} className="relationship-graph-node-circle" />
+                  <text x={NODE_RADIUS + 4} y={4} className="relationship-graph-node-label">
                     {truncateLabel(node.label)}
                   </text>
                 </g>
@@ -392,7 +397,7 @@ export const RelationshipGraph = ({ game, focusId }: RelationshipGraphProps) => 
         </g>
       </svg>
 
-      <div className={styles.controls}>
+      <div className="relationship-graph-controls">
         <Button
           variant="secondary"
           size="sm"

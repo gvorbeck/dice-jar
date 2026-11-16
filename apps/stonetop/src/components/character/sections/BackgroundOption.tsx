@@ -3,7 +3,7 @@ import { Radio, CheckboxGroup, Input, UseDots } from '@/components/ui';
 import type { CheckboxGroupItem } from '@/components/ui';
 import { parseMarkdown } from '@/lib/parseMarkdown';
 import type { BackgroundOption, ChoiceConfig } from '@/types';
-import styles from './Background.module.css';
+import './Background.css';
 
 const resolveMax = (choices: ChoiceConfig, level: number): number => {
   if (!choices.levelGatedMax) return choices.max;
@@ -51,7 +51,7 @@ const BoundedCheckboxList = ({ choices, level, disabled, selected, onSave }: Bou
   );
 
   return (
-    <div className={styles.choices}>
+    <div className="background-choices">
       <CheckboxGroup items={items} checked={checked} onChange={handleChange} max={effectiveMax + lockedValues.length} disabled={disabled} />
     </div>
   );
@@ -85,17 +85,17 @@ export const BackgroundOptionItem = memo(
     onUsesChange,
     onFreeTextChange,
   }: BackgroundOptionItemProps) => (
-    <div className={styles.option}>
+    <div className="background-option">
       <Radio
         name={groupName}
         value={option.value}
         checked={selected}
         onChange={() => onSelect(option.value)}
         label={
-          <span className={styles.optionTitleRow}>
-            <span className={styles.optionTitle}>{option.title}</span>
+          <span className="background-option-title-row">
+            <span className="background-option-title">{option.title}</span>
             {option.uses !== undefined && (
-              <span className={styles.optionTitleRowUses}>
+              <span className="background-option-title-row-uses">
                 <UseDots
                   total={option.uses}
                   checked={usesChecked}
@@ -108,8 +108,8 @@ export const BackgroundOptionItem = memo(
           </span>
         }
       />
-      <div className={styles.optionBody}>
-        <div className={styles.optionContent}>{parseMarkdown(option.content)}</div>
+      <div className="background-option-body">
+        <div className="background-option-content">{parseMarkdown(option.content)}</div>
         {option.choices && (
           <BoundedCheckboxList
             choices={option.choices}
@@ -119,7 +119,7 @@ export const BackgroundOptionItem = memo(
             onSave={onChoicesChange}
           />
         )}
-        {option.postContent && <div className={styles.optionContent}>{parseMarkdown(option.postContent)}</div>}
+        {option.postContent && <div className="background-option-content">{parseMarkdown(option.postContent)}</div>}
         {option.freeText && (
           <Input
             multiline

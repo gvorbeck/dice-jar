@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@dice-jar/cn';
 import { Dropdown } from '@/components/ui';
 import type { GameNav } from './gameNav';
-import styles from './PageNav.module.css';
+import './PageNav.css';
 
 /*
  * PageNav — lateral navigation between the sibling pages of a game (each
@@ -39,13 +39,13 @@ export const PageNav = ({ nav, dropdownId }: PageNavProps) => {
 
   return (
     <>
-      <nav aria-label="Switch page" className={styles.pills}>
-        <ul className={styles.pillList}>
+      <nav aria-label="Switch page" className="page-nav-pills">
+        <ul className="page-nav-pill-list">
           {items.map((item) => {
             const isCurrent = item.value === nav.current;
-            const pillCx = cn(styles.pill, isCurrent && styles.pillCurrent);
+            const pillCx = cn('page-nav-pill', isCurrent && 'page-nav-pill-current');
             return (
-              <li key={item.value} className={styles.pillItem}>
+              <li key={item.value} className="page-nav-pill-item">
                 {isCurrent ? (
                   <span className={pillCx} aria-current="page">
                     {item.label}
@@ -65,7 +65,7 @@ export const PageNav = ({ nav, dropdownId }: PageNavProps) => {
        * className the Dropdown accepts lands on its inner <select>, not its
        * wrapper, so hiding via that prop would leave the chevron floating.
        */}
-      <div className={styles.dropdown}>
+      <div className="page-nav-dropdown">
         <Dropdown
           id={dropdownId}
           aria-label="Switch to another page"

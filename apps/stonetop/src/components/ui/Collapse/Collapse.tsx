@@ -1,7 +1,7 @@
 import { useState, useId, type ReactNode } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Icon } from '../Icon/Icon';
-import styles from './Collapse.module.css';
+import './Collapse.css';
 
 interface CollapseProps {
   label: string;
@@ -14,19 +14,19 @@ interface CollapseProps {
 export const Collapse = ({ label, defaultOpen = false, children, className, action }: CollapseProps) => {
   const [open, setOpen] = useState(defaultOpen);
   const id = useId();
-  const cx = cn(styles.root, open && styles.open, className);
+  const cx = cn('collapse', open && 'collapse-open', className);
   const handleToggle = () => setOpen((v) => !v);
 
   return (
     <div className={cx}>
-      <div className={styles.header}>
-        <button type="button" className={styles.trigger} onClick={handleToggle} aria-expanded={open} aria-controls={id}>
-          <span className={styles.label}>{label}</span>
-          <Icon name="chevron-down" size="small" className={styles.chevron} aria-hidden="true" />
+      <div className="collapse-header">
+        <button type="button" className="collapse-trigger" onClick={handleToggle} aria-expanded={open} aria-controls={id}>
+          <span className="collapse-label">{label}</span>
+          <Icon name="chevron-down" size="small" className="collapse-chevron" aria-hidden="true" />
         </button>
-        {action && <div className={styles.action}>{action}</div>}
+        {action && <div className="collapse-action">{action}</div>}
       </div>
-      <div id={id} className={styles.body} hidden={!open}>
+      <div id={id} className="collapse-body" hidden={!open}>
         {children}
       </div>
     </div>

@@ -6,7 +6,7 @@ import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { BackgroundOptionItem } from './BackgroundOption';
 import type { BackgroundOption, CharacterData } from '@/types';
-import styles from './Background.module.css';
+import './Background.css';
 
 interface BackgroundProps {
   playbookKey?: string;
@@ -128,7 +128,7 @@ export const Background = ({ playbookKey, options, level = 0, data, onSave }: Ba
       onToggleCollapse={handleToggleCollapse}
       forceChildren
     >
-      <div className={styles.options}>
+      <div className="background-options">
         {visibleOptions.map((opt) => (
           <BackgroundOptionItem
             key={opt.value}

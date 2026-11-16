@@ -2,7 +2,7 @@ import { useState, useId, useMemo, useCallback } from 'react';
 import { ListBox, ListBoxItem, type Key } from 'react-aria-components';
 import { cn } from '@dice-jar/cn';
 import { Modal, Heading, Button, Input, Text } from '@/components/ui';
-import styles from './AddArcanaModal.module.css';
+import './AddArcanaModal.css';
 
 interface ArcanaItem {
   id: string;
@@ -80,11 +80,11 @@ export const AddArcanaModal = <T extends ArcanaItem>({
     [results, onAdd],
   );
 
-  const listCx = cn(styles.list, results.length === 0 && styles.listEmpty);
+  const listCx = cn('add-arcana-modal-list', results.length === 0 && 'add-arcana-modal-list-empty');
   const allAdded = existing.size === items.length;
 
   return (
-    <Modal open={open} onClose={handleClose} aria-labelledby={headingId} className={styles.modal}>
+    <Modal open={open} onClose={handleClose} aria-labelledby={headingId} className="add-arcana-modal-modal">
       <Heading as="h2" size="md" id={headingId}>
         {title}
       </Heading>
@@ -102,13 +102,13 @@ export const AddArcanaModal = <T extends ArcanaItem>({
         onAction={handleAction}
         className={listCx}
         renderEmptyState={() => (
-          <Text color="muted" className={styles.empty}>
+          <Text color="muted" className="add-arcana-modal-empty">
             {allAdded ? `All ${noun} have been added.` : 'No matches found.'}
           </Text>
         )}
       >
         {(a) => (
-          <ListBoxItem id={a.id} textValue={a.name} className={styles.item}>
+          <ListBoxItem id={a.id} textValue={a.name} className="add-arcana-modal-item">
             <Text as="span" font="serif" size="sm">
               {a.name}
             </Text>
@@ -121,7 +121,7 @@ export const AddArcanaModal = <T extends ArcanaItem>({
         )}
       </ListBox>
 
-      <div className={styles.actions}>
+      <div className="add-arcana-modal-actions">
         <Button variant="secondary" onClick={handleClose}>
           Cancel
         </Button>

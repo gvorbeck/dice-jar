@@ -1,6 +1,6 @@
 import { type ComponentPropsWithoutRef } from 'react';
 import { cn } from '@dice-jar/cn';
-import styles from './Stack.module.css';
+import './Stack.css';
 
 interface StackProps extends ComponentPropsWithoutRef<'div'> {
   direction?: 'row' | 'column';
@@ -9,7 +9,7 @@ interface StackProps extends ComponentPropsWithoutRef<'div'> {
 }
 
 export const Stack = ({ direction = 'column', gap = 4, align = 'stretch', className, children, ...rest }: StackProps) => {
-  const cx = cn(styles.base, styles[direction], gap !== undefined && styles[`gap-${gap}`], styles[`align-${align}`], className);
+  const cx = cn('stack-base', `stack-${direction}`, gap !== undefined && `stack-gap-${gap}`, `stack-align-${align}`, className);
 
   return (
     <div className={cx} {...rest}>

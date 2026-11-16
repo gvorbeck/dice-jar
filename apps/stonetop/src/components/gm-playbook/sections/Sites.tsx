@@ -1,5 +1,5 @@
 import { Heading, Text, List } from '@/components/ui';
-import styles from '@/pages/GmPlaybook/GmPlaybook.module.css';
+import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const Sites = () => (
   <div>
@@ -10,7 +10,7 @@ export const Sites = () => (
     />
     <Text>In every area/room/scene, include at least one detail or element that reflects the site's story.</Text>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Considerations
       </Heading>
@@ -30,7 +30,7 @@ export const Sites = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Exploration
       </Heading>

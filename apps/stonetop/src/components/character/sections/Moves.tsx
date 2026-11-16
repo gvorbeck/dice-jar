@@ -19,7 +19,7 @@ import {
 import { getLockReason } from '@/lib/moveLockReason';
 import { getPlaybook } from '@/lib/constants';
 import type { PlaybookType, PlaybookSectionProps } from '@/types';
-import styles from './Moves.module.css';
+import './Moves.css';
 
 interface MoveSectionProps {
   label: string;
@@ -63,11 +63,11 @@ const STATIC_SECTIONS: MoveSectionProps[] = [
 
 const MoveSection = ({ label, helperText, moves, emptyText }: MoveSectionProps) => (
   <Collapse label={label}>
-    <Text color="muted" className={styles.helperText}>
+    <Text color="muted" className="moves-helper-text">
       {helperText}
     </Text>
     {moves.length > 0 ? (
-      <div className={styles.moveGrid}>
+      <div className="moves-move-grid">
         {moves.map((move) => (
           <Move key={move.id} title={move.name} move={move} />
         ))}
@@ -328,7 +328,7 @@ export const Moves = ({ playbook, data, onSave, level }: MovesProps) => {
 
   return (
     <PlaybookSection title="Moves">
-      <div className={styles.collapseStack}>
+      <div className="moves-collapse-stack">
         {STATIC_SECTIONS.map((s) => (
           <MoveSection key={s.label} {...s} />
         ))}
@@ -340,12 +340,12 @@ export const Moves = ({ playbook, data, onSave, level }: MovesProps) => {
           action={<Toggle label="Selected only" checked={isHideUnselected} onChange={handleHideUnselected} />}
         >
           {playbookHelperText && (
-            <Text color="muted" className={styles.helperText}>
+            <Text color="muted" className="moves-helper-text">
               {playbookHelperText}
             </Text>
           )}
           {visibleTypeMoves.length > 0 ? (
-            <div className={styles.moveGrid}>{moveNodes}</div>
+            <div className="moves-move-grid">{moveNodes}</div>
           ) : (
             <Text color="muted">
               {sortedTypeMoves.length === 0 ? `No moves for ${playbookLabel} have been defined yet.` : 'No moves selected.'}

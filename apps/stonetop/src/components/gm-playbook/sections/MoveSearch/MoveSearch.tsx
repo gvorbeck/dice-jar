@@ -6,7 +6,7 @@ import { ALL_PLAYBOOK_MOVES } from '@/lib/moves/allPlaybookMoves';
 import { LIGHTBEARER_INVOCATIONS } from '@/lib/moves/lightbearerInvocations';
 import { REVENANT_MOVES, GHOST_MOVES, THRALL_MOVES, THRALL_MARK_DEFINITIONS } from '@/lib/moves/inserts';
 import type { MoveDefinition } from '@/types';
-import styles from './MoveSearch.module.css';
+import './MoveSearch.css';
 
 const ALL_MOVES = [
   ...BASIC_MOVES,
@@ -23,9 +23,9 @@ const ALL_MOVES = [
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 const MoveList = ({ moves }: { moves: MoveDefinition[] }) => (
-  <ul className={styles.list}>
+  <ul className="move-search-list">
     {moves.map((move) => (
-      <li key={move.id} className={styles.item}>
+      <li key={move.id} className="move-search-item">
         <Move title={move.name} move={move} />
       </li>
     ))}
@@ -47,29 +47,29 @@ export const MoveSearch = () => {
   const rightCol = results.slice(mid);
 
   return (
-    <div className={styles.root}>
+    <div className="move-search">
       <Input
         placeholder="Search moves by name…"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         aria-label="Search moves by name"
         aria-describedby={query.trim() ? resultHintId : undefined}
-        className={styles.input}
+        className="move-search-input"
       />
       <div id={resultHintId} aria-live="polite" aria-atomic="true">
         {query.trim() &&
           (results.length === 0 ? (
-            <Text font="serif" color="muted" className={styles.empty}>
+            <Text font="serif" color="muted" className="move-search-empty">
               No moves match "{query}".
             </Text>
           ) : (
-            <Text as="span" className={styles.visuallyHidden}>
+            <Text as="span" className="move-search-visually-hidden">
               {results.length} move{results.length === 1 ? '' : 's'} found.
             </Text>
           ))}
       </div>
       {results.length > 0 && (
-        <section aria-label="Move search results" className={styles.results}>
+        <section aria-label="Move search results" className="move-search-results">
           <PlaybookColumns left={<MoveList moves={leftCol} />} right={rightCol.length > 0 ? <MoveList moves={rightCol} /> : undefined} />
         </section>
       )}

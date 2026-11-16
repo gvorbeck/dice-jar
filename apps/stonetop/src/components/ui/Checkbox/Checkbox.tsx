@@ -2,7 +2,7 @@ import { useId, type InputHTMLAttributes } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Icon } from '../Icon/Icon';
 import { Text } from '../Text/Text';
-import styles from './Checkbox.module.css';
+import './Checkbox.css';
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: React.ReactNode;
@@ -12,22 +12,22 @@ interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'typ
 
 export const Checkbox = ({ label, className, variant = 'default', weight = 1, ...props }: CheckboxProps) => {
   const id = useId();
-  const cx = cn(styles.label, variant === 'provision' && styles.labelProvision, className);
+  const cx = cn('checkbox-label', variant === 'provision' && 'checkbox-label-provision', className);
   const iconName = props.checked ? 'filled-provisions' : 'empty-provisions';
-  const iconCx = cn(styles.provisionIcon, props.checked && styles.provisionIconChecked);
+  const iconCx = cn('checkbox-provision-icon', props.checked && 'checkbox-provision-icon-checked');
 
   return (
     <label htmlFor={id} className={cx}>
-      <input id={id} type="checkbox" className={styles.input} {...props} />
+      <input id={id} type="checkbox" className="checkbox-input" {...props} />
       {variant === 'provision' ? (
-        <span className={styles.provisionIcons}>
+        <span className="checkbox-provision-icons">
           {Array.from({ length: weight }, (_, i) => (
             <Icon key={`provision-icon-${props.checked ? 'filled' : 'empty'}-${i}`} name={iconName} size="small" className={iconCx} />
           ))}
         </span>
       ) : (
-        <span className={styles.indicator}>
-          <span className={styles.check} />
+        <span className="checkbox-indicator">
+          <span className="checkbox-check" />
         </span>
       )}
       {typeof label === 'string' ? <Text as="span">{label}</Text> : label}

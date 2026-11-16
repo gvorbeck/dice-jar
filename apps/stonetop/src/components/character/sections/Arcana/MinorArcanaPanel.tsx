@@ -4,7 +4,7 @@ import { MINOR_ARCANA } from '@/lib/arcana/minor';
 import type { MinorArcanum, ArcanaMinorEntry } from '@/types';
 import { MinorArcanaCard } from './MinorArcanaCard';
 import { AddArcanaModal } from './AddArcanaModal';
-import styles from './ArcanaPanel.module.css';
+import './ArcanaPanel.css';
 
 interface MinorArcanaCardRowProps {
   entry: ArcanaMinorEntry;
@@ -184,8 +184,8 @@ export const MinorArcanaPanel = ({ arcanaMinor, arcanaMinorRef, saveMinor }: Min
 
   return (
     <>
-      <div className={styles.panel}>
-        <div className={styles.panelHeader}>
+      <div className="arcana-panel-panel">
+        <div className="arcana-panel-panel-header">
           <Button variant="secondary" size="sm" icon="plus" onClick={handleOpenMinorModal}>
             Add Minor Arcanum
           </Button>
@@ -195,11 +195,11 @@ export const MinorArcanaPanel = ({ arcanaMinor, arcanaMinorRef, saveMinor }: Min
         </div>
 
         {arcanaMinor.length === 0 ? (
-          <Text color="muted" className={styles.empty}>
+          <Text color="muted" className="arcana-panel-empty">
             No minor arcana yet. Add one when your character discovers an arcanum.
           </Text>
         ) : (
-          <div className={styles.cardList}>
+          <div className="arcana-panel-card-list">
             {arcanaMinor.map((entry) => {
               const arcanum = MINOR_ARCANA.find((a) => a.id === entry.id);
               if (!arcanum) return null;

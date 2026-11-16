@@ -5,7 +5,7 @@ import type { MoveDefinition, PlaybookSectionProps } from '@/types';
 import { InsertLayout } from '../shared/InsertLayout';
 import { resolvePlaybookFeatures, featurePatch } from '@/lib/resolvePlaybookFeatures';
 import { GHOST_MOVES, GHOST_CONSEQUENCE_LABELS } from '@/lib/moves/inserts';
-import styles from './GhostInsert.module.css';
+import './GhostInsert.css';
 
 const POLTERGEIST_MOVE: MoveDefinition = {
   id: 'ghost-poltergeist-fury',
@@ -49,7 +49,7 @@ export const GhostInsert = ({ data, onSave }: GhostInsertProps) => {
     ({ consequences }: Parameters<NonNullable<React.ComponentProps<typeof InsertLayout>['consequenceAddon']>>[0]) => {
       if (!consequences[POLTERGEIST_ID]) return null;
       return (
-        <div className={styles.furySection}>
+        <div className="ghost-insert-fury-section">
           <Move
             title={POLTERGEIST_MOVE.name}
             move={POLTERGEIST_MOVE}

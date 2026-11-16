@@ -1,0 +1,32 @@
+.game-id-modal-id-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-3) var(--spacing-4);
+}
+
+.game-id-modal-id-text {
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  letter-spacing: 0.05em;
+  word-break: break-all;
+  color: var(--text-accent);
+}
+
+.game-id-modal-warning {
+  display: flex;
+  gap: var(--spacing-3);
+  background-color: color-mix(in srgb, var(--color-gold-400) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-gold-400) 25%, transparent);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-3) var(--spacing-4);
+}
+
+.game-id-modal-warning-label {
+  color: var(--text-accent);
+  font-weight: 600;
+}

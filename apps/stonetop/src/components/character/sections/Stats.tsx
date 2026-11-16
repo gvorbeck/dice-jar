@@ -8,7 +8,7 @@ import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { STAT_GROUPS, STATS } from '@/lib/constants';
 import { statCap } from '@/lib/statCap';
 import type { CharacterData } from '@/types';
-import styles from './Stats.module.css';
+import './Stats.css';
 
 interface StatBoxProps {
   label: string;
@@ -38,12 +38,12 @@ const StatBox = ({ label, abbr, statKey, value, cap, onChange, onBlur }: StatBox
 
   return (
     <Stack gap={1} align="center">
-      <label className={styles.statLabel} htmlFor={`stat-${abbr}`}>
+      <label className="stats-stat-label" htmlFor={`stat-${abbr}`}>
         {label}
       </label>
       <Input
         id={`stat-${abbr}`}
-        className={styles.statInput}
+        className="stats-stat-input"
         type="number"
         value={value}
         max={cap}
@@ -72,10 +72,10 @@ interface InfoBoxProps {
 const InfoBox = ({ label, statKey, value, isStatic, min, onChange, onBlur }: InfoBoxProps) => (
   <Stack gap={1} align="center">
     {isStatic ? (
-      <span className={styles.infoStatic}>{value}</span>
+      <span className="stats-info-static">{value}</span>
     ) : (
       <Input
-        className={styles.infoInput}
+        className="stats-info-input"
         type="number"
         value={value}
         min={min}
@@ -87,7 +87,7 @@ const InfoBox = ({ label, statKey, value, isStatic, min, onChange, onBlur }: Inf
         onWheel={(e) => e.currentTarget.blur()}
       />
     )}
-    <Text as="span" font="serif" size="sm" color="muted" className={styles.infoLabel}>
+    <Text as="span" font="serif" size="sm" color="muted" className="stats-info-label">
       {label}
     </Text>
   </Stack>
@@ -105,13 +105,13 @@ interface DebilityRowProps {
 
 const DebilityRow = ({ label, debilityKey, checked, locked, onChange }: DebilityRowProps) => {
   const isChecked = checked || !!locked;
-  const braceCx = cn(styles.debilityBrace, isChecked && styles.debilityBraceActive);
+  const braceCx = cn('stats-debility-brace', isChecked && 'stats-debility-brace-active');
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => onChange(debilityKey, e.target.checked),
     [onChange, debilityKey],
   );
   return (
-    <div className={styles.debility}>
+    <div className="stats-debility">
       <div className={braceCx} />
       <Checkbox
         name={`debility-${label}`}
@@ -305,7 +305,7 @@ export const Stats = ({ data, onSave, hpMax, damage = 'd6', scoreInstruction = D
 
   return (
     <PlaybookSection title="Stats" warn={warn} warnText="All stat fields must be filled in before play.">
-      <Text color="muted" className={styles.statsInstruction}>
+      <Text color="muted" className="stats-stats-instruction">
         {scoreInstruction}
       </Text>
       {overCap && (
@@ -314,10 +314,10 @@ export const Stats = ({ data, onSave, hpMax, damage = 'd6', scoreInstruction = D
         </Text>
       )}
       <Stack gap={4}>
-        <div className={styles.statRow}>
+        <div className="stats-stat-row">
           {STAT_GROUPS.map((group) => (
-            <div key={group.debilityKey} className={styles.statGroup}>
-              <div className={styles.statPair}>
+            <div key={group.debilityKey} className="stats-stat-group">
+              <div className="stats-stat-pair">
                 {group.fields.map((f) => (
                   <StatBox
                     key={f.field}
@@ -341,7 +341,7 @@ export const Stats = ({ data, onSave, hpMax, damage = 'd6', scoreInstruction = D
             </div>
           ))}
         </div>
-        <div className={styles.infoRow}>
+        <div className="stats-info-row">
           <InfoBox label="Damage" value={damage} isStatic />
           <InfoBox label={hpLabel} statKey="statHp" value={stats.statHp} onChange={handleStatChange} onBlur={handleFlush} />
           <InfoBox label="Armor" statKey="statArmor" value={stats.statArmor} onChange={handleStatChange} onBlur={handleFlush} />
@@ -349,7 +349,7 @@ export const Stats = ({ data, onSave, hpMax, damage = 'd6', scoreInstruction = D
           <InfoBox label="Level" statKey="statLevel" value={stats.statLevel} min={1} onChange={handleStatChange} onBlur={handleFlush} />
         </div>
         {levelUpHint && (
-          <Text color={canLevelUp ? 'accent' : 'muted'} className={cn(styles.levelUpHint, canLevelUp && styles.levelUpReady)}>
+          <Text color={canLevelUp ? 'accent' : 'muted'} className={cn('stats-level-up-hint', canLevelUp && 'stats-level-up-ready')}>
             {levelUpHint}
           </Text>
         )}

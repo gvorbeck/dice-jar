@@ -1,6 +1,6 @@
 import { cn } from '@dice-jar/cn';
 import type { ReactNode } from 'react';
-import styles from './PlaybookColumns.module.css';
+import './PlaybookColumns.css';
 
 interface PlaybookColumnsProps {
   left?: ReactNode;
@@ -11,14 +11,14 @@ interface PlaybookColumnsProps {
 
 export const PlaybookColumns = ({ left, right, full, className }: PlaybookColumnsProps) => {
   if (full !== undefined) {
-    const cx = cn(styles.full, className);
+    const cx = cn('playbook-columns-full', className);
     return <div className={cx}>{full}</div>;
   }
-  const cx = cn(styles.columns, className);
+  const cx = cn('playbook-columns-columns', className);
   return (
     <div className={cx}>
-      {left !== undefined && <div className={styles.col}>{left}</div>}
-      {right !== undefined && <div className={styles.col}>{right}</div>}
+      {left !== undefined && <div className="playbook-columns-col">{left}</div>}
+      {right !== undefined && <div className="playbook-columns-col">{right}</div>}
     </div>
   );
 };

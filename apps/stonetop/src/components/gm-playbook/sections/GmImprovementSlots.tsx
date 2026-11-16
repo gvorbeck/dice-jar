@@ -5,8 +5,8 @@ import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { changedById } from '@/lib/gameMutations';
 import type { SteadingData, GmImprovement } from '@/types';
 import { makeEmptyGmImprovement } from './steadingImprovementsData';
-import card from './improvementCard.module.css';
-import styles from './GmImprovementSlots.module.css';
+import './improvementCard.css';
+import './GmImprovementSlots.css';
 
 interface GmImprovementCardProps {
   slot: GmImprovement;
@@ -51,15 +51,15 @@ const GmImprovementCard = ({
   const handleCompletedToggle = useCallback(() => onCompletedToggle(index), [index, onCompletedToggle]);
   const handleRemove = useCallback(() => onRemove(index), [index, onRemove]);
 
-  const slotCx = cn(card.item, styles.gmItem, slot.completed && card.itemCompleted);
+  const slotCx = cn('improvement-card-item', 'gm-improvement-slots-gm-item', slot.completed && 'improvement-card-item-completed');
 
   return (
     <div className={slotCx}>
-      <div className={card.itemHeader}>
-        <Checkbox checked={slot.completed} onChange={handleCompletedToggle} className={card.itemCheckbox} />
+      <div className="improvement-card-item-header">
+        <Checkbox checked={slot.completed} onChange={handleCompletedToggle} className="improvement-card-item-checkbox" />
         <Input
           aria-label="Improvement name"
-          className={styles.gmTitleInput}
+          className="gm-improvement-slots-gm-title-input"
           value={slot.title}
           placeholder="IMPROVEMENT"
           onFocus={onFocus}
@@ -71,7 +71,7 @@ const GmImprovementCard = ({
       <Input
         multiline
         aria-label="Summary"
-        className={styles.gmTextarea}
+        className="gm-improvement-slots-gm-textarea"
         value={slot.summary}
         placeholder="Summary"
         rows={2}
@@ -79,12 +79,12 @@ const GmImprovementCard = ({
         onChange={handleSummaryChange}
         onBlur={onBlur}
       />
-      <RadioGroup legend="Category" legendHidden className={styles.categoryRow}>
+      <RadioGroup legend="Category" legendHidden className="gm-improvement-slots-category-row">
         <Radio
           name={`gm-improvement-category-${slot.id}`}
           value="resource"
           label="Resource"
-          className={styles.categoryRadio}
+          className="gm-improvement-slots-category-radio"
           checked={slot.category === 'resource'}
           onChange={handleCategoryResource}
         />
@@ -92,7 +92,7 @@ const GmImprovementCard = ({
           name={`gm-improvement-category-${slot.id}`}
           value="fortification"
           label="Fortification"
-          className={styles.categoryRadio}
+          className="gm-improvement-slots-category-radio"
           checked={slot.category === 'fortification'}
           onChange={handleCategoryFortification}
         />
@@ -100,19 +100,19 @@ const GmImprovementCard = ({
           name={`gm-improvement-category-${slot.id}`}
           value="asset"
           label="Asset"
-          className={styles.categoryRadio}
+          className="gm-improvement-slots-category-radio"
           checked={slot.category === 'asset'}
           onChange={handleCategoryAsset}
         />
       </RadioGroup>
-      <div className={card.section}>
+      <div className="improvement-card-section">
         <Heading as="h4" size="label">
           Requirements
         </Heading>
         <Input
           multiline
           aria-label="Requirements"
-          className={styles.gmTextarea}
+          className="gm-improvement-slots-gm-textarea"
           value={slot.requirements}
           placeholder="Requirements"
           rows={3}
@@ -121,14 +121,14 @@ const GmImprovementCard = ({
           onBlur={onBlur}
         />
       </div>
-      <div className={card.section}>
+      <div className="improvement-card-section">
         <Heading as="h4" size="label">
           Effects
         </Heading>
         <Input
           multiline
           aria-label="Effects"
-          className={styles.gmTextarea}
+          className="gm-improvement-slots-gm-textarea"
           value={slot.effects}
           placeholder="Effects"
           rows={3}
@@ -236,7 +236,7 @@ export const GmImprovementSlots = ({ gmImprovements, onSave }: GmImprovementSlot
   );
 
   return (
-    <div className={styles.gmSlots}>
+    <div className="gm-improvement-slots-gm-slots">
       <Heading as="h3" size="sm">
         Other improvements
       </Heading>
@@ -244,7 +244,7 @@ export const GmImprovementSlots = ({ gmImprovements, onSave }: GmImprovementSlot
         Additional possible improvements to Stonetop, revealed by the GM.
       </Text>
       {localSlots.length > 0 && (
-        <div className={styles.gmGrid}>
+        <div className="gm-improvement-slots-gm-grid">
           {localSlots.map((slot, i) => (
             <GmImprovementCard
               key={slot.id}

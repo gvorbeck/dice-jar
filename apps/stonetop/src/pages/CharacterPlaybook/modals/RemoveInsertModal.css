@@ -1,0 +1,9 @@
+.remove-insert-modal-warning {
+  margin: var(--spacing-4) 0;
+}
+
+.remove-insert-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+}

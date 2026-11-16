@@ -7,7 +7,7 @@ import { Icon } from '@/components/ui';
 import { Text } from '@/components/ui';
 import { generateId } from '@/lib/id';
 import { ToastContext, type ToastVariant } from './ToastContext';
-import styles from './Toast.module.css';
+import './Toast.css';
 
 interface ToastItem {
   id: string;
@@ -30,8 +30,8 @@ const ToastEntry = ({
   onPause: (id: string) => void;
   onResume: (id: string) => void;
 }) => {
-  const cx = cn(styles.toast, styles[item.variant], item.exiting && styles.exiting);
-  const iconCx = cn(styles.icon, styles[item.variant]);
+  const cx = cn('toast-toast', `toast-${item.variant}`, item.exiting && 'toast-exiting');
+  const iconCx = cn('toast-icon', `toast-${item.variant}`);
   const handleDismissItem = useCallback(() => onDismiss(item.id), [onDismiss, item.id]);
   const handlePause = useCallback(() => onPause(item.id), [onPause, item.id]);
   const handleResume = useCallback(() => onResume(item.id), [onResume, item.id]);
@@ -52,14 +52,14 @@ const ToastEntry = ({
       onBlur={handleResume}
     >
       <Icon name={iconName} size="small" className={iconCx} />
-      <Text as="span" size="xs" className={styles.body} role={isError ? 'alert' : undefined}>
+      <Text as="span" size="xs" className="toast-body" role={isError ? 'alert' : undefined}>
         {item.message}
       </Text>
       <Button
         variant="ghost"
         size="sm"
         icon="close"
-        className={styles.dismiss}
+        className="toast-dismiss"
         onClick={handleDismissItem}
         aria-label="Dismiss notification"
       />
@@ -173,10 +173,10 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
       {children}
       {createPortal(
         <>
-          <div role="status" aria-live="polite" aria-atomic="true" className={styles.announcer}>
+          <div role="status" aria-live="polite" aria-atomic="true" className="toast-announcer">
             {announcement}
           </div>
-          <div role="region" className={styles.region} aria-label="Notifications">
+          <div role="region" className="toast-region" aria-label="Notifications">
             {toasts.map((item) => (
               <ToastEntry key={item.id} item={item} onDismiss={handleDismiss} onPause={pauseToast} onResume={resumeToast} />
             ))}

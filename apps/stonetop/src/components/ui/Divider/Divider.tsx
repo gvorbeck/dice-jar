@@ -1,4 +1,4 @@
 import { cn } from '@dice-jar/cn';
-import styles from './Divider.module.css';
+import './Divider.css';
 
-export const Divider = ({ className }: { className?: string }) => <hr className={cn(styles.root, className)} />;
+export const Divider = ({ className }: { className?: string }) => <hr className={cn('divider', className)} />;

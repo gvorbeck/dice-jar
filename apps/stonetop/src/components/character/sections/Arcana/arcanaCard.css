@@ -1,0 +1,201 @@
+@import '../../../ui/field.css';
+
+.arcana-card-card {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.arcana-card-card-unlocked {
+  border-color: var(--border-accent);
+  /* Gold ring plus the shared glow token, so an unlocked arcanum reads as
+     charged with magic rather than merely outlined. */
+  box-shadow:
+    0 0 0 1px var(--color-gold-500),
+    var(--glow-gold);
+}
+
+.arcana-card-description {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.arcana-card-base-moves {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.arcana-card-front-move {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.arcana-card-move-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.arcana-card-move-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.arcana-card-marks-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.arcana-card-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.arcana-card-task-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  cursor: pointer;
+}
+
+.arcana-card-task-row > span {
+  flex: 1;
+  padding-top: 2px;
+}
+
+.arcana-card-task-count {
+  margin-top: var(--spacing-1);
+}
+
+.arcana-card-mysteries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding-top: var(--spacing-1);
+}
+
+.arcana-card-mysteries-label {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.arcana-card-mystery-moves {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.arcana-card-mystery-move-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+}
+
+/* Only the selectable (checkbox) header is clickable; granted moves render a static header. */
+label.arcana-card-mystery-move-header {
+  cursor: pointer;
+}
+
+.arcana-card-mystery-move-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.arcana-card-consequences {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.arcana-card-consequences-label {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+/* A moves-only section lays its moves out masonry-style — two columns on desktop, one below —
+   matching the PC Playbook's move grid (columns: 2 280px + break-inside: avoid on children). */
+.arcana-card-move-grid {
+  columns: 2 280px;
+  column-gap: var(--spacing-3);
+}
+
+.arcana-card-move-grid > * {
+  break-inside: avoid;
+  margin-bottom: var(--spacing-3);
+}
+
+.arcana-card-move-grid > *:last-child {
+  margin-bottom: 0;
+}
+
+.arcana-card-consequence-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.arcana-card-consequence-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  /* A transparent spine holds the padding steady so a row doesn't shift when it gains its border on
+     marking; only a marked consequence shows the danger-tinted spine + wash. */
+  padding: var(--spacing-1) var(--spacing-2);
+  border-left: 2px solid transparent;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.arcana-card-consequence-row-marked {
+  border-left-color: var(--color-danger);
+  background-color: color-mix(in srgb, var(--color-danger) 8%, transparent);
+}
+
+.arcana-card-consequence-row > span {
+  flex: 1;
+  padding-top: 2px;
+}
+
+/* The mark boxes sit at the row's start as a tight group, not a growing text column. */
+.arcana-card-consequence-row > .arcana-card-consequence-marks {
+  flex: 0 0 auto;
+  display: flex;
+  gap: var(--spacing-1);
+  padding-top: 0;
+}
+
+.arcana-card-consequence-children {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding-left: var(--spacing-6);
+}
+
+.arcana-card-consequence-table {
+  padding-left: var(--spacing-6);
+}

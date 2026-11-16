@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { ToastProvider, SaveStatusProvider, SaveStatus, ErrorBoundary } from '@/components/app';
 import { Spinner } from '@/components/ui';
-import styles from './App.module.css';
+import './App.css';
 
 /*
  * Each page is lazy-loaded — its JS bundle is only fetched the first time
@@ -56,7 +56,7 @@ export const App = () => {
         <ErrorBoundary resetKey={pathname}>
           <Suspense
             fallback={
-              <div className={styles.loading} aria-live="polite" aria-busy="true">
+              <div className="app-loading" aria-live="polite" aria-busy="true">
                 <Spinner />
               </div>
             }

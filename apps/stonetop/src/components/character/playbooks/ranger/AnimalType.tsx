@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { Checkbox, CheckboxGroup, Input, Text } from '@/components/ui';
 import type { AnimalTypeConfig } from '@/types';
-import styles from './RangerAnimalCompanion.module.css';
+import './RangerAnimalCompanion.css';
 
 export const ANIMAL_TYPES: AnimalTypeConfig[] = [
   {
@@ -198,7 +198,7 @@ export const TypePicksSection = ({
   );
 
   return (
-    <div className={styles.typePicksSection}>
+    <div className="ranger-animal-companion-type-picks-section">
       <Text as="span" size="xs" color="muted" leading="normal">
         {`**HP** ${typeConfig.hp} **Armor** ${typeConfig.armor} (size) **Damage** ${typeConfig.damage} *(hand)*`}
       </Text>
@@ -206,7 +206,7 @@ export const TypePicksSection = ({
         Pick {pickCount} more:
       </Text>
       <CheckboxGroup items={items} checked={checkedMap} onChange={onPickChange} columns={2} />
-      <div className={styles.typeCustomRow}>
+      <div className="ranger-animal-companion-type-custom-row">
         <Checkbox
           checked={customChecked}
           disabled={!isSelected || (!customChecked && atMax) || !customText}
@@ -214,7 +214,7 @@ export const TypePicksSection = ({
           aria-label={`Mark custom pick for ${typeConfig.label} as active`}
         />
         <Input
-          className={styles.typeCustomInput}
+          className="ranger-animal-companion-type-custom-input"
           type="text"
           value={customText}
           placeholder="Custom pick…"

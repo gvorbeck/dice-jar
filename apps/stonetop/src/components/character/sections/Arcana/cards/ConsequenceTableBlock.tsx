@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Table } from '@/components/ui';
 import type { ConsequenceTable } from '@/types';
-import styles from '../arcanaCard.module.css';
+import '../arcanaCard.css';
 
 interface ConsequenceTableBlockProps {
   consequenceId: string;
@@ -16,7 +16,7 @@ interface ConsequenceTableBlockProps {
 // The Mindgem's 1d4 purpose table: each row is radio-selectable, and the pick drives the row's
 // effect on the creature. Rendered through the shared ui/Table with its selectable-cells rows.
 export const ConsequenceTableBlock = memo(({ consequenceId, table, selectedRowId, disabled, onChoose }: ConsequenceTableBlockProps) => (
-  <div className={styles.consequenceTable}>
+  <div className="arcana-card-consequence-table">
     <Table
       columnHeaders={table.columnHeaders}
       selectionLabel={table.columnHeaders.join(' ')}

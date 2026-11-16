@@ -3,7 +3,7 @@ import { PageHeader } from '@/components/app/PageHeader/PageHeader';
 import type { GameNav } from '@/components/app/PageHeader/gameNav';
 import { DiceRoller } from '@/components/app/DiceRoller/DiceRoller';
 import type { LoggedRoll } from '@/types';
-import styles from './PageLayout.module.css';
+import './PageLayout.css';
 
 /*
  * PageLayout — the foundational shell that every page is built inside.
@@ -101,7 +101,7 @@ export const PageLayout = (props: Props) => {
        * own their full layout. In full mode, <main> applies the shared
        * 1200px constraint and padding used by all inner pages.
        */}
-      <main className={simple ? styles.mainSimple : styles.main}>{children}</main>
+      <main className={simple ? 'page-layout-main-simple' : 'page-layout-main'}>{children}</main>
 
       <PageFooter />
 

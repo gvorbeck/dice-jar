@@ -1,8 +1,8 @@
 import { cn } from '@dice-jar/cn';
 import { Heading, List, Text, Checkbox } from '@/components/ui';
 import { IMPROVEMENTS, type CheckItem } from './steadingImprovementsData';
-import card from './improvementCard.module.css';
-import styles from './PredefinedImprovementsList.module.css';
+import './improvementCard.css';
+import './PredefinedImprovementsList.css';
 
 const makeReqKeys = (impId: string, blockIdx: number, itemIdx: number, count: number) =>
   Array.from({ length: count }, (_, i) => `${impId}__req__b${blockIdx}i${itemIdx}__${i}`);
@@ -20,20 +20,20 @@ const ReqCheckItem = ({
 }) => {
   if (keys.length === 1) {
     return (
-      <div className={styles.checkRow}>
+      <div className="predefined-improvements-list-check-row">
         <Checkbox checked={checkedValues[0]} onChange={() => onToggle(keys[0]!)} label={item.label} />
       </div>
     );
   }
 
   return (
-    <div className={styles.checkRow}>
-      <div className={styles.multiBoxes}>
+    <div className="predefined-improvements-list-check-row">
+      <div className="predefined-improvements-list-multi-boxes">
         {keys.map((key, i) => (
           <Checkbox key={key} aria-label={item.label} checked={checkedValues[i]} onChange={() => onToggle(key)} />
         ))}
       </div>
-      <Text as="span" className={styles.checkRowLabel}>
+      <Text as="span" className="predefined-improvements-list-check-row-label">
         {item.label}
       </Text>
     </div>
@@ -46,13 +46,13 @@ interface PredefinedImprovementsListProps {
 }
 
 export const PredefinedImprovementsList = ({ improvements, onToggleKey }: PredefinedImprovementsListProps) => (
-  <div className={styles.list}>
+  <div className="predefined-improvements-list-list">
     {IMPROVEMENTS.map((imp) => {
       const completed = !!improvements[imp.id];
-      const itemCx = cn(card.item, completed && card.itemCompleted);
+      const itemCx = cn('improvement-card-item', completed && 'improvement-card-item-completed');
       return (
         <div key={imp.id} className={itemCx}>
-          <div className={card.itemHeader}>
+          <div className="improvement-card-item-header">
             <Checkbox
               checked={completed}
               onChange={() => onToggleKey(imp.id)}
@@ -61,18 +61,18 @@ export const PredefinedImprovementsList = ({ improvements, onToggleKey }: Predef
                   {imp.title}
                 </Text>
               }
-              className={card.itemCheckbox}
+              className="improvement-card-item-checkbox"
             />
           </div>
           <Text font="serif" color="muted" italic leading="tight">
             {imp.summary}
           </Text>
 
-          <div className={card.section}>
+          <div className="improvement-card-section">
             <Heading as="h4" size="label">
               Requirements
             </Heading>
-            <div className={styles.requirementBlocks}>
+            <div className="predefined-improvements-list-requirement-blocks">
               {imp.requirements.map((block, blockIdx) => {
                 if (block.type === 'text') {
                   return (
@@ -82,7 +82,7 @@ export const PredefinedImprovementsList = ({ improvements, onToggleKey }: Predef
                   );
                 }
                 return (
-                  <div key={`${imp.id}-cb-${blockIdx}`} className={styles.checkList}>
+                  <div key={`${imp.id}-cb-${blockIdx}`} className="predefined-improvements-list-check-list">
                     {block.items.map((item, itemIdx) => {
                       const keys = makeReqKeys(imp.id, blockIdx, itemIdx, item.count ?? 1);
                       const checkedValues = keys.map((k) => !!improvements[k]);
@@ -102,7 +102,7 @@ export const PredefinedImprovementsList = ({ improvements, onToggleKey }: Predef
             </div>
           </div>
 
-          <div className={card.section}>
+          <div className="improvement-card-section">
             <Heading as="h4" size="label">
               When you meet the requirements
             </Heading>

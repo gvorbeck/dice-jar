@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button, Heading, Icon, Text, Tooltip } from '@/components/ui';
-import styles from './PlaybookSection.module.css';
+import './PlaybookSection.css';
 
 const DEFAULT_WARN_TEXT = 'This section has unresolved choices — select an option to complete it.';
 
@@ -43,16 +43,16 @@ export const PlaybookSection = ({
   const handleToggle = isUncontrolled ? handleSelfToggle : onToggleCollapse;
 
   const showCollapse = collapsible && !overrideNote;
-  const chevronCx = cn(styles.collapseChevron, !collapsed && styles.collapseChevronOpen);
-  const collapseCx = cn(styles.collapseToggle, warn && styles.collapseToggleHidden);
-  const chooseCx = cn(styles.sectionTitleChoose, (!warn || !!overrideNote) && styles.sectionTitleChooseHidden);
-  const warnCx = cn(styles.sectionTitleWarn, (!warn || !!overrideNote) && styles.sectionTitleWarnHidden);
-  const sectionCx = cn(styles.section, overrideNote && styles.sectionOverride);
+  const chevronCx = cn('playbook-section-collapse-chevron', !collapsed && 'playbook-section-collapse-chevron-open');
+  const collapseCx = cn('playbook-section-collapse-toggle', warn && 'playbook-section-collapse-toggle-hidden');
+  const chooseCx = cn('playbook-section-section-title-choose', (!warn || !!overrideNote) && 'playbook-section-section-title-choose-hidden');
+  const warnCx = cn('playbook-section-section-title-warn', (!warn || !!overrideNote) && 'playbook-section-section-title-warn-hidden');
+  const sectionCx = cn('playbook-section-section', overrideNote && 'playbook-section-section-override');
 
   return (
     <section className={sectionCx}>
-      <div className={styles.sectionHeader}>
-        <Heading as="h3" size="label" className={styles.sectionTitle}>
+      <div className="playbook-section-section-header">
+        <Heading as="h3" size="label" className="playbook-section-section-title">
           {title}
           {(choose !== undefined || chooseNote) && (
             <Text as="span" className={chooseCx}>
@@ -64,7 +64,7 @@ export const PlaybookSection = ({
           </Tooltip>
         </Heading>
         {overrideNote && (
-          <Text as="span" className={styles.sectionOverrideNote}>
+          <Text as="span" className="playbook-section-section-override-note">
             {overrideNote}
           </Text>
         )}

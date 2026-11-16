@@ -1,0 +1,25 @@
+.relationship-repeater-rel-repeater {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+/* label-free cells keep equal heights — do not add labels inside .relRow */
+.relationship-repeater-rel-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.relationship-repeater-rel-dropdown {
+  width: 100%;
+}
+
+.relationship-repeater-rel-remove-btn {
+  flex-shrink: 0;
+}
+
+.relationship-repeater-rel-add-btn {
+  align-self: flex-start;
+}

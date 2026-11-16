@@ -6,8 +6,8 @@ import type { ArcanaMinorEntry, ArcanaMajorEntry } from '@/types';
 import { MAIN_ITEMS, UNDEFINED_MAIN_COUNT, loadBand, type MainItem } from './inventoryData';
 import type { ArcanaWeights } from './useArcanaWeights';
 import { UndefinedProvisions } from './UndefinedProvisions';
-import shared from './inventoryItem.module.css';
-import styles from './MainInventorySection.module.css';
+import './inventoryItem.css';
+import './MainInventorySection.css';
 
 interface MainItemRowProps {
   item: MainItem;
@@ -29,7 +29,7 @@ const MainItemRow = memo(({ item, checked, uses, prosperity, weightOverride, onC
   );
   const handleUses = useCallback((n: number) => onUsesChange(item.id, n), [item.id, onUsesChange]);
   return (
-    <div className={styles.mainItemRow}>
+    <div className="main-inventory-section-main-item-row">
       {/* Dots render as a sibling of the checkbox, never inside its <label>: interactive
             buttons nested in a <label> are invalid HTML and garble the accessible name. */}
       <Checkbox
@@ -38,13 +38,13 @@ const MainItemRow = memo(({ item, checked, uses, prosperity, weightOverride, onC
         checked={checked}
         onChange={handleChecked}
         label={
-          <span className={shared.itemLabel}>
+          <span className="inventory-item-item-label">
             <Text as="span">{item.label}</Text>
           </span>
         }
       />
       {hasUses && checked && (
-        <div className={styles.itemDots}>
+        <div className="main-inventory-section-item-dots">
           <UseDots total={effectiveTotal} checked={uses} onChange={handleUses} ariaLabel={item.label} />
         </div>
       )}
@@ -66,13 +66,13 @@ const ArcanaItemRow = memo(({ id, name, weight, carried, onCarriedChange }: Arca
     [id, onCarriedChange],
   );
   return (
-    <div className={styles.mainItemRow}>
+    <div className="main-inventory-section-main-item-row">
       <Checkbox
         variant="provision"
         weight={weight}
         checked={carried}
         onChange={handleChange}
-        label={<Text as="span" className={shared.itemLabel}>{`**${name}** *(arcanum)*`}</Text>}
+        label={<Text as="span" className="inventory-item-item-label">{`**${name}** *(arcanum)*`}</Text>}
       />
     </div>
   );
@@ -124,10 +124,10 @@ export const MainInventorySection = ({
   const loadLabel =
     band === null ? 'calculating load…' : band === 'overloaded' ? 'overloaded (slow, noisy, risk of injury)' : `${band} load`;
   const loadCx = cn(
-    styles.loadBadge,
-    band === 'light' && styles.loadLight,
-    band === 'normal' && styles.loadNormal,
-    (band === 'heavy' || band === 'overloaded') && styles.loadHeavy,
+    'main-inventory-section-load-badge',
+    band === 'light' && 'main-inventory-section-load-light',
+    band === 'normal' && 'main-inventory-section-load-normal',
+    (band === 'heavy' || band === 'overloaded') && 'main-inventory-section-load-heavy',
   );
 
   return (
@@ -144,7 +144,7 @@ export const MainInventorySection = ({
         ]}
       />
 
-      <div className={styles.loadRow}>
+      <div className="main-inventory-section-load-row">
         <Text
           as="span"
           className={loadCx}
@@ -153,7 +153,7 @@ export const MainInventorySection = ({
         >
           {isLoading ? (
             <>
-              <Icon name="hourglass" size="small" className={styles.loadIcon} />
+              <Icon name="hourglass" size="small" className="main-inventory-section-load-icon" />
               {loadLabel}
             </>
           ) : (

@@ -1,0 +1,135 @@
+/* ── Table ──────────────────────────────────────────── */
+.table-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-3);
+  font-size: var(--text-sm);
+}
+
+.table-table tbody tr {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.table-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table-table-cell {
+  padding: var(--spacing-2) var(--spacing-3) var(--spacing-2) 0;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.table-table-cell-indent {
+  padding: var(--spacing-1) var(--spacing-3) var(--spacing-1) var(--spacing-5);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.table-table-group-row td {
+  padding-top: var(--spacing-3);
+}
+
+.table-table-group-cell {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  padding-bottom: var(--spacing-1);
+}
+
+.table-table-value {
+  text-align: right;
+  white-space: nowrap;
+  color: var(--text-accent);
+  font-family: var(--font-serif);
+  font-size: var(--text-md);
+  font-weight: normal;
+  letter-spacing: 0.02em;
+  padding-right: 0;
+  vertical-align: top;
+}
+
+.table-table-th {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding: var(--spacing-2) var(--spacing-3) var(--spacing-2) 0;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.table-table-th:last-child {
+  text-align: right;
+}
+
+/* N-column tables left-align every header, overriding the two-column trailing right-align. */
+.table-table-th-start,
+.table-table-th-start:last-child {
+  text-align: left;
+}
+
+/* ── Selectable N-column rows ───────────────────────── */
+.table-table-cells-row td {
+  padding: var(--spacing-2) var(--spacing-3) var(--spacing-2) 0;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.table-table-selectable-row {
+  cursor: pointer;
+}
+
+.table-table-selectable-row:hover {
+  background-color: var(--surface-overlay);
+}
+
+.table-table-selected-row {
+  background-color: var(--surface-overlay);
+}
+
+/* ── Bordered table variant ─────────────────────────── */
+.table-table-wrapper {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-top: var(--spacing-4);
+}
+
+.table-table-title {
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: var(--text-md);
+  color: var(--text-primary);
+  padding: var(--spacing-3) var(--spacing-4) var(--spacing-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.table-table-bordered {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table-table-bordered .table-table-cell {
+  padding-left: var(--spacing-4);
+}
+
+.table-table-bordered .table-table-cell-indent {
+  padding-left: var(--spacing-8);
+}
+
+.table-table-bordered .table-table-group-cell {
+  padding-left: var(--spacing-4);
+}
+
+.table-table-bordered .table-table-th:first-child {
+  padding-left: var(--spacing-4);
+}
+
+.table-table-bordered .table-table-value,
+.table-table-bordered .table-table-th:last-child {
+  padding-right: var(--spacing-4);
+}

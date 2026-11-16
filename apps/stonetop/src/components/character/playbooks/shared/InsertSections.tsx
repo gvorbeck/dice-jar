@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { Input, Text } from '@/components/ui';
 import type { INSERT_PURPOSE_OPTIONS as PurposeOptions } from '@/lib/insertSharedData';
-import styles from './InsertSections.module.css';
+import './InsertSections.css';
 
 interface PurposeDetailProps {
   opt: (typeof PurposeOptions)[number];
@@ -14,9 +14,9 @@ export const PurposeDetail = ({ opt, nameValue, onNameChange, onNameBlur }: Purp
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onNameChange(opt.value, e), [onNameChange, opt.value]);
 
   return (
-    <div className={styles.purposeDetail}>
+    <div className="insert-sections-purpose-detail">
       <Input
-        className={styles.purposeNameInput}
+        className="insert-sections-purpose-name-input"
         type="text"
         value={nameValue}
         placeholder={opt.namePlaceholder}
@@ -24,9 +24,9 @@ export const PurposeDetail = ({ opt, nameValue, onNameChange, onNameBlur }: Purp
         onChange={handleChange}
         onBlur={onNameBlur}
       />
-      <ul className={styles.triggerList}>
+      <ul className="insert-sections-trigger-list">
         {opt.triggers.map((t) => (
-          <li key={t} className={styles.triggerItem}>
+          <li key={t} className="insert-sections-trigger-item">
             <Text as="span" font="serif" color="muted">
               {t}
             </Text>

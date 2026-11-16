@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Checkbox, Input, UseDots } from '@/components/ui';
-import styles from './CrewWidgets.module.css';
+import './CrewWidgets.css';
 
 interface StatBoxProps {
   label: React.ReactNode;
@@ -37,12 +37,12 @@ export const StatBox = memo(
     className,
     children,
   }: StatBoxProps) => {
-    const inputCx = cn(styles.statInput, compact && styles.statInputSm);
+    const inputCx = cn('crew-widgets-stat-input', compact && 'crew-widgets-stat-input-sm');
 
     return (
-      <div className={cn(styles.statBox, className)}>
+      <div className={cn('crew-widgets-stat-box', className)}>
         {staticValue !== undefined ? (
-          <span className={styles.statStatic}>{staticValue}</span>
+          <span className="crew-widgets-stat-static">{staticValue}</span>
         ) : (
           <Input
             className={inputCx}
@@ -55,7 +55,7 @@ export const StatBox = memo(
             {...inputProps}
           />
         )}
-        <span className={styles.statLabel}>
+        <span className="crew-widgets-stat-label">
           {label}
           {children}
         </span>
@@ -72,7 +72,7 @@ interface LoyaltyRowProps {
 }
 
 export const LoyaltyRow = memo(({ label = 'Loyalty', value, onChange, className }: LoyaltyRowProps) => (
-  <div className={cn(styles.loyaltyRow, className)}>
+  <div className={cn('crew-widgets-loyalty-row', className)}>
     {label}
     <UseDots total={3} checked={value} onChange={onChange} ariaLabel="Loyalty" />
   </div>
@@ -106,10 +106,10 @@ const GearRowItem = memo(
       [itemIndex, onTextChange],
     );
     return (
-      <div className={styles.gearRow}>
+      <div className="crew-widgets-gear-row">
         <Checkbox variant="provision" weight={weight} checked={checked} onChange={handleChecked} aria-label={ariaLabel} />
         <Input
-          className={styles.gearInput}
+          className="crew-widgets-gear-input"
           type="text"
           value={text}
           placeholder="Item…"
@@ -143,8 +143,8 @@ export const CustomItemsGrid = memo(
   ({ singleItems, doubleItems, doubleOffset, onCheckedChange, onTextChange, onBlur, ariaPrefix = 'Item' }: CustomItemsGridProps) => {
     const offset = doubleOffset ?? singleItems.length;
     return (
-      <div className={styles.gearColumns}>
-        <div className={styles.gearCol}>
+      <div className="crew-widgets-gear-columns">
+        <div className="crew-widgets-gear-col">
           {singleItems.map((item, i) => (
             <GearRowItem
               key={`single-${ariaPrefix}-${i}`}
@@ -160,7 +160,7 @@ export const CustomItemsGrid = memo(
             />
           ))}
         </div>
-        <div className={styles.gearCol}>
+        <div className="crew-widgets-gear-col">
           {doubleItems.map((item, i) => (
             <GearRowItem
               key={`double-${ariaPrefix}-${i}`}

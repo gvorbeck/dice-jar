@@ -1,6 +1,6 @@
 import { Heading, Text, List, Callout, Stack } from '@/components/ui';
-import playbookStyles from '@/components/gm-playbook/Playbook.module.css';
-import styles from '@/pages/GmPlaybook/GmPlaybook.module.css';
+import '@/components/gm-playbook/Playbook.css';
+import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const NPCs = () => (
   <div>
@@ -40,7 +40,7 @@ export const NPCs = () => (
       </Stack>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Trait
       </Heading>
@@ -53,7 +53,7 @@ export const NPCs = () => (
       </Stack>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Questions
       </Heading>
@@ -98,7 +98,7 @@ export const NPCs = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Impressions
       </Heading>
@@ -121,7 +121,7 @@ export const NPCs = () => (
       </Stack>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Instinct
       </Heading>
@@ -133,9 +133,9 @@ export const NPCs = () => (
       </Stack>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
-        Tags &amp; moves <span className={playbookStyles.muted}>(optional)</span>
+        Tags &amp; moves <span className="playbook-muted">(optional)</span>
       </Heading>
       <Text>
         Assign tags as you see fit, adjectives or nouns that describe their nature, capabilities (or lack thereof), or notable traits:
@@ -146,9 +146,9 @@ export const NPCs = () => (
       </Text>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
-        Connections <span className={playbookStyles.muted}>(optional)</span>
+        Connections <span className="playbook-muted">(optional)</span>
       </Heading>
       <Text>Ask yourself some or all of the following:</Text>
       <List
@@ -162,9 +162,9 @@ export const NPCs = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
-        Motivations <span className={playbookStyles.muted}>(optional)</span>
+        Motivations <span className="playbook-muted">(optional)</span>
       </Heading>
       <Text>Ask yourself some of the following:</Text>
       <List
@@ -180,9 +180,9 @@ export const NPCs = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
-        Embodiment <span className={playbookStyles.muted}>(optional)</span>
+        Embodiment <span className="playbook-muted">(optional)</span>
       </Heading>
       <Text>Use one or more tricks to embody the NPC:</Text>
       <Stack gap={4}>
@@ -196,14 +196,14 @@ export const NPCs = () => (
       </Stack>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
-        HP, armor, damage <span className={playbookStyles.muted}>(optional)</span>
+        HP, armor, damage <span className="playbook-muted">(optional)</span>
       </Heading>
       <Text>If you think it will matter, stat them up as if they were monsters or followers, whichever seems more appropriate.</Text>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Callout title="PERSUADE (vs. NPCs)">
         <Text>
           When you ***press or entice an NPC***, say what you want them to do (or not do). If they **have reason to resist**, roll +CHA: on
@@ -211,7 +211,7 @@ export const NPCs = () => (
           convince them, though it'll likely be costly, tricky, or distasteful.
         </Text>
       </Callout>
-      <Text className={playbookStyles.spacerTop}>Things that might convince an NPC:</Text>
+      <Text className="playbook-spacer-top">Things that might convince an NPC:</Text>
       <List
         variant="bullet"
         items={[

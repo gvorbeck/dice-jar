@@ -3,7 +3,7 @@ import { cn } from '@dice-jar/cn';
 import { Tooltip } from '../Tooltip/Tooltip';
 import { Button } from '../Button/Button';
 import { Icon } from '../Icon/Icon';
-import styles from './Tabs.module.css';
+import './Tabs.css';
 
 interface Tab {
   id?: string;
@@ -25,12 +25,12 @@ interface TabsProps {
   onAdd?: () => void;
 }
 
-export const tabBadgeClass = styles.tabBadge;
+export const tabBadgeClass = 'tabs-tab-badge';
 
 const TabRemoveButton = ({ tab, onRemove }: { tab: Tab; onRemove: () => void }) => (
-  <span className={styles.tabRemoveWrapper}>
+  <span className="tabs-tab-remove-wrapper">
     <Tooltip text={tab.removeTooltip ?? `Remove ${tab.label}`} side="bottom">
-      <button type="button" className={styles.tabRemove} aria-label={tab.removeTooltip ?? `Remove ${tab.label} tab`} onClick={onRemove}>
+      <button type="button" className="tabs-tab-remove" aria-label={tab.removeTooltip ?? `Remove ${tab.label} tab`} onClick={onRemove}>
         <Icon name="close" aria-hidden size="small" />
       </button>
     </Tooltip>
@@ -38,9 +38,9 @@ const TabRemoveButton = ({ tab, onRemove }: { tab: Tab; onRemove: () => void }) 
 );
 
 const AddTabButton = ({ onAdd }: { onAdd: () => void }) => (
-  <span className={styles.addTabWrapper}>
+  <span className="tabs-add-tab-wrapper">
     <Tooltip text="Add an Insert" side="bottom">
-      <Button variant="ghost" size="sm" icon="plus" onClick={onAdd} aria-label="Add an insert" className={styles.addTab} />
+      <Button variant="ghost" size="sm" icon="plus" onClick={onAdd} aria-label="Add an insert" className="tabs-add-tab" />
     </Tooltip>
   </span>
 );
@@ -76,8 +76,8 @@ const TabButton = ({
     },
     [tabRefs, index],
   );
-  const cx = cn(styles.tab, isActive && styles.active, onRemove && styles.tabHasRemove);
-  const slotCx = cn(styles.tabSlot, isActive && styles.tabSlotActive);
+  const cx = cn('tabs-tab', isActive && 'tabs-active', onRemove && 'tabs-tab-has-remove');
+  const slotCx = cn('tabs-tab-slot', isActive && 'tabs-tab-slot-active');
 
   const handleClick = useCallback(() => onActivate(index), [onActivate, index]);
   const handleKeyDown = useCallback(
@@ -172,7 +172,7 @@ export const Tabs = ({ tabs, defaultIndex = 0, activeIndex, onActiveChange, clas
     setEverActiveIds((prev) => (prev.has(activeId) ? prev : new Set([...prev, activeId])));
   }
 
-  const cx = cn(styles.root, className);
+  const cx = cn('tabs', className);
 
   // Keep the active tab within the scrolled strip. Clicking and keyboard focus
   // scroll it into view on their own, but a controlled `activeIndex` change
@@ -218,8 +218,8 @@ export const Tabs = ({ tabs, defaultIndex = 0, activeIndex, onActiveChange, clas
 
   return (
     <div className={cx}>
-      <div className={styles.tablistRow}>
-        <div ref={tablistRef} className={styles.tablist} role="tablist" aria-label={ariaLabel}>
+      <div className="tabs-tablist-row">
+        <div ref={tablistRef} className="tabs-tablist" role="tablist" aria-label={ariaLabel}>
           {resolvedTabs.map((tab, i) => (
             <TabButton
               key={tab.id}
@@ -244,7 +244,7 @@ export const Tabs = ({ tabs, defaultIndex = 0, activeIndex, onActiveChange, clas
           id={`${baseId}-panel-${tab.id}`}
           aria-labelledby={`${baseId}-tab-${tab.id}`}
           hidden={active !== i}
-          className={styles.panel}
+          className="tabs-panel"
         >
           {everActiveIds.has(tab.id) ? tab.content : null}
         </div>

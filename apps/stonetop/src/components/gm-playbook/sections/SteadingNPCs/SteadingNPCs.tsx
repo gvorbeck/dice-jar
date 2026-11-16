@@ -9,7 +9,7 @@ import { NPC_CONFIG, buildGroups, buildNameMap } from './npcData';
 import type { NpcFormState, RelTarget } from './npcData';
 import { NpcModal } from './NpcModal';
 import { NpcRow } from './NpcRow';
-import styles from './SteadingNPCs.module.css';
+import './SteadingNPCs.css';
 
 const excludeFromGroups = (groups: DropdownGroup<RelTarget>[], excludeId: string): DropdownGroup<RelTarget>[] =>
   groups.map((g) => ({ ...g, options: g.options.filter((o) => !o.value.endsWith(`::${excludeId}`)) })).filter((g) => g.options.length > 0);
@@ -69,8 +69,8 @@ const NpcSection = ({ title, description, npcs, onUpdate, onToggleDead, relation
   );
 
   return (
-    <div className={styles.section}>
-      <div className={styles.addRow}>
+    <div className="steading-npcs-section">
+      <div className="steading-npcs-add-row">
         <Text size="xs" color="muted">
           {description}
         </Text>
@@ -80,7 +80,7 @@ const NpcSection = ({ title, description, npcs, onUpdate, onToggleDead, relation
       </div>
 
       {npcs.length > 0 && (
-        <div className={styles.npcList} role="list" aria-label={`${title} list`}>
+        <div className="steading-npcs-npc-list" role="list" aria-label={`${title} list`}>
           {npcs.map((npc) => (
             <NpcRow
               key={npc.id}

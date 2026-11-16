@@ -1,5 +1,5 @@
 import { Heading, Text, List, Table, Callout } from '@/components/ui';
-import styles from '@/pages/GmPlaybook/GmPlaybook.module.css';
+import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const Expeditions = () => (
   <div>
@@ -15,7 +15,7 @@ export const Expeditions = () => (
       </Text>
     </Callout>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Requirements
       </Heading>
@@ -31,7 +31,7 @@ export const Expeditions = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Challenges
       </Heading>
@@ -53,7 +53,7 @@ export const Expeditions = () => (
       </Text>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         When the way is perilous
       </Heading>
@@ -69,7 +69,7 @@ export const Expeditions = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Table
         title="Travel times"
         columnHeaders={['Journey', 'Time']}
@@ -104,7 +104,7 @@ export const Expeditions = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         When they make camp
       </Heading>
@@ -136,7 +136,7 @@ export const Expeditions = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Legs of travel
       </Heading>
@@ -170,7 +170,7 @@ export const Expeditions = () => (
       <Text color="muted">"What do you do?" Resolve. Repeat or move on.</Text>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Points of interest
       </Heading>
@@ -203,12 +203,12 @@ export const Expeditions = () => (
       <Text>Otherwise, make a soft GM move. "What do you do?" Resolve actions. Repeat or move on.</Text>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Random weather
       </Heading>
       <Text>You decide the weather, but if you want, ask a player to roll the Die of Fate.</Text>
-      <div className={styles.weatherGrid}>
+      <div className="gm-playbook-weather-grid">
         <Table
           columnHeaders={['Late Winter / Early Spring', '1d6']}
           rows={[

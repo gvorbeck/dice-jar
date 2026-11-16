@@ -3,7 +3,7 @@ import { Checkbox, CheckboxGroup, Divider, Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { usePlaybookChecked } from '@/hooks/usePlaybookChecked';
 import type { PlaybookSectionProps } from '@/types';
-import localStyles from './FoxTallTales.module.css';
+import './FoxTallTales.css';
 
 const LOCATION_ITEMS = [
   { id: 'tales-lost-great-wood', label: 'the Great Wood' },
@@ -63,14 +63,14 @@ export const FoxTallTales = ({ data, onSave }: FoxTallTalesProps) => {
         Someone like you gets into all sorts of trouble, whether you mean to or not. Mix and match the following to come up with a couple of
         your more memorable adventures, and write them down in the space at the bottom of this column.
       </Text>
-      <div className={localStyles.taleGroup}>
+      <div className="fox-tall-tales-tale-group">
         <Text font="serif" color="muted" leading="normal">
           There was that time that you… (choose 1 per tale)
         </Text>
-        <div className={localStyles.list}>
-          <div className={localStyles.lostRow}>
+        <div className="fox-tall-tales-list">
+          <div className="fox-tall-tales-lost-row">
             <Checkbox checked={lostChecked} onChange={handleLostChange} label="… got lost in (choose 1):" />
-            <div className={localStyles.locationSub}>
+            <div className="fox-tall-tales-location-sub">
               <CheckboxGroup items={LOCATION_ITEMS} checked={checked} onChange={handleChange} max={1} disabled={!lostChecked} />
             </div>
           </div>

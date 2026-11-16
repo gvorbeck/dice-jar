@@ -1,11 +1,11 @@
 import { memo } from 'react';
 import { Heading, Text, List } from '@/components/ui';
-import styles from '@/pages/GmPlaybook/GmPlaybook.module.css';
+import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const Threats = memo(() => (
   <div>
     <Text size="xs">Threats are the lingering problems that cause trouble for the PCs, the steading, the region, or even the world.</Text>
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Text size="xs">
         Write up threats after the first session, based on what the players told you as they introduced their characters. Write new threats
         between sessions when…
@@ -19,7 +19,7 @@ export const Threats = memo(() => (
         ]}
       />
     </div>
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Write up a threat
       </Heading>
@@ -40,7 +40,7 @@ export const Threats = memo(() => (
         ]}
       />
     </div>
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Update threats
       </Heading>
@@ -58,13 +58,13 @@ export const Threats = memo(() => (
         ]}
       />
     </div>
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Threat moves
       </Heading>
-      <div className={styles.threatMovesGrid}>
+      <div className="gm-playbook-threat-moves-grid">
         <div>
-          <Heading as="h4" size="sm" className={styles.threatType}>
+          <Heading as="h4" size="sm" className="gm-playbook-threat-type">
             Affliction
           </Heading>
           <List
@@ -86,7 +86,7 @@ export const Threats = memo(() => (
           />
         </div>
         <div>
-          <Heading as="h4" size="sm" className={styles.threatType}>
+          <Heading as="h4" size="sm" className="gm-playbook-threat-type">
             Beast
           </Heading>
           <List
@@ -105,7 +105,7 @@ export const Threats = memo(() => (
           />
         </div>
         <div>
-          <Heading as="h4" size="sm" className={styles.threatType}>
+          <Heading as="h4" size="sm" className="gm-playbook-threat-type">
             Institution
           </Heading>
           <List
@@ -126,7 +126,7 @@ export const Threats = memo(() => (
           />
         </div>
         <div>
-          <Heading as="h4" size="sm" className={styles.threatType}>
+          <Heading as="h4" size="sm" className="gm-playbook-threat-type">
             MacGuffin
           </Heading>
           <List
@@ -147,7 +147,7 @@ export const Threats = memo(() => (
           />
         </div>
         <div>
-          <Heading as="h4" size="sm" className={styles.threatType}>
+          <Heading as="h4" size="sm" className="gm-playbook-threat-type">
             Magical entity
           </Heading>
           <List
@@ -169,7 +169,7 @@ export const Threats = memo(() => (
           />
         </div>
         <div>
-          <Heading as="h4" size="sm" className={styles.threatType}>
+          <Heading as="h4" size="sm" className="gm-playbook-threat-type">
             Rabble
           </Heading>
           <List
@@ -190,7 +190,7 @@ export const Threats = memo(() => (
           />
         </div>
         <div>
-          <Heading as="h4" size="sm" className={styles.threatType}>
+          <Heading as="h4" size="sm" className="gm-playbook-threat-type">
             Villain
           </Heading>
           <List
@@ -212,7 +212,7 @@ export const Threats = memo(() => (
           />
         </div>
         <div>
-          <Heading as="h4" size="sm" className={styles.threatType}>
+          <Heading as="h4" size="sm" className="gm-playbook-threat-type">
             Wildcard
           </Heading>
           <List

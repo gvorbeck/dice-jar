@@ -11,7 +11,7 @@ import { generateId } from '@/lib/id';
 import { useCrewSave } from '../shared/useCrewSave';
 import { StatBox, LoyaltyRow, CustomItemsGrid } from '../shared/CrewWidgets';
 import type { FollowerData, FollowerGearItem, PlaybookSectionProps } from '@/types';
-import styles from './FollowersInsert.module.css';
+import './FollowersInsert.css';
 
 const GEAR_SINGLE_COUNT = 3;
 const GEAR_DOUBLE_COUNT = 3;
@@ -63,7 +63,7 @@ const MoveRow = memo(({ followerIndex, moveIndex, value, onChange, onBlur }: Mov
   );
   return (
     <Input
-      className={styles.moveInput}
+      className="followers-insert-move-input"
       type="text"
       value={value}
       placeholder={`Move ${moveIndex + 1}…`}
@@ -168,17 +168,17 @@ const FollowerCard = memo(
     const doubleGear = follower.gear?.slice(GEAR_SINGLE_COUNT) ?? [];
 
     const followerLabel = follower.name || `Follower ${index + 1}`;
-    const loyaltyLabelCx = cn(styles.fieldLabel, styles.loyaltyLabel);
+    const loyaltyLabelCx = cn('followers-insert-field-label', 'followers-insert-loyalty-label');
 
     return (
-      <section className={styles.card} aria-labelledby={headingId}>
-        <Heading as="h3" id={headingId} className={styles.srOnly}>
+      <section className="followers-insert-card" aria-labelledby={headingId}>
+        <Heading as="h3" id={headingId} className="followers-insert-sr-only">
           {followerLabel}
         </Heading>
-        <div className={styles.cardHeader}>
-          <div className={styles.nameTagRow}>
+        <div className="followers-insert-card-header">
+          <div className="followers-insert-name-tag-row">
             <Input
-              className={styles.nameInput}
+              className="followers-insert-name-input"
               type="text"
               value={follower.name ?? ''}
               placeholder="Name"
@@ -187,7 +187,7 @@ const FollowerCard = memo(
               onBlur={onBlur}
             />
             <Input
-              className={styles.tagInput}
+              className="followers-insert-tag-input"
               type="text"
               value={follower.tags ?? ''}
               placeholder="Tags"
@@ -215,7 +215,7 @@ const FollowerCard = memo(
             size="xs"
             color="muted"
           >{`**${followerLabel}** will be permanently removed. All follower data will be lost and cannot be recovered.`}</Text>
-          <div className={styles.confirmActions}>
+          <div className="followers-insert-confirm-actions">
             <Button variant="ghost" size="md" onClick={handleCancelRemove}>
               Cancel
             </Button>
@@ -225,7 +225,7 @@ const FollowerCard = memo(
           </div>
         </Modal>
 
-        <div className={styles.flags}>
+        <div className="followers-insert-flags">
           <Checkbox
             checked={follower.exceptional ?? false}
             onChange={handleExceptional}
@@ -246,7 +246,7 @@ const FollowerCard = memo(
           />
         </div>
 
-        <div className={styles.statsRow}>
+        <div className="followers-insert-stats-row">
           <StatBox
             compact
             ariaLabel={`Follower ${index + 1} current HP`}
@@ -262,12 +262,12 @@ const FollowerCard = memo(
               </Text>
             }
           >
-            <Text as="span" className={styles.statMaxRow}>
-              <Text as="span" size="xs" color="muted" italic className={styles.statNote}>
+            <Text as="span" className="followers-insert-stat-max-row">
+              <Text as="span" size="xs" color="muted" italic className="followers-insert-stat-note">
                 Max
               </Text>
               <Input
-                className={styles.maxHpInput}
+                className="followers-insert-max-hp-input"
                 type="number"
                 value={follower.maxHp ?? ''}
                 min={0}
@@ -306,12 +306,12 @@ const FollowerCard = memo(
           />
         </div>
 
-        <div className={styles.fieldRow}>
-          <Text as="span" size="xs" color="muted" className={styles.fieldLabel}>
+        <div className="followers-insert-field-row">
+          <Text as="span" size="xs" color="muted" className="followers-insert-field-label">
             Instinct
           </Text>
           <Input
-            className={styles.fieldInput}
+            className="followers-insert-field-input"
             type="text"
             value={follower.instinct ?? ''}
             placeholder="What trouble do they cause…"
@@ -321,11 +321,11 @@ const FollowerCard = memo(
           />
         </div>
 
-        <div className={styles.movesSection}>
-          <Text as="span" size="xs" color="muted" className={styles.fieldLabel}>
+        <div className="followers-insert-moves-section">
+          <Text as="span" size="xs" color="muted" className="followers-insert-field-label">
             Moves
           </Text>
-          <div className={styles.movesList}>
+          <div className="followers-insert-moves-list">
             {(follower.moves ?? []).map((mv, mi) => (
               <MoveRow
                 key={`move-${follower.id}-${mi}`}
@@ -339,13 +339,13 @@ const FollowerCard = memo(
           </div>
         </div>
 
-        <div className={styles.costLoyaltyRow}>
-          <div className={styles.fieldRow}>
-            <Text as="span" size="xs" color="muted" className={styles.fieldLabel}>
+        <div className="followers-insert-cost-loyalty-row">
+          <div className="followers-insert-field-row">
+            <Text as="span" size="xs" color="muted" className="followers-insert-field-label">
               Cost
             </Text>
             <Input
-              className={styles.fieldInput}
+              className="followers-insert-field-input"
               type="text"
               value={follower.cost ?? ''}
               placeholder="What keeps them following…"
@@ -365,8 +365,8 @@ const FollowerCard = memo(
           />
         </div>
 
-        <div className={styles.gearSection}>
-          <Text as="span" size="xs" color="muted" className={styles.fieldLabel}>
+        <div className="followers-insert-gear-section">
+          <Text as="span" size="xs" color="muted" className="followers-insert-field-label">
             Gear
           </Text>
           <CustomItemsGrid
@@ -380,12 +380,12 @@ const FollowerCard = memo(
           />
         </div>
 
-        <div className={styles.fieldRow}>
-          <Text as="span" size="xs" color="muted" className={styles.fieldLabel}>
+        <div className="followers-insert-field-row">
+          <Text as="span" size="xs" color="muted" className="followers-insert-field-label">
             Notes
           </Text>
           <Input
-            className={styles.fieldInput}
+            className="followers-insert-field-input"
             type="text"
             value={follower.notes ?? ''}
             placeholder="Notes…"
@@ -533,10 +533,10 @@ export const FollowersInsert = ({ data, onSave }: FollowersInsertProps) => {
   );
 
   return (
-    <div className={styles.root}>
+    <div className="followers-insert">
       <PlaybookSection title="Followers">
         {followers.length === 0 && (
-          <Text size="xs" font="serif" color="muted" italic className={styles.empty}>
+          <Text size="xs" font="serif" color="muted" italic className="followers-insert-empty">
             No followers yet. Add one below.
           </Text>
         )}

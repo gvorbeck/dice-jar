@@ -1,0 +1,55 @@
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.checkbox-group-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.checkbox-group-gap-md {
+  gap: var(--spacing-3);
+}
+
+.checkbox-group-gap-lg {
+  gap: var(--spacing-4);
+}
+
+.checkbox-group-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-2) var(--spacing-4);
+}
+
+.checkbox-group-grid4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-2) var(--spacing-4);
+}
+
+.checkbox-group-grid6 {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--spacing-2) var(--spacing-4);
+}
+
+.checkbox-group-grid-responsive246 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-2) var(--spacing-4);
+}
+
+@media (min-width: 640px) {
+  .checkbox-group-grid-responsive246 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .checkbox-group-grid-responsive246 {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}

@@ -8,7 +8,7 @@ import { useToast } from '@/components/app';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import type { AppearanceRows } from '@/lib/characterCreation/appearanceOptions';
 import type { CharacterData } from '@/types';
-import styles from './Appearance.module.css';
+import './Appearance.css';
 
 const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
 
@@ -125,14 +125,14 @@ export const Appearance = ({ rows, data, onSave }: AppearanceProps = {}) => {
       forceChildren
     >
       {isCollapsed && isComplete && summary ? (
-        <Text color="muted" className={styles.summary}>
+        <Text color="muted" className="appearance-summary">
           {summary}
         </Text>
       ) : (
-        <div className={styles.rows}>
+        <div className="appearance-rows">
           {rows.map((options, rowIndex) => (
-            <div key={options[0]} className={styles.row}>
-              <RadioGroup legend={options.join(', ')} legendHidden className={styles.options}>
+            <div key={options[0]} className="appearance-row">
+              <RadioGroup legend={options.join(', ')} legendHidden className="appearance-options">
                 {options.map((opt) => (
                   <Radio
                     key={opt}
@@ -148,9 +148,9 @@ export const Appearance = ({ rows, data, onSave }: AppearanceProps = {}) => {
               </RadioGroup>
             </div>
           ))}
-          <div className={styles.row}>
+          <div className="appearance-row">
             <Checkbox
-              className={styles.customCheckbox}
+              className="appearance-custom-checkbox"
               name="appearance-custom"
               value="custom"
               checked={isCustom}
@@ -158,7 +158,7 @@ export const Appearance = ({ rows, data, onSave }: AppearanceProps = {}) => {
               label={
                 isCustom ? (
                   <Input
-                    className={styles.customInput}
+                    className="appearance-custom-input"
                     value={customText}
                     placeholder="Describe your appearance…"
                     aria-label="Custom appearance"
@@ -167,7 +167,7 @@ export const Appearance = ({ rows, data, onSave }: AppearanceProps = {}) => {
                     onClick={stopPropagation}
                   />
                 ) : (
-                  <span className={styles.customLabel}>Custom</span>
+                  <span className="appearance-custom-label">Custom</span>
                 )
               }
             />

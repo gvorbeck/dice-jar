@@ -5,7 +5,7 @@ import { Move } from '../../Move';
 import { usePlaybookChecked } from '@/hooks/usePlaybookChecked';
 import { LIGHTBEARER_INVOCATIONS } from '@/lib/moves/lightbearerInvocations';
 import type { MoveDefinition, PlaybookSectionProps } from '@/types';
-import styles from './LightbearerInvocations.module.css';
+import './LightbearerInvocations.css';
 
 const INTRO_LINES = [
   'Lightbearer, you start knowing 2 Invocations. Each time you reach an even-numbered level, learn 1 new Invocation.',
@@ -44,14 +44,14 @@ export const LightbearerInvocations = ({ data, onSave }: LightbearerInvocationsP
 
   return (
     <PlaybookSection title="Invocations">
-      <div className={styles.intro}>
+      <div className="lightbearer-invocations-intro">
         {INTRO_LINES.map((line) => (
           <Text key={line} font="serif" color="muted">
             {line}
           </Text>
         ))}
       </div>
-      <div className={styles.grid}>
+      <div className="lightbearer-invocations-grid">
         {sorted.map((inv) => (
           <InvocationMove key={inv.id} inv={inv} isChecked={checked[inv.id] ?? false} onChange={handleChange} />
         ))}

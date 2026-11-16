@@ -1,0 +1,7 @@
+/* ── Shared label rules → inventoryItem.css ──── */
+
+/* Small items */
+.small-inventory-section-small-item-row {
+  display: flex;
+  align-items: baseline;
+}

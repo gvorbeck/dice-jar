@@ -1,0 +1,12 @@
+.arcana-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
+}
+
+.arcana-tab-loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-4);
+}

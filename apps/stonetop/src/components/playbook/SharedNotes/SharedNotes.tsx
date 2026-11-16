@@ -3,7 +3,7 @@ import { Icon, PlaybookColumns, Spinner, Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import type { UseGameResult } from '@/hooks/useGame';
 import type { NotesLock } from '@/types';
-import styles from './SharedNotes.module.css';
+import './SharedNotes.css';
 
 // TipTap/ProseMirror is heavy and only needed once a playbook page has rendered its tabs, so it gets its
 // own chunk rather than riding in all three playbook page bundles.
@@ -30,12 +30,12 @@ export const SharedNotes = ({ notesKey, html, lock, actions, warning }: SharedNo
 
   return (
     <PlaybookColumns
-      className={styles.root}
+      className="shared-notes"
       full={
         <PlaybookSection title="Notes">
           {warning && (
-            <p className={styles.warning} role="note">
-              <Icon name="warning" size="small" className={styles.warningIcon} aria-hidden="true" />
+            <p className="shared-notes-warning" role="note">
+              <Icon name="warning" size="small" className="shared-notes-warning-icon" aria-hidden="true" />
               <Text as="span" size="xs">
                 {warning}
               </Text>
@@ -43,7 +43,7 @@ export const SharedNotes = ({ notesKey, html, lock, actions, warning }: SharedNo
           )}
           <Suspense
             fallback={
-              <div className={styles.loading}>
+              <div className="shared-notes-loading">
                 <Spinner />
               </div>
             }

@@ -11,7 +11,7 @@ import { useCrewSave } from '../shared/useCrewSave';
 import { useTrackedField } from '../shared/useTrackedField';
 import type { MoveDefinition, PlaybookSectionProps } from '@/types';
 import { THRALL_MOVES, THRALL_MARK_DEFINITIONS } from '@/lib/moves/inserts';
-import styles from './ThrallInsert.module.css';
+import './ThrallInsert.css';
 
 const THRALL_INSTINCT_OPTIONS = [
   { value: 'fascination', label: 'FASCINATION', description: 'To explore your powers, your master, your new existence.' },
@@ -43,8 +43,8 @@ const noop = () => {};
 const MarkEntry = ({ mark, gained, crossedOff, onGainedChange, onCrossedOffChange }: MarkEntryProps) => {
   const handleSelectChange = useCallback((val: boolean) => onGainedChange(mark.id, val), [mark.id, onGainedChange]);
   const handleCrossOff = useCallback(() => onCrossedOffChange(mark.id), [mark.id, onCrossedOffChange]);
-  const markCx = cn(styles.markEntry, crossedOff && styles.markCrossedOff);
-  const crossOffCx = cn(styles.crossOffBtn, crossedOff && styles.crossOffBtnActive);
+  const markCx = cn('thrall-insert-mark-entry', crossedOff && 'thrall-insert-mark-crossed-off');
+  const crossOffCx = cn('thrall-insert-cross-off-btn', crossedOff && 'thrall-insert-cross-off-btn-active');
   return (
     <div className={markCx}>
       <Move
@@ -183,14 +183,14 @@ export const ThrallInsert = ({ data, onSave }: ThrallInsertProps) => {
   );
 
   return (
-    <div className={styles.root}>
+    <div className="thrall-insert">
       <PlaybookSection title="Your Master">
         <Text size="xs" color="muted" leading="normal">
           The Thing Below that you called upon? The one that plucked your soul from the Last Door and hides you from the Pale Hunter? It
           owns you now.
         </Text>
         <Input
-          className={styles.masterInput}
+          className="thrall-insert-master-input"
           type="text"
           value={master}
           placeholder="Name your master, along with any titles that you know…"
@@ -224,7 +224,7 @@ export const ThrallInsert = ({ data, onSave }: ThrallInsertProps) => {
         <Text size="xs" color="muted" leading="normal">
           You gain all of the following:
         </Text>
-        <div className={styles.moveList}>
+        <div className="thrall-insert-move-list">
           {THRALL_MOVES.map((move) => (
             <Move
               key={move.id}
@@ -242,7 +242,7 @@ export const ThrallInsert = ({ data, onSave }: ThrallInsertProps) => {
           When you first gain this insert, the GM will choose 1 Mark for you, based on your master's nature. Gain more when a move tells
           you.
         </Text>
-        <div className={styles.markList}>
+        <div className="thrall-insert-mark-list">
           {THRALL_MARK_DEFINITIONS.map((mark) => (
             <MarkEntry
               key={mark.id}

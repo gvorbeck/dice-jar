@@ -1,0 +1,90 @@
+.background-options {
+  display: flex;
+  flex-direction: column;
+}
+
+.background-option {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.background-option:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.background-option:first-child {
+  padding-top: 0;
+}
+
+.background-option-title-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.background-option-title-row-uses {
+  margin-left: auto;
+}
+
+.background-option-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.background-option-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding-left: calc(16px + var(--spacing-3));
+}
+
+.background-option-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.background-option-content p {
+  margin: 0;
+}
+
+.background-option-content ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.background-option-content li {
+  display: flex;
+  gap: var(--spacing-2);
+  line-height: 1.45;
+}
+
+.background-option-content li::before {
+  content: '\2609';
+  color: var(--text-accent);
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.background-choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-1);
+}

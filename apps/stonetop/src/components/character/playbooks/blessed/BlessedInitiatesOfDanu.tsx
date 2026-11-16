@@ -8,7 +8,7 @@ import { Input, Radio, RadioGroup, Text, CheckboxGroup } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { StatBox, LoyaltyRow } from '../shared/CrewWidgets';
 import type { PlaybookSectionProps } from '@/types';
-import styles from './BlessedInitiatesOfDanu.module.css';
+import './BlessedInitiatesOfDanu.css';
 
 interface PickLine {
   key: string;
@@ -168,9 +168,9 @@ const InitiateSection = memo(
 
     return (
       <PlaybookSection title={config.name}>
-        <div className={styles.bodyTop}>
+        <div className="blessed-initiates-of-danu-body-top">
           <StatBox
-            className={styles.hpBox}
+            className="blessed-initiates-of-danu-hp-box"
             ariaLabel={`${config.name} current HP`}
             value={hp}
             inputProps={{ min: 0, max: config.hpMax }}
@@ -179,37 +179,41 @@ const InitiateSection = memo(
             onWheel={handleHpWheel}
             label={`HP (max ${config.hpMax})`}
           />
-          <Text font="serif" color="muted" italic className={styles.tags}>
+          <Text font="serif" color="muted" italic className="blessed-initiates-of-danu-tags">
             {config.tags}
           </Text>
-          <Text font="serif" color="muted" className={styles.stat}>{`**HP** ${config.hpMax} **Armor** ${config.armor}`}</Text>
-          <Text font="serif" color="muted" className={styles.stat}>{`**Damage** ${config.damage}`}</Text>
-          <Text font="serif" color="muted" className={styles.stat}>{`**Instinct** ${config.instinct}`}</Text>
-          <ul className={styles.moves}>
+          <Text
+            font="serif"
+            color="muted"
+            className="blessed-initiates-of-danu-stat"
+          >{`**HP** ${config.hpMax} **Armor** ${config.armor}`}</Text>
+          <Text font="serif" color="muted" className="blessed-initiates-of-danu-stat">{`**Damage** ${config.damage}`}</Text>
+          <Text font="serif" color="muted" className="blessed-initiates-of-danu-stat">{`**Instinct** ${config.instinct}`}</Text>
+          <ul className="blessed-initiates-of-danu-moves">
             {config.moves.map((m) => (
               <Text as="li" key={m}>
                 {m}
               </Text>
             ))}
           </ul>
-          <Text font="serif" color="muted" className={styles.stat}>{`**Cost** ${config.cost}`}</Text>
+          <Text font="serif" color="muted" className="blessed-initiates-of-danu-stat">{`**Cost** ${config.cost}`}</Text>
           <LoyaltyRow
             value={loyalty}
             onChange={onLoyaltyChange}
             label={
-              <Text font="serif" color="muted" className={styles.stat}>
+              <Text font="serif" color="muted" className="blessed-initiates-of-danu-stat">
                 **Loyalty**
               </Text>
             }
           />
         </div>
-        <div className={styles.rows}>
-          <Text font="serif" color="muted" italic className={styles.pickInstruction}>
+        <div className="blessed-initiates-of-danu-rows">
+          <Text font="serif" color="muted" italic className="blessed-initiates-of-danu-pick-instruction">
             Pick 1 on each line:
           </Text>
           {config.pickLines.map((line) => (
-            <div key={line.key} className={styles.row}>
-              <RadioGroup legend={line.label} legendHidden className={styles.options}>
+            <div key={line.key} className="blessed-initiates-of-danu-row">
+              <RadioGroup legend={line.label} legendHidden className="blessed-initiates-of-danu-options">
                 {line.options
                   .filter((opt) => !(line.key === 'pronoun' && opt === '___'))
                   .map((opt) => (
@@ -230,7 +234,7 @@ const InitiateSection = memo(
               </RadioGroup>
               {line.key === 'pronoun' && (
                 <Input
-                  className={styles.pronounInput}
+                  className="blessed-initiates-of-danu-pronoun-input"
                   type="text"
                   value={picks['pronoun_text'] ?? ''}
                   onChange={handlePronounTextChange}
@@ -241,9 +245,9 @@ const InitiateSection = memo(
               )}
             </div>
           ))}
-          <div className={styles.row}>
-            <div className={styles.options}>
-              <Text as="span" className={styles.stat}>
+          <div className="blessed-initiates-of-danu-row">
+            <div className="blessed-initiates-of-danu-options">
+              <Text as="span" className="blessed-initiates-of-danu-stat">
                 **rites of…**
               </Text>
               <CheckboxGroup items={RITES_ITEMS[config.value]!} checked={ritesChecked} onChange={handleRitesChange} max={1} />
@@ -411,7 +415,7 @@ export const BlessedInitiatesOfDanu = ({ data, onSave }: BlessedInitiatesOfDanuP
   const visibleInitiates = INITIATES.filter((i) => chosen.includes(i.value));
 
   return (
-    <div className={styles.grid}>
+    <div className="blessed-initiates-of-danu-grid">
       {visibleInitiates.map((config) => (
         <InitiateAdapter
           key={config.value}

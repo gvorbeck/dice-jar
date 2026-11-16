@@ -3,7 +3,7 @@ import { cn } from '@dice-jar/cn';
 import { Heading, Text, Checkbox, Button, Radio } from '@/components/ui';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
 import type { SteadingData, SteadingSize } from '@/types';
-import styles from './SteadingStats.module.css';
+import './SteadingStats.css';
 
 const SIZES: { value: SteadingSize; label: string; description: string }[] = [
   { value: 'hamlet', label: 'Hamlet', description: '<50 people' },
@@ -25,14 +25,18 @@ const StatStepper = ({ label, description, value, min = -1, max = 3, onChange }:
   const descId = useId();
   const handleDecrement = useCallback(() => onChange(Math.max(min, value - 1)), [onChange, min, value]);
   const handleIncrement = useCallback(() => onChange(Math.min(max, value + 1)), [onChange, max, value]);
-  const valueCx = cn(styles.statValue, value > 0 && styles.statValuePositive, value < 0 && styles.statValueNegative);
+  const valueCx = cn(
+    'steading-stats-stat-value',
+    value > 0 && 'steading-stats-stat-value-positive',
+    value < 0 && 'steading-stats-stat-value-negative',
+  );
   return (
-    <div className={styles.stat}>
-      <div className={styles.statTop}>
-        <div className={styles.statMeta}>
-          <span className={styles.statLabel}>{label}</span>
+    <div className="steading-stats-stat">
+      <div className="steading-stats-stat-top">
+        <div className="steading-stats-stat-meta">
+          <span className="steading-stats-stat-label">{label}</span>
         </div>
-        <div className={styles.statControl} role="group" aria-label={`${label} rating`} aria-describedby={descId}>
+        <div className="steading-stats-stat-control" role="group" aria-label={`${label} rating`} aria-describedby={descId}>
           <Button
             variant="ghost"
             size="sm"
@@ -124,23 +128,23 @@ export const SteadingStats = ({ steading, onSave }: SteadingStatsProps) => {
   );
 
   return (
-    <div className={styles.root}>
-      <div className={styles.stat}>
-        <div className={styles.statTop}>
-          <div className={styles.statMeta}>
-            <span className={styles.statLabel}>Size</span>
+    <div className="steading-stats">
+      <div className="steading-stats-stat">
+        <div className="steading-stats-stat-top">
+          <div className="steading-stats-stat-meta">
+            <span className="steading-stats-stat-label">Size</span>
             <Text as="span" size="xs" color="muted" leading="normal">
               Starts at village
             </Text>
           </div>
-          <div className={styles.sizeOptions} role="group" aria-label="Size">
+          <div className="steading-stats-size-options" role="group" aria-label="Size">
             {SIZES.map((s) => (
               <Radio
                 key={s.value}
                 name="steading-size"
                 value={s.value}
                 label={
-                  <span className={styles.sizeLabel}>
+                  <span className="steading-stats-size-label">
                     {s.label}{' '}
                     <Text as="span" color="muted">
                       ({s.description})
@@ -155,7 +159,7 @@ export const SteadingStats = ({ steading, onSave }: SteadingStatsProps) => {
         </div>
       </div>
 
-      <div className={styles.statsGrid}>
+      <div className="steading-stats-stats-grid">
         <StatStepper
           label="Fortunes"
           description="Morale & social cohesion. Rolls for Seasons Change & Requisition. Resets to +1 each season."
@@ -182,10 +186,10 @@ export const SteadingStats = ({ steading, onSave }: SteadingStatsProps) => {
         />
       </div>
 
-      <div className={styles.surplusRow}>
-        <div className={styles.statTop}>
-          <span className={styles.statLabel}>Surplus</span>
-          <div className={styles.statControl} role="group" aria-label="Surplus amount">
+      <div className="steading-stats-surplus-row">
+        <div className="steading-stats-stat-top">
+          <span className="steading-stats-stat-label">Surplus</span>
+          <div className="steading-stats-stat-control" role="group" aria-label="Surplus amount">
             <Button
               variant="ghost"
               size="sm"
@@ -194,7 +198,7 @@ export const SteadingStats = ({ steading, onSave }: SteadingStatsProps) => {
               disabled={stats.surplus <= 0}
               aria-label="Decrease Surplus"
             />
-            <span className={styles.statValue}>{stats.surplus}</span>
+            <span className="steading-stats-stat-value">{stats.surplus}</span>
             <Button variant="ghost" size="sm" icon="plus" onClick={handleIncrementSurplus} aria-label="Increase Surplus" />
           </div>
         </div>
@@ -203,12 +207,12 @@ export const SteadingStats = ({ steading, onSave }: SteadingStatsProps) => {
         </Text>
       </div>
 
-      <div className={styles.debilities}>
+      <div className="steading-stats-debilities">
         <Heading as="h3" size="label">
           Debilities
         </Heading>
-        <div className={styles.debilityList}>
-          <div className={styles.debility}>
+        <div className="steading-stats-debility-list">
+          <div className="steading-stats-debility">
             <Checkbox
               label="**Diminished**, by injury/sickness/doubt"
               checked={!!debilities.diminished}
@@ -218,7 +222,7 @@ export const SteadingStats = ({ steading, onSave }: SteadingStatsProps) => {
               Disadvantage to Deploy, Muster, or Pull Together.
             </Text>
           </div>
-          <div className={styles.debility}>
+          <div className="steading-stats-debility">
             <Checkbox
               label="**Lacking**, due to shortages/hoarding/distrust"
               checked={!!debilities.lacking}
@@ -228,7 +232,7 @@ export const SteadingStats = ({ steading, onSave }: SteadingStatsProps) => {
               Treat Prosperity as if it's 1 lower than it is.
             </Text>
           </div>
-          <div className={styles.debility}>
+          <div className="steading-stats-debility">
             <Checkbox
               label="**Malcontent**, from fear/anger/despair"
               checked={!!debilities.malcontent}

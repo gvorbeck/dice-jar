@@ -7,7 +7,7 @@ import { useLatest } from '@/hooks/useLatest';
 import { useNotesLock } from '@/hooks/useNotesLock';
 import { Text } from '@/components/ui';
 import type { NotesLock } from '@/types';
-import styles from './SharedNotes.module.css';
+import './SharedNotes.css';
 
 export interface NotesEditorProps {
   html: string;
@@ -34,7 +34,7 @@ const TOOLS: Tool[] = [
     id: 'bold',
     label: 'Bold',
     glyph: 'B',
-    glyphClass: styles.glyphBold,
+    glyphClass: 'shared-notes-glyph-bold',
     isActive: (e) => e.isActive('bold'),
     run: (e) => e.chain().focus().toggleBold().run(),
   },
@@ -42,7 +42,7 @@ const TOOLS: Tool[] = [
     id: 'italic',
     label: 'Italic',
     glyph: 'I',
-    glyphClass: styles.glyphItalic,
+    glyphClass: 'shared-notes-glyph-italic',
     isActive: (e) => e.isActive('italic'),
     run: (e) => e.chain().focus().toggleItalic().run(),
   },
@@ -50,7 +50,7 @@ const TOOLS: Tool[] = [
     id: 'underline',
     label: 'Underline',
     glyph: 'U',
-    glyphClass: styles.glyphUnderline,
+    glyphClass: 'shared-notes-glyph-underline',
     isActive: (e) => e.isActive('underline'),
     run: (e) => e.chain().focus().toggleUnderline().run(),
   },
@@ -140,9 +140,9 @@ const Toolbar = ({ editor, disabled, controlsId }: ToolbarProps) => {
   );
 
   return (
-    <div className={styles.toolbar} role="toolbar" aria-label="Formatting" aria-controls={controlsId} onKeyDown={handleKeyDown}>
+    <div className="shared-notes-toolbar" role="toolbar" aria-label="Formatting" aria-controls={controlsId} onKeyDown={handleKeyDown}>
       {TOOLS.map((tool, i) => {
-        const buttonCx = cn(styles.toolButton, active[i] && styles.toolButtonActive);
+        const buttonCx = cn('shared-notes-tool-button', active[i] && 'shared-notes-tool-button-active');
         return (
           <button
             key={tool.id}
@@ -213,7 +213,7 @@ export const NotesEditor = ({ html, lock, label, onSave, onClaim, onRefresh, onR
       editorProps: {
         attributes: {
           id: contentId,
-          class: styles.content!,
+          class: 'shared-notes-content'!,
           role: 'textbox',
           'aria-multiline': 'true',
           'aria-label': label,
@@ -235,14 +235,14 @@ export const NotesEditor = ({ html, lock, label, onSave, onClaim, onRefresh, onR
     isBusy,
   );
 
-  const editorCx = cn(styles.editor, othersTyping && styles.editorLocked);
+  const editorCx = cn('shared-notes-editor', othersTyping && 'shared-notes-editor-locked');
 
   return (
     <div className={editorCx}>
       <Toolbar editor={editor} disabled={othersTyping} controlsId={contentId} />
       <EditorContent editor={editor} />
       {/* Always mounted so screen readers announce the message when it appears. */}
-      <div id={statusId} className={styles.status} aria-live="polite">
+      <div id={statusId} className="shared-notes-status" aria-live="polite">
         {othersTyping && (
           <Text as="span" size="xs" color="muted" italic>
             Someone is typing…

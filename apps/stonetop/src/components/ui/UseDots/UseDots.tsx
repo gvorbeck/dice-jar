@@ -1,6 +1,6 @@
 import { cn } from '@dice-jar/cn';
 import { Text } from '../Text/Text';
-import styles from './UseDots.module.css';
+import './UseDots.css';
 
 interface UseDotsProps {
   total: number;
@@ -16,7 +16,7 @@ interface UseDotsProps {
 export const UseDots = ({ total, checked, onChange, disabled, label, ariaLabel }: UseDotsProps) => {
   const dots = Array.from({ length: total }, (_, i) => {
     const filled = i < checked;
-    const dotCx = cn(styles.useDot, filled && styles.useDotFilled);
+    const dotCx = cn('use-dots-use-dot', filled && 'use-dots-use-dot-filled');
     return (
       <button
         key={`dot-${total}-${i}`}
@@ -30,10 +30,10 @@ export const UseDots = ({ total, checked, onChange, disabled, label, ariaLabel }
     );
   });
   return (
-    <div role="group" className={styles.useDots} aria-label={ariaLabel ?? label ?? `Uses: ${checked} of ${total}`}>
+    <div role="group" className="use-dots-use-dots" aria-label={ariaLabel ?? label ?? `Uses: ${checked} of ${total}`}>
       {dots}
       {label && (
-        <Text as="span" font="serif" size="xs" italic color="muted" className={styles.useDotsLabel} aria-hidden="true">
+        <Text as="span" font="serif" size="xs" italic color="muted" className="use-dots-use-dots-label" aria-hidden="true">
           {label}
         </Text>
       )}

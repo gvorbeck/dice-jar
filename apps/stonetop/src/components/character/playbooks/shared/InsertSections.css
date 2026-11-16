@@ -1,0 +1,27 @@
+.insert-sections-purpose-detail {
+  padding-left: calc(16px + var(--spacing-3));
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.insert-sections-purpose-name-input {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+}
+
+.insert-sections-trigger-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.insert-sections-trigger-item {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}

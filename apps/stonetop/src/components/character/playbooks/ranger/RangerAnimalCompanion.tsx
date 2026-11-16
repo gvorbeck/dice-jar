@@ -15,7 +15,7 @@ import { LOYAL_TO_THE_END } from '@/lib/moves/ranger';
 import { LoyaltyRow } from '../shared/CrewWidgets';
 import { useToast } from '@/components/app';
 import type { PlaybookSectionProps, RadioOption } from '@/types';
-import styles from './RangerAnimalCompanion.module.css';
+import './RangerAnimalCompanion.css';
 
 const ANIMAL_INSTINCT_OPTIONS: RadioOption[] = [
   { value: 'To bully and threaten', label: 'To bully and threaten', description: '' },
@@ -230,7 +230,7 @@ export const RangerAnimalCompanion = ({ data, onSave }: RangerAnimalCompanionPro
       value={loyalty}
       onChange={handleLoyaltyChange}
       label={
-        <Text as="span" color="muted" className={styles.loyaltyLabel}>
+        <Text as="span" color="muted" className="ranger-animal-companion-loyalty-label">
           Loyalty
         </Text>
       }
@@ -238,7 +238,7 @@ export const RangerAnimalCompanion = ({ data, onSave }: RangerAnimalCompanionPro
   );
 
   return (
-    <div className={styles.root}>
+    <div className="ranger-animal-companion">
       <AnimalStats
         hp={hp}
         armor={armor}
@@ -265,7 +265,7 @@ export const RangerAnimalCompanion = ({ data, onSave }: RangerAnimalCompanionPro
         onChange={handleTypeSave}
         noCustom
       />
-      <div className={styles.columns}>
+      <div className="ranger-animal-companion-columns">
         <OptionSelect
           name="ranger-animal"
           options={ANIMAL_INSTINCT_OPTIONS}

@@ -7,7 +7,7 @@ import type { NpcRelationship } from '@/types';
 import { NPC_TRAITS, EMPTY_FORM } from './npcData';
 import type { NpcFormState, RelTarget } from './npcData';
 import { RelationshipRepeater } from './RelationshipRepeater';
-import styles from './NpcModal.module.css';
+import './NpcModal.css';
 
 interface NpcModalProps {
   open: boolean;
@@ -67,8 +67,8 @@ export const NpcModal = ({ open, onClose, onSave, initial = EMPTY_FORM, title, r
       <Heading as="h2" size="sm" id={headingId}>
         {title}
       </Heading>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.nameRow}>
+      <form onSubmit={handleSubmit} className="npc-modal-form">
+        <div className="npc-modal-name-row">
           <Input label="Name *" value={form.name} onChange={handleNameChange} required />
           <Button
             variant="ghost"
@@ -77,7 +77,7 @@ export const NpcModal = ({ open, onClose, onSave, initial = EMPTY_FORM, title, r
             icon="dice"
             onClick={handleRandomName}
             aria-label="Random name"
-            className={styles.diceBtn}
+            className="npc-modal-dice-btn"
           />
         </div>
         <Input label="Pronouns" value={form.pronouns} onChange={handlePronounsChange} placeholder="e.g. she/her" />
@@ -89,11 +89,11 @@ export const NpcModal = ({ open, onClose, onSave, initial = EMPTY_FORM, title, r
           suggestions={NPC_TRAITS}
           placeholder="Type or pick a trait…"
         />
-        <Fieldset legend="Relationships" className={styles.relFieldset}>
+        <Fieldset legend="Relationships" className="npc-modal-rel-fieldset">
           <RelationshipRepeater relationships={form.relationships} groups={relationshipGroups} onChange={handleRelationshipsChange} />
         </Fieldset>
         <Input multiline label="Notes" value={form.notes} onChange={handleNotesChange} rows={3} placeholder="Other notes about this NPC" />
-        <div className={styles.formActions}>
+        <div className="npc-modal-form-actions">
           <Button variant="ghost" size="md" type="button" onClick={onClose}>
             Cancel
           </Button>

@@ -1,5 +1,5 @@
 import { Button, Icon, Text } from '@/components/ui';
-import styles from './ArcanaCardHeader.module.css';
+import './ArcanaCardHeader.css';
 
 interface ArcanaCardHeaderProps {
   id: string;
@@ -13,15 +13,15 @@ interface ArcanaCardHeaderProps {
 // The card title row shared by major and minor arcana: name, optional weight + tags, and the remove
 // button. Minor cards pass a weight; major cards omit it.
 export const ArcanaCardHeader = ({ id, name, tags, weight, onRemove }: ArcanaCardHeaderProps) => (
-  <div className={styles.header}>
-    <div className={styles.headerText}>
+  <div className="arcana-card-header-header">
+    <div className="arcana-card-header-header-text">
       <Text font="serif" weight="bold">
         {name}
       </Text>
       {(weight !== undefined || tags) && (
-        <div className={styles.meta}>
+        <div className="arcana-card-header-meta">
           {weight !== undefined && (
-            <span className={styles.provisions}>
+            <span className="arcana-card-header-provisions">
               {Array.from({ length: weight }).map((_, i) => (
                 <Icon key={`prov-${id}-${i}`} name="empty-provisions" size="small" aria-label="provisions" />
               ))}
@@ -35,6 +35,6 @@ export const ArcanaCardHeader = ({ id, name, tags, weight, onRemove }: ArcanaCar
         </div>
       )}
     </div>
-    <Button variant="ghost" icon="close" onClick={onRemove} aria-label={`Remove ${name}`} className={styles.removeBtn} />
+    <Button variant="ghost" icon="close" onClick={onRemove} aria-label={`Remove ${name}`} className="arcana-card-header-remove-btn" />
   </div>
 );

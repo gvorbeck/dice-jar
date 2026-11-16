@@ -1,0 +1,108 @@
+@import '../ui/field.css';
+
+/* ── Section card ───────────────────────────────────── */
+.playbook-section-section {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* Flex row containing the heading and the optional collapse toggle.
+   Both the warn icon and collapse button are always in the DOM when present;
+   each is hidden independently via visibility: hidden, so margin-left: auto works for both. */
+.playbook-section-section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  min-height: 44px;
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.playbook-section-section-title {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.playbook-section-section-title-warn {
+  margin-left: auto;
+  color: var(--text-accent);
+  flex-shrink: 0;
+}
+
+.playbook-section-collapse-toggle {
+  color: var(--text-secondary);
+  border: none;
+  flex-shrink: 0;
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.playbook-section-collapse-toggle-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.playbook-section-collapse-toggle:hover {
+  color: var(--text-primary);
+  background: none;
+  border: none;
+}
+
+.playbook-section-collapse-toggle:focus-visible {
+  border-radius: var(--radius-sm);
+}
+
+.playbook-section-collapse-chevron {
+  transition: transform 150ms ease;
+}
+
+.playbook-section-collapse-chevron-open {
+  transform: rotate(180deg);
+}
+
+.playbook-section-section-title-warn-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.playbook-section-section-title-choose-hidden {
+  visibility: hidden;
+}
+
+.playbook-section-section-title-choose {
+  font-size: var(--text-2xs);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: none;
+  color: var(--text-secondary);
+}
+
+.playbook-section-section-override {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.playbook-section-section-override-note {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: var(--text-secondary);
+  font-style: italic;
+  flex-shrink: 0;
+}

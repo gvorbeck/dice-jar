@@ -9,7 +9,7 @@ import { parseDescriptionTasks } from './arcanaParsing';
 import { getMarkedFollowerCost } from '@/lib/consequenceActions';
 import { useArcanumGating } from './useArcanumGating';
 import { ArcanaBackSection, MysteryMoveBlock, TaskRow } from './cards';
-import styles from './arcanaCard.module.css';
+import './arcanaCard.css';
 
 interface MajorArcanaCardProps {
   arcanum: MajorArcanum;
@@ -47,7 +47,7 @@ export const MajorArcanaCard = ({
   const poolTrackers = frontTrackers.filter((t) => t.role !== 'marks');
   const { unlocked, projectedCreature, getConsequenceCheckedMarks, getMoveGating } = useArcanumGating(arcanum, entry);
 
-  const cx = cn(styles.card, unlocked && styles.cardUnlocked);
+  const cx = cn('arcana-card-card', unlocked && 'arcana-card-card-unlocked');
 
   // Legacy/hand-edited docs can have an arcanaMajor entry predating these fields; default so every
   // lookup below is safe without repeating the guard at each call site. Memoized so the fallback `{}`
@@ -100,10 +100,10 @@ export const MajorArcanaCard = ({
     <div className={cx}>
       <ArcanaCardHeader id={arcanum.id} name={arcanum.name} tags={tags} weight={arcanum.weight} onRemove={onRemove} />
 
-      {proseBefore && <div className={styles.description}>{parseMarkdown(proseBefore)}</div>}
+      {proseBefore && <div className="arcana-card-description">{parseMarkdown(proseBefore)}</div>}
 
       {tasks ? (
-        <div className={styles.taskList}>
+        <div className="arcana-card-task-list">
           {tasks.map((task, i) => {
             // The persisted mark key is positional (`task-i`) so a saved mark survives re-renders; the
             // React key also encodes the task text so it stays stable if the list is ever reordered.
@@ -118,7 +118,7 @@ export const MajorArcanaCard = ({
               />
             );
           })}
-          <Text as="span" font="serif" size="xs" color="muted" className={styles.taskCount}>
+          <Text as="span" font="serif" size="xs" color="muted" className="arcana-card-task-count">
             {entry.marksValue} / {marksTracker?.max} tasks completed
           </Text>
         </div>
@@ -145,12 +145,12 @@ export const MajorArcanaCard = ({
         />
       ))}
 
-      {proseAfter && <div className={styles.description}>{parseMarkdown(proseAfter)}</div>}
+      {proseAfter && <div className="arcana-card-description">{parseMarkdown(proseAfter)}</div>}
 
       {/* Base moves (e.g. the Codex's Cast a Codex Spell) render inline after the description prose so
           their typed body and dot controls show — in the same two-column grid the mystery moves use. */}
       {arcanum.baseMoves && arcanum.baseMoves.length > 0 && (
-        <div className={styles.moveGrid}>
+        <div className="arcana-card-move-grid">
           {arcanum.baseMoves.map((move) => (
             <MysteryMoveBlock
               key={move.id}
@@ -167,8 +167,8 @@ export const MajorArcanaCard = ({
       )}
 
       {unlocked && back && (
-        <div className={styles.mysteries}>
-          <Text font="serif" size="xs" weight="bold" className={styles.mysteriesLabel}>
+        <div className="arcana-card-mysteries">
+          <Text font="serif" size="xs" weight="bold" className="arcana-card-mysteries-label">
             {back.label}
           </Text>
           {back.sections.map((section) => (
@@ -209,7 +209,7 @@ interface DotRowProps {
 // The dot-tracker row shared by the front Marks tracker and any extra front pools (frontTrackers, e.g.
 // Acumen): dots on the left, a "N / max label" counter on the right.
 const DotRow = ({ total, value, label, ariaLabel, onChange }: DotRowProps) => (
-  <div className={styles.marksRow}>
+  <div className="arcana-card-marks-row">
     <UseDots total={total} checked={value} onChange={onChange} ariaLabel={ariaLabel} />
     <Text as="span" font="serif" size="xs" color="muted">
       {value} / {total} {label}

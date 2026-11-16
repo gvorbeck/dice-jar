@@ -4,7 +4,7 @@ import { Button, Heading, Icon, Input, Text } from '@/components/ui';
 import { rollNotation, type DiceRollOutcome } from '@/lib/diceNotation';
 import { generateId } from '@/lib/id';
 import type { LoggedRoll } from '@/types';
-import styles from './DiceRoller.module.css';
+import './DiceRoller.css';
 
 interface DiceRollerProps {
   // Who is rolling, for the shared log: a character id/name, or 'gm' / 'steading' / 'game' on pages
@@ -156,23 +156,23 @@ export const DiceRoller = ({ rollerId, rollerName, onRoll }: DiceRollerProps) =>
   const [last, ...earlier] = history;
 
   return (
-    <div className={cn(styles.root, open && styles.open)}>
-      <button ref={tabRef} type="button" className={styles.tab} onClick={handleToggle} aria-expanded={open} aria-controls={panelId}>
+    <div className={cn('dice-roller', open && 'dice-roller-open')}>
+      <button ref={tabRef} type="button" className="dice-roller-tab" onClick={handleToggle} aria-expanded={open} aria-controls={panelId}>
         <Icon name="dice" size="small" />
         Dice
       </button>
 
-      <section id={panelId} className={styles.panel} aria-label="Dice roller">
+      <section id={panelId} className="dice-roller-panel" aria-label="Dice roller">
         {/* The tab already toggles the drawer; this gives keyboard and touch users a close control
             right where they're working. */}
-        <div className={styles.header}>
-          <Heading as="h2" size="label" className={styles.title}>
+        <div className="dice-roller-header">
+          <Heading as="h2" size="label" className="dice-roller-title">
             <Icon name="dice" size="small" />
             Dice Roller
           </Heading>
           <Button type="button" variant="ghost" size="sm" icon="close" aria-label="Close dice roller" onClick={handleClose} />
         </div>
-        <form className={styles.form} onSubmit={handleSubmit}>
+        <form className="dice-roller-form" onSubmit={handleSubmit}>
           <Input
             ref={inputRef}
             label="Dice notation"
@@ -188,15 +188,15 @@ export const DiceRoller = ({ rollerId, rollerName, onRoll }: DiceRollerProps) =>
             enterKeyHint="go"
           />
 
-          <div className={styles.dice} role="group" aria-label="Add a die">
+          <div className="dice-roller-dice" role="group" aria-label="Add a die">
             {DICE.map((sides) => (
-              <Button key={sides} type="button" variant="secondary" size="sm" className={styles.die} onClick={() => handleDie(sides)}>
+              <Button key={sides} type="button" variant="secondary" size="sm" className="dice-roller-die" onClick={() => handleDie(sides)}>
                 d{sides}
               </Button>
             ))}
           </div>
 
-          <div className={styles.mods} role="group" aria-label="Modifier">
+          <div className="dice-roller-mods" role="group" aria-label="Modifier">
             <Button
               type="button"
               variant="ghost"
@@ -218,8 +218,8 @@ export const DiceRoller = ({ rollerId, rollerName, onRoll }: DiceRollerProps) =>
             />
           </div>
 
-          <div className={styles.actions}>
-            <Button type="submit" icon="dice" className={styles.rollBtn}>
+          <div className="dice-roller-actions">
+            <Button type="submit" icon="dice" className="dice-roller-roll-btn">
               Roll
             </Button>
             <Button type="button" variant="ghost" onClick={handleClear} disabled={!notation}>
@@ -229,41 +229,41 @@ export const DiceRoller = ({ rollerId, rollerName, onRoll }: DiceRollerProps) =>
         </form>
 
         {/* Polite live region so the result is announced to screen readers when a roll lands. */}
-        <div className={styles.result} aria-live="polite">
+        <div className="dice-roller-result" aria-live="polite">
           {last ? (
             // Keyed on the roll so each new result replays the pop-in animation.
-            <div key={last.id} className={styles.resultCard}>
-              <Text as="span" size="xs" color="muted" className={styles.resultNotation}>
+            <div key={last.id} className="dice-roller-result-card">
+              <Text as="span" size="xs" color="muted" className="dice-roller-result-notation">
                 {last.notation}
               </Text>
-              <span className={styles.total}>{last.total}</span>
-              <Text as="span" size="sm" color="muted" className={styles.breakdown}>
+              <span className="dice-roller-total">{last.total}</span>
+              <Text as="span" size="sm" color="muted" className="dice-roller-breakdown">
                 {last.breakdown}
               </Text>
             </div>
           ) : (
-            <Text size="sm" color="muted" className={styles.empty}>
+            <Text size="sm" color="muted" className="dice-roller-empty">
               Your roll appears here.
             </Text>
           )}
         </div>
 
         {earlier.length > 0 && (
-          <div className={styles.history}>
+          <div className="dice-roller-history">
             <Heading as="h3" size="label">
               Earlier
             </Heading>
-            <ul className={styles.historyList}>
+            <ul className="dice-roller-history-list">
               {earlier.map((h) => (
                 <li key={h.id}>
                   <button
                     type="button"
-                    className={styles.historyItem}
+                    className="dice-roller-history-item"
                     onClick={() => handleReuse(h.notation)}
                     aria-label={`Reuse ${h.notation}, rolled ${h.total}`}
                   >
-                    <span className={styles.historyNotation}>{h.notation}</span>
-                    <span className={styles.historyTotal}>{h.total}</span>
+                    <span className="dice-roller-history-notation">{h.notation}</span>
+                    <span className="dice-roller-history-total">{h.total}</span>
                   </button>
                 </li>
               ))}

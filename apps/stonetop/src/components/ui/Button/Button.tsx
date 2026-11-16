@@ -1,7 +1,7 @@
 import { forwardRef, type ReactNode, type ElementType, type ComponentPropsWithoutRef, type Ref } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Icon, type IconName, type IconSize } from '../Icon/Icon';
-import styles from './Button.module.css';
+import './Button.css';
 
 type ButtonOwnProps<E extends ElementType> = {
   as?: E;
@@ -32,7 +32,14 @@ const ButtonInner = (
   ref: Ref<Element>,
 ) => {
   const Tag = (as ?? 'button') as ElementType;
-  const cx = cn(styles.base, styles[variant], styles[size], icon && !children && styles.iconOnly, fullWidth && styles.fullWidth, className);
+  const cx = cn(
+    'button-base',
+    `button-${variant}`,
+    `button-${size}`,
+    icon && !children && 'button-icon-only',
+    fullWidth && 'button-full-width',
+    className,
+  );
 
   return (
     <Tag ref={ref} className={cx} {...(props as ComponentPropsWithoutRef<typeof Tag>)}>

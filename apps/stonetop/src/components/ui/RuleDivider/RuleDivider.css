@@ -1,0 +1,28 @@
+.rule-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.rule-divider::before,
+.rule-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+}
+
+.rule-divider::before {
+  background: linear-gradient(to left, var(--border-accent), transparent);
+}
+
+.rule-divider::after {
+  background: linear-gradient(to right, var(--border-accent), transparent);
+}
+
+.rule-divider-diamond {
+  width: 6px;
+  height: 6px;
+  background: var(--color-gold-400);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}

@@ -1,0 +1,23 @@
+.playbook-columns-columns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-6);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .playbook-columns-columns {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.playbook-columns-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  min-width: 0;
+}
+
+.playbook-columns-full {
+  width: 100%;
+}

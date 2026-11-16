@@ -1,0 +1,19 @@
+.blessed-earth-mother-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.blessed-earth-mother-instruction {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin: 0;
+  font-style: italic;
+}
+
+.blessed-earth-mother-shrine-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}

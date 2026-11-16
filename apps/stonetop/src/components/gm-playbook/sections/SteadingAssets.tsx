@@ -4,7 +4,7 @@ import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { useLatest } from '@/hooks/useLatest';
 import { ImprovementList } from './ImprovementList';
 import type { SteadingData } from '@/types';
-import styles from './SteadingAssets.module.css';
+import './SteadingAssets.css';
 
 const DRAFT_HORSES =
   'A pair of hardy draft horses, followers (*large*, *powerful*, *keen-nosed*, *hardy*): HP 10 each; Damage d6+3 (*hand*, *close*, *forceful*); Instinct: to panic; Cost: care & grooming.';
@@ -70,7 +70,7 @@ const CurrencyField = ({ label, fieldKey, savedValue, onSave }: CurrencyFieldPro
   }, [local, fieldKey, onSaveRef]);
 
   return (
-    <div className={styles.denomination}>
+    <div className="steading-assets-denomination">
       <Input
         label={label}
         type="number"
@@ -79,7 +79,7 @@ const CurrencyField = ({ label, fieldKey, savedValue, onSave }: CurrencyFieldPro
         onChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        className={styles.currencyInput}
+        className="steading-assets-currency-input"
       />
     </div>
   );
@@ -156,8 +156,8 @@ export const SteadingAssets = ({ steading, onSave }: SteadingAssetsProps) => {
   );
 
   return (
-    <div className={styles.root}>
-      <Text size="xs" color="muted" className={styles.description}>
+    <div className="steading-assets">
+      <Text size="xs" color="muted" className="steading-assets-description">
         Owned by the residents of Stonetop in common. To take them on an expedition or otherwise put them at risk, you must Requisition.
       </Text>
 
@@ -173,11 +173,11 @@ export const SteadingAssets = ({ steading, onSave }: SteadingAssetsProps) => {
         onRemoveFixed={handleRemoveFixed}
       />
 
-      <div className={styles.currency}>
+      <div className="steading-assets-currency">
         <Heading as="h3" size="label">
           Silver
         </Heading>
-        <div className={styles.currencyGrid}>
+        <div className="steading-assets-currency-grid">
           <CurrencyField label="Purses" fieldKey="silverPurses" savedValue={localCurrency.silverPurses} onSave={handleCurrencySave} />
           <CurrencyField label="Handfuls" fieldKey="silverHandfuls" savedValue={localCurrency.silverHandfuls} onSave={handleCurrencySave} />
           <CurrencyField label="Coins" fieldKey="silverCoins" savedValue={localCurrency.silverCoins} onSave={handleCurrencySave} />
@@ -185,7 +185,7 @@ export const SteadingAssets = ({ steading, onSave }: SteadingAssetsProps) => {
         <Heading as="h3" size="label">
           Gold
         </Heading>
-        <div className={styles.currencyGrid}>
+        <div className="steading-assets-currency-grid">
           <CurrencyField label="Purses" fieldKey="goldPurses" savedValue={localCurrency.goldPurses} onSave={handleCurrencySave} />
           <CurrencyField label="Handfuls" fieldKey="goldHandfuls" savedValue={localCurrency.goldHandfuls} onSave={handleCurrencySave} />
           <CurrencyField label="Coins" fieldKey="goldCoins" savedValue={localCurrency.goldCoins} onSave={handleCurrencySave} />

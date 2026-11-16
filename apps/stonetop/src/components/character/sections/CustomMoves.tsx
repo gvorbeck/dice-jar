@@ -4,7 +4,7 @@ import { Button, Collapse, Heading, Input, Modal, Stack, Text } from '@/componen
 import { generateId } from '@/lib/id';
 import { Move } from '../Move';
 import type { CharacterData } from '@/types';
-import styles from './Moves.module.css';
+import './Moves.css';
 
 interface CustomMovesProps {
   data: CharacterData | undefined;
@@ -43,11 +43,11 @@ export const CustomMoves = ({ data, onSave }: CustomMovesProps) => {
 
   return (
     <Collapse label="Custom Moves">
-      <Text color="muted" className={styles.helperText}>
+      <Text color="muted" className="moves-helper-text">
         These moves apply only to specific game or setting elements, and only if you choose to use them. Consult your GM.
       </Text>
       {moves.length > 0 ? (
-        <div className={styles.moveGrid}>
+        <div className="moves-move-grid">
           {moves.map((m) => (
             <Move
               key={m.id}
@@ -76,7 +76,7 @@ export const CustomMoves = ({ data, onSave }: CustomMovesProps) => {
       ) : (
         <Text color="muted">No custom moves yet.</Text>
       )}
-      <form onSubmit={handleSubmit} className={styles.customForm}>
+      <form onSubmit={handleSubmit} className="moves-custom-form">
         <Stack gap={3}>
           <Input label="Move name" value={name} onChange={(e) => setName(e.target.value)} />
           <Input label="Move text" note="Bold and italic only" multiline rows={4} value={text} onChange={(e) => setText(e.target.value)} />

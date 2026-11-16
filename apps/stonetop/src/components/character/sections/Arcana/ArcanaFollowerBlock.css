@@ -1,0 +1,161 @@
+.arcana-follower-block-follower {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  background: var(--surface-page);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+/* A follower not yet gained (its activating consequence is unmarked): dimmed and read as pending. The
+   tracker is separately disabled, so this is purely the visual cue. */
+.arcana-follower-block-follower-inactive {
+  opacity: 0.55;
+}
+
+.arcana-follower-block-follower-activation {
+  margin-top: var(--spacing-1);
+}
+
+.arcana-follower-block-follower-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.arcana-follower-block-follower-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.arcana-follower-block-follower-hp-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.arcana-follower-block-follower-hp-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.arcana-follower-block-follower-hp-input {
+  width: 2.5rem;
+  padding: 2px var(--spacing-1);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: var(--text-xs);
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Drop the native number spinner: it pads the box on the right and reads as clutter. */
+.arcana-follower-block-follower-hp-input::-webkit-outer-spin-button,
+.arcana-follower-block-follower-hp-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.arcana-follower-block-follower-hp-input:focus-visible {
+  border-color: var(--border-accent);
+  outline: 2px solid var(--border-accent);
+  outline-offset: 1px;
+}
+
+.arcana-follower-block-follower-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.arcana-follower-block-follower-instinct {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.arcana-follower-block-follower-cost {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.arcana-follower-block-follower-moves {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+/* ── Rolled aspects (Servant of Daagon's d4 assignments) ── */
+.arcana-follower-block-aspects {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.arcana-follower-block-aspect-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.arcana-follower-block-aspect-row {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: flex-start;
+}
+
+.arcana-follower-block-aspect-die {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: var(--text-md);
+  line-height: 1;
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Drop the native number spinner: it makes the focused box grow and reads as clutter for a d4 field. */
+.arcana-follower-block-aspect-die::-webkit-outer-spin-button,
+.arcana-follower-block-aspect-die::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.arcana-follower-block-aspect-die:focus-visible {
+  border-color: var(--border-accent);
+  outline: 2px solid var(--border-accent);
+  outline-offset: 1px;
+}
+
+.arcana-follower-block-aspect-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+/* Vertically center the row's label against the input box (single-line rows read as aligned; rows
+   whose label is followed by a checklist keep the label centered on the die, list flowing below). */
+.arcana-follower-block-aspect-label {
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+}

@@ -1,6 +1,6 @@
 import { useCallback, memo } from 'react';
 import { Checkbox } from '@/components/ui';
-import styles from './UndefinedProvisions.module.css';
+import './UndefinedProvisions.css';
 
 interface UndefinedProvisionsProps {
   total: number;
@@ -9,7 +9,7 @@ interface UndefinedProvisionsProps {
 }
 
 export const UndefinedProvisions = memo(({ total, checked, onChange }: UndefinedProvisionsProps) => (
-  <span className={styles.undefinedBoxes} role="group" aria-label={`Undefined: ${checked} of ${total}`}>
+  <span className="undefined-provisions-undefined-boxes" role="group" aria-label={`Undefined: ${checked} of ${total}`}>
     {Array.from({ length: total }, (_, i) => (
       <UndefinedProvisionBox key={`undefined-${total}-${i}`} index={i} checked={checked} onChange={onChange} />
     ))}

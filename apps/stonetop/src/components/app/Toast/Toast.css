@@ -1,0 +1,109 @@
+@import '../../ui/field.css';
+
+.toast-region {
+  position: fixed;
+  bottom: var(--spacing-6);
+  right: var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  z-index: var(--z-toast);
+  pointer-events: none;
+}
+
+.toast-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  border: 1px solid;
+  max-width: 360px;
+  pointer-events: all;
+  animation: toast-slide-in 180ms ease-out;
+}
+
+.toast-toast.toast-exiting {
+  animation: toast-fade-out 200ms ease-in forwards;
+}
+
+.toast-error {
+  background-color: color-mix(in srgb, var(--color-danger) 12%, var(--surface-overlay));
+  border-color: color-mix(in srgb, var(--color-danger) 40%, transparent);
+  color: var(--text-primary);
+}
+
+.toast-info {
+  background-color: color-mix(in srgb, var(--color-gold-400) 12%, var(--surface-overlay));
+  border-color: color-mix(in srgb, var(--color-gold-400) 40%, transparent);
+  color: var(--text-primary);
+}
+
+.toast-success {
+  background-color: color-mix(in srgb, var(--color-success) 12%, var(--surface-overlay));
+  border-color: color-mix(in srgb, var(--color-success) 40%, transparent);
+  color: var(--text-primary);
+}
+
+.toast-icon {
+  flex-shrink: 0;
+}
+
+.toast-icon.toast-error {
+  color: var(--text-danger);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.toast-icon.toast-info {
+  color: var(--text-accent);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.toast-icon.toast-success {
+  color: var(--text-success);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.toast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* !important overrides Button ghost variant border/padding — the Button's own rules would otherwise win on specificity */
+.toast-dismiss {
+  flex-shrink: 0;
+  border: none !important;
+  padding: 0 !important;
+  color: var(--text-secondary) !important;
+}
+
+.toast-dismiss:hover {
+  background: none !important;
+  color: var(--text-primary) !important;
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

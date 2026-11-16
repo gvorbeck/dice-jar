@@ -1,0 +1,31 @@
+.npc-modal-rel-fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.npc-modal-name-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: var(--spacing-2);
+}
+
+.npc-modal-dice-btn {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.npc-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-4);
+}
+
+.npc-modal-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-2);
+}

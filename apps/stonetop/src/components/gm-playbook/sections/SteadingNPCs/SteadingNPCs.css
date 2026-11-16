@@ -1,0 +1,18 @@
+.steading-npcs-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.steading-npcs-add-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+}
+
+.steading-npcs-npc-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}

@@ -1,0 +1,67 @@
+.minor-arcana-card-card {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  transition: border-color 150ms ease;
+}
+
+.minor-arcana-card-card-unlocked {
+  border-color: var(--border-accent);
+}
+
+.minor-arcana-card-description {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.minor-arcana-card-requirements {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.minor-arcana-card-req-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+}
+
+.minor-arcana-card-req-row > span:last-child {
+  flex: 1;
+}
+
+.minor-arcana-card-req-boxes {
+  display: flex;
+  gap: var(--spacing-1);
+  flex-shrink: 0;
+}
+
+.minor-arcana-card-requirements-note {
+  font-family: var(--font-serif);
+}
+
+.minor-arcana-card-move-reveal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.minor-arcana-card-move-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.minor-arcana-card-move-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}

@@ -1,0 +1,91 @@
+.npc-row-npc-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.npc-row-npc-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  min-width: 0;
+}
+
+.npc-row-npc-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.npc-row-npc-pronouns {
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-left: var(--spacing-1);
+}
+
+.npc-row-npc-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1);
+}
+
+:is(.npc-row-npc-pill, .npc-row-npc-trait, .npc-row-npc-rel-trait) {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--spacing-2);
+  height: 1.375rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.npc-row-npc-trait {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.npc-row-npc-rel-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1);
+}
+
+.npc-row-npc-rel-trait {
+  background: color-mix(in srgb, var(--color-gold-500) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-gold-500) 35%, transparent);
+  color: var(--text-accent);
+}
+
+.npc-row-npc-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  flex-shrink: 0;
+}
+
+.npc-row-npc-row-dead {
+  opacity: 0.55;
+}
+
+.npc-row-npc-name-strike {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-secondary);
+}
+
+.npc-row-npc-dead-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-left: var(--spacing-2);
+  letter-spacing: 0.04em;
+}
+
+.npc-row-tombstone-active {
+  color: var(--text-secondary);
+}

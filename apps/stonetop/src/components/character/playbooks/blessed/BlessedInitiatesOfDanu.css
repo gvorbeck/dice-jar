@@ -1,0 +1,123 @@
+@import '../../../ui/field.css';
+
+.blessed-initiates-of-danu-body-top {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding-right: 84px;
+  margin-bottom: var(--spacing-3);
+}
+
+.blessed-initiates-of-danu-tags {
+  margin: 0;
+}
+
+.blessed-initiates-of-danu-hp-box {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.blessed-initiates-of-danu-stat {
+  margin: 0;
+}
+
+.blessed-initiates-of-danu-stat strong {
+  color: var(--text-primary);
+}
+
+.blessed-initiates-of-danu-moves {
+  margin: 0;
+  padding-left: var(--spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.blessed-initiates-of-danu-moves li {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.blessed-initiates-of-danu-pick-instruction {
+  margin: 0;
+}
+
+.blessed-initiates-of-danu-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.blessed-initiates-of-danu-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.blessed-initiates-of-danu-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.blessed-initiates-of-danu-row:first-child {
+  padding-top: 0;
+}
+
+.blessed-initiates-of-danu-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2) var(--spacing-4);
+  align-items: center;
+}
+
+.blessed-initiates-of-danu-pronoun-input {
+  width: 100px;
+  padding: var(--spacing-1) var(--spacing-2);
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.blessed-initiates-of-danu-pronoun-input:focus-visible {
+  border-color: var(--border-accent);
+}
+
+.blessed-initiates-of-danu-pronoun-input::placeholder {
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.blessed-initiates-of-danu-grid {
+  columns: 1;
+  column-gap: var(--spacing-6);
+}
+
+.blessed-initiates-of-danu-grid > * {
+  break-inside: avoid;
+  margin-bottom: var(--spacing-6);
+}
+
+.blessed-initiates-of-danu-grid > *:last-child {
+  margin-bottom: 0;
+}
+
+@media (min-width: 768px) {
+  .blessed-initiates-of-danu-grid {
+    columns: 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .blessed-initiates-of-danu-grid {
+    columns: 3;
+  }
+}

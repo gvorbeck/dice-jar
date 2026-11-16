@@ -9,7 +9,7 @@ import { useFirestoreSync } from '@/hooks/useFirestoreSync';
 import { useLatest } from '@/hooks/useLatest';
 import { RollAffordance, type StatOption } from './RollAffordance';
 import { useCharacterRollOptional } from './CharacterRollContext';
-import styles from './Move.module.css';
+import './Move.css';
 
 // Persistent left-control state: box 0 selects/gates the move, boxes 1..n track times taken.
 interface LeftControlState {
@@ -143,7 +143,7 @@ const MoveSelectGroup = ({
   readOnly?: boolean;
   locked?: boolean;
 }) => (
-  <div className={styles.takeBoxes}>
+  <div className="move-take-boxes">
     <Checkbox
       aria-label={`Select ${moveName}`}
       checked={selected}
@@ -197,8 +197,8 @@ export const Move = ({
     console.error(`Move "${move.id}": rightControl persists at most 2 slots, got ${rightControlState.length}.`);
   }
 
-  const moveCx = cn(styles.move, selected && styles.moveSelected);
-  const nameCx = cn(styles.moveName, selected && styles.moveNameSelected);
+  const moveCx = cn('move-move', selected && 'move-move-selected');
+  const nameCx = cn('move-move-name', selected && 'move-move-name-selected');
   const nameEl = (
     <Text as="span" className={nameCx}>
       {title}
@@ -256,20 +256,20 @@ export const Move = ({
     const key = `${move.id}-block-${index}`;
     switch (block.kind) {
       case 'divider':
-        return <Divider key={key} className={styles.bodyDivider} />;
+        return <Divider key={key} className="move-body-divider" />;
       case 'para': {
         if (block.icon) {
-          const iconParaCx = cn(styles.moveBodyWithIcon, block.indent && styles.indent);
+          const iconParaCx = cn('move-move-body-with-icon', block.indent && 'move-indent');
           return (
             <div key={key} className={iconParaCx}>
-              <Icon name={block.icon} size="small" className={styles.moveBodyIcon} aria-hidden="true" />
+              <Icon name={block.icon} size="small" className="move-move-body-icon" aria-hidden="true" />
               <Text font="serif" color="muted" leading="tight">
                 {block.text}
               </Text>
             </div>
           );
         }
-        const paraCx = cn(block.indent && styles.indent);
+        const paraCx = cn(block.indent && 'move-indent');
         return (
           <Text key={key} font="serif" color="muted" leading="tight" className={paraCx}>
             {block.text}
@@ -277,7 +277,7 @@ export const Move = ({
         );
       }
       case 'list': {
-        const listCx = cn(block.indent && styles.indent);
+        const listCx = cn(block.indent && 'move-indent');
         return <List key={key} variant="bullet" items={block.items} keyPrefix={key} className={listCx} />;
       }
       case 'checkbox': {
@@ -341,10 +341,10 @@ export const Move = ({
 
   return (
     <div className={moveCx}>
-      <div className={styles.moveHeader}>
+      <div className="move-move-header">
         {selection !== undefined ? (
           takeCount > 0 ? (
-            <div className={styles.moveHeaderLeft}>
+            <div className="move-move-header-left">
               <MoveSelectGroup
                 moveName={title}
                 selected={selected}
@@ -364,7 +364,7 @@ export const Move = ({
               checked={selected}
               onChange={(e) => selection.onSelectChange(e.target.checked)}
               label={nameEl}
-              className={styles.moveCheckbox}
+              className="move-move-checkbox"
               // Same as MoveSelectGroup: keep an already-selected locked move deselectable.
               disabled={readOnly || (locked && !selected)}
             />
@@ -373,13 +373,13 @@ export const Move = ({
           nameEl
         )}
         {rightSpecs.length > 0 && (
-          <div className={styles.usesGroup}>
+          <div className="move-uses-group">
             {rightSpecs.map((spec, i) => {
               const state = rightControlState?.[i];
               const count = Math.max(1, spec.number ?? 1);
               // The preceding control's `divider` flag draws a separator before this one, rendered as a
               // left border on this slot rather than a separate element.
-              const dividedCx = cn(styles.usesSlot, rightSpecs.length > 1 && rightSpecs[i - 1]?.divider && styles.usesSlotDivided);
+              const dividedCx = cn('move-uses-slot', rightSpecs.length > 1 && rightSpecs[i - 1]?.divider && 'move-uses-slot-divided');
               return (
                 <span key={`${move.id}-rc-${i}`} className={dividedCx}>
                   {spec.type === 'dot' ? (
@@ -404,10 +404,10 @@ export const Move = ({
             })}
           </div>
         )}
-        {headerAction && <div className={styles.headerAction}>{headerAction}</div>}
+        {headerAction && <div className="move-header-action">{headerAction}</div>}
       </div>
       {hasBody && (
-        <div className={styles.moveBody}>
+        <div className="move-move-body">
           {hasRoll && statOptions && (
             <RollAffordance
               stat={statOptions[0]!.stat}
@@ -439,7 +439,7 @@ export const Move = ({
             <TakeNotesField value={takeNoteValue ?? ''} onSave={onTakeNoteSave} disabled={interactiveDisabled} />
           )}
           {citationText && (
-            <Text as="span" font="serif" size="xs" color="tertiary" italic className={styles.moveCitation}>
+            <Text as="span" font="serif" size="xs" color="tertiary" italic className="move-move-citation">
               {citationText}
             </Text>
           )}

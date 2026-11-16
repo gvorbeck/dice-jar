@@ -1,5 +1,5 @@
 import { Heading, Text, List, Table, Callout, Stack } from '@/components/ui';
-import styles from '@/pages/GmPlaybook/GmPlaybook.module.css';
+import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const Monsters = () => (
   <div>
@@ -287,7 +287,7 @@ export const Monsters = () => (
       ]}
     />
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Callout title="Monsters & followers">
         <Text>When you ***convert a monster into a follower***:</Text>
         <List

@@ -1,7 +1,7 @@
 import { type ComponentPropsWithoutRef } from 'react';
 import { cn } from '@dice-jar/cn';
 import { parseInlineMarkdown } from '@/lib/parseMarkdown';
-import styles from './Text.module.css';
+import './Text.css';
 
 interface TextProps extends ComponentPropsWithoutRef<'span'> {
   as?: 'p' | 'span' | 'li';
@@ -26,16 +26,16 @@ export const Text = ({
   ...props
 }: TextProps) => {
   const cx = cn(
-    styles.base,
-    styles[size],
-    styles[color],
-    styles[font],
-    weight === 'semibold' && styles.semibold,
-    weight === 'bold' && styles.bold,
-    italic && styles.italic,
-    leading === 'tight' && styles.leadingTight,
-    leading === 'normal' && styles.leadingNormal,
-    leading === 'loose' && styles.leadingLoose,
+    'text-base',
+    `text-${size}`,
+    `text-${color}`,
+    `text-${font}`,
+    weight === 'semibold' && 'text-semibold',
+    weight === 'bold' && 'text-bold',
+    italic && 'text-italic',
+    leading === 'tight' && 'text-leading-tight',
+    leading === 'normal' && 'text-leading-normal',
+    leading === 'loose' && 'text-leading-loose',
     className,
   );
 

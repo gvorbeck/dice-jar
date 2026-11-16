@@ -1,7 +1,7 @@
 import { useCallback, useId, useState } from 'react';
 import { Button, Heading, Modal, Text } from '@/components/ui';
 import type { GameExportEnvelope, ImportSummary } from '@/lib/gameBackup';
-import styles from './ImportGameModal.module.css';
+import './ImportGameModal.css';
 
 interface ImportGameModalProps {
   open: boolean;
@@ -61,8 +61,8 @@ export const ImportGameModal = ({ open, gameId, currentName, envelope, summary, 
         Replace this game's data?
       </Heading>
 
-      <div className={styles.body}>
-        <dl className={styles.details}>
+      <div className="import-game-modal-body">
+        <dl className="import-game-modal-details">
           <dt>
             <Text as="span" size="xs" color="muted">
               Backup of
@@ -101,11 +101,11 @@ export const ImportGameModal = ({ open, gameId, currentName, envelope, summary, 
           </Text>
         )}
 
-        <div className={styles.warning}>
+        <div className="import-game-modal-warning">
           <Text size="xs" color="muted">
-            <strong className={styles.warningLabel}>Everything in this game will be overwritten.</strong> Characters, steading, and notes
-            added since the backup was taken will be lost, and anyone with the game open will see it change. This cannot be undone from
-            inside the app.
+            <strong className="import-game-modal-warning-label">Everything in this game will be overwritten.</strong> Characters, steading,
+            and notes added since the backup was taken will be lost, and anyone with the game open will see it change. This cannot be undone
+            from inside the app.
           </Text>
         </div>
 
@@ -114,7 +114,7 @@ export const ImportGameModal = ({ open, gameId, currentName, envelope, summary, 
         </Text>
       </div>
 
-      <div className={styles.actions}>
+      <div className="import-game-modal-actions">
         <Button variant="ghost" size="md" onClick={onClose} disabled={importing}>
           Cancel
         </Button>

@@ -5,7 +5,7 @@ import { bigMagicCount } from '@/lib/bigMagic';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { resolvePlaybookFeatures, featurePatch } from '@/lib/resolvePlaybookFeatures';
 import type { PlaybookSectionProps } from '@/types';
-import styles from './BlessedSacredPouch.module.css';
+import './BlessedSacredPouch.css';
 
 interface IsLine {
   key: string;
@@ -65,7 +65,7 @@ export const BlessedSacredPouch = ({ data, onSave }: BlessedSacredPouchProps) =>
 
   return (
     <PlaybookSection title="Sacred Pouch">
-      <div className={styles.body}>
+      <div className="blessed-sacred-pouch-body">
         <Text size="xs" color="muted" leading="normal">
           Your sacred pouch (*magical*) doesn't take up space in your inventory. It can hold up to 3 Stock (sacred herbs, powders, stones,
           pigments, chalks, clay, and so forth). Each time you gain an even-numbered level, your pouch can hold +1 Stock. When ***anyone but
@@ -80,13 +80,13 @@ export const BlessedSacredPouch = ({ data, onSave }: BlessedSacredPouchProps) =>
 
         <Divider />
 
-        <Text size="xs" color="muted" className={styles.instruction}>
+        <Text size="xs" color="muted" className="blessed-sacred-pouch-instruction">
           Your sacred pouch is… (choose 1 on each line)
         </Text>
-        <div className={styles.isLines}>
+        <div className="blessed-sacred-pouch-is-lines">
           {IS_LINES.map((line) => (
-            <div key={line.key} className={styles.isRow}>
-              <RadioGroup legend={line.label} legendHidden className={styles.optionRow}>
+            <div key={line.key} className="blessed-sacred-pouch-is-row">
+              <RadioGroup legend={line.label} legendHidden className="blessed-sacred-pouch-option-row">
                 {line.options.map((opt) => (
                   <Radio
                     key={opt}
@@ -105,7 +105,7 @@ export const BlessedSacredPouch = ({ data, onSave }: BlessedSacredPouchProps) =>
 
         <Divider />
 
-        <Text size="xs" color="muted" className={styles.instruction}>
+        <Text size="xs" color="muted" className="blessed-sacred-pouch-instruction">
           What remarkable trait does it possess? (choose {traitPicks})
         </Text>
         <CheckboxGroup items={TRAITS} checked={traits} onChange={handleTrait} max={traitPicks} />

@@ -2,7 +2,7 @@ import { useId, useState, useCallback } from 'react';
 import { Button, Heading, Modal, Text } from '@/components/ui';
 import { useToast } from '@/components/app';
 import { getInsertTab, type InsertOption } from '@/lib/insertTabs';
-import styles from './RemoveInsertModal.module.css';
+import './RemoveInsertModal.css';
 
 interface RemoveInsertModalProps {
   open: boolean;
@@ -44,10 +44,10 @@ export const RemoveInsertModal = ({ open, insert, onClose, onConfirm }: RemoveIn
         <Text
           font="serif"
           color="muted"
-          className={styles.warning}
+          className="remove-insert-modal-warning"
         >{`This will remove the **${label}** tab from this character sheet.${warning ? ` ${warning}` : ''}`}</Text>
       )}
-      <div className={styles.actions}>
+      <div className="remove-insert-modal-actions">
         <Button variant="secondary" onClick={onClose} disabled={removing}>
           Cancel
         </Button>

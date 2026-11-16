@@ -1,7 +1,7 @@
 import { useId, forwardRef, type InputHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Text } from '../Text/Text';
-import styles from './Input.module.css';
+import './Input.css';
 
 interface BaseProps {
   label?: string;
@@ -24,7 +24,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
     const noteId = note ? `${generatedId}-note` : undefined;
     // Merge any caller-supplied aria-describedby with the note/error ids we own.
     const describedBy = [ariaDescribedBy, noteId, errorId].filter((x): x is string => Boolean(x)).join(' ') || undefined;
-    const cx = cn(styles.input, error && styles.hasError, className);
+    const cx = cn('input-input', error && 'input-has-error', className);
 
     const el = multiline ? (
       <textarea
@@ -54,7 +54,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
             </Text>
           )}
           {error && (
-            <span id={errorId} className={styles.error}>
+            <span id={errorId} className="input-error">
               {error}
             </span>
           )}
@@ -63,9 +63,9 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
     }
 
     return (
-      <div className={styles.wrapper}>
-        <div className={styles.labelRow}>
-          <label htmlFor={resolvedId} className={styles.label}>
+      <div className="input-wrapper">
+        <div className="input-label-row">
+          <label htmlFor={resolvedId} className="input-label">
             {label}
           </label>
           {note && (
@@ -76,7 +76,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
         </div>
         {el}
         {error && (
-          <span id={errorId} className={styles.error}>
+          <span id={errorId} className="input-error">
             {error}
           </span>
         )}

@@ -1,5 +1,5 @@
 import { cn } from '@dice-jar/cn';
-import styles from './Spinner.module.css';
+import './Spinner.css';
 
 interface Props {
   className?: string;
@@ -8,5 +8,5 @@ interface Props {
 }
 
 export const Spinner = ({ className, label = 'Loading…' }: Props) => (
-  <span className={cn(styles.root, className)} role="status" aria-label={label} />
+  <span className={cn('spinner', className)} role="status" aria-label={label} />
 );

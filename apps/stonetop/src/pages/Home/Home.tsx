@@ -7,7 +7,7 @@ import { createGame, createGameWithId } from '@/lib/game';
 import { useGameIdCheck } from '@/hooks/useGameIdCheck';
 import { useJoinIdCheck } from '@/hooks/useJoinIdCheck';
 import { Button, Heading, Icon, Input, RuleDivider, Stack, Text } from '@/components/ui';
-import styles from './Home.module.css';
+import './Home.css';
 
 const STATUS_MESSAGES = {
   idle: '',
@@ -88,19 +88,19 @@ export const Home = () => {
   const showSlugPreview = status === 'available' || status === 'checking';
 
   const hintCx = cn(
-    styles.idHint,
-    status === 'available' && styles.idHintAvailable,
-    (status === 'taken' || status === 'invalid') && styles.idHintTaken,
-    status === 'checking' && styles.idHintChecking,
+    'home-id-hint',
+    status === 'available' && 'home-id-hint-available',
+    (status === 'taken' || status === 'invalid') && 'home-id-hint-taken',
+    status === 'checking' && 'home-id-hint-checking',
   );
 
   const isJoinDisabled = joinStatus !== 'found';
 
   const joinHintCx = cn(
-    styles.idHint,
-    joinStatus === 'found' && styles.idHintAvailable,
-    (joinStatus === 'notfound' || joinStatus === 'error') && styles.idHintTaken,
-    joinStatus === 'checking' && styles.idHintChecking,
+    'home-id-hint',
+    joinStatus === 'found' && 'home-id-hint-available',
+    (joinStatus === 'notfound' || joinStatus === 'error') && 'home-id-hint-taken',
+    joinStatus === 'checking' && 'home-id-hint-checking',
   );
 
   return (
@@ -110,27 +110,27 @@ export const Home = () => {
         description="Track your Stonetop TTRPG campaign — manage characters, GM playbook, and game sessions."
         url={`${window.location.origin}${location.pathname}`}
       />
-      <div className={styles.page}>
-        <div className={styles.hero}>
-          <div className={styles.logoWrap}>
-            <Icon logoIcon="stonetop" className={styles.logo} />
-            <div className={styles.heroText}>
-              <Text className={styles.eyebrow}>Party Tracker</Text>
-              <Heading as="h1" size="xl" className={styles.wordmark}>
+      <div className="home-page">
+        <div className="home-hero">
+          <div className="home-logo-wrap">
+            <Icon logoIcon="stonetop" className="home-logo" />
+            <div className="home-hero-text">
+              <Text className="home-eyebrow">Party Tracker</Text>
+              <Heading as="h1" size="xl" className="home-wordmark">
                 Hearthfire
               </Heading>
             </div>
           </div>
-          <RuleDivider className={styles.rule} />
-          <Text className={styles.subtitle}>For the Stonetop TTRPG by Jeremy Strandberg</Text>
+          <RuleDivider className="home-rule" />
+          <Text className="home-subtitle">For the Stonetop TTRPG by Jeremy Strandberg</Text>
         </div>
 
-        <div className={styles.cards}>
-          <div className={styles.card}>
+        <div className="home-cards">
+          <div className="home-card">
             <Heading as="h2" size="label">
               New Game
             </Heading>
-            <form onSubmit={handleCreate} className={styles.cardBody}>
+            <form onSubmit={handleCreate} className="home-card-body">
               <Text color="muted" size="xs">
                 Start a new session. Leave the name blank for a generated ID, or choose one your group will remember.
               </Text>
@@ -149,7 +149,7 @@ export const Home = () => {
                 <div id={customIdHintId} aria-live="polite" aria-atomic="true">
                   {status !== 'idle' && (
                     <>
-                      {showSlugPreview && <Text as="span" className={styles.idSlugPreview}>{`hearthfire.camp/game/**${slug}**`}</Text>}
+                      {showSlugPreview && <Text as="span" className="home-id-slug-preview">{`hearthfire.camp/game/**${slug}**`}</Text>}
                       <Text as="span" size="xs" className={hintCx}>
                         {STATUS_MESSAGES[status]}
                       </Text>
@@ -168,11 +168,11 @@ export const Home = () => {
             </form>
           </div>
 
-          <div className={styles.card}>
+          <div className="home-card">
             <Heading as="h2" size="label">
               Join Game
             </Heading>
-            <form onSubmit={handleJoin} className={styles.cardBody}>
+            <form onSubmit={handleJoin} className="home-card-body">
               <Stack gap={2}>
                 <Input
                   id="join-id"

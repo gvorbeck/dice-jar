@@ -1,0 +1,70 @@
+.add-arcana-modal-modal {
+  width: min(480px, 90vw);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.add-arcana-modal-list {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.add-arcana-modal-list-empty {
+  border: none;
+}
+
+.add-arcana-modal-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding: var(--spacing-2) var(--spacing-3);
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background 100ms ease;
+}
+
+.add-arcana-modal-item:last-child {
+  border-bottom: none;
+}
+
+.add-arcana-modal-item[data-hovered] {
+  background: var(--surface-raised);
+}
+
+.add-arcana-modal-list[data-focus-visible] {
+  outline: 2px solid var(--border-accent);
+  outline-offset: -2px;
+}
+
+.add-arcana-modal-item[data-selected] {
+  background: var(--surface-overlay);
+}
+
+.add-arcana-modal-item[data-selected][data-hovered] {
+  background: var(--surface-overlay);
+}
+
+.add-arcana-modal-empty {
+  padding: var(--spacing-4);
+  text-align: center;
+}
+
+.add-arcana-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+}
+
+.add-arcana-modal-item[data-focus-visible] {
+  outline: 2px solid var(--border-accent);
+  outline-offset: -2px;
+}

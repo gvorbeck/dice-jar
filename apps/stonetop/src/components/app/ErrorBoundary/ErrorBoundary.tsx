@@ -2,7 +2,7 @@ import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Button } from '@/components/ui';
 import { Heading } from '@/components/ui';
 import { Text } from '@/components/ui';
-import styles from './ErrorBoundary.module.css';
+import './ErrorBoundary.css';
 
 interface Props {
   children: ReactNode;
@@ -33,12 +33,12 @@ export class ErrorBoundary extends Component<Props, State> {
   render = () => {
     if (this.state.hasError) {
       return (
-        <main className={styles.page}>
-          <div role="alert" className={styles.srOnly} aria-atomic="true">
+        <main className="error-boundary-page">
+          <div role="alert" className="error-boundary-sr-only" aria-atomic="true">
             Something went wrong.
           </div>
-          <div className={styles.content}>
-            <Text className={styles.code}>!</Text>
+          <div className="error-boundary-content">
+            <Text className="error-boundary-code">!</Text>
             <Heading as="h1" size="xl">
               Something went wrong.
             </Heading>

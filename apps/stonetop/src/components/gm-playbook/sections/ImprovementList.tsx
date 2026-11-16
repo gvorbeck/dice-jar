@@ -1,6 +1,6 @@
 import { List, Icon, Tooltip, Text, Button } from '@/components/ui';
 import { RepeaterField } from '@/components/fields';
-import styles from './ImprovementList.module.css';
+import './ImprovementList.css';
 
 interface ImprovementItem {
   id: string;
@@ -51,11 +51,11 @@ export const ImprovementList = ({
   ];
 
   const listItems = allFixed.map(({ id, label, fromImprovement, removable }) => (
-    <span key={id} className={styles.fixedItem}>
+    <span key={id} className="improvement-list-fixed-item">
       <Text as="span">{label}</Text>
       {fromImprovement && (
         <Tooltip text="Added by a completed improvement" side="top" plain>
-          <Icon name="info" size="small" className={styles.infoIcon} />
+          <Icon name="info" size="small" className="improvement-list-info-icon" />
         </Tooltip>
       )}
       {removable && onRemoveFixed && (
@@ -65,16 +65,22 @@ export const ImprovementList = ({
           icon="close"
           onClick={() => onRemoveFixed(label)}
           aria-label={`Remove ${label}`}
-          className={styles.removeFixedBtn}
+          className="improvement-list-remove-fixed-btn"
         />
       )}
     </span>
   ));
 
   return (
-    <div className={styles.root}>
+    <div className="improvement-list">
       <List variant="bullet" items={listItems} />
-      <RepeaterField items={customItems} onSave={onSave} addLabel={addLabel} itemLabel={itemLabel} className={styles.customList} />
+      <RepeaterField
+        items={customItems}
+        onSave={onSave}
+        addLabel={addLabel}
+        itemLabel={itemLabel}
+        className="improvement-list-custom-list"
+      />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import type { NpcRelationship } from '@/types';
 import { generateId } from '@/lib/id';
 import { encodeTarget, decodeTarget, filterLinkedTargets } from './npcData';
 import type { RelTarget } from './npcData';
-import styles from './RelationshipRepeater.module.css';
+import './RelationshipRepeater.css';
 
 interface RelationshipRowProps {
   rel: NpcRelationship;
@@ -32,7 +32,7 @@ const RelationshipRow = ({ rel, groups, position, onTypeChange, onTargetChange, 
   const handleRemove = useCallback(() => onRemove(rel.id), [rel.id, onRemove]);
 
   return (
-    <div className={styles.relRow}>
+    <div className="relationship-repeater-rel-row">
       <Input value={rel.type} placeholder='e.g. "mother", "rival"' aria-label={`Relationship ${position} type`} onChange={handleType} />
       <Dropdown
         id={dropdownId}
@@ -40,7 +40,7 @@ const RelationshipRow = ({ rel, groups, position, onTypeChange, onTargetChange, 
         value={encodeTarget(rel)}
         onChange={handleTarget}
         placeholder="Link to character…"
-        className={styles.relDropdown}
+        className="relationship-repeater-rel-dropdown"
         aria-label={`Relationship ${position} linked character`}
       />
       <Button
@@ -50,7 +50,7 @@ const RelationshipRow = ({ rel, groups, position, onTypeChange, onTargetChange, 
         icon="close"
         onClick={handleRemove}
         aria-label={`Remove relationship ${position}`}
-        className={styles.relRemoveBtn}
+        className="relationship-repeater-rel-remove-btn"
       />
     </div>
   );
@@ -108,7 +108,7 @@ export const RelationshipRepeater = ({ relationships, groups, onChange }: Relati
   const canAdd = allTaken.size < totalTargets && !hasBlankRow;
 
   return (
-    <div className={styles.relRepeater}>
+    <div className="relationship-repeater-rel-repeater">
       {relationships.map((rel, i) => {
         // Hide targets other rows already use; keep this row's own selection.
         const taken = new Set(allTaken);
@@ -126,7 +126,15 @@ export const RelationshipRepeater = ({ relationships, groups, onChange }: Relati
           />
         );
       })}
-      <Button type="button" variant="ghost" size="sm" icon="plus" onClick={handleAdd} disabled={!canAdd} className={styles.relAddBtn}>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        icon="plus"
+        onClick={handleAdd}
+        disabled={!canAdd}
+        className="relationship-repeater-rel-add-btn"
+      >
         Add relationship
       </Button>
     </div>

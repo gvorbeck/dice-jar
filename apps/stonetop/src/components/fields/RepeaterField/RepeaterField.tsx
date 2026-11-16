@@ -4,7 +4,7 @@ import { Button } from '@/components/ui';
 import { Icon } from '@/components/ui';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 import { useLatest } from '@/hooks/useLatest';
-import styles from './RepeaterField.module.css';
+import './RepeaterField.css';
 
 interface BaseItem {
   id: number;
@@ -90,22 +90,22 @@ const Row = memo(
     );
     const handleRemove = useCallback(() => onRemove(item.id), [item.id, onRemove]);
 
-    const provisionWrapCx = cn(styles.provisionWrap, weight === 2 && styles.provisionWrapDouble);
-    const provisionIconCx = cn(styles.provisionIcon, checked && styles.provisionIconChecked);
+    const provisionWrapCx = cn('repeater-field-provision-wrap', weight === 2 && 'repeater-field-provision-wrap-double');
+    const provisionIconCx = cn('repeater-field-provision-icon', checked && 'repeater-field-provision-icon-checked');
 
     return (
-      <li className={styles.item}>
+      <li className="repeater-field-item">
         {hasCheckbox ? (
           <span className={provisionWrapCx}>
             <input
               type="checkbox"
               id={checkId}
-              className={styles.provisionInput}
+              className="repeater-field-provision-input"
               checked={checked}
               aria-label={`Mark ${itemLabel.toLowerCase()} ${position} as carried`}
               onChange={handleChecked}
             />
-            <label htmlFor={checkId} className={styles.provisionLabel} aria-hidden="true">
+            <label htmlFor={checkId} className="repeater-field-provision-label" aria-hidden="true">
               {Array.from({ length: weight }, (_, i) => (
                 <span key={`provision-icon-${item.id}-${i}`} className={provisionIconCx}>
                   <Icon name={checked ? 'filled-provisions' : 'empty-provisions'} size="small" />
@@ -114,7 +114,7 @@ const Row = memo(
             </label>
           </span>
         ) : (
-          <span className={styles.bullet} aria-hidden="true">
+          <span className="repeater-field-bullet" aria-hidden="true">
             ☉
           </span>
         )}
@@ -122,7 +122,7 @@ const Row = memo(
         <input
           ref={inputRef}
           type="text"
-          className={styles.input}
+          className="repeater-field-input"
           value={item.text}
           placeholder="Item…"
           aria-label={`${itemLabel} ${position}`}
@@ -131,7 +131,12 @@ const Row = memo(
         />
 
         {hasWeight && (
-          <select className={styles.weightSelect} value={weight} aria-label={`${itemLabel} ${position} weight`} onChange={handleWeight}>
+          <select
+            className="repeater-field-weight-select"
+            value={weight}
+            aria-label={`${itemLabel} ${position} weight`}
+            onChange={handleWeight}
+          >
             <option value={1}>1 load</option>
             <option value={2}>2 load</option>
           </select>
@@ -143,7 +148,7 @@ const Row = memo(
           icon="close"
           onClick={handleRemove}
           aria-label={`Remove ${itemLabel.toLowerCase()} ${position}`}
-          className={styles.removeBtn}
+          className="repeater-field-remove-btn"
         />
       </li>
     );
@@ -180,11 +185,11 @@ type RepeaterFieldProps = PlainProps | CheckedProps | CheckedWeightProps;
 
 type SaveFn = PlainProps['onSave'] | CheckedProps['onSave'] | CheckedWeightProps['onSave'];
 
-const addBtnCx = cn(styles.addBtn, styles.addBtnOffset);
+const addBtnCx = cn('repeater-field-add-btn', 'repeater-field-add-btn-offset');
 
 export const RepeaterField = (props: RepeaterFieldProps) => {
   const { addLabel, itemLabel, className } = props;
-  const listCx = cn(styles.list, className);
+  const listCx = cn('repeater-field-list', className);
 
   const nextId = useRef(props.items.length);
   const onSaveRef = useLatest<SaveFn>(props.onSave);

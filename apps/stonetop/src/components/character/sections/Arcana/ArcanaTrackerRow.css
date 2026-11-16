@@ -1,0 +1,9 @@
+.arcana-tracker-row-tracker {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.arcana-tracker-row-tracker-label {
+  min-width: 4rem;
+}

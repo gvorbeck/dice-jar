@@ -1,0 +1,27 @@
+@import '../../ui/field.css';
+
+/* The footer that appears at the bottom of every page. */
+.page-footer-footer {
+  padding: var(--spacing-4) var(--spacing-6);
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-subtle);
+  letter-spacing: 0.03em;
+  line-height: 1.8;
+}
+
+/* Make links inside the footer gold-colored and always underlined for WCAG 1.4.1 (non-color affordance). */
+.page-footer-link {
+  color: var(--text-accent);
+  text-decoration: underline;
+}
+
+.page-footer-link:hover {
+  text-decoration: none;
+}
+
+.page-footer-link:focus-visible {
+  border-radius: var(--radius-sm);
+}

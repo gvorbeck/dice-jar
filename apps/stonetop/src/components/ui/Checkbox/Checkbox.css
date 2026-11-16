@@ -1,0 +1,100 @@
+@import '../field.css';
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--text-sm);
+  /* Must match the Text atom's body line-height — the indicator's 1lh centering below relies on it. */
+  line-height: 1.6;
+}
+
+.checkbox-indicator {
+  flex-shrink: 0;
+  /* Center within the label's first line; multi-line labels stay first-line aligned. */
+  margin-top: calc((1lh - 16px) / 2);
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+/* Label-less checkboxes (aria-label only, e.g. move take-boxes) have no text line to align to —
+   drop the offset so parent flex rows can center the bare indicator exactly. */
+.checkbox-indicator:last-child {
+  margin-top: 0;
+}
+
+.checkbox-check {
+  width: 9px;
+  height: 6px;
+  border-left: 1.5px solid var(--color-gold-400);
+  border-bottom: 1.5px solid var(--color-gold-400);
+  transform: rotate(-45deg) translateY(-1px);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.checkbox-input:checked + .checkbox-indicator {
+  border-color: var(--color-gold-500);
+}
+
+.checkbox-input:checked + .checkbox-indicator .checkbox-check {
+  opacity: 1;
+}
+
+.checkbox-input:focus-visible + .checkbox-indicator {
+  outline: 2px solid var(--color-gold-400);
+  outline-offset: 2px;
+}
+
+.checkbox-label:hover .checkbox-indicator {
+  border-color: var(--color-gold-400);
+}
+
+.checkbox-input:disabled + .checkbox-indicator {
+  opacity: 0.5;
+  border-color: var(--border-subtle);
+}
+
+.checkbox-label:has(.checkbox-input:disabled) {
+  cursor: not-allowed;
+}
+
+/* ── Provision variant ── */
+.checkbox-label-provision {
+  gap: var(--spacing-2);
+}
+
+.checkbox-provision-icons {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.checkbox-provision-icon {
+  color: var(--text-secondary);
+}
+
+.checkbox-provision-icon-checked {
+  color: var(--text-accent);
+}
+
+.checkbox-input:focus-visible ~ .checkbox-provision-icons {
+  outline: 2px solid var(--color-gold-400);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.checkbox-input:disabled ~ .checkbox-provision-icons {
+  opacity: 0.5;
+}

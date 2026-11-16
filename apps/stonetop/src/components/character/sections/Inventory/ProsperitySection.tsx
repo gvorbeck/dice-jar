@@ -3,7 +3,7 @@ import { cn } from '@dice-jar/cn';
 import { Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { PROSPERITY_NOTES } from './inventoryData';
-import styles from './ProsperitySection.module.css';
+import './ProsperitySection.css';
 
 interface ProsperityOptionRowProps {
   val: -1 | 0 | 1 | 2;
@@ -11,10 +11,10 @@ interface ProsperityOptionRowProps {
 }
 
 const ProsperityOptionRow = memo(({ val, selected }: ProsperityOptionRowProps) => {
-  const cx = cn(styles.prosperityOption, selected && styles.prosperitySelected);
+  const cx = cn('prosperity-section-prosperity-option', selected && 'prosperity-section-prosperity-selected');
   return (
     <div className={cx} aria-current={selected ? true : undefined}>
-      <span className={styles.prosperityValue}>{val > 0 ? `+${val}` : val}</span>
+      <span className="prosperity-section-prosperity-value">{val > 0 ? `+${val}` : val}</span>
       <Text as="span" font="serif" size="sm" color="muted" italic>
         {PROSPERITY_NOTES[val]}
       </Text>
@@ -31,7 +31,7 @@ export const ProsperitySection = ({ prosperity }: ProsperitySectionProps) => (
     <Text font="serif" color="muted" leading="normal">
       Affects uses from Supplies, HP from Recover, and piercing on iron weapons. Set by the GM.
     </Text>
-    <div className={styles.prosperityList}>
+    <div className="prosperity-section-prosperity-list">
       {([-1, 0, 1, 2] as const).map((val) => (
         <ProsperityOptionRow key={val} val={val} selected={prosperity === val} />
       ))}

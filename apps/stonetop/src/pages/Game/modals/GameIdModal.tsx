@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Button, Heading, Modal, Text } from '@/components/ui';
-import styles from './GameIdModal.module.css';
+import './GameIdModal.css';
 
 interface GameIdModalProps {
   gameId: string;
@@ -39,8 +39,8 @@ export const GameIdModal = ({ gameId, open, onClose }: GameIdModalProps) => {
         Your Game ID
       </Heading>
 
-      <div className={styles.idRow}>
-        <Text as="span" color="accent" className={styles.idText}>
+      <div className="game-id-modal-id-row">
+        <Text as="span" color="accent" className="game-id-modal-id-text">
           {gameId}
         </Text>
         <Button
@@ -59,10 +59,10 @@ export const GameIdModal = ({ gameId, open, onClose }: GameIdModalProps) => {
         </Text>
       )}
 
-      <div className={styles.warning}>
+      <div className="game-id-modal-warning">
         <Text size="xs" color="muted">
-          <strong className={styles.warningLabel}>Save this ID somewhere safe.</strong> It's the only way to access this game. If you lose
-          it, there's no way to recover it.
+          <strong className="game-id-modal-warning-label">Save this ID somewhere safe.</strong> It's the only way to access this game. If
+          you lose it, there's no way to recover it.
         </Text>
       </div>
 

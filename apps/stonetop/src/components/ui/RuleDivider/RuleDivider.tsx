@@ -1,12 +1,12 @@
 import { cn } from '@dice-jar/cn';
-import styles from './RuleDivider.module.css';
+import './RuleDivider.css';
 
 interface RuleDividerProps {
   className?: string;
 }
 
 export const RuleDivider = ({ className }: RuleDividerProps) => (
-  <div className={cn(styles.root, className)}>
-    <span className={styles.diamond} />
+  <div className={cn('rule-divider', className)}>
+    <span className="rule-divider-diamond" />
   </div>
 );

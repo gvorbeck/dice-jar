@@ -1,6 +1,6 @@
 import { useId, type InputHTMLAttributes } from 'react';
 import { cn } from '@dice-jar/cn';
-import styles from './Toggle.module.css';
+import './Toggle.css';
 
 interface ToggleWithLabel extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label: React.ReactNode;
@@ -16,13 +16,13 @@ type ToggleProps = ToggleWithLabel | ToggleWithAriaLabel;
 
 export const Toggle = ({ label, className, ...props }: ToggleProps) => {
   const id = useId();
-  const cx = cn(styles.label, className);
+  const cx = cn('toggle-label', className);
 
   return (
     <label htmlFor={id} className={cx}>
-      <input id={id} type="checkbox" role="switch" className={styles.input} {...props} />
-      <span className={styles.track}>
-        <span className={styles.thumb} />
+      <input id={id} type="checkbox" role="switch" className="toggle-input" {...props} />
+      <span className="toggle-track">
+        <span className="toggle-thumb" />
       </span>
       {label}
     </label>

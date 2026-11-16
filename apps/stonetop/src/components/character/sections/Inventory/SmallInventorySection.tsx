@@ -4,8 +4,8 @@ import { RepeaterField } from '@/components/fields';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { SMALL_ITEMS, UNDEFINED_SMALL_COUNT, type SmallItem } from './inventoryData';
 import { UndefinedProvisions } from './UndefinedProvisions';
-import shared from './inventoryItem.module.css';
-import styles from './SmallInventorySection.module.css';
+import './inventoryItem.css';
+import './SmallInventorySection.css';
 
 interface SmallItemRowProps {
   item: SmallItem;
@@ -19,12 +19,12 @@ const SmallItemRow = memo(({ item, checked, onCheckedChange }: SmallItemRowProps
     [item.id, onCheckedChange],
   );
   return (
-    <div className={styles.smallItemRow}>
+    <div className="small-inventory-section-small-item-row">
       <Checkbox
         checked={checked}
         onChange={handleChecked}
         label={
-          <Text as="span" className={shared.itemLabel}>
+          <Text as="span" className="inventory-item-item-label">
             {item.label}
           </Text>
         }

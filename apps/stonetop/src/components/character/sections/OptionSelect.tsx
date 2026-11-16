@@ -8,7 +8,7 @@ import { useFirestoreSync } from '@/hooks/useFirestoreSync';
 import { useCollapsibleSection } from '@/hooks/useCollapsibleSection';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import type { RadioOption } from '@/types';
-import styles from './OptionSelect.module.css';
+import './OptionSelect.css';
 
 const CUSTOM_VALUE = '__custom__';
 
@@ -156,21 +156,21 @@ export const OptionSelect = ({
     >
       {header}
       {instruction && (
-        <Text color="muted" className={styles.instruction}>
+        <Text color="muted" className="option-select-instruction">
           {instruction}
         </Text>
       )}
-      <RadioGroup legend={title} legendHidden className={styles.options}>
+      <RadioGroup legend={title} legendHidden className="option-select-options">
         {visibleOptions.map((opt) => (
-          <div key={opt.value} className={styles.option}>
+          <div key={opt.value} className="option-select-option">
             <Radio
               name={name}
               value={opt.value}
               checked={selected === opt.value}
               onChange={handleSelect}
               label={
-                <span className={styles.optionLabel}>
-                  <span className={styles.optionTitle}>{opt.label}</span>
+                <span className="option-select-option-label">
+                  <span className="option-select-option-title">{opt.label}</span>
                   {opt.description && (
                     <Text as="span" size="sm" color="muted">
                       {opt.description}
@@ -188,7 +188,7 @@ export const OptionSelect = ({
           </div>
         ))}
         {showCustom && (
-          <div className={styles.option}>
+          <div className="option-select-option">
             <Radio
               name={name}
               value={CUSTOM_VALUE}
@@ -205,11 +205,11 @@ export const OptionSelect = ({
                     onBlur={handleCustomBlur}
                     placeholder={`Describe your ${title.toLowerCase()}…`}
                     onClick={(e) => e.stopPropagation()}
-                    className={styles.customTextarea}
+                    className="option-select-custom-textarea"
                     rows={1}
                   />
                 ) : (
-                  <span className={styles.customLabel}>Custom…</span>
+                  <span className="option-select-custom-label">Custom…</span>
                 )
               }
             />

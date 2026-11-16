@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Input, Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { StatBox } from '../shared/CrewWidgets';
-import styles from './RangerAnimalCompanion.module.css';
+import './RangerAnimalCompanion.css';
 
 interface AnimalStatsProps {
   hp: string;
@@ -48,8 +48,8 @@ export const AnimalStats = ({
       <Text size="xs" color="muted" leading="normal">
         You are accompanied by a beast, with whom you have bonded deeply and communicate without words. Treat it as a follower.
       </Text>
-      <div className={styles.headerRow}>
-        <div className={styles.statsRow}>
+      <div className="ranger-animal-companion-header-row">
+        <div className="ranger-animal-companion-stats-row">
           <StatBox
             ariaLabel="Animal Companion HP"
             value={hp}
@@ -99,10 +99,10 @@ export const AnimalStats = ({
             }
           />
         </div>
-        <div className={styles.nameBlock}>
+        <div className="ranger-animal-companion-name-block">
           <Input
             label="Name"
-            className={styles.nameInput}
+            className="ranger-animal-companion-name-input"
             type="text"
             value={name}
             placeholder="…"
@@ -111,7 +111,7 @@ export const AnimalStats = ({
           />
           <Input
             label="Damage tags"
-            className={styles.tagsInput}
+            className="ranger-animal-companion-tags-input"
             type="text"
             value={damageTags}
             placeholder="…"

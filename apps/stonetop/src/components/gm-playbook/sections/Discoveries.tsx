@@ -1,5 +1,5 @@
 import { Heading, Text, List, Stack } from '@/components/ui';
-import styles from '@/pages/GmPlaybook/GmPlaybook.module.css';
+import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const Discoveries = () => (
   <div>
@@ -23,7 +23,7 @@ export const Discoveries = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Encounters
       </Heading>
@@ -41,7 +41,7 @@ export const Discoveries = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Opportunities
       </Heading>
@@ -62,7 +62,7 @@ export const Discoveries = () => (
       />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Artifacts &amp; arcana
       </Heading>

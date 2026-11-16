@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { PageMeta } from '@/components/app/PageMeta/PageMeta';
 import { Heading, Text, Button, Spinner } from '@/components/ui';
 import type { GameSession } from '@/types';
-import styles from './GameGuard.module.css';
+import './GameGuard.css';
 
 interface Props {
   loading: boolean;
@@ -27,7 +27,7 @@ export const GameGuard = ({
 }: Props) => {
   if (loading) {
     return (
-      <main className={styles.centered} aria-live="polite" aria-busy={true}>
+      <main className="game-guard-centered" aria-live="polite" aria-busy={true}>
         <Spinner label={loadingText} />
       </main>
     );
@@ -35,7 +35,7 @@ export const GameGuard = ({
 
   if (error) {
     return (
-      <main className={styles.centered}>
+      <main className="game-guard-centered">
         <PageMeta noindex title="Something went wrong — Hearthfire" description="This game could not be loaded." />
         <Heading as="h1" size="md">
           Something went wrong
@@ -50,7 +50,7 @@ export const GameGuard = ({
 
   if (!game) {
     return (
-      <main className={styles.centered}>
+      <main className="game-guard-centered">
         <PageMeta noindex title="Game not found — Hearthfire" description="No game exists with this ID." />
         <Heading as="h1" size="md">
           Game not found

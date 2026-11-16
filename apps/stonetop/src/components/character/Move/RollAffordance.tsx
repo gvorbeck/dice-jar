@@ -6,7 +6,7 @@ import { bandFor, effectiveMode, remodeRoll, rollAction, type RollMode, type Rol
 import { generateId } from '@/lib/id';
 import { BURN_BRIGHTLY_COST } from '@/lib/burnBrightly';
 import { useCharacterRollOptional } from './CharacterRollContext';
-import styles from './RollAffordance.module.css';
+import './RollAffordance.css';
 
 // The subset of a completed roll a parent needs to log. Kept structural so Move doesn't depend on the
 // session type; Moves.tsx maps it onto a LoggedRoll.
@@ -209,7 +209,7 @@ export const RollAffordance = ({
 
   const hitBand = result && !tumbling ? bandFor(result.total, bands) : null;
   const label = rollLabel(activeStat, activeResource);
-  const triggerCx = cn(styles.trigger, open && styles.rerollIcon);
+  const triggerCx = cn('roll-affordance-trigger', open && 'roll-affordance-reroll-icon');
   const atMin = adjust <= ADJUST_MIN;
   const atMax = adjust >= ADJUST_MAX;
 
@@ -221,10 +221,10 @@ export const RollAffordance = ({
   };
 
   return (
-    <div className={styles.root}>
-      <div className={styles.controls}>
+    <div className="roll-affordance">
+      <div className="roll-affordance-controls">
         {isMultiStat ? (
-          <div className={styles.statPicker} role="group" aria-label="Choose a stat to roll">
+          <div className="roll-affordance-stat-picker" role="group" aria-label="Choose a stat to roll">
             {statOptions.map((option) => {
               const optLabel = rollLabel(option.stat, option.resource);
               const isActive = open && option.stat === activeStat && option.resource === activeResource;
@@ -234,7 +234,7 @@ export const RollAffordance = ({
                   variant="ghost"
                   size="sm"
                   icon="dice"
-                  className={cn(styles.trigger, isActive && styles.statTriggerActive)}
+                  className={cn('roll-affordance-trigger', isActive && 'roll-affordance-stat-trigger-active')}
                   onClick={() => handleStatClick(option)}
                   disabled={paying}
                   aria-label={`Roll ${optLabel}`.trim()}
@@ -268,12 +268,12 @@ export const RollAffordance = ({
           </Button>
         )}
 
-        <div className={styles.modeToggle} role="group" aria-label="Advantage / disadvantage">
+        <div className="roll-affordance-mode-toggle" role="group" aria-label="Advantage / disadvantage">
           {MODES.map((m) => (
             <button
               key={m.value}
               type="button"
-              className={cn(styles.modeButton, chosen === m.value && styles.modeButtonActive)}
+              className={cn('roll-affordance-mode-button', chosen === m.value && 'roll-affordance-mode-button-active')}
               aria-pressed={chosen === m.value}
               aria-label={m.value === 'normal' ? m.title : undefined}
               title={m.title}
@@ -286,7 +286,7 @@ export const RollAffordance = ({
         </div>
 
         {activeDebility && (
-          <Text as="span" size="xs" color="muted" className={styles.modeNote}>
+          <Text as="span" size="xs" color="muted" className="roll-affordance-mode-note">
             {chosen === 'adv'
               ? 'Advantage cancels your debility.'
               : chosen === 'dis'
@@ -295,7 +295,7 @@ export const RollAffordance = ({
           </Text>
         )}
 
-        <div className={styles.adjust} role="group" aria-label="Roll modifier">
+        <div className="roll-affordance-adjust" role="group" aria-label="Roll modifier">
           <Button
             variant="ghost"
             size="sm"
@@ -304,7 +304,7 @@ export const RollAffordance = ({
             aria-disabled={atMin}
             aria-label="Subtract 1 from the roll"
           />
-          <span className={styles.adjustValue} aria-live="polite" aria-atomic="true">
+          <span className="roll-affordance-adjust-value" aria-live="polite" aria-atomic="true">
             {signed(adjust)}
           </span>
           <Button
@@ -319,20 +319,24 @@ export const RollAffordance = ({
       </div>
 
       {open && result && (
-        <div className={styles.result} role="status" aria-live="polite">
-          <div className={styles.diceRow}>
+        <div className="roll-affordance-result" role="status" aria-live="polite">
+          <div className="roll-affordance-dice-row">
             {result.dice.map((face, i) => (
               <span
                 key={`die-${i}-${face}`}
-                className={cn(styles.die, tumbling && styles.dieTumbling, !tumbling && result.dropped === i && styles.dieDropped)}
+                className={cn(
+                  'roll-affordance-die',
+                  tumbling && 'roll-affordance-die-tumbling',
+                  !tumbling && result.dropped === i && 'roll-affordance-die-dropped',
+                )}
               >
                 {face}
               </span>
             ))}
-            <Text as="span" size="xs" color="muted" className={styles.modText}>
+            <Text as="span" size="xs" color="muted" className="roll-affordance-mod-text">
               {modText(result)}
             </Text>
-            <span className={cn(styles.total, !tumbling && styles.totalSettled)}>= {result.total}</span>
+            <span className={cn('roll-affordance-total', !tumbling && 'roll-affordance-total-settled')}>= {result.total}</span>
           </div>
           {burn?.available && !burned && !tumbling && (
             <Button variant="ghost" size="sm" onClick={handleBurn} disabled={paying}>
@@ -340,7 +344,7 @@ export const RollAffordance = ({
             </Button>
           )}
           {hitBand && (
-            <Text as="span" size="xs" weight="semibold" color="accent" className={styles.band}>
+            <Text as="span" size="xs" weight="semibold" color="accent" className="roll-affordance-band">
               ▸ {hitBand.label}
             </Text>
           )}

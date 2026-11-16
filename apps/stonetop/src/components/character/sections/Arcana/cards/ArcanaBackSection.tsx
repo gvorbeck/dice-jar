@@ -9,7 +9,7 @@ import { ConsequenceRow } from './ConsequenceRow';
 import { ConsequenceTableBlock } from './ConsequenceTableBlock';
 import { MysteryCreatureCard } from './MysteryCreatureCard';
 import { MysteryMoveBlock } from './MysteryMoveBlock';
-import styles from '../arcanaCard.module.css';
+import '../arcanaCard.css';
 
 // True when a section entry is a consequence (rather than a MoveDefinition). MoveDefinitions carry a
 // `body`; consequences carry `value`.
@@ -66,10 +66,10 @@ export const ArcanaBackSection = ({
   // A section whose entries are all moves lays them out masonry-style (two columns on desktop, one
   // below); a section that mixes in consequences or followers stays a single stacked column.
   const isMovesOnly = section.content.every((item) => !isConsequence(item) && !isFollowerEntry(item));
-  const itemsClassName = isMovesOnly ? styles.moveGrid : styles.consequences;
+  const itemsClassName = isMovesOnly ? 'arcana-card-move-grid' : 'arcana-card-consequences';
   return (
-    <div className={styles.consequences}>
-      <Text font="serif" size="xs" weight="bold" className={styles.consequencesLabel}>
+    <div className="arcana-card-consequences">
+      <Text font="serif" size="xs" weight="bold" className="arcana-card-consequences-label">
         {section.label}
       </Text>
       {section.creature && projectedCreature && <MysteryCreatureCard creature={projectedCreature} onSave={onMysteryCreatureSave} />}
@@ -110,7 +110,7 @@ export const ArcanaBackSection = ({
           ) : null,
         )}
       </div>
-      {section.note && <div className={styles.description}>{parseMarkdown(section.note)}</div>}
+      {section.note && <div className="arcana-card-description">{parseMarkdown(section.note)}</div>}
     </div>
   );
 };
@@ -232,7 +232,7 @@ const ConsequenceConsequence = ({
 }: ConsequenceConsequenceProps) => {
   const checkedMarks = getConsequenceCheckedMarks(consequence.id, consequence.value, consequence.checkboxes);
   return (
-    <div className={styles.consequenceGroup}>
+    <div className="arcana-card-consequence-group">
       <ConsequenceRow
         id={consequence.id}
         text={consequence.value}
@@ -254,7 +254,7 @@ const ConsequenceConsequence = ({
         />
       )}
       {consequence.children && consequence.children.length > 0 && (
-        <div className={styles.consequenceChildren}>
+        <div className="arcana-card-consequence-children">
           {consequence.children.map((child) => (
             <ConsequenceConsequence
               key={child.id}

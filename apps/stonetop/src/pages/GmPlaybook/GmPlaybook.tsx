@@ -31,7 +31,7 @@ import {
 import { GameGuard } from '@/components/app/GameGuard/GameGuard';
 import { DEFAULT_GAME_NAME } from '@/lib/constants';
 import type { ContentLists, GameSession, LoggedRoll } from '@/types';
-import styles from './GmPlaybook.module.css';
+import './GmPlaybook.css';
 
 const ReferenceTabContent = () => (
   <PlaybookColumns
@@ -172,7 +172,7 @@ const GmPlaybookContent = ({ g, id, updateContent, updateField, logRoll, notesAc
       <div ref={headerRef} />
       <Tabs
         aria-label="GM Playbook sections"
-        className={styles.tabs}
+        className="gm-playbook-tabs"
         tabs={tabs}
         activeIndex={activeIndex}
         onActiveChange={handleActiveChange}

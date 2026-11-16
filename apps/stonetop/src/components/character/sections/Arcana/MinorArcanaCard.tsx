@@ -6,7 +6,7 @@ import type { MinorArcanum } from '@/types';
 import { ArcanaCardHeader } from './ArcanaCardHeader';
 import { ArcanaFollowerBlock } from './ArcanaFollowerBlock';
 import { ArcanaTrackerRow } from './ArcanaTrackerRow';
-import styles from './MinorArcanaCard.module.css';
+import './MinorArcanaCard.css';
 
 interface MinorArcanaCardProps {
   arcanum: MinorArcanum;
@@ -101,16 +101,16 @@ export const MinorArcanaCard = ({
     [onToggleRequirement],
   );
 
-  const cx = cn(styles.card, isUnlocked && styles.cardUnlocked);
+  const cx = cn('minor-arcana-card-card', isUnlocked && 'minor-arcana-card-card-unlocked');
   const { move } = arcanum;
 
   return (
     <div className={cx}>
       <ArcanaCardHeader id={arcanum.id} name={arcanum.name} tags={arcanum.tags} weight={arcanum.weight} onRemove={onRemove} />
 
-      <div className={styles.description}>{parseMarkdown(arcanum.description)}</div>
+      <div className="minor-arcana-card-description">{parseMarkdown(arcanum.description)}</div>
 
-      <div className={styles.requirements}>
+      <div className="minor-arcana-card-requirements">
         {marksTracker ? (
           <>
             <ArcanaTrackerRow label={marksTracker.label} total={marksTracker.max} checked={marksValue ?? 0} onChange={onMarksChange} />
@@ -130,8 +130,8 @@ export const MinorArcanaCard = ({
                   {arcanum.requirementsDivider.text}
                 </Text>
               )}
-              <label className={styles.reqRow}>
-                <span className={styles.reqBoxes}>
+              <label className="minor-arcana-card-req-row">
+                <span className="minor-arcana-card-req-boxes">
                   {slotKeys.map((key) => (
                     <Checkbox key={key} checked={!!requirementsChecked?.[key]} onChange={makeToggle(key)} />
                   ))}
@@ -143,12 +143,12 @@ export const MinorArcanaCard = ({
             </Fragment>
           ))
         )}
-        {arcanum.requirementsNote && <div className={styles.requirementsNote}>{parseMarkdown(arcanum.requirementsNote)}</div>}
+        {arcanum.requirementsNote && <div className="minor-arcana-card-requirements-note">{parseMarkdown(arcanum.requirementsNote)}</div>}
       </div>
 
       {isUnlocked && (
-        <div className={styles.moveReveal}>
-          <div className={styles.moveHeader}>
+        <div className="minor-arcana-card-move-reveal">
+          <div className="minor-arcana-card-move-header">
             <Text font="serif" weight="bold">
               {move.name}
             </Text>
@@ -173,7 +173,7 @@ export const MinorArcanaCard = ({
             />
           )}
 
-          <div className={styles.moveText}>{parseMarkdown(move.text)}</div>
+          <div className="minor-arcana-card-move-text">{parseMarkdown(move.text)}</div>
 
           {move.notesField && <NotesField label={move.notesField.label} value={notes ?? ''} onChange={onNotesChange} />}
 

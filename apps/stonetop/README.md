@@ -22,15 +22,15 @@ A digital companion for [Stonetop](https://www.kickstarter.com/projects/19561016
 
 ## Tech Stack
 
-| Layer     | Technology                                                  |
-| --------- | ----------------------------------------------------------- |
-| Framework | React 19 + TypeScript                                       |
-| Build     | Vite                                                        |
-| Routing   | React Router v7                                             |
-| UI        | React Aria Components, CSS Modules (moving to plain tokens) |
-| Database  | Firebase Firestore                                          |
-| Testing   | Vitest, Playwright + axe, Firestore rules emulator          |
-| Hosting   | Firebase Hosting (custom domain)                            |
+| Layer     | Technology                                         |
+| --------- | -------------------------------------------------- |
+| Framework | React 19 + TypeScript                              |
+| Build     | Vite                                               |
+| Routing   | React Router v7                                    |
+| UI        | React Aria Components, plain CSS with tokens       |
+| Database  | Firebase Firestore                                 |
+| Testing   | Vitest, Playwright + axe, Firestore rules emulator |
+| Hosting   | Firebase Hosting (custom domain)                   |
 
 ---
 

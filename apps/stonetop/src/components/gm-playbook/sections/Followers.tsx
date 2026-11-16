@@ -1,6 +1,6 @@
 import { Heading, Text, List, Table, Stack } from '@/components/ui';
-import playbookStyles from '@/components/gm-playbook/Playbook.module.css';
-import styles from '@/pages/GmPlaybook/GmPlaybook.module.css';
+import '@/components/gm-playbook/Playbook.css';
+import '@/pages/GmPlaybook/GmPlaybook.css';
 
 const tagsRollItems = [
   "add +1 if the follower has at least one relevant tag or move (or +2 if they're also exceptional)",
@@ -158,7 +158,7 @@ const stepsItems = [
   </>,
   <>
     <Heading as="h3" size="sm">
-      Moves <span className={playbookStyles.muted}>(optional)</span>
+      Moves <span className="playbook-muted">(optional)</span>
     </Heading>
     <Text>
       Write up to 3 GM moves, reflecting abilities not covered by a tag, how they use a specific tag, and/or common behaviors (good or bad).
@@ -183,7 +183,7 @@ export const Followers = () => (
   <div>
     <List variant="numbered" items={stepsItems} />
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Followers in play
       </Heading>
@@ -226,7 +226,7 @@ export const Followers = () => (
       <List variant="bullet" items={followersAtZeroHPItems} />
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         *Group* followers
       </Heading>
@@ -252,7 +252,7 @@ export const Followers = () => (
       </Text>
     </div>
 
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Abstracting group exchanges
       </Heading>

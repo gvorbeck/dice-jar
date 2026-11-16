@@ -7,7 +7,7 @@ import { ThemeToggle } from './ThemeToggle';
 import type { GameNav } from './gameNav';
 import { SiteBanner } from '@/components/app/SiteBanner/SiteBanner';
 import { SITE_BANNER } from '@/lib/siteBanner';
-import styles from './PageHeader.module.css';
+import './PageHeader.css';
 
 /*
  * PageHeader — the semantic <header> landmark at the top of every page.
@@ -152,22 +152,22 @@ export const PageHeader = (props: Props) => {
     const titleLabel = (props as FullProps).titleLabel;
 
     pageIdentity = (
-      <div className={styles.body}>
+      <div className="page-header-body">
         {nav && (
-          <div className={styles.navRow}>
+          <div className="page-header-nav-row">
             <PageNav nav={nav} dropdownId={navDropdownId} />
           </div>
         )}
-        <div className={styles.titleRow}>
+        <div className="page-header-title-row">
           {icon && (
-            <span className={styles.titleIcon} aria-hidden="true">
+            <span className="page-header-title-icon" aria-hidden="true">
               {icon}
             </span>
           )}
           {onSaveTitle && editing ? (
             <Input
               ref={inputRef as React.Ref<HTMLInputElement>}
-              className={styles.titleInput}
+              className="page-header-title-input"
               value={value}
               onChange={handleChange}
               onBlur={commit}
@@ -186,7 +186,7 @@ export const PageHeader = (props: Props) => {
                     variant="ghost"
                     icon="pencil"
                     size="sm"
-                    className={styles.editBtn}
+                    className="page-header-edit-btn"
                     onClick={startEditing}
                     aria-label={titleLabel!}
                   />
@@ -196,11 +196,11 @@ export const PageHeader = (props: Props) => {
           )}
         </div>
         {subtitle && (
-          <Text color="muted" size="xs" className={styles.subtitle}>
+          <Text color="muted" size="xs" className="page-header-subtitle">
             {subtitle}
           </Text>
         )}
-        <div className={styles.gameId}>
+        <div className="page-header-game-id">
           <Text color="muted" size="xs">
             Game ID:{' '}
             <Text as="span" color="accent" size="xs">
@@ -212,14 +212,14 @@ export const PageHeader = (props: Props) => {
               variant="ghost"
               icon={copied ? 'check' : 'copy'}
               size="sm"
-              className={styles.copyBtn}
+              className="page-header-copy-btn"
               onClick={copyGameId}
               aria-label={copyLabel}
             />
           </Tooltip>
-          {actions && <div className={styles.actions}>{actions}</div>}
+          {actions && <div className="page-header-actions">{actions}</div>}
         </div>
-        <RuleDivider className={styles.rule} />
+        <RuleDivider className="page-header-rule" />
       </div>
     );
   }
@@ -229,7 +229,7 @@ export const PageHeader = (props: Props) => {
      * <header> is the correct semantic landmark here — it wraps the entire
      * top-of-page identity block, not just the wordmark strip.
      */
-    <header className={styles.header}>
+    <header className="page-header-header">
       {SITE_BANNER && <SiteBanner>{SITE_BANNER}</SiteBanner>}
 
       {/*
@@ -238,9 +238,9 @@ export const PageHeader = (props: Props) => {
        * own hero treatment and don't need the wordmark here.
        */}
       {!simple && (
-        <div className={styles.topBar}>
-          <Heading as="h1" size="md" className={styles.wordmark}>
-            <Link to="/" className={styles.wordmarkLink}>
+        <div className="page-header-top-bar">
+          <Heading as="h1" size="md" className="page-header-wordmark">
+            <Link to="/" className="page-header-wordmark-link">
               Hearthfire
             </Link>
           </Heading>

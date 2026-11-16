@@ -4,7 +4,7 @@ import type { SteadingData, GmImprovement } from '@/types';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { PredefinedImprovementsList } from './PredefinedImprovementsList';
 import { GmImprovementSlots } from './GmImprovementSlots';
-import styles from './SteadingImprovements.module.css';
+import './SteadingImprovements.css';
 
 interface SteadingImprovementsProps {
   improvements: Record<string, boolean> | undefined;
@@ -28,7 +28,7 @@ export const SteadingImprovements = ({ improvements = {}, gmImprovements, onSave
   );
 
   return (
-    <div className={styles.root}>
+    <div className="steading-improvements">
       <Text size="xs" color="muted">
         Check an improvement when all requirements are met. The GM may reveal additional improvements in play.
       </Text>

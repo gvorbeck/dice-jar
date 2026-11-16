@@ -5,7 +5,7 @@ import { applyConsequenceActions, hasConsequenceActions } from '@/lib/consequenc
 import type { MajorArcanum, ArcanaMajorEntry, Creature, CharacterData } from '@/types';
 import { MajorArcanaCard } from './MajorArcanaCard';
 import { AddArcanaModal } from './AddArcanaModal';
-import styles from './ArcanaPanel.module.css';
+import './ArcanaPanel.css';
 
 // Set an entry's marks and latch `everUnlocked` the first time marks reach the unlock threshold (the
 // tracker's `unlockAt`, or its `max` when unspecified). Once latched it never clears, so an arcanum that
@@ -303,19 +303,19 @@ export const MajorArcanaPanel = ({
 
   return (
     <>
-      <div className={styles.panel}>
-        <div className={styles.panelHeader}>
+      <div className="arcana-panel-panel">
+        <div className="arcana-panel-panel-header">
           <Button variant="secondary" size="sm" icon="plus" onClick={handleOpenMajorModal}>
             Add Major Arcanum
           </Button>
         </div>
 
         {arcanaMajor.length === 0 ? (
-          <Text color="muted" className={styles.empty}>
+          <Text color="muted" className="arcana-panel-empty">
             No major arcana yet. Add one when your character is assigned their arcanum.
           </Text>
         ) : (
-          <div className={styles.cardList}>
+          <div className="arcana-panel-card-list">
             {arcanaMajor.map((entry) => {
               const arcanum = MAJOR_ARCANA.find((a) => a.id === entry.id);
               if (!arcanum) return null;

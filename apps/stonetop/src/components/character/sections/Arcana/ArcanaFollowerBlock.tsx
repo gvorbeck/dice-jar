@@ -4,7 +4,7 @@ import { CheckboxGroup, List, Text } from '@/components/ui';
 import { parseInlineMarkdown } from '@/lib/parseMarkdown';
 import type { ArcanaFollower } from '@/types';
 import { ArcanaTrackerRow } from './ArcanaTrackerRow';
-import styles from './ArcanaFollowerBlock.module.css';
+import './ArcanaFollowerBlock.css';
 
 // A short screen-reader label for a d4 box, from the aspect row's bold lead-in (e.g. "**Tags:** 1 = …"
 // → "Tags die"), so the field isn't announced as the whole option paragraph with literal asterisks.
@@ -50,11 +50,11 @@ export const ArcanaFollowerBlock = memo(
     onAspectCheckChange,
   }: ArcanaFollowerBlockProps) => {
     const isMultiHp = !!(follower.hpCount && follower.hpCount > 1);
-    const cx = cn(styles.follower, inactive && styles.followerInactive);
+    const cx = cn('arcana-follower-block-follower', inactive && 'arcana-follower-block-follower-inactive');
 
     return (
       <div className={cx} aria-disabled={inactive || undefined}>
-        <div className={styles.followerHeader}>
+        <div className="arcana-follower-block-follower-header">
           <Text font="serif" weight="bold">
             {follower.name}
           </Text>
@@ -64,8 +64,8 @@ export const ArcanaFollowerBlock = memo(
             </Text>
           )}
         </div>
-        <div className={styles.followerStats}>
-          <div className={styles.followerHpRow}>
+        <div className="arcana-follower-block-follower-stats">
+          <div className="arcana-follower-block-follower-hp-row">
             {follower.hp !== undefined &&
               Array.from({ length: follower.hpCount ?? 1 }).map((_, i) => (
                 <HpInput
@@ -79,7 +79,7 @@ export const ArcanaFollowerBlock = memo(
                 />
               ))}
             {follower.armor !== undefined && (
-              <span className={styles.followerStat}>
+              <span className="arcana-follower-block-follower-stat">
                 <Text as="span" font="serif" size="xs" color="muted">
                   Armor
                 </Text>
@@ -89,7 +89,7 @@ export const ArcanaFollowerBlock = memo(
               </span>
             )}
             {follower.damage && (
-              <span className={styles.followerStat}>
+              <span className="arcana-follower-block-follower-stat">
                 <Text as="span" font="serif" size="xs" color="muted">
                   Damage
                 </Text>
@@ -108,7 +108,7 @@ export const ArcanaFollowerBlock = memo(
               disabled={inactive}
             />
           )}
-          <div className={styles.followerInstinct}>
+          <div className="arcana-follower-block-follower-instinct">
             <Text as="span" font="serif" size="xs" color="muted">
               Instinct:{' '}
             </Text>
@@ -117,7 +117,7 @@ export const ArcanaFollowerBlock = memo(
             </Text>
           </div>
           {follower.qualities && (
-            <div className={styles.followerMoves}>
+            <div className="arcana-follower-block-follower-moves">
               <Text as="span" font="serif" size="xs" color="muted">
                 Moves
               </Text>
@@ -132,7 +132,7 @@ export const ArcanaFollowerBlock = memo(
             </div>
           )}
           {follower.cost && (
-            <div className={styles.followerCost}>
+            <div className="arcana-follower-block-follower-cost">
               <Text as="span" font="serif" size="xs" color="muted">
                 Cost:{' '}
               </Text>
@@ -142,15 +142,15 @@ export const ArcanaFollowerBlock = memo(
             </div>
           )}
           {follower.aspects && (
-            <div className={styles.aspects}>
+            <div className="arcana-follower-block-aspects">
               {follower.aspects.intro && (
                 <Text font="serif" size="xs" color="muted">
                   {parseInlineMarkdown(follower.aspects.intro)}
                 </Text>
               )}
-              <div className={styles.aspectRows}>
+              <div className="arcana-follower-block-aspect-rows">
                 {follower.aspects.rows.map((row) => (
-                  <div key={`aspect-${arcanaId}-${row.id}`} className={styles.aspectRow}>
+                  <div key={`aspect-${arcanaId}-${row.id}`} className="arcana-follower-block-aspect-row">
                     <AspectDie
                       rowId={row.id}
                       label={aspectDieLabel(row.label)}
@@ -160,8 +160,8 @@ export const ArcanaFollowerBlock = memo(
                       disabled={inactive}
                       onChange={onAspectInputChange}
                     />
-                    <div className={styles.aspectBody}>
-                      <div className={styles.aspectLabel}>
+                    <div className="arcana-follower-block-aspect-body">
+                      <div className="arcana-follower-block-aspect-label">
                         {/* Inner span keeps the inline content as one flex child, so the flex box
                           centering doesn't collapse the space after the bold "Tags:" label. */}
                         <Text as="span" font="serif" size="xs">
@@ -193,7 +193,7 @@ export const ArcanaFollowerBlock = memo(
           )}
         </div>
         {inactive && activationNote && (
-          <Text as="span" font="serif" size="xs" italic color="muted" className={styles.followerActivation}>
+          <Text as="span" font="serif" size="xs" italic color="muted" className="arcana-follower-block-follower-activation">
             {activationNote}
           </Text>
         )}
@@ -234,13 +234,13 @@ const HpInput = memo(({ index, followerName, isMultiHp, value, max, onFollowerHp
     [index, max, onFollowerHpChange],
   );
   return (
-    <label className={styles.followerHpLabel}>
+    <label className="arcana-follower-block-follower-hp-label">
       <Text as="span" font="serif" size="xs" color="muted">
         {isMultiHp ? `HP ${index + 1}` : 'HP'}
       </Text>
       <input
         type="number"
-        className={styles.followerHpInput}
+        className="arcana-follower-block-follower-hp-input"
         value={draft}
         min={0}
         max={max}
@@ -293,7 +293,7 @@ const AspectDie = memo(({ rowId, label, value, min, max, disabled, onChange }: A
   return (
     <input
       type="number"
-      className={styles.aspectDie}
+      className="arcana-follower-block-aspect-die"
       value={draft}
       min={min}
       max={max}

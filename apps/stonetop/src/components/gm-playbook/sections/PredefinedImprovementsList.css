@@ -1,0 +1,49 @@
+/* ── Improvement list ─────────────────────────────────── */
+.predefined-improvements-list-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+@media (min-width: 768px) {
+  .predefined-improvements-list-list {
+    display: block;
+    columns: 2;
+    column-gap: var(--spacing-4);
+  }
+}
+
+/* ── Shared card rules → improvementCard.css ──── */
+
+/* ── Requirements / Benefits sections ────────────────── */
+.predefined-improvements-list-requirement-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+/* ── Checkbox list within a requirement block ─────────── */
+.predefined-improvements-list-check-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.predefined-improvements-list-check-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-2);
+}
+
+.predefined-improvements-list-multi-boxes {
+  display: flex;
+  gap: var(--spacing-1);
+  flex-shrink: 0;
+}
+
+.predefined-improvements-list-check-row-label {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}

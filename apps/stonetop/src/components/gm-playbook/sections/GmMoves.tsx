@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Heading, List } from '@/components/ui';
-import styles from '@/pages/GmPlaybook/GmPlaybook.module.css';
+import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const GmMoves = memo(() => (
   <div>
@@ -22,7 +22,7 @@ export const GmMoves = memo(() => (
         'Advance towards impending doom',
       ]}
     />
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Exploration
       </Heading>
@@ -39,7 +39,7 @@ export const GmMoves = memo(() => (
         ]}
       />
     </div>
-    <div className={styles.subsection}>
+    <div className="gm-playbook-subsection">
       <Heading as="h3" size="sm">
         Homefront
       </Heading>
