@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { Button, Heading, Text, Checkbox, Input, Radio, RadioGroup } from '@/components/ui';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
@@ -153,6 +153,12 @@ export const GmImprovementSlots = ({ gmImprovements, onSave }: GmImprovementSlot
   // save *while* a title field is still focused — so it's passed to the hook as its
   // own gate rather than folded into pendingRef.
   const focusedRef = useRef(false);
+  // The list this tab last read or wrote. Diffs are taken against it, not the latest props: while a
+  // field is focused props advance but the local list is frozen, and a stale entry would overwrite another tab's edit.
+  const baselineRef = useRef(gmImprovements ?? []);
+  useEffect(() => {
+    if (!focusedRef.current) baselineRef.current = gmImprovements ?? [];
+  }, [gmImprovements]);
 
   const {
     value: localSlots,
@@ -161,19 +167,22 @@ export const GmImprovementSlots = ({ gmImprovements, onSave }: GmImprovementSlot
     save: saveSlots,
   } = useOptimisticField<GmImprovement[], [removedId?: string]>(
     gmImprovements ?? [],
-    // Diff against the stored list, not the local ref: typing updates the ref before blur saves.
-    (slots, removedId): Promise<void> =>
-      onSave({
-        gmImprovements: changedById(gmImprovements ?? [], slots),
+    (slots, removedId): Promise<void> => {
+      const changed = changedById(baselineRef.current, slots);
+      baselineRef.current = slots;
+      return onSave({
+        gmImprovements: changed,
         ...(removedId ? { removedGmImprovementIds: [removedId] } : {}),
-      }),
+      });
+    },
     undefined,
     focusedRef,
   );
 
   const handleSlotFocus = useCallback(() => {
     focusedRef.current = true;
-  }, []);
+    baselineRef.current = localSlotsRef.current;
+  }, [localSlotsRef]);
 
   // Optimistic-only update while typing; the write is deferred to blur.
   const handleSlotChange = useCallback(

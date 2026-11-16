@@ -23,4 +23,19 @@ describe('GmImprovementSlots', () => {
     const sent = onSave.mock.calls.at(-1)![0].gmImprovements;
     expect(sent).toEqual([expect.objectContaining({ id: 's1', title: 'Granary' })]);
   });
+
+  it("does not resend another tab's edit that arrived while a field was focused", async () => {
+    const a = { ...makeEmptyGmImprovement(), id: 'a', title: '' };
+    const b = { ...makeEmptyGmImprovement(), id: 'b', title: 'Old' };
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    const { rerender } = render(<GmImprovementSlots gmImprovements={[a, b]} onSave={onSave} />);
+
+    const [title] = screen.getAllByRole('textbox', { name: 'Improvement name' });
+    await userEvent.type(title!, 'Mill');
+    rerender(<GmImprovementSlots gmImprovements={[a, { ...b, title: 'Theirs' }]} onSave={onSave} />);
+    await userEvent.tab();
+
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
+    expect(onSave.mock.calls.at(-1)![0].gmImprovements).toEqual([expect.objectContaining({ id: 'a', title: 'Mill' })]);
+  });
 });
