@@ -22,7 +22,7 @@ const SmallItemRow = memo(({ item, checked, onCheckedChange }: SmallItemRowProps
         checked={checked}
         onChange={handleChecked}
         label={
-          <Text as="span" className="inventory-item-item-label">
+          <Text as="span" className="inventory-item-label">
             {item.label}
           </Text>
         }

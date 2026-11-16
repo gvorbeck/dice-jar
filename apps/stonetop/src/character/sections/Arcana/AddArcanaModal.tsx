@@ -83,7 +83,7 @@ export const AddArcanaModal = <T extends ArcanaItem>({
   const allAdded = existing.size === items.length;
 
   return (
-    <Modal open={open} onClose={handleClose} aria-labelledby={headingId} className="add-arcana-modal-modal">
+    <Modal open={open} onClose={handleClose} aria-labelledby={headingId} className="add-arcana-modal">
       <Heading as="h2" size="md" id={headingId}>
         {title}
       </Heading>

@@ -27,7 +27,7 @@ const itemFingerprint = (node: React.ReactNode): string => {
 
 export const List = ({ variant, items, keyPrefix, className }: ListProps) => {
   const Tag = variant === 'numbered' ? 'ol' : 'ul';
-  const cx = cn('list-list', `list-${variant}`, className);
+  const cx = cn('list', `list-${variant}`, className);
   const prefix = keyPrefix ?? `list-item-${variant}`;
 
   return (

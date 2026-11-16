@@ -158,7 +158,7 @@ export const SteadingStats = ({ steading, onSave }: SteadingStatsProps) => {
         </div>
       </div>
 
-      <div className="steading-stats-stats-grid">
+      <div className="steading-stats-grid">
         <StatStepper
           label="Fortunes"
           description="Morale & social cohesion. Rolls for Seasons Change & Requisition. Resets to +1 each season."

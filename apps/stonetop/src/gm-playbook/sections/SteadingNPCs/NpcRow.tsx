@@ -15,7 +15,7 @@ export const NpcRow = ({ npc, onEdit, onRemove, onToggleDead, resolveTarget }: N
   const handleEdit = useCallback(() => onEdit(npc), [onEdit, npc]);
   const handleRemove = useCallback(() => onRemove(npc.id), [onRemove, npc.id]);
   const handleToggleDead = useCallback(() => onToggleDead(npc.id), [onToggleDead, npc.id]);
-  const rowCx = cn('npc-row-npc-row', npc.dead && 'npc-row-npc-row-dead');
+  const rowCx = cn('npc-row', npc.dead && 'npc-row-dead');
   const nameCx = cn(npc.dead && 'npc-row-npc-name-strike');
   const tombstoneCx = cn(npc.dead && 'npc-row-tombstone-active');
   return (

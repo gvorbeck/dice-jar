@@ -196,8 +196,8 @@ export const Move = ({
     console.error(`Move "${move.id}": rightControl persists at most 2 slots, got ${rightControlState.length}.`);
   }
 
-  const moveCx = cn('move-move', selected && 'move-move-selected');
-  const nameCx = cn('move-move-name', selected && 'move-move-name-selected');
+  const moveCx = cn('move', selected && 'move-selected');
+  const nameCx = cn('move-name', selected && 'move-name-selected');
   const nameEl = (
     <Text as="span" className={nameCx}>
       {title}
@@ -261,7 +261,7 @@ export const Move = ({
           const iconParaCx = cn('flex start gap-2', block.indent && 'move-indent');
           return (
             <div key={key} className={iconParaCx}>
-              <Icon name={block.icon} size="small" className="move-move-body-icon" aria-hidden="true" />
+              <Icon name={block.icon} size="small" className="move-body-icon" aria-hidden="true" />
               <Text font="serif" color="muted" leading="tight">
                 {block.text}
               </Text>
@@ -340,7 +340,7 @@ export const Move = ({
 
   return (
     <div className={moveCx}>
-      <div className="move-move-header">
+      <div className="move-header">
         {selection !== undefined ? (
           takeCount > 0 ? (
             <div className="row gap-2">
@@ -363,7 +363,7 @@ export const Move = ({
               checked={selected}
               onChange={(e) => selection.onSelectChange(e.target.checked)}
               label={nameEl}
-              className="move-move-checkbox"
+              className="move-checkbox"
               // Same as MoveSelectGroup: keep an already-selected locked move deselectable.
               disabled={readOnly || (locked && !selected)}
             />
@@ -406,7 +406,7 @@ export const Move = ({
         {headerAction && <div className="no-shrink">{headerAction}</div>}
       </div>
       {hasBody && (
-        <div className="move-move-body">
+        <div className="move-body">
           {hasRoll && statOptions && (
             <RollAffordance
               stat={statOptions[0]!.stat}
@@ -438,7 +438,7 @@ export const Move = ({
             <TakeNotesField value={takeNoteValue ?? ''} onSave={onTakeNoteSave} disabled={interactiveDisabled} />
           )}
           {citationText && (
-            <Text as="span" font="serif" size="xs" color="tertiary" italic className="move-move-citation">
+            <Text as="span" font="serif" size="xs" color="tertiary" italic className="move-citation">
               {citationText}
             </Text>
           )}

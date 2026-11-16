@@ -57,7 +57,7 @@ export interface CreatureCardProps {
 
 export const CreatureCard = memo(({ creature, onFieldChange, onBlur, className }: CreatureCardProps) => {
   const headingId = useId();
-  const cx = cn('creature-card-card', className);
+  const cx = cn('creature-card', className);
 
   const handleName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => onFieldChange('name', e.target.value), [onFieldChange]);
   const handleHp = useCallback((value: string) => onFieldChange('hp', value), [onFieldChange]);

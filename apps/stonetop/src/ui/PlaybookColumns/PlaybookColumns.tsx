@@ -13,7 +13,7 @@ export const PlaybookColumns = ({ left, right, full, className }: PlaybookColumn
     const cx = cn('w-full', className);
     return <div className={cx}>{full}</div>;
   }
-  const cx = cn('playbook-columns-columns', className);
+  const cx = cn('playbook-columns', className);
   return (
     <div className={cx}>
       {left !== undefined && <div className="playbook-columns-col">{left}</div>}

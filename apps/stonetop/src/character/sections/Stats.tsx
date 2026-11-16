@@ -304,7 +304,7 @@ export const Stats = ({ data, onSave, hpMax, damage = 'd6', scoreInstruction = D
 
   return (
     <PlaybookSection title="Stats" warn={warn} warnText="All stat fields must be filled in before play.">
-      <Text color="muted" className="stats-stats-instruction">
+      <Text color="muted" className="stats-instruction">
         {scoreInstruction}
       </Text>
       {overCap && (

@@ -36,7 +36,7 @@ const MainItemRow = memo(({ item, checked, uses, prosperity, weightOverride, onC
         checked={checked}
         onChange={handleChecked}
         label={
-          <span className="inventory-item-item-label">
+          <span className="inventory-item-label">
             <Text as="span">{item.label}</Text>
           </span>
         }
@@ -70,7 +70,7 @@ const ArcanaItemRow = memo(({ id, name, weight, carried, onCarriedChange }: Arca
         weight={weight}
         checked={carried}
         onChange={handleChange}
-        label={<Text as="span" className="inventory-item-item-label">{`**${name}** *(arcanum)*`}</Text>}
+        label={<Text as="span" className="inventory-item-label">{`**${name}** *(arcanum)*`}</Text>}
       />
     </div>
   );

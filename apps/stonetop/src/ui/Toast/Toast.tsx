@@ -29,7 +29,7 @@ const ToastEntry = ({
   onPause: (id: string) => void;
   onResume: (id: string) => void;
 }) => {
-  const cx = cn('toast-toast', `toast-${item.variant}`, item.exiting && 'toast-exiting');
+  const cx = cn('toast', `toast-${item.variant}`, item.exiting && 'toast-exiting');
   const iconCx = cn('toast-icon', `toast-${item.variant}`);
   const handleDismissItem = useCallback(() => onDismiss(item.id), [onDismiss, item.id]);
   const handlePause = useCallback(() => onPause(item.id), [onPause, item.id]);

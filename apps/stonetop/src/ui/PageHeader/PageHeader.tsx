@@ -228,7 +228,7 @@ export const PageHeader = (props: Props) => {
      * <header> is the correct semantic landmark here — it wraps the entire
      * top-of-page identity block, not just the wordmark strip.
      */
-    <header className="page-header-header">
+    <header className="page-header">
       {SITE_BANNER && <SiteBanner>{SITE_BANNER}</SiteBanner>}
 
       {/*

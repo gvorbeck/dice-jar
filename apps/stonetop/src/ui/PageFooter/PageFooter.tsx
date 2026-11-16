@@ -7,7 +7,7 @@
 const CURRENT_YEAR = new Date().getFullYear();
 
 export const PageFooter = () => (
-  <footer className="page-footer-footer">
+  <footer className="page-footer">
     {/* Game credit line — required by the CC BY-SA 4.0 license. */}
     Stonetop is written by Jeremy Strandberg and published by Lampblack &amp; Brimstone. Text released under CC BY-SA 4.0. Some concepts
     derived from Dungeon World by Sage LaTorra &amp; Adam Koebel (CC BY). Logo icon commissioned from{' '}

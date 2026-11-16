@@ -46,7 +46,7 @@ export const MajorArcanaCard = ({
   const poolTrackers = frontTrackers.filter((t) => t.role !== 'marks');
   const { unlocked, projectedCreature, getConsequenceCheckedMarks, getMoveGating } = useArcanumGating(arcanum, entry);
 
-  const cx = cn('arcana-card-card', unlocked && 'arcana-card-card-unlocked');
+  const cx = cn('arcana-card', unlocked && 'arcana-card-unlocked');
 
   // Legacy/hand-edited docs can have an arcanaMajor entry predating these fields; default so every
   // lookup below is safe without repeating the guard at each call site. Memoized so the fallback `{}`

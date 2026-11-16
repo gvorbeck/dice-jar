@@ -100,7 +100,7 @@ export const MinorArcanaCard = ({
     [onToggleRequirement],
   );
 
-  const cx = cn('minor-arcana-card-card', isUnlocked && 'minor-arcana-card-card-unlocked');
+  const cx = cn('minor-arcana-card', isUnlocked && 'minor-arcana-card-unlocked');
   const { move } = arcanum;
 
   return (

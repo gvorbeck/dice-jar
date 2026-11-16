@@ -44,14 +44,14 @@ export const PlaybookSection = ({
   const showCollapse = collapsible && !overrideNote;
   const chevronCx = cn('playbook-section-collapse-chevron', !collapsed && 'playbook-section-collapse-chevron-open');
   const collapseCx = cn('playbook-section-collapse-toggle field-focus-visible', warn && 'playbook-section-collapse-toggle-hidden');
-  const chooseCx = cn('playbook-section-section-title-choose', (!warn || !!overrideNote) && 'playbook-section-section-title-choose-hidden');
-  const warnCx = cn('playbook-section-section-title-warn', (!warn || !!overrideNote) && 'playbook-section-section-title-warn-hidden');
-  const sectionCx = cn('playbook-section-section', overrideNote && 'playbook-section-section-override');
+  const chooseCx = cn('playbook-section-title-choose', (!warn || !!overrideNote) && 'playbook-section-title-choose-hidden');
+  const warnCx = cn('playbook-section-title-warn', (!warn || !!overrideNote) && 'playbook-section-title-warn-hidden');
+  const sectionCx = cn('playbook-section', overrideNote && 'playbook-section-override');
 
   return (
     <section className={sectionCx}>
-      <div className="playbook-section-section-header">
-        <Heading as="h3" size="label" className="playbook-section-section-title">
+      <div className="playbook-section-header">
+        <Heading as="h3" size="label" className="playbook-section-title">
           {title}
           {(choose !== undefined || chooseNote) && (
             <Text as="span" className={chooseCx}>
@@ -63,7 +63,7 @@ export const PlaybookSection = ({
           </Tooltip>
         </Heading>
         {overrideNote && (
-          <Text as="span" className="playbook-section-section-override-note">
+          <Text as="span" className="playbook-section-override-note">
             {overrideNote}
           </Text>
         )}

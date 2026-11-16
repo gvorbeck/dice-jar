@@ -13,7 +13,7 @@ interface ArcanaCardHeaderProps {
 // button. Minor cards pass a weight; major cards omit it.
 export const ArcanaCardHeader = ({ id, name, tags, weight, onRemove }: ArcanaCardHeaderProps) => (
   <div className="flex start gap-2">
-    <div className="arcana-card-header-header-text">
+    <div className="arcana-card-header-text">
       <Text font="serif" weight="bold">
         {name}
       </Text>

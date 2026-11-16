@@ -23,7 +23,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
     const noteId = note ? `${generatedId}-note` : undefined;
     // Merge any caller-supplied aria-describedby with the note/error ids we own.
     const describedBy = [ariaDescribedBy, noteId, errorId].filter((x): x is string => Boolean(x)).join(' ') || undefined;
-    const cx = cn('input-input field-focus-visible', error && 'input-has-error', className);
+    const cx = cn('input field-focus-visible', error && 'input-has-error', className);
 
     const el = multiline ? (
       <textarea

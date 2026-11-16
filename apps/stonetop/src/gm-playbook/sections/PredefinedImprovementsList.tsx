@@ -44,7 +44,7 @@ interface PredefinedImprovementsListProps {
 }
 
 export const PredefinedImprovementsList = ({ improvements, onToggleKey }: PredefinedImprovementsListProps) => (
-  <div className="predefined-improvements-list-list">
+  <div className="predefined-improvements-list">
     {IMPROVEMENTS.map((imp) => {
       const completed = !!improvements[imp.id];
       const itemCx = cn('improvement-card-item', completed && 'improvement-card-item-completed');

@@ -166,7 +166,7 @@ export const TagInput = ({ label, value, onChange, suggestions = [], placeholder
             ref={inputRef}
             id={inputId}
             type="text"
-            className="tag-input-input field-focus-visible"
+            className="tag-input field-focus-visible"
             value={inputVal}
             placeholder={value.length === 0 ? placeholder : ''}
             onChange={handleInputChange}

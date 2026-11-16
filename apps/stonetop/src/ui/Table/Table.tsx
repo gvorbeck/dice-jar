@@ -40,10 +40,10 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
   const columnCount = columnHeaders?.length ?? 2;
   // N-column (cells) tables keep every header left-aligned; only the classic two-column label/value
   // tables right-align the trailing value column.
-  const thClass = cn('table-table-th', hasCells && 'table-table-th-start');
+  const thClass = cn('table-th', hasCells && 'table-th-start');
 
   const table = (
-    <table className={bordered ? 'table-table-bordered' : 'table-table'}>
+    <table className={bordered ? 'table-bordered' : 'table'}>
       {columnHeaders && (
         <thead>
           <tr>
@@ -59,8 +59,8 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
         {rows.map((row, i) => {
           if (isGroup(row)) {
             return (
-              <tr key={`group-${i}-${row.group}`} className="table-table-group-row">
-                <td colSpan={columnCount} className="table-table-group-cell">
+              <tr key={`group-${i}-${row.group}`} className="table-group-row">
+                <td colSpan={columnCount} className="table-group-cell">
                   {row.group}
                 </td>
               </tr>
@@ -68,14 +68,14 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
           }
           if (isCells(row)) {
             const trClass = cn(
-              'table-table-cells-row',
-              row.selectable && !row.disabled && 'table-table-selectable-row',
-              row.selected && 'table-table-selected-row',
+              'table-cells-row',
+              row.selectable && !row.disabled && 'table-selectable-row',
+              row.selected && 'table-selected-row',
             );
             return (
               <tr key={`cells-${row.id}`} className={trClass}>
                 {row.cells.map((cell, c) => (
-                  <td key={`cell-${row.id}-${c}`} className="table-table-cell">
+                  <td key={`cell-${row.id}-${c}`} className="table-cell">
                     {row.selectable && c === 0 ? (
                       <Radio
                         checked={!!row.selected}
@@ -94,8 +94,8 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
           }
           return (
             <tr key={`row-${i}-${row.label}`}>
-              <td className={row.indent ? 'table-table-cell-indent' : 'table-table-cell'}>{row.label}</td>
-              <td className="table-table-value">{row.value}</td>
+              <td className={row.indent ? 'table-cell-indent' : 'table-cell'}>{row.label}</td>
+              <td className="table-value">{row.value}</td>
             </tr>
           );
         })}
@@ -105,8 +105,8 @@ export const Table = ({ rows, title, columnHeaders, bordered, selectionLabel }: 
 
   if (bordered) {
     return (
-      <div className="table-table-wrapper">
-        {title && <div className="table-table-title">{title}</div>}
+      <div className="table-wrapper">
+        {title && <div className="table-title">{title}</div>}
         {table}
       </div>
     );

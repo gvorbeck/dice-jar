@@ -6,7 +6,7 @@ interface SiteBannerProps {
 }
 
 export const SiteBanner = ({ children }: SiteBannerProps) => (
-  <div className="site-banner-banner" role="status" aria-live="polite">
+  <div className="site-banner" role="status" aria-live="polite">
     <Text size="xs">{children}</Text>
   </div>
 );

@@ -29,7 +29,7 @@ export const UseDots = ({ total, checked, onChange, disabled, label, ariaLabel }
     );
   });
   return (
-    <div role="group" className="use-dots-use-dots" aria-label={ariaLabel ?? label ?? `Uses: ${checked} of ${total}`}>
+    <div role="group" className="use-dots" aria-label={ariaLabel ?? label ?? `Uses: ${checked} of ${total}`}>
       {dots}
       {label && (
         <Text as="span" font="serif" size="xs" italic color="muted" className="nowrap" aria-hidden="true">

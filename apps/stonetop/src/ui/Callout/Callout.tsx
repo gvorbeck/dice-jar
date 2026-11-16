@@ -6,7 +6,7 @@ type Props = {
 };
 
 export const Callout = ({ title, children }: Props) => (
-  <div className="callout-callout">
+  <div className="callout">
     <Heading as="h3" size="sm">
       {title}
     </Heading>
