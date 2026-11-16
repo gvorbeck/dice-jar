@@ -10,7 +10,7 @@ export interface CharacterRollContextValue {
   data: CharacterData | undefined;
   onRoll: (moveName: string, report: RollReport) => void;
   // Burn Brightly: whether the character has the XP for it now, and the 2 XP spend (see lib/burnBrightly).
-  burn: { available: boolean; onBurn: () => void };
+  burn: { available: boolean; onBurn: () => Promise<void> };
 }
 
 export const CharacterRollContext = createContext<CharacterRollContextValue | null>(null);

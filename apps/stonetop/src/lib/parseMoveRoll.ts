@@ -5,7 +5,7 @@ import { STAT_ABBRS } from './constants';
 // resource the character sheet doesn't hold (+Favor, +Population, +Defenses, +STAT, …). The sheet can't
 // resolve that last group, so those roll from 0 and the player dials the value in on the affordance's
 // adjustment stepper — which is also how "add +1 for this, -1 for that" prose gets applied.
-const ROLL_TARGET_RE = /\broll \+([a-z]+)\b/i;
+const ROLL_TARGET_RE = /\broll \+([a-z0-9]+)\b/i;
 
 // Substitution pattern: "roll +CON... roll +CHA instead" — the second stat replaces the first.
 const ROLL_INSTEAD_RE = /\broll \+[a-z]+\b.*\broll \+([a-z]+)\s+instead\b/i;
@@ -67,7 +67,7 @@ const parseBands = (text: string): RollBand[] => {
 const resolveTarget = (target: string, bands: RollBand[]): MoveRoll => {
   const upper = target.toUpperCase();
   if (STAT_TARGETS.has(upper)) return { stat: upper as RollStat, bands };
-  if (upper === 'NOTHING') return { stat: 'nothing', bands };
+  if (upper === 'NOTHING' || upper === '0') return { stat: 'nothing', bands };
   return { stat: 'nothing', bands, resource: target };
 };
 

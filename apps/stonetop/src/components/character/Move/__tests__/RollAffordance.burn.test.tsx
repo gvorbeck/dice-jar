@@ -20,7 +20,7 @@ const seedDice = (faces: number[]) => {
 
 afterEach(() => vi.restoreAllMocks());
 
-const renderRoll = (available: boolean, onRoll = vi.fn(), onBurn = vi.fn()) => {
+const renderRoll = (available: boolean, onRoll = vi.fn(), onBurn = vi.fn().mockResolvedValue(undefined)) => {
   render(
     <CharacterRollContext.Provider value={{ data: {} as CharacterData, onRoll: vi.fn(), burn: { available, onBurn } }}>
       <RollAffordance stat="WIS" bands={BANDS} mod={0} debilityDisadvantage={false} onRoll={onRoll} />
@@ -50,6 +50,20 @@ describe('RollAffordance — Burn Brightly', () => {
     const last = onRoll.mock.calls.at(-1)![0]!;
     expect(last).toMatchObject({ total: 7, mod: 1, band: '7-9', burned: true });
     expect(last.rollId).toBe(onRoll.mock.calls[0]![0]!.rollId); // the same log entry, updated in place
+  });
+
+  it('grants nothing when the XP payment fails, and can be tried again', async () => {
+    seedDice([3, 3]);
+    const onBurn = vi.fn().mockRejectedValueOnce(new Error('Not enough XP.')).mockResolvedValue(undefined);
+    const { onRoll } = renderRoll(true, vi.fn(), onBurn);
+    await userEvent.click(screen.getByRole('button', { name: 'Roll +WIS' }));
+    await userEvent.click(await screen.findByRole('button', { name: /Burn Brightly/ }));
+    expect(screen.getByText('= 6')).toBeInTheDocument();
+    expect(onRoll).toHaveBeenCalledTimes(1); // only the original roll was logged
+
+    await userEvent.click(screen.getByRole('button', { name: /Burn Brightly/ }));
+    expect(screen.getByText('= 7')).toBeInTheDocument();
+    expect(onRoll.mock.calls.at(-1)![0]!).toMatchObject({ burned: true, total: 7 });
   });
 
   it('can be done only once per roll, and the next roll offers it again', async () => {

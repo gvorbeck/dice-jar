@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { statCap } from '../statCap';
-import { ALL_PLAYBOOK_MOVES } from '../moves/allPlaybookMoves';
+import { statCap } from './statCap';
+import { ALL_PLAYBOOK_MOVES } from './moves/allPlaybookMoves';
 
 // Book 1, pp. 52, 106-107: Improved Stat raises a stat to at most +2; only Superior Stat (level 6+) reaches +3.
 describe('statCap', () => {

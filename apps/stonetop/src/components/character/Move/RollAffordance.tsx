@@ -104,12 +104,17 @@ export const RollAffordance = ({
   // The ref is the source of truth for logging and for the once-per-roll guard: state would still be stale in a
   // second click, or in the report() that doRoll runs in the same handler that clears it.
   const burnedRef = useRef(false);
+  const [paying, setPaying] = useState(false);
+  const resultRef = useRef<RollResult | null>(null);
   const burn = useCharacterRollOptional()?.burn;
   const tumbleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const rollId = useRef('');
   const spare = useRef<number | null>(null);
 
   useEffect(() => () => clearTimeout(tumbleTimer.current), []);
+  useEffect(() => {
+    resultRef.current = result;
+  }, [result]);
 
   const report = useCallback(
     (next: RollResult, stat: RollStat, resource: string | undefined) => {
@@ -181,13 +186,24 @@ export const RollAffordance = ({
 
   // Burn Brightly (Book 1, p. 231): spend 2 XP after the roll for +1, once per roll. The +1 goes into the roll's
   // mod, so a later switch of advantage/disadvantage keeps it, and the log entry is updated in place.
-  const handleBurn = useCallback(() => {
+  const handleBurn = useCallback(async () => {
     if (!result || burnedRef.current || !burn) return;
-    const next = { ...result, mod: result.mod + 1, total: result.total + 1 };
+    const id = rollId.current;
     burnedRef.current = true;
+    setPaying(true);
+    try {
+      await burn.onBurn(); // the XP is paid first; a failed payment (save error, or the XP is gone) earns no bonus
+    } catch {
+      burnedRef.current = false;
+      setPaying(false);
+      return;
+    }
+    setPaying(false);
+    if (rollId.current !== id) return; // re-rolled while paying: the XP is spent, but there is no roll left to improve
+    const current = resultRef.current ?? result;
+    const next = { ...current, mod: current.mod + 1, total: current.total + 1 };
     setBurned(true);
     setResult(next);
-    burn.onBurn();
     report(next, activeStat, activeResource);
   }, [result, burn, report, activeStat, activeResource]);
 
@@ -318,7 +334,7 @@ export const RollAffordance = ({
             <span className={clsx(styles.total, !tumbling && styles.totalSettled)}>= {result.total}</span>
           </div>
           {burn?.available && !burned && !tumbling && (
-            <Button variant="ghost" size="sm" onClick={handleBurn}>
+            <Button variant="ghost" size="sm" onClick={handleBurn} disabled={paying}>
               Burn Brightly (−{BURN_BRIGHTLY_COST} XP, +1)
             </Button>
           )}

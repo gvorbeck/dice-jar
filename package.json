@@ -12,6 +12,8 @@
   },
   "scripts": {
     "prepare": "husky",
+    "dg": "npm run dev -w apps/delta-green -- --open",
+    "st": "npm run dev -w apps/stonetop -- --open",
     "format": "prettier --write .",
     "lint": "eslint . --max-warnings 0",
     "knip": "knip",

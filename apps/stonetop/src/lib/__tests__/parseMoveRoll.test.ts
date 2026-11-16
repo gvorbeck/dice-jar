@@ -5,6 +5,16 @@ import type { MoveDefinition } from '@/types';
 const move = (body: MoveDefinition['body']): MoveDefinition => ({ id: 'm', name: 'M', body });
 
 describe('parseMoveRoll', () => {
+  // Book 1, p. 143 (Loyal to the End): "roll +0" is a bare 2d6, the same as "+nothing".
+  it('reads "roll +0" as a plain roll with its bands', () => {
+    const move = {
+      id: 'x',
+      name: 'X',
+      body: [{ kind: 'para', text: 'When it is at 0 HP, roll +0: **on a 10+**, fine; **on a 7-9**, hurt; **on a 6-**, dying.' }],
+    } as MoveDefinition;
+    expect(parseMoveRoll(move)).toEqual([{ stat: 'nothing', bands: expect.arrayContaining([expect.objectContaining({ label: '10+' })]) }]);
+  });
+
   it('parses a bolded three-band stat roll (blessed.ts style)', () => {
     const result = parseMoveRoll(
       move([

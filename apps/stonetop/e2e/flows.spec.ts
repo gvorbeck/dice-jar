@@ -100,3 +100,21 @@ test('Burn Brightly spends 2 XP for +1 once the character can level up, and the 
   await expect(other.getByLabel('XP', { exact: true })).toHaveValue('6');
   await other.context().close();
 });
+
+// Book 1, pp. 40, 52, 230: stats stop at +2, and a debility's disadvantage is cancelled by advantage.
+test('a stat stops at +2, and advantage cancels a marked debility', async ({ page }) => {
+  const id = await createGame(page);
+  await addCharacter(page, 'The Blessed');
+  await page.goto(`/game/${id}/blessed`);
+
+  const str = page.getByLabel('Strength', { exact: true });
+  await str.fill('3');
+  await expect(str).toHaveValue('2');
+
+  await page.locator('label', { hasText: 'weakened' }).first().click();
+  await page.getByRole('button', { name: 'Basic Moves' }).click();
+  await page.getByRole('button', { name: 'Roll +STR' }).first().click();
+  await expect(page.getByText('Debility: disadvantage.').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Adv', exact: true }).first().click();
+  await expect(page.getByText('Advantage cancels your debility.')).toHaveCount(1);
+});

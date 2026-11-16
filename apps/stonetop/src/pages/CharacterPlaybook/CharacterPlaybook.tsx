@@ -332,9 +332,8 @@ const CharacterSheet = ({
   const burn = useMemo(
     () => ({
       available: canBurnBrightly(character.data),
-      onBurn: () => {
-        adjustCharacterStats(character.id, { statXp: -BURN_BRIGHTLY_COST }).catch(() => {});
-      },
+      // Rejects when the XP can't be paid (the save failed, or another device spent it first), and the roll gets no bonus.
+      onBurn: () => adjustCharacterStats(character.id, { statXp: -BURN_BRIGHTLY_COST }),
     }),
     [character.data, character.id, adjustCharacterStats],
   );

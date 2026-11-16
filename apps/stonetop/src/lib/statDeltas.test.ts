@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyStatDeltas } from '../statDeltas';
+import { applyStatDeltas } from './statDeltas';
 import type { CharacterData } from '@/types';
 
 const sheet = (over: Partial<CharacterData>) => ({ statHp: '10', statArmor: '1', statXp: '3', ...over }) as CharacterData;
@@ -15,9 +15,12 @@ describe('applyStatDeltas', () => {
   it('treats a blank or missing value as 0', () => {
     expect(applyStatDeltas(sheet({ statHp: '' }), { statHp: 2 })).toMatchObject({ statHp: '2' });
   });
-  it('lets HP and armor go negative but never XP', () => {
+  it('lets HP and armor go negative', () => {
     expect(applyStatDeltas(sheet({ statHp: '1' }), { statHp: -3 })).toMatchObject({ statHp: '-2' });
-    expect(applyStatDeltas(sheet({ statXp: '1' }), { statXp: -2 })).toMatchObject({ statXp: '0' });
+  });
+  it('refuses to overspend XP, so a second payment from the same balance fails', () => {
+    expect(applyStatDeltas(sheet({ statXp: '2' }), { statXp: -2 })).toMatchObject({ statXp: '0' });
+    expect(() => applyStatDeltas(sheet({ statXp: '1' }), { statXp: -2 })).toThrow('Not enough XP');
   });
   it('does not change the sheet it was given', () => {
     const before = sheet({});
