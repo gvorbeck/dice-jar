@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Button, Input, Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { Move } from '../../Move';
@@ -43,8 +43,8 @@ const noop = () => {};
 const MarkEntry = ({ mark, gained, crossedOff, onGainedChange, onCrossedOffChange }: MarkEntryProps) => {
   const handleSelectChange = useCallback((val: boolean) => onGainedChange(mark.id, val), [mark.id, onGainedChange]);
   const handleCrossOff = useCallback(() => onCrossedOffChange(mark.id), [mark.id, onCrossedOffChange]);
-  const markCx = clsx(styles.markEntry, crossedOff && styles.markCrossedOff);
-  const crossOffCx = clsx(styles.crossOffBtn, crossedOff && styles.crossOffBtnActive);
+  const markCx = cn(styles.markEntry, crossedOff && styles.markCrossedOff);
+  const crossOffCx = cn(styles.crossOffBtn, crossedOff && styles.crossOffBtnActive);
   return (
     <div className={markCx}>
       <Move

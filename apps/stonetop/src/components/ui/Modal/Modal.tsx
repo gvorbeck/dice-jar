@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Dialog, Modal as AriaModal, ModalOverlay } from 'react-aria-components';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -21,7 +21,7 @@ export const Modal = ({ open, onClose, children, className, 'aria-labelledby': l
     isDismissable
     className={styles.backdrop}
   >
-    <AriaModal className={clsx(styles.panel, className)}>
+    <AriaModal className={cn(styles.panel, className)}>
       <Dialog aria-labelledby={labelledBy} className={styles.dialog}>
         {children}
       </Dialog>

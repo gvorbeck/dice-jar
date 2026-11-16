@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Button, Text } from '@/components/ui';
 import type { GameSession } from '@/types';
 import { useLatest } from '@/hooks/useLatest';
@@ -368,7 +368,7 @@ export const RelationshipGraph = ({ game, focusId }: RelationshipGraphProps) => 
 
           <g>
             {nodes.map((node) => {
-              const groupCx = clsx(styles.node, styles[node.kind], node.dead && styles.dead, drag?.id === node.id && styles.dragging);
+              const groupCx = cn(styles.node, styles[node.kind], node.dead && styles.dead, drag?.id === node.id && styles.dragging);
               return (
                 <g
                   key={node.id}

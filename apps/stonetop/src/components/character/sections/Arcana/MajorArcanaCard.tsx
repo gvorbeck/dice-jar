@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Text } from '@/components/ui';
 import { UseDots } from '@/components/ui/UseDots/UseDots';
 import { parseMarkdown } from '@/lib/parseMarkdown';
@@ -47,7 +47,7 @@ export const MajorArcanaCard = ({
   const poolTrackers = frontTrackers.filter((t) => t.role !== 'marks');
   const { unlocked, projectedCreature, getConsequenceCheckedMarks, getMoveGating } = useArcanumGating(arcanum, entry);
 
-  const cx = clsx(styles.card, unlocked && styles.cardUnlocked);
+  const cx = cn(styles.card, unlocked && styles.cardUnlocked);
 
   // Legacy/hand-edited docs can have an arcanaMajor entry predating these fields; default so every
   // lookup below is safe without repeating the guard at each call site. Memoized so the fallback `{}`

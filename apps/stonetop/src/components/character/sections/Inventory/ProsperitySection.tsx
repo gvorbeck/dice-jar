@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { PROSPERITY_NOTES } from './inventoryData';
@@ -11,7 +11,7 @@ interface ProsperityOptionRowProps {
 }
 
 const ProsperityOptionRow = memo(({ val, selected }: ProsperityOptionRowProps) => {
-  const cx = clsx(styles.prosperityOption, selected && styles.prosperitySelected);
+  const cx = cn(styles.prosperityOption, selected && styles.prosperitySelected);
   return (
     <div className={cx} aria-current={selected ? true : undefined}>
       <span className={styles.prosperityValue}>{val > 0 ? `+${val}` : val}</span>

@@ -1,5 +1,5 @@
 import { useId, type InputHTMLAttributes } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import styles from './Toggle.module.css';
 
 interface ToggleWithLabel extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
@@ -16,7 +16,7 @@ type ToggleProps = ToggleWithLabel | ToggleWithAriaLabel;
 
 export const Toggle = ({ label, className, ...props }: ToggleProps) => {
   const id = useId();
-  const cx = clsx(styles.label, className);
+  const cx = cn(styles.label, className);
 
   return (
     <label htmlFor={id} className={cx}>

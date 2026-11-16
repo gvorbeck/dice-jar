@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useLatest } from '@/hooks/useLatest';
 import { useFirestoreSync } from '@/hooks/useFirestoreSync';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 import { Checkbox, Input, Text, Stack } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
@@ -105,7 +105,7 @@ interface DebilityRowProps {
 
 const DebilityRow = ({ label, debilityKey, checked, locked, onChange }: DebilityRowProps) => {
   const isChecked = checked || !!locked;
-  const braceCx = clsx(styles.debilityBrace, isChecked && styles.debilityBraceActive);
+  const braceCx = cn(styles.debilityBrace, isChecked && styles.debilityBraceActive);
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => onChange(debilityKey, e.target.checked),
     [onChange, debilityKey],
@@ -349,7 +349,7 @@ export const Stats = ({ data, onSave, hpMax, damage = 'd6', scoreInstruction = D
           <InfoBox label="Level" statKey="statLevel" value={stats.statLevel} min={1} onChange={handleStatChange} onBlur={handleFlush} />
         </div>
         {levelUpHint && (
-          <Text color={canLevelUp ? 'accent' : 'muted'} className={clsx(styles.levelUpHint, canLevelUp && styles.levelUpReady)}>
+          <Text color={canLevelUp ? 'accent' : 'muted'} className={cn(styles.levelUpHint, canLevelUp && styles.levelUpReady)}>
             {levelUpHint}
           </Text>
         )}

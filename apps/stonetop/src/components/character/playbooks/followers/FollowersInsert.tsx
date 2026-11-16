@@ -1,7 +1,7 @@
 import { useState, useCallback, memo, useId } from 'react';
 import { useLatest } from '@/hooks/useLatest';
 import { useFirestoreSync } from '@/hooks/useFirestoreSync';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Button, Checkbox, Heading, Input, Modal, Text, Tooltip } from '@/components/ui';
 
 import { useToast } from '@/components/app';
@@ -168,7 +168,7 @@ const FollowerCard = memo(
     const doubleGear = follower.gear?.slice(GEAR_SINGLE_COUNT) ?? [];
 
     const followerLabel = follower.name || `Follower ${index + 1}`;
-    const loyaltyLabelCx = clsx(styles.fieldLabel, styles.loyaltyLabel);
+    const loyaltyLabelCx = cn(styles.fieldLabel, styles.loyaltyLabel);
 
     return (
       <section className={styles.card} aria-labelledby={headingId}>

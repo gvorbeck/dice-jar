@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Text } from '../Text/Text';
 import styles from './UseDots.module.css';
 
@@ -16,7 +16,7 @@ interface UseDotsProps {
 export const UseDots = ({ total, checked, onChange, disabled, label, ariaLabel }: UseDotsProps) => {
   const dots = Array.from({ length: total }, (_, i) => {
     const filled = i < checked;
-    const dotCx = clsx(styles.useDot, filled && styles.useDotFilled);
+    const dotCx = cn(styles.useDot, filled && styles.useDotFilled);
     return (
       <button
         key={`dot-${total}-${i}`}

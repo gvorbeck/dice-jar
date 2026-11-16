@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { EditorContent, useEditor, useEditorState, type Editor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
 import { useFirestoreSync } from '@/hooks/useFirestoreSync';
@@ -142,7 +142,7 @@ const Toolbar = ({ editor, disabled, controlsId }: ToolbarProps) => {
   return (
     <div className={styles.toolbar} role="toolbar" aria-label="Formatting" aria-controls={controlsId} onKeyDown={handleKeyDown}>
       {TOOLS.map((tool, i) => {
-        const buttonCx = clsx(styles.toolButton, active[i] && styles.toolButtonActive);
+        const buttonCx = cn(styles.toolButton, active[i] && styles.toolButtonActive);
         return (
           <button
             key={tool.id}
@@ -235,7 +235,7 @@ export const NotesEditor = ({ html, lock, label, onSave, onClaim, onRefresh, onR
     isBusy,
   );
 
-  const editorCx = clsx(styles.editor, othersTyping && styles.editorLocked);
+  const editorCx = cn(styles.editor, othersTyping && styles.editorLocked);
 
   return (
     <div className={editorCx}>

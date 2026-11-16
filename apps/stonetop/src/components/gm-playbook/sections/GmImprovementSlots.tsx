@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Button, Heading, Text, Checkbox, Input, Radio, RadioGroup } from '@/components/ui';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { changedById } from '@/lib/gameMutations';
@@ -51,7 +51,7 @@ const GmImprovementCard = ({
   const handleCompletedToggle = useCallback(() => onCompletedToggle(index), [index, onCompletedToggle]);
   const handleRemove = useCallback(() => onRemove(index), [index, onRemove]);
 
-  const slotCx = clsx(card.item, styles.gmItem, slot.completed && card.itemCompleted);
+  const slotCx = cn(card.item, styles.gmItem, slot.completed && card.itemCompleted);
 
   return (
     <div className={slotCx}>

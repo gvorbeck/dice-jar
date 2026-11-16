@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Icon } from '../Icon/Icon';
 import styles from './ScrollToTop.module.css';
 
@@ -26,7 +26,7 @@ export const ScrollToTop = ({ sentinelRef }: ScrollToTopProps) => {
     window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
   };
 
-  const cx = clsx(styles.btn, visible && styles.visible);
+  const cx = cn(styles.btn, visible && styles.visible);
 
   return (
     <button className={cx} onClick={scrollToTop} aria-label="Scroll to top" aria-hidden={!visible} tabIndex={visible ? 0 : -1}>

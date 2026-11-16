@@ -1,5 +1,5 @@
 import { type ComponentPropsWithoutRef } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import styles from './Stack.module.css';
 
 interface StackProps extends ComponentPropsWithoutRef<'div'> {
@@ -9,7 +9,7 @@ interface StackProps extends ComponentPropsWithoutRef<'div'> {
 }
 
 export const Stack = ({ direction = 'column', gap = 4, align = 'stretch', className, children, ...rest }: StackProps) => {
-  const cx = clsx(styles.base, styles[direction], gap !== undefined && styles[`gap-${gap}`], styles[`align-${align}`], className);
+  const cx = cn(styles.base, styles[direction], gap !== undefined && styles[`gap-${gap}`], styles[`align-${align}`], className);
 
   return (
     <div className={cx} {...rest}>

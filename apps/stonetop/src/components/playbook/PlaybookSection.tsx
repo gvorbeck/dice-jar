@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Button, Heading, Icon, Text, Tooltip } from '@/components/ui';
 import styles from './PlaybookSection.module.css';
 
@@ -43,11 +43,11 @@ export const PlaybookSection = ({
   const handleToggle = isUncontrolled ? handleSelfToggle : onToggleCollapse;
 
   const showCollapse = collapsible && !overrideNote;
-  const chevronCx = clsx(styles.collapseChevron, !collapsed && styles.collapseChevronOpen);
-  const collapseCx = clsx(styles.collapseToggle, warn && styles.collapseToggleHidden);
-  const chooseCx = clsx(styles.sectionTitleChoose, (!warn || !!overrideNote) && styles.sectionTitleChooseHidden);
-  const warnCx = clsx(styles.sectionTitleWarn, (!warn || !!overrideNote) && styles.sectionTitleWarnHidden);
-  const sectionCx = clsx(styles.section, overrideNote && styles.sectionOverride);
+  const chevronCx = cn(styles.collapseChevron, !collapsed && styles.collapseChevronOpen);
+  const collapseCx = cn(styles.collapseToggle, warn && styles.collapseToggleHidden);
+  const chooseCx = cn(styles.sectionTitleChoose, (!warn || !!overrideNote) && styles.sectionTitleChooseHidden);
+  const warnCx = cn(styles.sectionTitleWarn, (!warn || !!overrideNote) && styles.sectionTitleWarnHidden);
+  const sectionCx = cn(styles.section, overrideNote && styles.sectionOverride);
 
   return (
     <section className={sectionCx}>

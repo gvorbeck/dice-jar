@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, memo } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { CheckboxGroup, List, Text } from '@/components/ui';
 import { parseInlineMarkdown } from '@/lib/parseMarkdown';
 import type { ArcanaFollower } from '@/types';
@@ -50,7 +50,7 @@ export const ArcanaFollowerBlock = memo(
     onAspectCheckChange,
   }: ArcanaFollowerBlockProps) => {
     const isMultiHp = !!(follower.hpCount && follower.hpCount > 1);
-    const cx = clsx(styles.follower, inactive && styles.followerInactive);
+    const cx = cn(styles.follower, inactive && styles.followerInactive);
 
     return (
       <div className={cx} aria-disabled={inactive || undefined}>

@@ -1,5 +1,5 @@
 import { useId, type InputHTMLAttributes } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Icon } from '../Icon/Icon';
 import { Text } from '../Text/Text';
 import styles from './Checkbox.module.css';
@@ -12,9 +12,9 @@ interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'typ
 
 export const Checkbox = ({ label, className, variant = 'default', weight = 1, ...props }: CheckboxProps) => {
   const id = useId();
-  const cx = clsx(styles.label, variant === 'provision' && styles.labelProvision, className);
+  const cx = cn(styles.label, variant === 'provision' && styles.labelProvision, className);
   const iconName = props.checked ? 'filled-provisions' : 'empty-provisions';
-  const iconCx = clsx(styles.provisionIcon, props.checked && styles.provisionIconChecked);
+  const iconCx = cn(styles.provisionIcon, props.checked && styles.provisionIconChecked);
 
   return (
     <label htmlFor={id} className={cx}>

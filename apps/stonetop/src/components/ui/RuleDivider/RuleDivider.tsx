@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import styles from './RuleDivider.module.css';
 
 interface RuleDividerProps {
@@ -6,7 +6,7 @@ interface RuleDividerProps {
 }
 
 export const RuleDivider = ({ className }: RuleDividerProps) => (
-  <div className={clsx(styles.root, className)}>
+  <div className={cn(styles.root, className)}>
     <span className={styles.diamond} />
   </div>
 );

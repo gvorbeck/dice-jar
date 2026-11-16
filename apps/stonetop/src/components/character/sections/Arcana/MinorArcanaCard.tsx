@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState, memo } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Checkbox, CheckboxGroup, Input, Text } from '@/components/ui';
 import { parseMarkdown } from '@/lib/parseMarkdown';
 import type { MinorArcanum } from '@/types';
@@ -101,7 +101,7 @@ export const MinorArcanaCard = ({
     [onToggleRequirement],
   );
 
-  const cx = clsx(styles.card, isUnlocked && styles.cardUnlocked);
+  const cx = cn(styles.card, isUnlocked && styles.cardUnlocked);
   const { move } = arcanum;
 
   return (

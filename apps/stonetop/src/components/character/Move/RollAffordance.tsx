@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Text } from '@/components/ui';
 import type { RollBand, RollStat } from '@/types';
@@ -209,7 +209,7 @@ export const RollAffordance = ({
 
   const hitBand = result && !tumbling ? bandFor(result.total, bands) : null;
   const label = rollLabel(activeStat, activeResource);
-  const triggerCx = clsx(styles.trigger, open && styles.rerollIcon);
+  const triggerCx = cn(styles.trigger, open && styles.rerollIcon);
   const atMin = adjust <= ADJUST_MIN;
   const atMax = adjust >= ADJUST_MAX;
 
@@ -234,7 +234,7 @@ export const RollAffordance = ({
                   variant="ghost"
                   size="sm"
                   icon="dice"
-                  className={clsx(styles.trigger, isActive && styles.statTriggerActive)}
+                  className={cn(styles.trigger, isActive && styles.statTriggerActive)}
                   onClick={() => handleStatClick(option)}
                   disabled={paying}
                   aria-label={`Roll ${optLabel}`.trim()}
@@ -273,7 +273,7 @@ export const RollAffordance = ({
             <button
               key={m.value}
               type="button"
-              className={clsx(styles.modeButton, chosen === m.value && styles.modeButtonActive)}
+              className={cn(styles.modeButton, chosen === m.value && styles.modeButtonActive)}
               aria-pressed={chosen === m.value}
               aria-label={m.value === 'normal' ? m.title : undefined}
               title={m.title}
@@ -324,7 +324,7 @@ export const RollAffordance = ({
             {result.dice.map((face, i) => (
               <span
                 key={`die-${i}-${face}`}
-                className={clsx(styles.die, tumbling && styles.dieTumbling, !tumbling && result.dropped === i && styles.dieDropped)}
+                className={cn(styles.die, tumbling && styles.dieTumbling, !tumbling && result.dropped === i && styles.dieDropped)}
               >
                 {face}
               </span>
@@ -332,7 +332,7 @@ export const RollAffordance = ({
             <Text as="span" size="xs" color="muted" className={styles.modText}>
               {modText(result)}
             </Text>
-            <span className={clsx(styles.total, !tumbling && styles.totalSettled)}>= {result.total}</span>
+            <span className={cn(styles.total, !tumbling && styles.totalSettled)}>= {result.total}</span>
           </div>
           {burn?.available && !burned && !tumbling && (
             <Button variant="ghost" size="sm" onClick={handleBurn} disabled={paying}>

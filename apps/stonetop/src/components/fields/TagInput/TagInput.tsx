@@ -1,5 +1,5 @@
 import { useState, useRef, useId, useCallback, useEffect, useMemo, memo } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Button } from '@/components/ui';
 import styles from './TagInput.module.css';
 
@@ -46,7 +46,7 @@ const SuggestionItem = memo(({ suggestion, index, isActive, listboxId, onAdd }: 
     [suggestion, onAdd],
   );
 
-  const cx = clsx(styles.option, isActive && styles.optionActive);
+  const cx = cn(styles.option, isActive && styles.optionActive);
 
   return (
     <div id={`${listboxId}-option-${index}`} role="option" aria-selected={isActive} className={cx} onPointerDown={handlePointerDown}>
@@ -149,7 +149,7 @@ export const TagInput = ({ label, value, onChange, suggestions = [], placeholder
   }, []);
 
   const showDropdown = open && filtered.length > 0;
-  const cx = clsx(styles.root, className);
+  const cx = cn(styles.root, className);
 
   return (
     <div className={cx} ref={containerRef}>

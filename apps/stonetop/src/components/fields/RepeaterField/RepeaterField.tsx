@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useId, memo } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Button } from '@/components/ui';
 import { Icon } from '@/components/ui';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
@@ -90,8 +90,8 @@ const Row = memo(
     );
     const handleRemove = useCallback(() => onRemove(item.id), [item.id, onRemove]);
 
-    const provisionWrapCx = clsx(styles.provisionWrap, weight === 2 && styles.provisionWrapDouble);
-    const provisionIconCx = clsx(styles.provisionIcon, checked && styles.provisionIconChecked);
+    const provisionWrapCx = cn(styles.provisionWrap, weight === 2 && styles.provisionWrapDouble);
+    const provisionIconCx = cn(styles.provisionIcon, checked && styles.provisionIconChecked);
 
     return (
       <li className={styles.item}>
@@ -180,11 +180,11 @@ type RepeaterFieldProps = PlainProps | CheckedProps | CheckedWeightProps;
 
 type SaveFn = PlainProps['onSave'] | CheckedProps['onSave'] | CheckedWeightProps['onSave'];
 
-const addBtnCx = clsx(styles.addBtn, styles.addBtnOffset);
+const addBtnCx = cn(styles.addBtn, styles.addBtnOffset);
 
 export const RepeaterField = (props: RepeaterFieldProps) => {
   const { addLabel, itemLabel, className } = props;
-  const listCx = clsx(styles.list, className);
+  const listCx = cn(styles.list, className);
 
   const nextId = useRef(props.items.length);
   const onSaveRef = useLatest<SaveFn>(props.onSave);

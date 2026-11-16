@@ -42,7 +42,7 @@ export const useJoinIdCheck = (raw: string) => {
     }, DEBOUNCE_MS);
 
     return () => {
-      clearTimeout(timerRef.current!);
+      clearTimeout(timerRef.current ?? undefined);
       ac.abort();
     };
   }, [trimmed]);

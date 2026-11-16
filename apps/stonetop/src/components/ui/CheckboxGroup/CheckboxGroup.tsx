@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Checkbox } from '../Checkbox/Checkbox';
 import { Fieldset } from '../Fieldset/Fieldset';
 import { Text } from '../Text/Text';
@@ -36,7 +36,7 @@ export const CheckboxGroup = ({
   const selectedCount = items.filter(({ id }) => checked[id]).length;
   const atMax = max !== undefined && selectedCount >= max;
 
-  const gridClass = clsx(
+  const gridClass = cn(
     columns === 'responsive-2-4-6'
       ? styles.gridResponsive246
       : columns === 6

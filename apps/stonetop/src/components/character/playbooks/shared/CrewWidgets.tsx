@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Checkbox, Input, UseDots } from '@/components/ui';
 import styles from './CrewWidgets.module.css';
 
@@ -37,10 +37,10 @@ export const StatBox = memo(
     className,
     children,
   }: StatBoxProps) => {
-    const inputCx = clsx(styles.statInput, compact && styles.statInputSm);
+    const inputCx = cn(styles.statInput, compact && styles.statInputSm);
 
     return (
-      <div className={clsx(styles.statBox, className)}>
+      <div className={cn(styles.statBox, className)}>
         {staticValue !== undefined ? (
           <span className={styles.statStatic}>{staticValue}</span>
         ) : (
@@ -72,7 +72,7 @@ interface LoyaltyRowProps {
 }
 
 export const LoyaltyRow = memo(({ label = 'Loyalty', value, onChange, className }: LoyaltyRowProps) => (
-  <div className={clsx(styles.loyaltyRow, className)}>
+  <div className={cn(styles.loyaltyRow, className)}>
     {label}
     <UseDots total={3} checked={value} onChange={onChange} ariaLabel="Loyalty" />
   </div>

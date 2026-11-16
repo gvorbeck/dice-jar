@@ -1,5 +1,5 @@
 import { useId, forwardRef, type InputHTMLAttributes, type TextareaHTMLAttributes } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { Text } from '../Text/Text';
 import styles from './Input.module.css';
 
@@ -24,7 +24,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
     const noteId = note ? `${generatedId}-note` : undefined;
     // Merge any caller-supplied aria-describedby with the note/error ids we own.
     const describedBy = [ariaDescribedBy, noteId, errorId].filter((x): x is string => Boolean(x)).join(' ') || undefined;
-    const cx = clsx(styles.input, error && styles.hasError, className);
+    const cx = cn(styles.input, error && styles.hasError, className);
 
     const el = multiline ? (
       <textarea

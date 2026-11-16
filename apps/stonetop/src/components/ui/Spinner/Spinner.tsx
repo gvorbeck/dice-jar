@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import styles from './Spinner.module.css';
 
 interface Props {
@@ -8,5 +8,5 @@ interface Props {
 }
 
 export const Spinner = ({ className, label = 'Loading…' }: Props) => (
-  <span className={clsx(styles.root, className)} role="status" aria-label={label} />
+  <span className={cn(styles.root, className)} role="status" aria-label={label} />
 );

@@ -1,5 +1,5 @@
 import { useState, useCallback, useId } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/cn';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PageMeta } from '@/components/app/PageMeta/PageMeta';
 import { PageLayout } from '@/components/app/PageLayout/PageLayout';
@@ -87,7 +87,7 @@ export const Home = () => {
   const isCreateDisabled = creating || status === 'taken' || status === 'invalid' || status === 'checking';
   const showSlugPreview = status === 'available' || status === 'checking';
 
-  const hintCx = clsx(
+  const hintCx = cn(
     styles.idHint,
     status === 'available' && styles.idHintAvailable,
     (status === 'taken' || status === 'invalid') && styles.idHintTaken,
@@ -96,7 +96,7 @@ export const Home = () => {
 
   const isJoinDisabled = joinStatus !== 'found';
 
-  const joinHintCx = clsx(
+  const joinHintCx = cn(
     styles.idHint,
     joinStatus === 'found' && styles.idHintAvailable,
     (joinStatus === 'notfound' || joinStatus === 'error') && styles.idHintTaken,
