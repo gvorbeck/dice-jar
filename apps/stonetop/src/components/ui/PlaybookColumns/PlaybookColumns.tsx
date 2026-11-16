@@ -1,6 +1,5 @@
 import { cn } from '@dice-jar/cn';
 import type { ReactNode } from 'react';
-import './PlaybookColumns.css';
 
 interface PlaybookColumnsProps {
   left?: ReactNode;

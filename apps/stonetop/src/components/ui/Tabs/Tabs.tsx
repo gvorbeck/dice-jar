@@ -3,7 +3,6 @@ import { cn } from '@dice-jar/cn';
 import { Tooltip } from '../Tooltip/Tooltip';
 import { Button } from '../Button/Button';
 import { Icon } from '../Icon/Icon';
-import './Tabs.css';
 
 interface Tab {
   id?: string;
@@ -40,7 +39,14 @@ const TabRemoveButton = ({ tab, onRemove }: { tab: Tab; onRemove: () => void }) 
 const AddTabButton = ({ onAdd }: { onAdd: () => void }) => (
   <span className="tabs-add-tab-wrapper">
     <Tooltip text="Add an Insert" side="bottom">
-      <Button variant="ghost" size="sm" icon="plus" onClick={onAdd} aria-label="Add an insert" className="tabs-add-tab" />
+      <Button
+        variant="ghost"
+        size="sm"
+        icon="plus"
+        onClick={onAdd}
+        aria-label="Add an insert"
+        className="tabs-add-tab field-focus-visible"
+      />
     </Tooltip>
   </span>
 );
@@ -76,7 +82,7 @@ const TabButton = ({
     },
     [tabRefs, index],
   );
-  const cx = cn('tabs-tab', isActive && 'tabs-active', onRemove && 'tabs-tab-has-remove');
+  const cx = cn('tabs-tab field-focus-visible', isActive && 'tabs-active', onRemove && 'tabs-tab-has-remove');
   const slotCx = cn('tabs-tab-slot', isActive && 'tabs-tab-slot-active');
 
   const handleClick = useCallback(() => onActivate(index), [onActivate, index]);

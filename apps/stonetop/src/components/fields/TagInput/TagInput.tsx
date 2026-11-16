@@ -1,7 +1,6 @@
 import { useState, useRef, useId, useCallback, useEffect, useMemo, memo } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button } from '@/components/ui';
-import './TagInput.css';
 
 interface TagInputProps {
   label?: string;
@@ -22,7 +21,7 @@ const TagChip = memo(({ tag, onRemove }: TagChipProps) => {
   return (
     <span className="tag-input-tag">
       {tag}
-      <button type="button" className="tag-input-tag-remove" onClick={handleRemove} aria-label={`Remove trait: ${tag}`}>
+      <button type="button" className="tag-input-tag-remove field-focus-visible" onClick={handleRemove} aria-label={`Remove trait: ${tag}`}>
         ×
       </button>
     </span>
@@ -167,7 +166,7 @@ export const TagInput = ({ label, value, onChange, suggestions = [], placeholder
             ref={inputRef}
             id={inputId}
             type="text"
-            className="tag-input-input"
+            className="tag-input-input field-focus-visible"
             value={inputVal}
             placeholder={value.length === 0 ? placeholder : ''}
             onChange={handleInputChange}

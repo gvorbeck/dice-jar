@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { Input, Text } from '@/components/ui';
 import type { INSERT_PURPOSE_OPTIONS as PurposeOptions } from '@/lib/insertSharedData';
-import './InsertSections.css';
 
 interface PurposeDetailProps {
   opt: (typeof PurposeOptions)[number];

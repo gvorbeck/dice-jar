@@ -14,7 +14,6 @@ import { PageLayout } from '@/components/app/PageLayout/PageLayout';
 import { RollLog } from '@/components/character/RollLog/RollLog';
 import { GameDataActions } from './GameDataActions';
 import type { Character, GameSession } from '@/types';
-import './Game.css';
 
 interface LocationState {
   isNew?: boolean;
@@ -226,11 +225,11 @@ const GameContent = ({
         actions={<GameDataActions gameId={id} gameName={gameName} onReplaceGameData={onReplaceGameData} />}
       >
         <div className="game-sections">
-          <div className="game-section-characters">
+          <div className="game-section-characters game-section">
             <Heading as="h2" size="label">
               Characters
             </Heading>
-            <div className="game-sr-only" role="status" aria-live="polite" aria-atomic="true">
+            <div className="game-sr-only field-sr-only" role="status" aria-live="polite" aria-atomic="true">
               {moveAnnouncement}
             </div>
             {orderedCharacters.length === 0 ? (

@@ -3,7 +3,6 @@ import { PageHeader } from '@/components/app/PageHeader/PageHeader';
 import type { GameNav } from '@/components/app/PageHeader/gameNav';
 import { DiceRoller } from '@/components/app/DiceRoller/DiceRoller';
 import type { LoggedRoll } from '@/types';
-import './PageLayout.css';
 
 /*
  * PageLayout — the foundational shell that every page is built inside.

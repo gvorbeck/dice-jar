@@ -1,5 +1,4 @@
 import { Tab, TabList } from 'react-aria-components';
-import './ArcanaSubTabs.css';
 
 export type ArcanaSubTab = 'minor' | 'major';
 

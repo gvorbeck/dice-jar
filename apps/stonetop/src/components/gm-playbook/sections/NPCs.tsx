@@ -1,6 +1,4 @@
 import { Heading, Text, List, Callout, Stack } from '@/components/ui';
-import '@/components/gm-playbook/Playbook.css';
-import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const NPCs = () => (
   <div>
@@ -40,7 +38,7 @@ export const NPCs = () => (
       </Stack>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Trait
       </Heading>
@@ -53,7 +51,7 @@ export const NPCs = () => (
       </Stack>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Questions
       </Heading>
@@ -98,7 +96,7 @@ export const NPCs = () => (
       />
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Impressions
       </Heading>
@@ -121,7 +119,7 @@ export const NPCs = () => (
       </Stack>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Instinct
       </Heading>
@@ -133,7 +131,7 @@ export const NPCs = () => (
       </Stack>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Tags &amp; moves <span className="playbook-muted">(optional)</span>
       </Heading>
@@ -146,7 +144,7 @@ export const NPCs = () => (
       </Text>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Connections <span className="playbook-muted">(optional)</span>
       </Heading>
@@ -162,7 +160,7 @@ export const NPCs = () => (
       />
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Motivations <span className="playbook-muted">(optional)</span>
       </Heading>
@@ -180,7 +178,7 @@ export const NPCs = () => (
       />
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Embodiment <span className="playbook-muted">(optional)</span>
       </Heading>
@@ -196,14 +194,14 @@ export const NPCs = () => (
       </Stack>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         HP, armor, damage <span className="playbook-muted">(optional)</span>
       </Heading>
       <Text>If you think it will matter, stat them up as if they were monsters or followers, whichever seems more appropriate.</Text>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Callout title="PERSUADE (vs. NPCs)">
         <Text>
           When you ***press or entice an NPC***, say what you want them to do (or not do). If they **have reason to resist**, roll +CHA: on

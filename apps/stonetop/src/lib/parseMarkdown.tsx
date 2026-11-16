@@ -3,7 +3,6 @@ import { Icon } from '@/components/ui/Icon/Icon';
 import { List } from '@/components/ui/List/List';
 import { Table } from '@/components/ui/Table/Table';
 import { Text } from '@/components/ui/Text/Text';
-import './parseMarkdown.css';
 
 const INLINE_RE = /(\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|\*[^*]+\*|◊|◈|◻|on a 10\+|on a 7[-–]9|on a 6[-–]|either way)/i;
 const AUTO_BOLD_RE = /^(on a 10\+|on a 7[-–]9|on a 6[-–]|either way)$/i;

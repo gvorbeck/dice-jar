@@ -1,6 +1,5 @@
 import { cn } from '@dice-jar/cn';
 import { Focusable, OverlayArrow, Tooltip as AriaTooltip, TooltipTrigger } from 'react-aria-components';
-import './Tooltip.css';
 
 interface TooltipProps {
   text: string;
@@ -18,7 +17,7 @@ export const Tooltip = ({ text, side = 'top', plain = false, noTabStop = false, 
   <TooltipTrigger delay={0} closeDelay={100}>
     <Focusable excludeFromTabOrder={plain && noTabStop}>
       {plain ? (
-        <span role="img" aria-label={text} className={cn('tooltip-wrapper', className)}>
+        <span role="img" aria-label={text} className={cn('tooltip-wrapper field-focus-visible', className)}>
           {children}
         </span>
       ) : (

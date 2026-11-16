@@ -4,7 +4,6 @@ import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { useLatest } from '@/hooks/useLatest';
 import { ImprovementList } from './ImprovementList';
 import type { SteadingData } from '@/types';
-import './SteadingAssets.css';
 
 const DRAFT_HORSES =
   'A pair of hardy draft horses, followers (*large*, *powerful*, *keen-nosed*, *hardy*): HP 10 each; Damage d6+3 (*hand*, *close*, *forceful*); Instinct: to panic; Cost: care & grooming.';

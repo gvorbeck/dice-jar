@@ -7,7 +7,6 @@ import { ThemeToggle } from './ThemeToggle';
 import type { GameNav } from './gameNav';
 import { SiteBanner } from '@/components/app/SiteBanner/SiteBanner';
 import { SITE_BANNER } from '@/lib/siteBanner';
-import './PageHeader.css';
 
 /*
  * PageHeader — the semantic <header> landmark at the top of every page.
@@ -167,7 +166,7 @@ export const PageHeader = (props: Props) => {
           {onSaveTitle && editing ? (
             <Input
               ref={inputRef as React.Ref<HTMLInputElement>}
-              className="page-header-title-input"
+              className="page-header-title-input field-focus-visible"
               value={value}
               onChange={handleChange}
               onBlur={commit}
@@ -186,7 +185,7 @@ export const PageHeader = (props: Props) => {
                     variant="ghost"
                     icon="pencil"
                     size="sm"
-                    className="page-header-edit-btn"
+                    className="page-header-edit-btn field-focus-visible"
                     onClick={startEditing}
                     aria-label={titleLabel!}
                   />
@@ -212,7 +211,7 @@ export const PageHeader = (props: Props) => {
               variant="ghost"
               icon={copied ? 'check' : 'copy'}
               size="sm"
-              className="page-header-copy-btn"
+              className="page-header-copy-btn field-focus-visible"
               onClick={copyGameId}
               aria-label={copyLabel}
             />
@@ -240,7 +239,7 @@ export const PageHeader = (props: Props) => {
       {!simple && (
         <div className="page-header-top-bar">
           <Heading as="h1" size="md" className="page-header-wordmark">
-            <Link to="/" className="page-header-wordmark-link">
+            <Link to="/" className="page-header-wordmark-link field-focus-visible">
               Hearthfire
             </Link>
           </Heading>

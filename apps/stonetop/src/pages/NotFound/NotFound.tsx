@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { PageMeta } from '@/components/app/PageMeta/PageMeta';
 import { PageLayout } from '@/components/app/PageLayout/PageLayout';
 import { Button, Heading, Text } from '@/components/ui';
-import './NotFound.css';
 
 export const NotFound = () => {
   const navigate = useNavigate();

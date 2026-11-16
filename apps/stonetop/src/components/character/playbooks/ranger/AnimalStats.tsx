@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { Input, Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { StatBox } from '../shared/CrewWidgets';
-import './RangerAnimalCompanion.css';
 
 interface AnimalStatsProps {
   hp: string;

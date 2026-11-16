@@ -13,7 +13,6 @@ import { useCrewSave } from '../shared/useCrewSave';
 import { useTrackedField } from '../shared/useTrackedField';
 import { StatBox, LoyaltyRow, CustomItemsGrid } from '../shared/CrewWidgets';
 import type { PlaybookSectionProps } from '@/types';
-import './MarshalCrew.css';
 
 const CREW_HP_BASE = 6;
 const CREW_DAMAGE_DICE = ['d6', 'd8', 'd10'] as const;
@@ -179,7 +178,7 @@ const IndividualSlot = memo(({ index, name, tag, traits, onChange, onBlur }: Ind
     <div className="marshal-crew-individual">
       <div className="marshal-crew-individual-fields">
         <Input
-          className="marshal-crew-individual-input"
+          className="marshal-crew-individual-input field-focus-visible"
           type="text"
           value={name}
           placeholder="Name"
@@ -188,7 +187,7 @@ const IndividualSlot = memo(({ index, name, tag, traits, onChange, onBlur }: Ind
           onBlur={onBlur}
         />
         <Input
-          className="marshal-crew-individual-input"
+          className="marshal-crew-individual-input field-focus-visible"
           type="text"
           value={tag}
           placeholder="Tag"
@@ -199,7 +198,7 @@ const IndividualSlot = memo(({ index, name, tag, traits, onChange, onBlur }: Ind
       </div>
       <Input
         multiline
-        className="marshal-crew-individual-traits"
+        className="marshal-crew-individual-traits field-focus-visible"
         value={traits}
         placeholder="Traits"
         aria-label={`Individual ${index + 1} traits`}
@@ -582,7 +581,7 @@ export const MarshalCrew = ({ data, prosperity, onSave }: MarshalCrewProps) => {
             <Input
               key={CUSTOM_TAG_SLOT_IDS[i]}
               data-index={i}
-              className="marshal-crew-custom-tag-input"
+              className="marshal-crew-custom-tag-input field-focus-visible"
               type="text"
               value={val}
               placeholder="Custom tag"

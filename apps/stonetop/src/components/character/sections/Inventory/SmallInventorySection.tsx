@@ -4,8 +4,6 @@ import { RepeaterField } from '@/components/fields';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { SMALL_ITEMS, UNDEFINED_SMALL_COUNT, type SmallItem } from './inventoryData';
 import { UndefinedProvisions } from './UndefinedProvisions';
-import './inventoryItem.css';
-import './SmallInventorySection.css';
 
 interface SmallItemRowProps {
   item: SmallItem;

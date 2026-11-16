@@ -5,8 +5,6 @@ import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { changedById } from '@/lib/gameMutations';
 import type { SteadingData, GmImprovement } from '@/types';
 import { makeEmptyGmImprovement } from './steadingImprovementsData';
-import './improvementCard.css';
-import './GmImprovementSlots.css';
 
 interface GmImprovementCardProps {
   slot: GmImprovement;
@@ -59,7 +57,7 @@ const GmImprovementCard = ({
         <Checkbox checked={slot.completed} onChange={handleCompletedToggle} className="improvement-card-item-checkbox" />
         <Input
           aria-label="Improvement name"
-          className="gm-improvement-slots-gm-title-input"
+          className="gm-improvement-slots-gm-title-input field-focus-visible"
           value={slot.title}
           placeholder="IMPROVEMENT"
           onFocus={onFocus}
@@ -71,7 +69,7 @@ const GmImprovementCard = ({
       <Input
         multiline
         aria-label="Summary"
-        className="gm-improvement-slots-gm-textarea"
+        className="gm-improvement-slots-gm-textarea field-focus-visible"
         value={slot.summary}
         placeholder="Summary"
         rows={2}
@@ -112,7 +110,7 @@ const GmImprovementCard = ({
         <Input
           multiline
           aria-label="Requirements"
-          className="gm-improvement-slots-gm-textarea"
+          className="gm-improvement-slots-gm-textarea field-focus-visible"
           value={slot.requirements}
           placeholder="Requirements"
           rows={3}
@@ -128,7 +126,7 @@ const GmImprovementCard = ({
         <Input
           multiline
           aria-label="Effects"
-          className="gm-improvement-slots-gm-textarea"
+          className="gm-improvement-slots-gm-textarea field-focus-visible"
           value={slot.effects}
           placeholder="Effects"
           rows={3}

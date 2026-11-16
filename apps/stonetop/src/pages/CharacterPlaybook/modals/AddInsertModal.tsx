@@ -1,7 +1,6 @@
 import { useState, useId, useCallback, useMemo } from 'react';
 import { Button, Heading, Modal, Radio, RadioGroup } from '@/components/ui';
 import { INSERT_TABS, type InsertOption } from '@/lib/insertTabs';
-import './AddInsertModal.css';
 
 interface AddInsertModalProps {
   open: boolean;

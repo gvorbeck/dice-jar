@@ -3,7 +3,6 @@ import { Radio, CheckboxGroup, Input, UseDots } from '@/components/ui';
 import type { CheckboxGroupItem } from '@/components/ui';
 import { parseMarkdown } from '@/lib/parseMarkdown';
 import type { BackgroundOption, ChoiceConfig } from '@/types';
-import './Background.css';
 
 const resolveMax = (choices: ChoiceConfig, level: number): number => {
   if (!choices.levelGatedMax) return choices.max;

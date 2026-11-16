@@ -2,7 +2,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@dice-jar/cn';
 import { Dropdown } from '@/components/ui';
 import type { GameNav } from './gameNav';
-import './PageNav.css';
 
 /*
  * PageNav — lateral navigation between the sibling pages of a game (each
@@ -43,7 +42,7 @@ export const PageNav = ({ nav, dropdownId }: PageNavProps) => {
         <ul className="page-nav-pill-list">
           {items.map((item) => {
             const isCurrent = item.value === nav.current;
-            const pillCx = cn('page-nav-pill', isCurrent && 'page-nav-pill-current');
+            const pillCx = cn('page-nav-pill field-focus-visible', isCurrent && 'page-nav-pill-current');
             return (
               <li key={item.value} className="page-nav-pill-item">
                 {isCurrent ? (

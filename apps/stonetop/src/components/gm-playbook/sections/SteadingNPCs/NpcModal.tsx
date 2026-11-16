@@ -7,7 +7,6 @@ import type { NpcRelationship } from '@/types';
 import { NPC_TRAITS, EMPTY_FORM } from './npcData';
 import type { NpcFormState, RelTarget } from './npcData';
 import { RelationshipRepeater } from './RelationshipRepeater';
-import './NpcModal.css';
 
 interface NpcModalProps {
   open: boolean;

@@ -4,7 +4,6 @@ import { Checkbox } from '../Checkbox/Checkbox';
 import { Fieldset } from '../Fieldset/Fieldset';
 import { Text } from '../Text/Text';
 import type { CheckboxGroupItem } from '@/types';
-import './CheckboxGroup.css';
 
 interface CheckboxGroupProps {
   items: CheckboxGroupItem[] | string[];

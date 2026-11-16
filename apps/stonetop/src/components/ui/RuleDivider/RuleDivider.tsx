@@ -1,5 +1,4 @@
 import { cn } from '@dice-jar/cn';
-import './RuleDivider.css';
 
 interface RuleDividerProps {
   className?: string;

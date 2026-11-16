@@ -1,6 +1,5 @@
 import { memo, useCallback } from 'react';
 import { Checkbox, Text } from '@/components/ui';
-import '../arcanaCard.css';
 
 interface TaskRowProps {
   taskKey: string;

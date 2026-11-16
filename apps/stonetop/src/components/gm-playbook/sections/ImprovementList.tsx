@@ -1,6 +1,5 @@
 import { List, Icon, Tooltip, Text, Button } from '@/components/ui';
 import { RepeaterField } from '@/components/fields';
-import './ImprovementList.css';
 
 interface ImprovementItem {
   id: string;

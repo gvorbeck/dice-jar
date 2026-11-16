@@ -2,7 +2,6 @@ import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Button } from '@/components/ui';
 import { Heading } from '@/components/ui';
 import { Text } from '@/components/ui';
-import './ErrorBoundary.css';
 
 interface Props {
   children: ReactNode;
@@ -34,7 +33,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <main className="error-boundary-page">
-          <div role="alert" className="error-boundary-sr-only" aria-atomic="true">
+          <div role="alert" className="error-boundary-sr-only field-sr-only" aria-atomic="true">
             Something went wrong.
           </div>
           <div className="error-boundary-content">

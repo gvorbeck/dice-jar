@@ -1,7 +1,6 @@
 import { cn } from '@dice-jar/cn';
 import { Text } from '@/components/ui';
 import type { LoggedRoll } from '@/types';
-import './RollLog.css';
 
 interface RollLogProps {
   rolls: LoggedRoll[];

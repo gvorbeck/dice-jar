@@ -5,7 +5,6 @@ import type { GameSession } from '@/types';
 import { useLatest } from '@/hooks/useLatest';
 import { buildRelationshipGraph, pairKey, reciprocalLabelOffset, reciprocalPairKeys } from './relationshipGraphData';
 import type { GraphNode } from './relationshipGraphData';
-import './RelationshipGraph.css';
 
 // Viewport the simulation lays out into. The SVG scales to its container via a
 // viewBox, so these are coordinate-space units, not pixels. Sized to roughly the

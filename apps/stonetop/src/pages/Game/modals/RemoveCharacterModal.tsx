@@ -3,7 +3,6 @@ import { Button, Heading, Modal, Text } from '@/components/ui';
 import { useToast } from '@/components/app';
 import { getPlaybook } from '@/lib/constants';
 import type { Character } from '@/types';
-import './RemoveCharacterModal.css';
 
 interface RemoveCharacterModalProps {
   open: boolean;

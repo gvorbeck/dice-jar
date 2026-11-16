@@ -6,7 +6,6 @@ import { List } from '../List/List';
 import { Text } from '../Text/Text';
 import { UseDots } from '../UseDots/UseDots';
 import type { Creature } from '@/types';
-import './CreatureCard.css';
 
 const handleNumberWheel = (e: React.WheelEvent<HTMLInputElement>) => e.currentTarget.blur();
 
@@ -29,7 +28,7 @@ const StatBox = memo(({ label, note, value, ariaLabel, onChange, onBlur }: StatB
         {label}
       </Text>
       <Input
-        className="creature-card-stat-input"
+        className="creature-card-stat-input field-focus-visible"
         type="number"
         value={value}
         min={0}
@@ -70,7 +69,7 @@ export const CreatureCard = memo(({ creature, onFieldChange, onBlur, className }
 
   return (
     <section className={cx} aria-labelledby={headingId}>
-      <Heading as="h3" id={headingId} className="creature-card-sr-only">
+      <Heading as="h3" id={headingId} className="creature-card-sr-only field-sr-only">
         {creatureLabel}
       </Heading>
       <div className="creature-card-body">

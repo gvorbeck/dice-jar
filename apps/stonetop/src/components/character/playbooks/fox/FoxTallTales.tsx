@@ -3,7 +3,6 @@ import { Checkbox, CheckboxGroup, Divider, Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { usePlaybookChecked } from '@/hooks/usePlaybookChecked';
 import type { PlaybookSectionProps } from '@/types';
-import './FoxTallTales.css';
 
 const LOCATION_ITEMS = [
   { id: 'tales-lost-great-wood', label: 'the Great Wood' },

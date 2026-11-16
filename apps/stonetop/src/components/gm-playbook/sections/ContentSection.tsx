@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { Text, Input } from '@/components/ui';
 import { useDebouncedTextField } from '@/hooks/useDebouncedTextField';
 import type { ContentLists } from '@/types';
-import '@/pages/GmPlaybook/GmPlaybook.css';
 
 interface ContentSectionProps {
   content: ContentLists | undefined;

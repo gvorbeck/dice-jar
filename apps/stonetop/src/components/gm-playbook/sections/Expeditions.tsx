@@ -1,5 +1,4 @@
 import { Heading, Text, List, Table, Callout } from '@/components/ui';
-import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const Expeditions = () => (
   <div>
@@ -15,7 +14,7 @@ export const Expeditions = () => (
       </Text>
     </Callout>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Requirements
       </Heading>
@@ -31,7 +30,7 @@ export const Expeditions = () => (
       />
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Challenges
       </Heading>
@@ -53,7 +52,7 @@ export const Expeditions = () => (
       </Text>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         When the way is perilous
       </Heading>
@@ -69,7 +68,7 @@ export const Expeditions = () => (
       />
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Table
         title="Travel times"
         columnHeaders={['Journey', 'Time']}
@@ -104,7 +103,7 @@ export const Expeditions = () => (
       />
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         When they make camp
       </Heading>
@@ -136,7 +135,7 @@ export const Expeditions = () => (
       />
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Legs of travel
       </Heading>
@@ -170,7 +169,7 @@ export const Expeditions = () => (
       <Text color="muted">"What do you do?" Resolve. Repeat or move on.</Text>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Points of interest
       </Heading>
@@ -203,12 +202,12 @@ export const Expeditions = () => (
       <Text>Otherwise, make a soft GM move. "What do you do?" Resolve actions. Repeat or move on.</Text>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Random weather
       </Heading>
       <Text>You decide the weather, but if you want, ask a player to roll the Die of Fate.</Text>
-      <div className="gm-playbook-weather-grid">
+      <div className="gm-playbook-weather-grid playbook-shared-grid2">
         <Table
           columnHeaders={['Late Winter / Early Spring', '1d6']}
           rows={[

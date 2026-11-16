@@ -24,7 +24,6 @@ import { SteadingNPCs } from '@/components/gm-playbook/sections/SteadingNPCs/Ste
 import { RelationshipGraph } from '@/components/gm-playbook/sections/SteadingNPCs/RelationshipGraph';
 import { PlacesOfInterest, ReferenceNames, NpcTraits } from '@/components/gm-playbook/sections/SteadingReference';
 import type { GameSession, LoggedRoll, SteadingData, SteadingNPC } from '@/types';
-import './SteadingPlaybook.css';
 
 interface SteadingContentProps {
   g: GameSession;

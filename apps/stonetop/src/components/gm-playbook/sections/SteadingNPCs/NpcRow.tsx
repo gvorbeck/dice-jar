@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button, Text, Tooltip } from '@/components/ui';
 import type { SteadingNPC, NpcRelationship } from '@/types';
-import './NpcRow.css';
 
 interface NpcRowProps {
   npc: SteadingNPC;
@@ -39,7 +38,7 @@ export const NpcRow = ({ npc, onEdit, onRemove, onToggleDead, resolveTarget }: N
         {npc.traits && npc.traits.length > 0 && (
           <div className="npc-row-npc-traits">
             {npc.traits.map((t) => (
-              <span key={t} className="npc-row-npc-trait">
+              <span key={t} className="npc-row-npc-trait npc-row-npc-pill">
                 {t}
               </span>
             ))}
@@ -50,7 +49,7 @@ export const NpcRow = ({ npc, onEdit, onRemove, onToggleDead, resolveTarget }: N
             {npc.relationships.map((rel) => {
               const label = [rel.type, rel.targetId ? resolveTarget(rel) : ''].filter(Boolean).join(': ');
               return label ? (
-                <span key={rel.id} className="npc-row-npc-rel-trait">
+                <span key={rel.id} className="npc-row-npc-rel-trait npc-row-npc-pill">
                   {label}
                 </span>
               ) : null;

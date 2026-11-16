@@ -7,7 +7,6 @@ import { useLatest } from '@/hooks/useLatest';
 import { useNotesLock } from '@/hooks/useNotesLock';
 import { Text } from '@/components/ui';
 import type { NotesLock } from '@/types';
-import './SharedNotes.css';
 
 export interface NotesEditorProps {
   html: string;
@@ -142,7 +141,7 @@ const Toolbar = ({ editor, disabled, controlsId }: ToolbarProps) => {
   return (
     <div className="shared-notes-toolbar" role="toolbar" aria-label="Formatting" aria-controls={controlsId} onKeyDown={handleKeyDown}>
       {TOOLS.map((tool, i) => {
-        const buttonCx = cn('shared-notes-tool-button', active[i] && 'shared-notes-tool-button-active');
+        const buttonCx = cn('shared-notes-tool-button field-focus-visible', active[i] && 'shared-notes-tool-button-active');
         return (
           <button
             key={tool.id}

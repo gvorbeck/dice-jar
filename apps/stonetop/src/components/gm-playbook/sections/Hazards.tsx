@@ -1,5 +1,4 @@
 import { Heading, Text, List, Table, Stack } from '@/components/ui';
-import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const Hazards = () => (
   <div>
@@ -10,7 +9,7 @@ export const Hazards = () => (
       <Text>Just describe what it is, what it looks like, what it does, how it works.</Text>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         As GM moves
       </Heading>
@@ -27,7 +26,7 @@ export const Hazards = () => (
       <Text>If dynamic, changing: give it an **instinct**, written as "to ___" (e.g. "to bury everything").</Text>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         As an impending doom
       </Heading>
@@ -41,7 +40,7 @@ export const Hazards = () => (
       </Stack>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         As player moves
       </Heading>
@@ -62,7 +61,7 @@ export const Hazards = () => (
       />
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         If it deals damage
       </Heading>

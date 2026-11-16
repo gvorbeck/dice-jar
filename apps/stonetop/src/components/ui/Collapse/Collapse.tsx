@@ -1,7 +1,6 @@
 import { useState, useId, type ReactNode } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Icon } from '../Icon/Icon';
-import './Collapse.css';
 
 interface CollapseProps {
   label: string;
@@ -20,7 +19,13 @@ export const Collapse = ({ label, defaultOpen = false, children, className, acti
   return (
     <div className={cx}>
       <div className="collapse-header">
-        <button type="button" className="collapse-trigger" onClick={handleToggle} aria-expanded={open} aria-controls={id}>
+        <button
+          type="button"
+          className="collapse-trigger field-focus-visible"
+          onClick={handleToggle}
+          aria-expanded={open}
+          aria-controls={id}
+        >
           <span className="collapse-label">{label}</span>
           <Icon name="chevron-down" size="small" className="collapse-chevron" aria-hidden="true" />
         </button>

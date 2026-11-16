@@ -1,7 +1,6 @@
 import { useId, type InputHTMLAttributes } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Text } from '../Text/Text';
-import './Radio.css';
 
 interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label: React.ReactNode;
@@ -13,7 +12,7 @@ export const Radio = ({ label, className, ...props }: RadioProps) => {
 
   return (
     <label htmlFor={id} className={cx}>
-      <input id={id} type="radio" className="radio-input" {...props} />
+      <input id={id} type="radio" className="radio-input field-sr-only" {...props} />
       <span className="radio-indicator">
         <span className="radio-dot" />
       </span>

@@ -82,7 +82,6 @@ import type { SheetGuard } from '@/lib/statDeltas';
 import type { AdditiveStat, Character, CharacterData, GameSession, LoggedRoll, NotesLock, PlaybookType, PlaybookFeatures } from '@/types';
 import type { RollReport } from '@/components/character/Move/RollAffordance';
 import { CharacterRollContext } from '@/components/character/Move/CharacterRollContext';
-import './CharacterPlaybook.css';
 
 type PlaybookSectionComponent = ComponentType<{ data: CharacterData | undefined; onSave: (data: Partial<CharacterData>) => Promise<void> }>;
 type PlaybookSectionEntry = { key: string; Component: PlaybookSectionComponent };

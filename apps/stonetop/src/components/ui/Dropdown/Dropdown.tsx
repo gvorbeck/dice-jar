@@ -1,6 +1,5 @@
 import { forwardRef, type ForwardedRef, type SelectHTMLAttributes } from 'react';
 import { cn } from '@dice-jar/cn';
-import './Dropdown.css';
 
 interface DropdownOption<T extends string> {
   value: T;
@@ -44,16 +43,16 @@ const DropdownInner = <T extends string>(
   { label, id, options, groups, value, onChange, placeholder = 'Select…', className, ...props }: DropdownProps<T>,
   ref: ForwardedRef<HTMLSelectElement>,
 ) => {
-  const selectCx = cn('dropdown-select', !value && 'dropdown-placeholder', className);
+  const selectCx = cn('dropdown-select field-focus-visible', !value && 'dropdown-placeholder', className);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onChange(e.target.value as T);
   };
 
   return (
-    <div className="dropdown-wrapper">
+    <div className="dropdown-wrapper field-wrapper">
       {label && (
-        <label htmlFor={id} className="dropdown-label">
+        <label htmlFor={id} className="dropdown-label field-label">
           {label}
         </label>
       )}

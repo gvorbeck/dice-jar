@@ -5,7 +5,6 @@ import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { CheckboxGroup, Input, List, Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import type { CharacterData, IntroductionsConfig } from '@/types';
-import './Introductions.css';
 
 interface IntroductionsProps {
   config?: IntroductionsConfig;

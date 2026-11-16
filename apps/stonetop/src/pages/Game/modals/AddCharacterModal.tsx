@@ -4,7 +4,6 @@ import { useToast } from '@/components/app';
 import { PLAYBOOKS, getPlaybook } from '@/lib/constants';
 import { generateId } from '@/lib/id';
 import type { Character, PlaybookType } from '@/types';
-import './AddCharacterModal.css';
 
 interface AddCharacterModalProps {
   open: boolean;

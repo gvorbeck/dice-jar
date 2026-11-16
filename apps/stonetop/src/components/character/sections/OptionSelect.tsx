@@ -8,7 +8,6 @@ import { useFirestoreSync } from '@/hooks/useFirestoreSync';
 import { useCollapsibleSection } from '@/hooks/useCollapsibleSection';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import type { RadioOption } from '@/types';
-import './OptionSelect.css';
 
 const CUSTOM_VALUE = '__custom__';
 

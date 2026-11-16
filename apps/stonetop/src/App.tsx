@@ -2,7 +2,6 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { ToastProvider, SaveStatusProvider, SaveStatus, ErrorBoundary } from '@/components/app';
 import { Spinner } from '@/components/ui';
-import './App.css';
 
 /*
  * Each page is lazy-loaded — its JS bundle is only fetched the first time

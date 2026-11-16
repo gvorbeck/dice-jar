@@ -7,7 +7,6 @@ import { Icon } from '@/components/ui';
 import { Text } from '@/components/ui';
 import { generateId } from '@/lib/id';
 import { ToastContext, type ToastVariant } from './ToastContext';
-import './Toast.css';
 
 interface ToastItem {
   id: string;
@@ -173,7 +172,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
       {children}
       {createPortal(
         <>
-          <div role="status" aria-live="polite" aria-atomic="true" className="toast-announcer">
+          <div role="status" aria-live="polite" aria-atomic="true" className="toast-announcer field-sr-only">
             {announcement}
           </div>
           <div role="region" className="toast-region" aria-label="Notifications">

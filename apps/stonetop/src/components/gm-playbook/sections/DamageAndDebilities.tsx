@@ -1,6 +1,5 @@
 import { memo } from 'react';
 import { Heading, Text, List, Table, Callout } from '@/components/ui';
-import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const DamageAndDebilities = memo(() => (
   <div>
@@ -8,7 +7,7 @@ export const DamageAndDebilities = memo(() => (
       Deal damage when your GM move has someone getting hurt, banged up, knocked around, injured. If it's caused by a danger, deal damage
       per its stats. Otherwise:
     </Text>
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         What would it do to a normal person?
       </Heading>
@@ -21,7 +20,7 @@ export const DamageAndDebilities = memo(() => (
         ]}
       />
     </div>
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Text>Inflict a debility when your GM move would leave a PC weakened, dazed, or miserable.</Text>
       <List
         variant="bullet"
@@ -42,7 +41,7 @@ export const DamageAndDebilities = memo(() => (
         required to do so (Defying Danger, expending supplies or some other resource, finding ___, Making Camp, etc.).
       </Text>
     </Callout>
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Text>When they tend to a debility or problematic wound, additional requirements might include:</Text>
       <List
         variant="bullet"

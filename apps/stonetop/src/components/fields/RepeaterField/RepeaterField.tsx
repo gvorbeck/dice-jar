@@ -4,7 +4,6 @@ import { Button } from '@/components/ui';
 import { Icon } from '@/components/ui';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 import { useLatest } from '@/hooks/useLatest';
-import './RepeaterField.css';
 
 interface BaseItem {
   id: number;

@@ -11,7 +11,6 @@ import { useCrewSave } from '../shared/useCrewSave';
 import { useTrackedField } from '../shared/useTrackedField';
 import type { MoveDefinition, PlaybookSectionProps } from '@/types';
 import { THRALL_MOVES, THRALL_MARK_DEFINITIONS } from '@/lib/moves/inserts';
-import './ThrallInsert.css';
 
 const THRALL_INSTINCT_OPTIONS = [
   { value: 'fascination', label: 'FASCINATION', description: 'To explore your powers, your master, your new existence.' },

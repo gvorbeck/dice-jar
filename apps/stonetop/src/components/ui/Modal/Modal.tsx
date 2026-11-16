@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { Dialog, Modal as AriaModal, ModalOverlay } from 'react-aria-components';
 import { cn } from '@dice-jar/cn';
-import './Modal.css';
 
 interface ModalProps {
   open: boolean;
@@ -21,7 +20,7 @@ export const Modal = ({ open, onClose, children, className, 'aria-labelledby': l
     isDismissable
     className="modal-backdrop"
   >
-    <AriaModal className={cn('modal-panel', className)}>
+    <AriaModal className={cn('modal-panel field-focus-visible', className)}>
       <Dialog aria-labelledby={labelledBy} className="modal-dialog">
         {children}
       </Dialog>

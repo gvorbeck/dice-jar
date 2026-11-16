@@ -1,7 +1,6 @@
 import { useCallback, useId, useState } from 'react';
 import { Button, Heading, Modal, Text } from '@/components/ui';
 import type { GameExportEnvelope, ImportSummary } from '@/lib/gameBackup';
-import './ImportGameModal.css';
 
 interface ImportGameModalProps {
   open: boolean;

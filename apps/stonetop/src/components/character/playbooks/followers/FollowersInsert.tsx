@@ -11,7 +11,6 @@ import { generateId } from '@/lib/id';
 import { useCrewSave } from '../shared/useCrewSave';
 import { StatBox, LoyaltyRow, CustomItemsGrid } from '../shared/CrewWidgets';
 import type { FollowerData, FollowerGearItem, PlaybookSectionProps } from '@/types';
-import './FollowersInsert.css';
 
 const GEAR_SINGLE_COUNT = 3;
 const GEAR_DOUBLE_COUNT = 3;
@@ -172,7 +171,7 @@ const FollowerCard = memo(
 
     return (
       <section className="followers-insert-card" aria-labelledby={headingId}>
-        <Heading as="h3" id={headingId} className="followers-insert-sr-only">
+        <Heading as="h3" id={headingId} className="followers-insert-sr-only field-sr-only">
           {followerLabel}
         </Heading>
         <div className="followers-insert-card-header">
@@ -267,7 +266,7 @@ const FollowerCard = memo(
                 Max
               </Text>
               <Input
-                className="followers-insert-max-hp-input"
+                className="followers-insert-max-hp-input field-focus-visible"
                 type="number"
                 value={follower.maxHp ?? ''}
                 min={0}

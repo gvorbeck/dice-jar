@@ -2,7 +2,6 @@ import { useId, useState, useCallback } from 'react';
 import { Button, Heading, Modal, Text } from '@/components/ui';
 import { useToast } from '@/components/app';
 import { getInsertTab, type InsertOption } from '@/lib/insertTabs';
-import './RemoveInsertModal.css';
 
 interface RemoveInsertModalProps {
   open: boolean;

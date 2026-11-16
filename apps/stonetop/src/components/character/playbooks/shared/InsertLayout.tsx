@@ -10,7 +10,6 @@ import { useInsertSections } from './useInsertSections';
 import { useConsequenceCheckboxes } from './useConsequenceCheckboxes';
 import type { PlaybookFeatures, PlaybookSectionProps } from '@/types';
 import type { RadioOption } from '@/types';
-import './InsertLayout.css';
 
 const INSTINCT_OPTIONS = INSERT_INSTINCT_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label, description: opt.description }));
 

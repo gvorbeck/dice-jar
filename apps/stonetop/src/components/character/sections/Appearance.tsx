@@ -8,7 +8,6 @@ import { useToast } from '@/components/app';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import type { AppearanceRows } from '@/lib/characterCreation/appearanceOptions';
 import type { CharacterData } from '@/types';
-import './Appearance.css';
 
 const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
 

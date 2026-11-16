@@ -6,7 +6,6 @@ import { bandFor, effectiveMode, remodeRoll, rollAction, type RollMode, type Rol
 import { generateId } from '@/lib/id';
 import { BURN_BRIGHTLY_COST } from '@/lib/burnBrightly';
 import { useCharacterRollOptional } from './CharacterRollContext';
-import './RollAffordance.css';
 
 // The subset of a completed roll a parent needs to log. Kept structural so Move doesn't depend on the
 // session type; Moves.tsx maps it onto a LoggedRoll.
@@ -273,7 +272,7 @@ export const RollAffordance = ({
             <button
               key={m.value}
               type="button"
-              className={cn('roll-affordance-mode-button', chosen === m.value && 'roll-affordance-mode-button-active')}
+              className={cn('roll-affordance-mode-button field-focus-visible', chosen === m.value && 'roll-affordance-mode-button-active')}
               aria-pressed={chosen === m.value}
               aria-label={m.value === 'normal' ? m.title : undefined}
               title={m.title}

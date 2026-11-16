@@ -9,7 +9,6 @@ import { ConsequenceRow } from './ConsequenceRow';
 import { ConsequenceTableBlock } from './ConsequenceTableBlock';
 import { MysteryCreatureCard } from './MysteryCreatureCard';
 import { MysteryMoveBlock } from './MysteryMoveBlock';
-import '../arcanaCard.css';
 
 // True when a section entry is a consequence (rather than a MoveDefinition). MoveDefinitions carry a
 // `body`; consequences carry `value`.

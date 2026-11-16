@@ -3,7 +3,6 @@ import { cn } from '@dice-jar/cn';
 import { Heading, Text, Checkbox, Button, Radio } from '@/components/ui';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
 import type { SteadingData, SteadingSize } from '@/types';
-import './SteadingStats.css';
 
 const SIZES: { value: SteadingSize; label: string; description: string }[] = [
   { value: 'hamlet', label: 'Hamlet', description: '<50 people' },

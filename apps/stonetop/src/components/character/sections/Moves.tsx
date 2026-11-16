@@ -19,7 +19,6 @@ import {
 import { getLockReason } from '@/lib/moveLockReason';
 import { getPlaybook } from '@/lib/constants';
 import type { PlaybookType, PlaybookSectionProps } from '@/types';
-import './Moves.css';
 
 interface MoveSectionProps {
   label: string;

@@ -1,7 +1,6 @@
 import { forwardRef, type ReactNode, type ElementType, type ComponentPropsWithoutRef, type Ref } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Icon, type IconName, type IconSize } from '../Icon/Icon';
-import './Button.css';
 
 type ButtonOwnProps<E extends ElementType> = {
   as?: E;
@@ -33,7 +32,7 @@ const ButtonInner = (
 ) => {
   const Tag = (as ?? 'button') as ElementType;
   const cx = cn(
-    'button-base',
+    'button-base field-focus-visible',
     `button-${variant}`,
     `button-${size}`,
     icon && !children && 'button-icon-only',

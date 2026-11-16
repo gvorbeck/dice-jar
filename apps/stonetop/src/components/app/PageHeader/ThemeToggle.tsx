@@ -1,6 +1,5 @@
 import { Toggle, Icon } from '@/components/ui';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import './ThemeToggle.css';
 
 export const ThemeToggle = () => {
   const { scheme, toggle } = useColorScheme();

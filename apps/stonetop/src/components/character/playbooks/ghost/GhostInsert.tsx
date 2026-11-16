@@ -5,7 +5,6 @@ import type { MoveDefinition, PlaybookSectionProps } from '@/types';
 import { InsertLayout } from '../shared/InsertLayout';
 import { resolvePlaybookFeatures, featurePatch } from '@/lib/resolvePlaybookFeatures';
 import { GHOST_MOVES, GHOST_CONSEQUENCE_LABELS } from '@/lib/moves/inserts';
-import './GhostInsert.css';
 
 const POLTERGEIST_MOVE: MoveDefinition = {
   id: 'ghost-poltergeist-fury',

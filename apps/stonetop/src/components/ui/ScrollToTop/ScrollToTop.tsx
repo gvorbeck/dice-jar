@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Icon } from '../Icon/Icon';
-import './ScrollToTop.css';
 
 interface ScrollToTopProps {
   sentinelRef: React.RefObject<HTMLDivElement | null>;
@@ -26,7 +25,7 @@ export const ScrollToTop = ({ sentinelRef }: ScrollToTopProps) => {
     window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
   };
 
-  const cx = cn('scroll-to-top-btn', visible && 'scroll-to-top-visible');
+  const cx = cn('scroll-to-top-btn field-focus-visible', visible && 'scroll-to-top-visible');
 
   return (
     <button className={cx} onClick={scrollToTop} aria-label="Scroll to top" aria-hidden={!visible} tabIndex={visible ? 0 : -1}>

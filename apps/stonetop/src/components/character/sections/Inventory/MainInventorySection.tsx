@@ -6,8 +6,6 @@ import type { ArcanaMinorEntry, ArcanaMajorEntry } from '@/types';
 import { MAIN_ITEMS, UNDEFINED_MAIN_COUNT, loadBand, type MainItem } from './inventoryData';
 import type { ArcanaWeights } from './useArcanaWeights';
 import { UndefinedProvisions } from './UndefinedProvisions';
-import './inventoryItem.css';
-import './MainInventorySection.css';
 
 interface MainItemRowProps {
   item: MainItem;

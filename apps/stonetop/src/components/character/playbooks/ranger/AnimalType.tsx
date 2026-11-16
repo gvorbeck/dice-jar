@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { Checkbox, CheckboxGroup, Input, Text } from '@/components/ui';
 import type { AnimalTypeConfig } from '@/types';
-import './RangerAnimalCompanion.css';
 
 export const ANIMAL_TYPES: AnimalTypeConfig[] = [
   {

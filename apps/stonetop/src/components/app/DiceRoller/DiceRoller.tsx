@@ -4,7 +4,6 @@ import { Button, Heading, Icon, Input, Text } from '@/components/ui';
 import { rollNotation, type DiceRollOutcome } from '@/lib/diceNotation';
 import { generateId } from '@/lib/id';
 import type { LoggedRoll } from '@/types';
-import './DiceRoller.css';
 
 interface DiceRollerProps {
   // Who is rolling, for the shared log: a character id/name, or 'gm' / 'steading' / 'game' on pages
@@ -157,7 +156,14 @@ export const DiceRoller = ({ rollerId, rollerName, onRoll }: DiceRollerProps) =>
 
   return (
     <div className={cn('dice-roller', open && 'dice-roller-open')}>
-      <button ref={tabRef} type="button" className="dice-roller-tab" onClick={handleToggle} aria-expanded={open} aria-controls={panelId}>
+      <button
+        ref={tabRef}
+        type="button"
+        className="dice-roller-tab field-focus-visible"
+        onClick={handleToggle}
+        aria-expanded={open}
+        aria-controls={panelId}
+      >
         <Icon name="dice" size="small" />
         Dice
       </button>
@@ -258,7 +264,7 @@ export const DiceRoller = ({ rollerId, rollerName, onRoll }: DiceRollerProps) =>
                 <li key={h.id}>
                   <button
                     type="button"
-                    className="dice-roller-history-item"
+                    className="dice-roller-history-item field-focus-visible"
                     onClick={() => handleReuse(h.notation)}
                     aria-label={`Reuse ${h.notation}, rolled ${h.total}`}
                   >

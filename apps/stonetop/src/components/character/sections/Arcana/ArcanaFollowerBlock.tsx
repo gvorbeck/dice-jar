@@ -4,7 +4,6 @@ import { CheckboxGroup, List, Text } from '@/components/ui';
 import { parseInlineMarkdown } from '@/lib/parseMarkdown';
 import type { ArcanaFollower } from '@/types';
 import { ArcanaTrackerRow } from './ArcanaTrackerRow';
-import './ArcanaFollowerBlock.css';
 
 // A short screen-reader label for a d4 box, from the aspect row's bold lead-in (e.g. "**Tags:** 1 = …"
 // → "Tags die"), so the field isn't announced as the whole option paragraph with literal asterisks.

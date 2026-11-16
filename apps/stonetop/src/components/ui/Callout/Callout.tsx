@@ -1,5 +1,4 @@
 import { Heading } from '@/components/ui/Heading/Heading';
-import './Callout.css';
 
 type Props = {
   title: string;

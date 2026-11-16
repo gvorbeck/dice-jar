@@ -1,7 +1,6 @@
 import { type ComponentPropsWithoutRef } from 'react';
 import { cn } from '@dice-jar/cn';
 import { parseInlineMarkdown } from '@/lib/parseMarkdown';
-import './Text.css';
 
 interface TextProps extends ComponentPropsWithoutRef<'span'> {
   as?: 'p' | 'span' | 'li';

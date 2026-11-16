@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { PageMeta } from '@/components/app/PageMeta/PageMeta';
 import { Heading, Text, Button, Spinner } from '@/components/ui';
 import type { GameSession } from '@/types';
-import './GameGuard.css';
 
 interface Props {
   loading: boolean;

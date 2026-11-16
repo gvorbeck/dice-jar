@@ -3,7 +3,6 @@ import { Button, Tooltip } from '@/components/ui';
 import { useToast } from '@/components/app';
 import { exportGame, readImportFile, type GameExportEnvelope, type ImportSummary } from '@/lib/gameBackup';
 import { ImportGameModal } from './modals/ImportGameModal';
-import './GameDataActions.css';
 
 interface GameDataActionsProps {
   gameId: string;
@@ -95,7 +94,7 @@ export const GameDataActions = ({ gameId, gameName, onReplaceGameData }: GameDat
           variant="ghost"
           icon="download"
           size="sm"
-          className="game-data-actions-action-btn"
+          className="game-data-actions-action-btn field-focus-visible"
           onClick={handleExport}
           disabled={exporting}
           aria-label="Export game data"
@@ -107,7 +106,7 @@ export const GameDataActions = ({ gameId, gameName, onReplaceGameData }: GameDat
           variant="ghost"
           icon="upload"
           size="sm"
-          className="game-data-actions-action-btn"
+          className="game-data-actions-action-btn field-focus-visible"
           onClick={handleImportClick}
           aria-label="Import game data from a backup file"
         />

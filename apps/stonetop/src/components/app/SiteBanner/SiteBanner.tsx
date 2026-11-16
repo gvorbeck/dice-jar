@@ -1,6 +1,5 @@
 import { type ReactNode } from 'react';
 import { Text } from '@/components/ui';
-import './SiteBanner.css';
 
 interface SiteBannerProps {
   children: ReactNode;

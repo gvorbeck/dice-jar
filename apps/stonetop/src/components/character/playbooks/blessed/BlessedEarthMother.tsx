@@ -4,7 +4,6 @@ import { CheckboxGroup, Divider, Radio, RadioGroup, Text } from '@/components/ui
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { resolvePlaybookFeatures, featurePatch } from '@/lib/resolvePlaybookFeatures';
 import type { PlaybookSectionProps } from '@/types';
-import './BlessedEarthMother.css';
 
 const SHRINE_OPTIONS = [
   '... loved, well-used, dripping with offerings and petitions.',

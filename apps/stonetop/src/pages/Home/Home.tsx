@@ -7,7 +7,6 @@ import { createGame, createGameWithId } from '@/lib/game';
 import { useGameIdCheck } from '@/hooks/useGameIdCheck';
 import { useJoinIdCheck } from '@/hooks/useJoinIdCheck';
 import { Button, Heading, Icon, Input, RuleDivider, Stack, Text } from '@/components/ui';
-import './Home.css';
 
 const STATUS_MESSAGES = {
   idle: '',

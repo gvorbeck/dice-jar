@@ -6,7 +6,6 @@ import type { MinorArcanum } from '@/types';
 import { ArcanaCardHeader } from './ArcanaCardHeader';
 import { ArcanaFollowerBlock } from './ArcanaFollowerBlock';
 import { ArcanaTrackerRow } from './ArcanaTrackerRow';
-import './MinorArcanaCard.css';
 
 interface MinorArcanaCardProps {
   arcanum: MinorArcanum;

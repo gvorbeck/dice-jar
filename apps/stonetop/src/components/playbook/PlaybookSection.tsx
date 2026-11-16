@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button, Heading, Icon, Text, Tooltip } from '@/components/ui';
-import './PlaybookSection.css';
 
 const DEFAULT_WARN_TEXT = 'This section has unresolved choices — select an option to complete it.';
 
@@ -44,7 +43,7 @@ export const PlaybookSection = ({
 
   const showCollapse = collapsible && !overrideNote;
   const chevronCx = cn('playbook-section-collapse-chevron', !collapsed && 'playbook-section-collapse-chevron-open');
-  const collapseCx = cn('playbook-section-collapse-toggle', warn && 'playbook-section-collapse-toggle-hidden');
+  const collapseCx = cn('playbook-section-collapse-toggle field-focus-visible', warn && 'playbook-section-collapse-toggle-hidden');
   const chooseCx = cn('playbook-section-section-title-choose', (!warn || !!overrideNote) && 'playbook-section-section-title-choose-hidden');
   const warnCx = cn('playbook-section-section-title-warn', (!warn || !!overrideNote) && 'playbook-section-section-title-warn-hidden');
   const sectionCx = cn('playbook-section-section', overrideNote && 'playbook-section-section-override');

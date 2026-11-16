@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import { Table } from '@/components/ui';
 import type { ConsequenceTable } from '@/types';
-import '../arcanaCard.css';
 
 interface ConsequenceTableBlockProps {
   consequenceId: string;

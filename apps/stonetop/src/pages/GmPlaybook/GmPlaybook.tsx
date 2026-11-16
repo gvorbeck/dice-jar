@@ -31,7 +31,6 @@ import {
 import { GameGuard } from '@/components/app/GameGuard/GameGuard';
 import { DEFAULT_GAME_NAME } from '@/lib/constants';
 import type { ContentLists, GameSession, LoggedRoll } from '@/types';
-import './GmPlaybook.css';
 
 const ReferenceTabContent = () => (
   <PlaybookColumns

@@ -9,7 +9,6 @@ import { useFirestoreSync } from '@/hooks/useFirestoreSync';
 import { useLatest } from '@/hooks/useLatest';
 import { RollAffordance, type StatOption } from './RollAffordance';
 import { useCharacterRollOptional } from './CharacterRollContext';
-import './Move.css';
 
 // Persistent left-control state: box 0 selects/gates the move, boxes 1..n track times taken.
 interface LeftControlState {

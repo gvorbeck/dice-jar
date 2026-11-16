@@ -1,6 +1,5 @@
 import { Text } from '@/components/ui';
 import { UseDots } from '@/components/ui/UseDots/UseDots';
-import './ArcanaTrackerRow.css';
 
 interface ArcanaTrackerRowProps {
   label: string;

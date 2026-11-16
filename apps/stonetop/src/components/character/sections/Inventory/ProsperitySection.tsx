@@ -3,7 +3,6 @@ import { cn } from '@dice-jar/cn';
 import { Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { PROSPERITY_NOTES } from './inventoryData';
-import './ProsperitySection.css';
 
 interface ProsperityOptionRowProps {
   val: -1 | 0 | 1 | 2;

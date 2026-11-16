@@ -1,6 +1,5 @@
 import { type ComponentPropsWithoutRef } from 'react';
 import { cn } from '@dice-jar/cn';
-import './Stack.css';
 
 interface StackProps extends ComponentPropsWithoutRef<'div'> {
   direction?: 'row' | 'column';

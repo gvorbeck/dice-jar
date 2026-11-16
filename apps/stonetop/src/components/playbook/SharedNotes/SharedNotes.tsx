@@ -3,7 +3,6 @@ import { Icon, PlaybookColumns, Spinner, Text } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import type { UseGameResult } from '@/hooks/useGame';
 import type { NotesLock } from '@/types';
-import './SharedNotes.css';
 
 // TipTap/ProseMirror is heavy and only needed once a playbook page has rendered its tabs, so it gets its
 // own chunk rather than riding in all three playbook page bundles.

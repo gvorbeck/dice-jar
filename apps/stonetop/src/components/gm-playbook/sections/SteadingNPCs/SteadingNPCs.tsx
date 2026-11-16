@@ -9,7 +9,6 @@ import { NPC_CONFIG, buildGroups, buildNameMap } from './npcData';
 import type { NpcFormState, RelTarget } from './npcData';
 import { NpcModal } from './NpcModal';
 import { NpcRow } from './NpcRow';
-import './SteadingNPCs.css';
 
 const excludeFromGroups = (groups: DropdownGroup<RelTarget>[], excludeId: string): DropdownGroup<RelTarget>[] =>
   groups.map((g) => ({ ...g, options: g.options.filter((o) => !o.value.endsWith(`::${excludeId}`)) })).filter((g) => g.options.length > 0);

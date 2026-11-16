@@ -1,6 +1,5 @@
 import { Text, List, Input } from '@/components/ui';
 import { useDebouncedTextField } from '@/hooks/useDebouncedTextField';
-import '@/pages/GmPlaybook/GmPlaybook.css';
 
 interface IWonderProps {
   value: string;

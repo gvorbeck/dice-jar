@@ -1,6 +1,5 @@
 import { cn } from '@dice-jar/cn';
 import { Radio } from '../Radio/Radio';
-import './Table.css';
 
 type DataRow = { label: string; value: string; indent?: boolean };
 type GroupRow = { group: string };

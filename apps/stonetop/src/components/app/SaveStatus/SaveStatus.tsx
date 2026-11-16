@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button, Icon, Text } from '@/components/ui';
 import { useSaveStatusOptional } from './SaveStatusContext';
-import './SaveStatus.css';
 
 // Coarse buckets are enough for an ambient indicator — under a minute reads as
 // "just now", then minutes, then hours. Avoids second-by-second churn.

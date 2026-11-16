@@ -1,5 +1,4 @@
 import { Button, Icon, Text } from '@/components/ui';
-import './ArcanaCardHeader.css';
 
 interface ArcanaCardHeaderProps {
   id: string;

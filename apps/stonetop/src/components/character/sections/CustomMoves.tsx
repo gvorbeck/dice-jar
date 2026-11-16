@@ -4,7 +4,6 @@ import { Button, Collapse, Heading, Input, Modal, Stack, Text } from '@/componen
 import { generateId } from '@/lib/id';
 import { Move } from '../Move';
 import type { CharacterData } from '@/types';
-import './Moves.css';
 
 interface CustomMovesProps {
   data: CharacterData | undefined;

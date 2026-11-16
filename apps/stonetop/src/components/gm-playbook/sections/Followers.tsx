@@ -1,6 +1,4 @@
 import { Heading, Text, List, Table, Stack } from '@/components/ui';
-import '@/components/gm-playbook/Playbook.css';
-import '@/pages/GmPlaybook/GmPlaybook.css';
 
 const tagsRollItems = [
   "add +1 if the follower has at least one relevant tag or move (or +2 if they're also exceptional)",
@@ -183,7 +181,7 @@ export const Followers = () => (
   <div>
     <List variant="numbered" items={stepsItems} />
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Followers in play
       </Heading>
@@ -226,7 +224,7 @@ export const Followers = () => (
       <List variant="bullet" items={followersAtZeroHPItems} />
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         *Group* followers
       </Heading>
@@ -252,7 +250,7 @@ export const Followers = () => (
       </Text>
     </div>
 
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Abstracting group exchanges
       </Heading>

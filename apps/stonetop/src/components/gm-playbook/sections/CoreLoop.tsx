@@ -1,6 +1,5 @@
 import { memo } from 'react';
 import { Heading, Text, List } from '@/components/ui';
-import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const CoreLoop = memo(() => (
   <div>
@@ -63,7 +62,7 @@ export const CoreLoop = memo(() => (
         </>,
       ]}
     />
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Other things to do
       </Heading>

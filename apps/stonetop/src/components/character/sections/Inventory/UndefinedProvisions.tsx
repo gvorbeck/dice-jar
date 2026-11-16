@@ -1,6 +1,5 @@
 import { useCallback, memo } from 'react';
 import { Checkbox } from '@/components/ui';
-import './UndefinedProvisions.css';
 
 interface UndefinedProvisionsProps {
   total: number;

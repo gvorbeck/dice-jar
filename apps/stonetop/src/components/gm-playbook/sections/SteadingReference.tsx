@@ -10,7 +10,6 @@ import {
   BARRIER_PASS_NAMES_STR,
 } from '@/lib/npcNames';
 import type { SteadingData } from '@/types';
-import './SteadingReference.css';
 
 const TRAITS_COL_A = [
   'all thumbs',
@@ -158,7 +157,7 @@ export const NpcTraits = () => (
     <Text size="xs" color="muted">
       Assign as needed; choose from this list or make up your own.
     </Text>
-    <div className="steading-reference-traits-grid">
+    <div className="steading-reference-traits-grid playbook-shared-grid2">
       <ul className="steading-reference-traits-list" aria-label="NPC traits (first half)">
         {TRAITS_COL_A.map((t) => (
           <li key={t} className="steading-reference-trait">

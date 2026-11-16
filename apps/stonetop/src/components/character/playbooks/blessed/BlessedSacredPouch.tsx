@@ -5,7 +5,6 @@ import { bigMagicCount } from '@/lib/bigMagic';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { resolvePlaybookFeatures, featurePatch } from '@/lib/resolvePlaybookFeatures';
 import type { PlaybookSectionProps } from '@/types';
-import './BlessedSacredPouch.css';
 
 interface IsLine {
   key: string;

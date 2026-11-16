@@ -6,7 +6,6 @@ import { ALL_PLAYBOOK_MOVES } from '@/lib/moves/allPlaybookMoves';
 import { LIGHTBEARER_INVOCATIONS } from '@/lib/moves/lightbearerInvocations';
 import { REVENANT_MOVES, GHOST_MOVES, THRALL_MOVES, THRALL_MARK_DEFINITIONS } from '@/lib/moves/inserts';
 import type { MoveDefinition } from '@/types';
-import './MoveSearch.css';
 
 const ALL_MOVES = [
   ...BASIC_MOVES,
@@ -63,7 +62,7 @@ export const MoveSearch = () => {
               No moves match "{query}".
             </Text>
           ) : (
-            <Text as="span" className="move-search-visually-hidden">
+            <Text as="span" className="move-search-visually-hidden field-sr-only">
               {results.length} move{results.length === 1 ? '' : 's'} found.
             </Text>
           ))}

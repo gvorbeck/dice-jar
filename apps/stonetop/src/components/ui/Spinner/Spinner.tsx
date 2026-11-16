@@ -1,5 +1,4 @@
 import { cn } from '@dice-jar/cn';
-import './Spinner.css';
 
 interface Props {
   className?: string;

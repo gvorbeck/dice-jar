@@ -4,7 +4,6 @@ import type { SteadingData, GmImprovement } from '@/types';
 import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { PredefinedImprovementsList } from './PredefinedImprovementsList';
 import { GmImprovementSlots } from './GmImprovementSlots';
-import './SteadingImprovements.css';
 
 interface SteadingImprovementsProps {
   improvements: Record<string, boolean> | undefined;

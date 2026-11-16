@@ -4,7 +4,6 @@ import { MINOR_ARCANA } from '@/lib/arcana/minor';
 import type { MinorArcanum, ArcanaMinorEntry } from '@/types';
 import { MinorArcanaCard } from './MinorArcanaCard';
 import { AddArcanaModal } from './AddArcanaModal';
-import './ArcanaPanel.css';
 
 interface MinorArcanaCardRowProps {
   entry: ArcanaMinorEntry;

@@ -5,7 +5,6 @@ import { useOptimisticField } from '@/hooks/useOptimisticField';
 import type { ArcanaMajorEntry, ArcanaMinorEntry, PlaybookSectionProps } from '@/types';
 import { Spinner } from '@/components/ui';
 import { ArcanaSubTabs, type ArcanaSubTab } from './ArcanaSubTabs';
-import './ArcanaTab.css';
 
 // The character tab lives in the first hash segment (e.g. "#arcana", from useHashTabs); the Arcana
 // sub-tab lives in a second "&"-delimited segment ("#arcana&major") so a refresh or shared link keeps

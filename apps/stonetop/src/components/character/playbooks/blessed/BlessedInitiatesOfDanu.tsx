@@ -8,7 +8,6 @@ import { Input, Radio, RadioGroup, Text, CheckboxGroup } from '@/components/ui';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { StatBox, LoyaltyRow } from '../shared/CrewWidgets';
 import type { PlaybookSectionProps } from '@/types';
-import './BlessedInitiatesOfDanu.css';
 
 interface PickLine {
   key: string;
@@ -234,7 +233,7 @@ const InitiateSection = memo(
               </RadioGroup>
               {line.key === 'pronoun' && (
                 <Input
-                  className="blessed-initiates-of-danu-pronoun-input"
+                  className="blessed-initiates-of-danu-pronoun-input field-focus-visible"
                   type="text"
                   value={picks['pronoun_text'] ?? ''}
                   onChange={handlePronounTextChange}

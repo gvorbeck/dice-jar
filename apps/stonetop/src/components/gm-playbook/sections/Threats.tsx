@@ -1,11 +1,10 @@
 import { memo } from 'react';
 import { Heading, Text, List } from '@/components/ui';
-import '@/pages/GmPlaybook/GmPlaybook.css';
 
 export const Threats = memo(() => (
   <div>
     <Text size="xs">Threats are the lingering problems that cause trouble for the PCs, the steading, the region, or even the world.</Text>
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Text size="xs">
         Write up threats after the first session, based on what the players told you as they introduced their characters. Write new threats
         between sessions when…
@@ -19,7 +18,7 @@ export const Threats = memo(() => (
         ]}
       />
     </div>
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Write up a threat
       </Heading>
@@ -40,7 +39,7 @@ export const Threats = memo(() => (
         ]}
       />
     </div>
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Update threats
       </Heading>
@@ -58,11 +57,11 @@ export const Threats = memo(() => (
         ]}
       />
     </div>
-    <div className="gm-playbook-subsection">
+    <div className="gm-playbook-subsection playbook-shared-subsection">
       <Heading as="h3" size="sm">
         Threat moves
       </Heading>
-      <div className="gm-playbook-threat-moves-grid">
+      <div className="gm-playbook-threat-moves-grid playbook-shared-grid2">
         <div>
           <Heading as="h4" size="sm" className="gm-playbook-threat-type">
             Affliction

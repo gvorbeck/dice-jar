@@ -1,5 +1,4 @@
 import { List, Text } from '@/components/ui';
-import './FlowOfPlay.css';
 
 const NodeLabel = ({ id }: { id: string }) => <span className="flow-of-play-node-label">{id}</span>;
 

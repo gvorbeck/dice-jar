@@ -1,8 +1,6 @@
 import { cn } from '@dice-jar/cn';
 import { Heading, List, Text, Checkbox } from '@/components/ui';
 import { IMPROVEMENTS, type CheckItem } from './steadingImprovementsData';
-import './improvementCard.css';
-import './PredefinedImprovementsList.css';
 
 const makeReqKeys = (impId: string, blockIdx: number, itemIdx: number, count: number) =>
   Array.from({ length: count }, (_, i) => `${impId}__req__b${blockIdx}i${itemIdx}__${i}`);

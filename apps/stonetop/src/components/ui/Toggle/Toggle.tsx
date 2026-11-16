@@ -1,6 +1,5 @@
 import { useId, type InputHTMLAttributes } from 'react';
 import { cn } from '@dice-jar/cn';
-import './Toggle.css';
 
 interface ToggleWithLabel extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label: React.ReactNode;
@@ -20,7 +19,7 @@ export const Toggle = ({ label, className, ...props }: ToggleProps) => {
 
   return (
     <label htmlFor={id} className={cx}>
-      <input id={id} type="checkbox" role="switch" className="toggle-input" {...props} />
+      <input id={id} type="checkbox" role="switch" className="toggle-input field-sr-only" {...props} />
       <span className="toggle-track">
         <span className="toggle-thumb" />
       </span>

@@ -1,7 +1,6 @@
 import { cn } from '@dice-jar/cn';
 import { isValidElement } from 'react';
 import { Text } from '../Text/Text';
-import './List.css';
 
 type ListVariant = 'bullet' | 'numbered' | 'ellipses';
 

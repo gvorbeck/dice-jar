@@ -5,7 +5,6 @@ import { applyConsequenceActions, hasConsequenceActions } from '@/lib/consequenc
 import type { MajorArcanum, ArcanaMajorEntry, Creature, CharacterData } from '@/types';
 import { MajorArcanaCard } from './MajorArcanaCard';
 import { AddArcanaModal } from './AddArcanaModal';
-import './ArcanaPanel.css';
 
 // Set an entry's marks and latch `everUnlocked` the first time marks reach the unlock threshold (the
 // tracker's `unlockAt`, or its `max` when unspecified). Once latched it never clears, so an arcanum that

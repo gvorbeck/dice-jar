@@ -5,7 +5,6 @@ import type { NpcRelationship } from '@/types';
 import { generateId } from '@/lib/id';
 import { encodeTarget, decodeTarget, filterLinkedTargets } from './npcData';
 import type { RelTarget } from './npcData';
-import './RelationshipRepeater.css';
 
 interface RelationshipRowProps {
   rel: NpcRelationship;

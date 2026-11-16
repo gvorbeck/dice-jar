@@ -1,7 +1,6 @@
 import { memo, useCallback } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Checkbox, Input, UseDots } from '@/components/ui';
-import './CrewWidgets.css';
 
 interface StatBoxProps {
   label: React.ReactNode;
@@ -37,7 +36,7 @@ export const StatBox = memo(
     className,
     children,
   }: StatBoxProps) => {
-    const inputCx = cn('crew-widgets-stat-input', compact && 'crew-widgets-stat-input-sm');
+    const inputCx = cn('crew-widgets-stat-input field-focus-visible', compact && 'crew-widgets-stat-input-sm');
 
     return (
       <div className={cn('crew-widgets-stat-box', className)}>
@@ -109,7 +108,7 @@ const GearRowItem = memo(
       <div className="crew-widgets-gear-row">
         <Checkbox variant="provision" weight={weight} checked={checked} onChange={handleChecked} aria-label={ariaLabel} />
         <Input
-          className="crew-widgets-gear-input"
+          className="crew-widgets-gear-input field-focus-visible"
           type="text"
           value={text}
           placeholder="Item…"

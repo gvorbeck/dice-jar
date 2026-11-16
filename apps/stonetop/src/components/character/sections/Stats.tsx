@@ -8,7 +8,6 @@ import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { STAT_GROUPS, STATS } from '@/lib/constants';
 import { statCap } from '@/lib/statCap';
 import type { CharacterData } from '@/types';
-import './Stats.css';
 
 interface StatBoxProps {
   label: string;
@@ -43,7 +42,7 @@ const StatBox = ({ label, abbr, statKey, value, cap, onChange, onBlur }: StatBox
       </label>
       <Input
         id={`stat-${abbr}`}
-        className="stats-stat-input"
+        className="stats-stat-input field-focus-visible"
         type="number"
         value={value}
         max={cap}
@@ -75,7 +74,7 @@ const InfoBox = ({ label, statKey, value, isStatic, min, onChange, onBlur }: Inf
       <span className="stats-info-static">{value}</span>
     ) : (
       <Input
-        className="stats-info-input"
+        className="stats-info-input field-focus-visible"
         type="number"
         value={value}
         min={min}

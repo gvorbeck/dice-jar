@@ -1,6 +1,5 @@
 import { cn } from '@dice-jar/cn';
 import { Text } from '../Text/Text';
-import './UseDots.css';
 
 interface UseDotsProps {
   total: number;
@@ -16,7 +15,7 @@ interface UseDotsProps {
 export const UseDots = ({ total, checked, onChange, disabled, label, ariaLabel }: UseDotsProps) => {
   const dots = Array.from({ length: total }, (_, i) => {
     const filled = i < checked;
-    const dotCx = cn('use-dots-use-dot', filled && 'use-dots-use-dot-filled');
+    const dotCx = cn('use-dots-use-dot field-focus-visible', filled && 'use-dots-use-dot-filled');
     return (
       <button
         key={`dot-${total}-${i}`}

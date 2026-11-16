@@ -15,7 +15,6 @@ import { LOYAL_TO_THE_END } from '@/lib/moves/ranger';
 import { LoyaltyRow } from '../shared/CrewWidgets';
 import { useToast } from '@/components/app';
 import type { PlaybookSectionProps, RadioOption } from '@/types';
-import './RangerAnimalCompanion.css';
 
 const ANIMAL_INSTINCT_OPTIONS: RadioOption[] = [
   { value: 'To bully and threaten', label: 'To bully and threaten', description: '' },

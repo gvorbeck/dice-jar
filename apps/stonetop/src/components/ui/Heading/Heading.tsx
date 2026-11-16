@@ -1,7 +1,6 @@
 import { type ReactNode } from 'react';
 import { cn } from '@dice-jar/cn';
 import { parseInlineMarkdown } from '@/lib/parseMarkdown';
-import './Heading.css';
 
 interface HeadingProps {
   as?: 'h1' | 'h2' | 'h3' | 'h4';

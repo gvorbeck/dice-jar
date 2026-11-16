@@ -9,7 +9,6 @@ import { parseDescriptionTasks } from './arcanaParsing';
 import { getMarkedFollowerCost } from '@/lib/consequenceActions';
 import { useArcanumGating } from './useArcanumGating';
 import { ArcanaBackSection, MysteryMoveBlock, TaskRow } from './cards';
-import './arcanaCard.css';
 
 interface MajorArcanaCardProps {
   arcanum: MajorArcanum;

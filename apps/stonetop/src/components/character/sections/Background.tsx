@@ -6,7 +6,6 @@ import { useOptimisticField } from '@/hooks/useOptimisticField';
 import { PlaybookSection } from '@/components/playbook/PlaybookSection';
 import { BackgroundOptionItem } from './BackgroundOption';
 import type { BackgroundOption, CharacterData } from '@/types';
-import './Background.css';
 
 interface BackgroundProps {
   playbookKey?: string;
