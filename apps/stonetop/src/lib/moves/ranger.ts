@@ -203,7 +203,7 @@ export const RANGER_MOVES: MoveDefinition[] = [
     body: [
       {
         kind: 'para',
-        text: 'The grunts, barks, chirps, and calls of natural beasts are a language to you. You can understand their intentions and communicate basic ideas. When you **Persuade a beast**, you can choose to roll +WIS.',
+        text: 'The grunts, barks, chirps, and calls of natural beasts are as a language to you. You can understand their intentions and communicate basic ideas. When you **Persuade a beast**, you can choose to roll +WIS.',
       },
     ],
   },
@@ -287,7 +287,7 @@ export const RANGER_MOVES: MoveDefinition[] = [
     body: [
       {
         kind: 'para',
-        text: 'When ***a journey causes you to Defy Danger or Struggle as One*** you also learn or discover something interesting and useful—ask the GM what.',
+        text: 'When ***a journey causes you to Defy Danger or Struggle as One***, **on a 10+**, you also learn or discover something interesting and useful—ask the GM what.',
       },
     ],
   },
@@ -305,3 +305,16 @@ export const RANGER_MOVES: MoveDefinition[] = [
     ],
   },
 ];
+
+// The Animal Companion insert's own move, always in play (Book 1, p. 143). Not a pickable playbook move.
+export const LOYAL_TO_THE_END: MoveDefinition = {
+  id: 'ranger-loyal-to-the-end',
+  name: 'Loyal to the End',
+  body: [
+    {
+      kind: 'para',
+      text: "When **your companion is at 0 HP**, roll +0, with advantage if it holds Loyalty: **on a 10+**, it'll be fine once it regains any HP; **on a 7-9**, it gets the injured tag; **on a 6-**, it's injured and will die soon unless someone saves it.",
+    },
+  ],
+  citation: 'Book 1, p. 143',
+};

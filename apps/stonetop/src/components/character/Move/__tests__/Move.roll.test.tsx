@@ -4,6 +4,7 @@ import type { ReactElement } from 'react';
 import { Move } from '../Move';
 import { CharacterRollContext } from '../CharacterRollContext';
 import type { CharacterData, MoveDefinition } from '@/types';
+import { LOYAL_TO_THE_END } from '@/lib/moves/ranger';
 
 const rollableMove: MoveDefinition = {
   id: 'test-rollable',
@@ -15,11 +16,23 @@ const rollableMove: MoveDefinition = {
 };
 
 const renderInSheet = (ui: ReactElement) =>
-  render(<CharacterRollContext.Provider value={{ data: {} as CharacterData, onRoll: vi.fn() }}>{ui}</CharacterRollContext.Provider>);
+  render(
+    <CharacterRollContext.Provider value={{ data: {} as CharacterData, onRoll: vi.fn(), burn: { available: false, onBurn: vi.fn() } }}>
+      {ui}
+    </CharacterRollContext.Provider>,
+  );
 
 const noop = () => {};
 
+// Book 1, p. 143: Loyal to the End says "roll +0", a bare 2d6 with no stat to name.
+const loyalToTheEnd = LOYAL_TO_THE_END;
+
 describe('Move roll affordance gating', () => {
+  it('shows a roll button on Loyal to the End (roll +0)', () => {
+    renderInSheet(<Move title={loyalToTheEnd.name} move={loyalToTheEnd} />);
+    expect(screen.getByLabelText('Roll')).toBeInTheDocument();
+  });
+
   // Regression: basic / special / follower moves render with no `selection` prop — they are always
   // the character's — but were treated as "unselected" and lost their roll button entirely.
   it('shows the roll button on a display-only move (no selection control)', () => {

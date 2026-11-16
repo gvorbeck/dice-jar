@@ -11,6 +11,14 @@ export interface RollResult {
   mode: RollMode;
 }
 
+// Advantage and disadvantage are binary and cancel each other (Book 1, pp. 40, 74-75, 230). `chosen` is what the player
+// has from moves, gear and the GM; a marked debility on the rolled stat is a source of disadvantage on top of that.
+export const effectiveMode = (chosen: RollMode, debilityDisadvantage: boolean): RollMode => {
+  const adv = chosen === 'adv';
+  const dis = chosen === 'dis' || debilityDisadvantage;
+  return adv === dis ? 'normal' : adv ? 'adv' : 'dis';
+};
+
 const d6 = (): number => Math.floor(Math.random() * 6) + 1;
 
 // Read a set of already-rolled dice under a mode. Normal is a plain 2d6; advantage keeps the two highest

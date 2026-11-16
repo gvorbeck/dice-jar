@@ -2,8 +2,10 @@ import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Text } from '@/components/ui';
 import type { RollBand, RollStat } from '@/types';
-import { bandFor, remodeRoll, rollAction, type RollMode, type RollResult } from '@/lib/rollDice';
+import { bandFor, effectiveMode, remodeRoll, rollAction, type RollMode, type RollResult } from '@/lib/rollDice';
 import { generateId } from '@/lib/id';
+import { BURN_BRIGHTLY_COST } from '@/lib/burnBrightly';
+import { useCharacterRollOptional } from './CharacterRollContext';
 import styles from './RollAffordance.module.css';
 
 // The subset of a completed roll a parent needs to log. Kept structural so Move doesn't depend on the
@@ -22,6 +24,7 @@ export interface RollReport {
   total: number;
   mode: RollMode;
   band: string | null;
+  burned?: boolean;
 }
 
 // A resolved stat option for a multi-stat move (Defy Danger, Interfere, Heavy Death's Door).
@@ -90,15 +93,28 @@ export const RollAffordance = ({
   const activeResource = isMultiStat && selectedStat ? selectedStat.resource : initialResource;
 
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<RollMode>(initialDebilityDis ? 'dis' : 'normal');
+  // What the player has from moves, gear or the GM. A marked debility adds disadvantage on top; effectiveMode combines them.
+  const [chosen, setChosen] = useState<RollMode>('normal');
+  const activeDebility = isMultiStat && selectedStat ? selectedStat.debilityDisadvantage : initialDebilityDis;
+  const mode = effectiveMode(chosen, activeDebility);
   const [result, setResult] = useState<RollResult | null>(null);
   const [tumbling, setTumbling] = useState(false);
   const [adjust, setAdjust] = useState(0);
+  const [burned, setBurned] = useState(false);
+  // The ref is the source of truth for logging and for the once-per-roll guard: state would still be stale in a
+  // second click, or in the report() that doRoll runs in the same handler that clears it.
+  const burnedRef = useRef(false);
+  const [paying, setPaying] = useState(false);
+  const resultRef = useRef<RollResult | null>(null);
+  const burn = useCharacterRollOptional()?.burn;
   const tumbleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const rollId = useRef('');
   const spare = useRef<number | null>(null);
 
   useEffect(() => () => clearTimeout(tumbleTimer.current), []);
+  useEffect(() => {
+    resultRef.current = result;
+  }, [result]);
 
   const report = useCallback(
     (next: RollResult, stat: RollStat, resource: string | undefined) => {
@@ -112,6 +128,7 @@ export const RollAffordance = ({
         total: next.total,
         mode: next.mode,
         band: bandFor(next.total, bands)?.label ?? null,
+        ...(burnedRef.current ? { burned: true } : {}),
       });
     },
     [bands, onRoll],
@@ -121,6 +138,8 @@ export const RollAffordance = ({
     (rollMode: RollMode, mod: number, stat: RollStat, resource: string | undefined) => {
       const next = rollAction(mod + adjust, rollMode);
       rollId.current = generateId();
+      burnedRef.current = false;
+      setBurned(false);
       spare.current = null;
       setResult(next);
       setTumbling(true);
@@ -141,8 +160,8 @@ export const RollAffordance = ({
   const handleStatClick = useCallback(
     (option: StatOption) => {
       setSelectedStat(option);
-      const newMode = option.debilityDisadvantage ? 'dis' : 'normal';
-      setMode(newMode);
+      const newMode = effectiveMode('normal', option.debilityDisadvantage);
+      setChosen('normal');
       setResult(null);
       spare.current = null;
       if (!open) setOpen(true);
@@ -153,16 +172,38 @@ export const RollAffordance = ({
 
   const handleMode = useCallback(
     (next: RollMode) => {
-      if (next === mode) return;
-      setMode(next);
-      if (!result) return;
-      const remoded = remodeRoll(result, next, spare.current);
+      if (next === chosen) return;
+      setChosen(next);
+      const nextMode = effectiveMode(next, activeDebility);
+      if (!result || nextMode === result.mode) return;
+      const remoded = remodeRoll(result, nextMode, spare.current);
       spare.current = remoded.dice[2] ?? result.dice[2] ?? spare.current;
       setResult(remoded);
       report(remoded, activeStat, activeResource);
     },
-    [mode, result, report, activeStat, activeResource],
+    [chosen, activeDebility, result, report, activeStat, activeResource],
   );
+
+  // Burn Brightly (Book 1, p. 231): spend 2 XP after the roll for +1, once per roll. The +1 goes into the roll's
+  // mod, so a later switch of advantage/disadvantage keeps it, and the log entry is updated in place.
+  const handleBurn = useCallback(async () => {
+    if (!result || burnedRef.current || !burn) return;
+    burnedRef.current = true;
+    setPaying(true);
+    try {
+      await burn.onBurn(); // the XP is paid first; a failed payment (save error, or the XP is gone) earns no bonus
+    } catch {
+      burnedRef.current = false;
+      setPaying(false);
+      return;
+    }
+    setPaying(false);
+    const current = resultRef.current ?? result;
+    const next = { ...current, mod: current.mod + 1, total: current.total + 1 };
+    setBurned(true);
+    setResult(next);
+    report(next, activeStat, activeResource);
+  }, [result, burn, report, activeStat, activeResource]);
 
   const handleAdjust = useCallback((delta: number) => setAdjust((a) => Math.min(ADJUST_MAX, Math.max(ADJUST_MIN, a + delta))), []);
 
@@ -195,6 +236,7 @@ export const RollAffordance = ({
                   icon="dice"
                   className={clsx(styles.trigger, isActive && styles.statTriggerActive)}
                   onClick={() => handleStatClick(option)}
+                  disabled={paying}
                   aria-label={`Roll ${optLabel}`.trim()}
                   aria-pressed={isActive}
                 >
@@ -214,6 +256,7 @@ export const RollAffordance = ({
             icon="dice"
             className={triggerCx}
             onClick={handleButton}
+            disabled={paying}
             aria-label={open ? 'Re-roll' : `Roll ${label}`.trim()}
             title={open ? 'Re-roll' : undefined}
           >
@@ -230,16 +273,27 @@ export const RollAffordance = ({
             <button
               key={m.value}
               type="button"
-              className={clsx(styles.modeButton, mode === m.value && styles.modeButtonActive)}
-              aria-pressed={mode === m.value}
+              className={clsx(styles.modeButton, chosen === m.value && styles.modeButtonActive)}
+              aria-pressed={chosen === m.value}
               aria-label={m.value === 'normal' ? m.title : undefined}
               title={m.title}
               onClick={() => handleMode(m.value)}
+              disabled={paying}
             >
               {m.label}
             </button>
           ))}
         </div>
+
+        {activeDebility && (
+          <Text as="span" size="xs" color="muted" className={styles.modeNote}>
+            {chosen === 'adv'
+              ? 'Advantage cancels your debility.'
+              : chosen === 'dis'
+                ? 'Disadvantage doesn’t stack with your debility.'
+                : 'Debility: disadvantage.'}
+          </Text>
+        )}
 
         <div className={styles.adjust} role="group" aria-label="Roll modifier">
           <Button
@@ -280,6 +334,11 @@ export const RollAffordance = ({
             </Text>
             <span className={clsx(styles.total, !tumbling && styles.totalSettled)}>= {result.total}</span>
           </div>
+          {burn?.available && !burned && !tumbling && (
+            <Button variant="ghost" size="sm" onClick={handleBurn} disabled={paying}>
+              Burn Brightly (−{BURN_BRIGHTLY_COST} XP, +1)
+            </Button>
+          )}
           {hitBand && (
             <Text as="span" size="xs" weight="semibold" color="accent" className={styles.band}>
               ▸ {hitBand.label}

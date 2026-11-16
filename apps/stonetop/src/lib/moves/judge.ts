@@ -164,7 +164,7 @@ export const JUDGE_MOVES: MoveDefinition[] = [
     body: [
       {
         kind: 'para',
-        text: 'When you **strike a thing of supernatural chaos**, roll +WIS: **on a 10+**, deal your damage and choose 1 from the list below; **on a 7-9**, deal your damage and choose 1, but you also expose yourself to harm or unwanted attention.',
+        text: 'When you **strike a thing of supernatural chaos**, roll +WIS: **on a 10+**, deal your damage and choose 1 from the list below; **on a 7-9**, deal damage and choose 1, but you also expose yourself to harm or unwanted attention.',
       },
       {
         kind: 'list',

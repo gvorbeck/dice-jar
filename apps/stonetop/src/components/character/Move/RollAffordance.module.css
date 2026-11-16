@@ -279,3 +279,7 @@
     transform: rotate(-360deg);
   }
 }
+
+.modeNote {
+  align-self: center;
+}

@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { rollAction, remodeRoll, statModifier, resolveRollStat, bandFor } from '../rollDice';
+import { rollAction, remodeRoll, statModifier, resolveRollStat, bandFor, effectiveMode } from '../rollDice';
 import type { CharacterData, RollBand } from '@/types';
 
 const BANDS: RollBand[] = [
@@ -135,5 +135,19 @@ describe('bandFor', () => {
 
   it('returns null when no band matches', () => {
     expect(bandFor(8, [{ label: '10+', min: 10, max: null }])).toBeNull();
+  });
+});
+
+// Book 1, pp. 40, 74-75, 230: advantage and disadvantage cancel; neither stacks.
+describe('effectiveMode', () => {
+  it.each([
+    ['normal', false, 'normal'],
+    ['adv', false, 'adv'],
+    ['dis', false, 'dis'],
+    ['normal', true, 'dis'],
+    ['adv', true, 'normal'],
+    ['dis', true, 'dis'],
+  ] as const)('a chosen %s roll with debility %s is %s', (chosen, debility, expected) => {
+    expect(effectiveMode(chosen, debility)).toBe(expected);
   });
 });

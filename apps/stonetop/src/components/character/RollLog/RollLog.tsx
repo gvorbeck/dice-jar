@@ -57,6 +57,7 @@ export const RollLog = ({ rolls }: RollLogProps) => {
           <Text as="span" size="sm" className={clsx(styles.result, roll.breakdown && styles.resultWrap)}>
             {roll.breakdown ?? diceExpr(roll)} = <span className={styles.total}>{roll.total}</span>
             {roll.band && <span className={styles.band}> ({roll.band})</span>}
+            {roll.burned && <span className={styles.band}> burned brightly</span>}
           </Text>
         </li>
       ))}

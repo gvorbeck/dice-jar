@@ -286,7 +286,7 @@ export const FOX_MOVES: MoveDefinition[] = [
     body: [
       {
         kind: 'para',
-        text: 'When you ***try to escape being caught or controlled***, treat a 6- as a 7-9. On a 12+, say how you turn the tables or use the circumstances to your advantage.',
+        text: 'When you ***roll to escape being caught or controlled***, treat a 6- as a 7-9. On a 12+, say how you turn the tables or use the circumstances to your advantage.',
       },
     ],
   },

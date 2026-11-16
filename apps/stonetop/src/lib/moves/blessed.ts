@@ -67,7 +67,7 @@ export const BLESSED_MOVES: MoveDefinition[] = [
     body: [
       {
         kind: 'para',
-        text: 'When you **call on the world itself to bind a spirit or a perversion of nature**, spend 1 Stock and roll +WIS: **on a 7+**, roots, vines, and earth pull at them, and they pick 1; **on a 10+**, as a 7-9, but both apply.',
+        text: 'When you **call on the world itself to bind a spirit or a perversion of nature**, spend 1 Stock and roll +WIS: **on a 7-9**, roots, vines, and earth pull at them, and they pick 1; **on a 10+**, as a 7-9, but both apply.',
       },
       {
         kind: 'list',

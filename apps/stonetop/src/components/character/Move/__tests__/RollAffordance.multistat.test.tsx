@@ -69,28 +69,30 @@ describe('RollAffordance multi-stat picker', () => {
     expect(screen.getByLabelText('Roll +STR')).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('auto-sets disadvantage when switching to a debilitated stat', async () => {
+  it('rolls the debilitated stat with disadvantage and notes it', async () => {
     fixDice();
+    const onRoll = vi.fn();
     const user = userEvent.setup();
-    render(<RollAffordance stat="STR" bands={BANDS} mod={2} debilityDisadvantage={false} statOptions={OPTIONS} />);
+    render(<RollAffordance stat="STR" bands={BANDS} mod={2} debilityDisadvantage={false} statOptions={OPTIONS} onRoll={onRoll} />);
 
     await user.click(screen.getByLabelText('Roll +STR'));
-    expect(screen.getByRole('button', { name: 'Dis' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.queryByText('Debility: disadvantage.')).not.toBeInTheDocument();
 
     await user.click(screen.getByLabelText('Roll +CON'));
-    expect(screen.getByRole('button', { name: 'Dis' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Debility: disadvantage.')).toBeInTheDocument();
+    expect(onRoll.mock.calls[1]![0]!).toMatchObject({ stat: 'CON', mode: 'dis' });
   });
 
-  it('resets mode to normal when switching to a non-debilitated stat', async () => {
+  it('drops the debility note and the chosen mode when switching to a stat without one', async () => {
     fixDice();
     const user = userEvent.setup();
     render(<RollAffordance stat="STR" bands={BANDS} mod={2} debilityDisadvantage={false} statOptions={OPTIONS} />);
 
     await user.click(screen.getByLabelText('Roll +CON'));
-    expect(screen.getByRole('button', { name: 'Dis' })).toHaveAttribute('aria-pressed', 'true');
-
+    await user.click(screen.getByRole('button', { name: 'Adv' }));
     await user.click(screen.getByLabelText('Roll +STR'));
     expect(screen.getByLabelText('Normal — 2 dice')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByText(/debility/i)).not.toBeInTheDocument();
   });
 
   it('includes the resource in the report for a resource option', async () => {

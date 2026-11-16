@@ -49,7 +49,7 @@ npm ci
 npm run check
 ```
 
-`npm ci` also installs the git hooks. One app's script: `npm run dev -w apps/<app>`.
+`npm ci` also installs the git hooks. One app's script: `npm run dev -w apps/<app>`. To start an app's dev server: `npm run dg` (delta-green) or `npm run st` (stonetop).
 
 | Root script                                                                     |                                                                                                                                                    |
 | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |

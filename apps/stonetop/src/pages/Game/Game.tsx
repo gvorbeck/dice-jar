@@ -120,10 +120,32 @@ const GameContent = ({
   const [moveAnnouncement, setMoveAnnouncement] = useState('');
   const orderedCharactersRef = useRef<Character[]>(g.characters);
 
+  // While a reorder is being saved the local order is the truth: a snapshot that still has the old order must not
+  // snap the list back. Once the save settles (done or failed), the latest server order wins again.
+  const latestCharactersRef = useRef<Character[]>(g.characters);
+  const savesInFlight = useRef(0);
+
   useEffect(() => {
+    latestCharactersRef.current = g.characters;
+    if (savesInFlight.current > 0) return;
     setOrderedCharacters(g.characters);
     orderedCharactersRef.current = g.characters;
   }, [g.characters]);
+
+  const saveOrder = useCallback(
+    (next: Character[]) => {
+      savesInFlight.current += 1;
+      onReorderCharacters(next)
+        .catch(() => {})
+        .finally(() => {
+          savesInFlight.current -= 1;
+          if (savesInFlight.current > 0) return;
+          setOrderedCharacters(latestCharactersRef.current);
+          orderedCharactersRef.current = latestCharactersRef.current;
+        });
+    },
+    [onReorderCharacters],
+  );
 
   const handleRemoveCharacter = useCallback((character: Character) => setRemovingCharacter(character), []);
   const handleCloseRemoveModal = useCallback(() => setRemovingCharacter(null), []);
@@ -148,9 +170,9 @@ const GameContent = ({
       const moved = next[to]!;
       const label = moved.name?.trim() || getPlaybook(moved.playbook)?.label || moved.playbook;
       setMoveAnnouncement(`${label} moved to position ${to + 1} of ${next.length}.`);
-      onReorderCharacters(next).catch(() => {});
+      saveOrder(next);
     },
-    [onReorderCharacters],
+    [saveOrder],
   );
 
   const showGrip = orderedCharacters.length > 1;
@@ -166,7 +188,7 @@ const GameContent = ({
       const next = [...rest.slice(0, at), ...picked, ...rest.slice(at)];
       orderedCharactersRef.current = next;
       setOrderedCharacters(next);
-      onReorderCharacters(next).catch(() => {});
+      saveOrder(next);
     },
   });
 

@@ -82,7 +82,7 @@ export const LIGHTBEARER_INVOCATIONS: MoveDefinition[] = [
       },
       {
         kind: 'para',
-        text: '**Empowered**: illusions in the light are dispelled and shapeshifters are momentarily stunned.',
+        text: '**Empowered**: illusions in the light are dispelled and shapeshifters in the light are momentarily stunned.',
       },
     ],
   },

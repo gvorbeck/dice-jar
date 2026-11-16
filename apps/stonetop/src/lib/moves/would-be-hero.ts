@@ -211,7 +211,7 @@ export const WOULD_BE_HERO_MOVES: MoveDefinition[] = [
     body: [
       {
         kind: 'para',
-        text: "Choose a move from any other playbook, as long as you meet its requirements. You can pick a different playbook each time. You can't take Improved Stat or Superior Stat.",
+        text: "Choose a move from any other playbook, as long as you meet its requirements. You can pick from a different playbook each time. You can't take Improved Stat or Superior Stat.",
       },
     ],
   },

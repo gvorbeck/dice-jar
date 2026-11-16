@@ -121,3 +121,8 @@ export const computeTotalLoad = (data: CharacterData | undefined, minorWeights: 
   }, 0);
   return namedLoad + possessionLoad + arcanaMinorLoad + arcanaMajorLoad + (data?.inventoryUndefined ?? 0);
 };
+
+export type LoadBand = 'light' | 'normal' | 'heavy' | 'overloaded';
+
+// Book 1, pp. 77 and 326-327.
+export const loadBand = (load: number): LoadBand => (load <= 3 ? 'light' : load <= 6 ? 'normal' : load <= 9 ? 'heavy' : 'overloaded');

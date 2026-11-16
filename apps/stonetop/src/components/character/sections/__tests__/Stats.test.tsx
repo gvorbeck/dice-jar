@@ -120,3 +120,39 @@ describe('Stats — XP save ownership (frozen-tab regression #xp-wipe)', () => {
     expect(onSave).toHaveBeenLastCalledWith(expect.objectContaining({ statXp: '5' }));
   });
 });
+
+describe('Stats — stat cap (Book 1, pp. 52, 106-107)', () => {
+  const base = {
+    statHp: '18',
+    statStr: '2',
+    statDex: '1',
+    statInt: '1',
+    statWis: '0',
+    statCon: '0',
+    statCha: '-1',
+    statXp: '0',
+    statLevel: '1',
+  } as CharacterData;
+
+  it('stops a stat at +2 until Superior Stat is taken', async () => {
+    setup(base);
+    const str = screen.getByLabelText('Strength') as HTMLInputElement;
+    await userEvent.clear(str);
+    await userEvent.type(str, '3');
+    expect(str.value).toBe('2');
+  });
+
+  it('allows +3 once Superior Stat is taken', async () => {
+    setup({ ...base, typeMoves: { 'judge-superior-stat': true } });
+    const str = screen.getByLabelText('Strength') as HTMLInputElement;
+    await userEvent.clear(str);
+    await userEvent.type(str, '3');
+    expect(str.value).toBe('3');
+  });
+
+  it('flags a saved stat that is above the cap without changing it', () => {
+    setup({ ...base, statStr: '3' });
+    expect((screen.getByLabelText('Strength') as HTMLInputElement).value).toBe('3');
+    expect(screen.getByRole('status')).toHaveTextContent('above +2');
+  });
+});

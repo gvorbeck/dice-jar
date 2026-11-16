@@ -77,7 +77,9 @@ const SeekerCollection = lazy(() => import('@/components/character/playbooks/see
 const WouldBeHeroFearAnger = lazy(() =>
   import('@/components/character/playbooks/would-be-hero').then((m) => ({ default: m.WouldBeHeroFearAnger })),
 );
-import type { Character, CharacterData, GameSession, LoggedRoll, NotesLock, PlaybookType, PlaybookFeatures } from '@/types';
+import { BURN_BRIGHTLY_COST, canBurnBrightly, requireBurnBrightly } from '@/lib/burnBrightly';
+import type { SheetGuard } from '@/lib/statDeltas';
+import type { AdditiveStat, Character, CharacterData, GameSession, LoggedRoll, NotesLock, PlaybookType, PlaybookFeatures } from '@/types';
 import type { RollReport } from '@/components/character/Move/RollAffordance';
 import { CharacterRollContext } from '@/components/character/Move/CharacterRollContext';
 import styles from './CharacterPlaybook.module.css';
@@ -224,7 +226,7 @@ interface SheetProps {
   nav: GameNav;
   updateCharacterName: (characterId: string, name: string) => Promise<void>;
   updateCharacterData: (characterId: string, data: Partial<CharacterData>) => Promise<void>;
-  adjustCharacterStats: (characterId: string, deltas: Partial<Record<'statArmor' | 'statHp', number>>) => Promise<void>;
+  adjustCharacterStats: (characterId: string, deltas: Partial<Record<AdditiveStat, number>>, guard?: SheetGuard) => Promise<void>;
   logRoll: (roll: LoggedRoll) => Promise<void>;
   notesHtml: string | undefined;
   notesLock: NotesLock | undefined;
@@ -318,6 +320,7 @@ const CharacterSheet = ({
         total: report.total,
         mode: report.mode,
         band: report.band,
+        burned: report.burned,
         createdAt,
       };
       logRoll(roll).catch(() => {});
@@ -327,7 +330,15 @@ const CharacterSheet = ({
 
   // One roll context for the whole sheet, so every Move — Moves tab, Arcana mysteries, inserts — offers
   // rolling without threading. Memoized so the value reference only changes when the data or callback do.
-  const rollContextValue = useMemo(() => ({ data: character.data, onRoll: handleRoll }), [character.data, handleRoll]);
+  const burn = useMemo(
+    () => ({
+      available: canBurnBrightly(character.data),
+      // Rejects when the XP can't be paid (the save failed, or another device spent it first), and the roll gets no bonus.
+      onBurn: () => adjustCharacterStats(character.id, { statXp: -BURN_BRIGHTLY_COST }, requireBurnBrightly),
+    }),
+    [character.data, character.id, adjustCharacterStats],
+  );
+  const rollContextValue = useMemo(() => ({ data: character.data, onRoll: handleRoll, burn }), [character.data, handleRoll, burn]);
 
   const handleSaveCharacterData = useCallback(
     (data: Partial<CharacterData>) => updateCharacterData(character.id, data),
@@ -554,7 +565,7 @@ const CharacterPlaybookContent = ({
   playbook: PlaybookType;
   updateCharacterName: (characterId: string, name: string) => Promise<void>;
   updateCharacterData: (characterId: string, data: Partial<CharacterData>) => Promise<void>;
-  adjustCharacterStats: (characterId: string, deltas: Partial<Record<'statArmor' | 'statHp', number>>) => Promise<void>;
+  adjustCharacterStats: (characterId: string, deltas: Partial<Record<AdditiveStat, number>>, guard?: SheetGuard) => Promise<void>;
   logRoll: (roll: LoggedRoll) => Promise<void>;
   notesActions: NotesActions;
 }) => {

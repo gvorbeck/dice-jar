@@ -23,6 +23,12 @@ describe('parseDiceRolls', () => {
     expect(roll.breakdown).toBe('[4, 4] + 1');
   });
 
+  it('keeps the Burn Brightly flag only when it is true', () => {
+    expect(parseDiceRolls([{ ...base, burned: true }])?.[0]).toHaveProperty('burned', true);
+    expect(parseDiceRolls([{ ...base, burned: false }])?.[0]).not.toHaveProperty('burned');
+    expect(parseDiceRolls([base])?.[0]).not.toHaveProperty('burned');
+  });
+
   it('leaves them off legacy move rolls', () => {
     const [roll] = parseDiceRolls([base]) ?? [];
     expect(roll).not.toHaveProperty('notation');
