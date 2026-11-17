@@ -228,6 +228,10 @@ export const firestoreMockModule = () => {
         docs.set(ref.path, structuredClone(data));
         emit(ref.path);
       },
+      delete: (ref: Ref) => {
+        docs.delete(ref.path);
+        emit(ref.path);
+      },
       update: (ref: Ref, payload: DocData) => {
         const existing = docs.get(ref.path) ?? {};
         docs.set(ref.path, applyUpdate(existing, payload));
@@ -272,4 +276,5 @@ interface Transaction {
   get: (ref: Ref) => Promise<ReturnType<typeof makeSnapshot>>;
   set: (ref: Ref, data: DocData) => void;
   update: (ref: Ref, payload: DocData) => void;
+  delete: (ref: Ref) => void;
 }

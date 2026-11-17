@@ -62,8 +62,7 @@ export const STEADING_ID_ARRAY_FIELDS = {
   gmImprovements: 'removedGmImprovementIds',
 } as const;
 
-// Thrown by a write that found, on the freshly-read document, that the game has moved to subcollections (MIGRATION.md).
-// A tab can still hold a cached copy from before the move, so the caller carries on the new way instead of failing.
+// Thrown when a write finds the game has moved to subcollections, so a tab with a stale copy can carry on the new way.
 export class GameMovedError extends Error {}
 
 export const withCharacters = async (ref: ReturnType<typeof doc>, transform: (characters: Character[]) => Character[]): Promise<void> => {
@@ -83,11 +82,9 @@ export const withCharacters = async (ref: ReturnType<typeof doc>, transform: (ch
   });
 };
 
-// Applies a partial CharacterData save to the freshly-read character, so a save built from a (possibly stale) prop
-// snapshot only touches what it names.
+// Applies a partial CharacterData save to the freshly-read character, so a stale save only touches what it names.
 export const patchCharacterData = (c: Character, data: Partial<CharacterData>): Character => {
-  // Shallow-merge every plain-object field (typeMoves, specialPossessions, appearance, etc.) so a concurrent save to a
-  // sibling key on the same field can't be clobbered. Arrays (e.g. arcanaMinor) are id-merged below instead.
+  // Shallow-merge plain-object fields so a concurrent save to a sibling key can't be clobbered; arrays are id-merged below.
   const next = { ...c.data, ...data };
   for (const key of Object.keys(data) as (keyof CharacterData)[]) {
     const incoming = data[key];
@@ -96,14 +93,13 @@ export const patchCharacterData = (c: Character, data: Partial<CharacterData>): 
       (next as Record<string, unknown>)[key] = { ...existing, ...incoming };
     }
   }
-  // playbookFeatures additionally supports key deletion via the explicit deleteFeatureKeys sentinel; omitting a key
-  // from the patch merges as "unchanged", not "deleted".
+  // Omitting a playbookFeatures key merges as "unchanged"; deletion needs the explicit deleteFeatureKeys sentinel.
   if (data.deleteFeatureKeys?.length && next.playbookFeatures) {
     next.playbookFeatures = { ...next.playbookFeatures };
     for (const key of data.deleteFeatureKeys) delete next.playbookFeatures[key];
   }
   delete next.deleteFeatureKeys;
-  // Id-merge arcana entries so a concurrent edit to a different entry survives; removal uses the removedArcana*Ids sentinels.
+  // Arcana entries id-merge so a concurrent edit to another entry survives; removal uses the removedArcana*Ids sentinels.
   if (data.arcanaMinor) next.arcanaMinor = mergeById(c.data?.arcanaMinor, data.arcanaMinor, data.removedArcanaMinorIds);
   if (data.arcanaMajor) next.arcanaMajor = mergeById(c.data?.arcanaMajor, data.arcanaMajor, data.removedArcanaMajorIds);
   delete next.removedArcanaMinorIds;

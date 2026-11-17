@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, runTransaction, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, runTransaction, updateDoc } from 'firebase/firestore';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLatest } from './useLatest';
 import { db } from '@/lib/firebase';
@@ -20,8 +20,8 @@ import {
   withCharacters,
 } from '@/lib/gameMutations';
 import { applyStatDeltas, type SheetGuard } from '@/lib/statDeltas';
-import { joinGame } from '@/lib/gameShape';
 import * as v2 from '@/lib/gameV2';
+import { fitsOneDocument } from '@/lib/gameBackup';
 import type { AdditiveStat, Character, CharacterData, ContentLists, GameSession, LoggedRoll, SteadingData } from '@/model';
 
 // Re-exported from their new home in lib/gameParsing so existing consumers and tests
@@ -135,7 +135,7 @@ export const useGame = (gameId: string): UseGameResult => {
     const waiting = docRaw === undefined || (moved && (characterDocs === undefined || rollDocs === undefined));
     if (waiting || !docRaw) return { game: null, loading: waiting && !loadError, parseFailed: false };
     try {
-      const raw = moved ? joinGame({ game: docRaw, characters: characterDocs ?? [], rolls: rollDocs ?? [] }) : docRaw;
+      const raw = moved ? v2.assembleGame(docRaw, characterDocs ?? [], rollDocs ?? []) : docRaw;
       return { game: parseGameSession(raw, gameId), loading: false, parseFailed: false };
     } catch {
       return { game: null, loading: false, parseFailed: true };
@@ -418,9 +418,19 @@ export const useGame = (gameId: string): UseGameResult => {
   // through a destructive-action dialog and downloads a safety copy of the live doc first.
   const replaceGameData = useCallback(
     async (game: Record<string, unknown>) => {
-      await reportSave(() => (movedRef.current ? v2.replaceGame(gameId, game) : setDoc(gameRef, game)));
+      await reportSave(() =>
+        either(
+          () =>
+            runTransaction(db, async (tx) => {
+              if ((await tx.get(gameRef)).data()?.schemaVersion === 2) throw new GameMovedError();
+              if (!fitsOneDocument(game)) throw new Error('That backup is too large for a single game document.');
+              tx.set(gameRef, game);
+            }),
+          () => v2.replaceGame(gameId, game),
+        ),
+      );
     },
-    [gameId, gameRef, reportSave, movedRef],
+    [gameId, gameRef, reportSave, either],
   );
 
   return {

@@ -8,7 +8,8 @@ vi.mock('firebase/firestore', () => firestoreMockModule());
 vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
 
 import { useGame } from '../useGame';
-import { joinGame, splitGame } from '../gameShape';
+import { assembleGame } from '../gameV2';
+import { splitGame } from '../gameShape';
 import { ROLL_LOG_CAP } from '../gameParsing';
 import type { Character, LoggedRoll } from '@/model';
 
@@ -66,8 +67,7 @@ const seed = () => {
 
 const stored = (path: string) => firestoreStore.list(path).map(({ id, data }) => ({ id, data }));
 // The moved game put back into one document, to compare with the old one.
-const movedAsOneDocument = () =>
-  joinGame({ game: firestoreStore.get(V2)!, characters: stored(`${V2}/characters`), rolls: stored(`${V2}/rolls`) });
+const movedAsOneDocument = () => assembleGame(firestoreStore.get(V2)!, stored(`${V2}/characters`), stored(`${V2}/rolls`));
 const oneDocument = () => firestoreStore.get(V1)!;
 
 const renderBoth = async () => {
@@ -194,6 +194,12 @@ describe('the same saves give the same game', () => {
     ).toEqual(['r1', 'r2', 'r3']);
   });
 
+  it('lists rolls by when they were made, also after an older one is edited and gets a new time', async () => {
+    const { old, moved } = await renderBoth();
+    await both(old, moved, (api) => api.logRoll(roll('r1', 50, { mode: 'adv' }) as unknown as LoggedRoll));
+    expect((movedAsOneDocument().diceRolls as { id: string }[]).map((r) => r.id)).toEqual(['r2', 'r1']);
+  });
+
   it('keeps only the newest rolls', async () => {
     const { old, moved } = await renderBoth();
     for (let i = 0; i < ROLL_LOG_CAP + 5; i++) {
@@ -298,6 +304,7 @@ describe('a tab that still holds the game from before it was moved', () => {
     ['reorder', (api: Api) => api.reorderCharacters([char('c'), char('a'), char('b')] as unknown as Character[])],
     ['add', (api: Api) => api.addCharacter(char('d') as unknown as Character)],
     ['roll', (api: Api) => api.logRoll(roll('r9', 99) as unknown as LoggedRoll)],
+    ['restore a backup', (api: Api) => api.replaceGameData({ name: 'Back', createdAt: 1, characters: [char('z')] })],
   ])('carries on the new way after the first write finds the game moved: %s', async (_name, save) => {
     const { result } = renderHook(() => useGame('old'));
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -315,5 +322,77 @@ describe('a tab that still holds the game from before it was moved', () => {
     expect(addToastSpy).not.toHaveBeenCalled();
     expect(firestoreStore.get(V1)!.characters).toEqual([]); // never written back into the array
     expect('diceRolls' in firestoreStore.get(V1)!).toBe(false);
+  });
+});
+
+describe('two players at once', () => {
+  it('two rolls logged together on a full log still leave the log at its cap', async () => {
+    const full = Array.from({ length: ROLL_LOG_CAP }, (_, i) => roll(`f${i}`, 1000 + i));
+    const r = splitGame({ ...game(), diceRolls: full });
+    if (!r.ok) throw new Error('fixture does not split');
+    r.split.rolls.forEach((c) => firestoreStore.set(`${V2}/rolls/${c.id}`, c.data));
+    for (const id of stored(`${V2}/rolls`).map((x) => x.id)) if (!id.startsWith('f')) firestoreStore.delete(`${V2}/rolls/${id}`);
+    const { moved } = await renderBoth();
+    await act(async () => {
+      await Promise.all([
+        moved.result.current.logRoll(roll('p1', 5000) as unknown as LoggedRoll),
+        moved.result.current.logRoll(roll('p2', 5001) as unknown as LoggedRoll),
+      ]);
+    });
+    const ids = stored(`${V2}/rolls`).map((x) => x.id);
+    expect(ids).toHaveLength(ROLL_LOG_CAP);
+    expect(ids).toEqual(expect.arrayContaining(['p1', 'p2']));
+  });
+
+  it('a restore sweeps up a character another player added while it was running', async () => {
+    const { moved } = await renderBoth();
+    const { getDocs } = await import('firebase/firestore');
+    const real = vi.mocked(getDocs).getMockImplementation()!;
+    let added = false;
+    vi.mocked(getDocs).mockImplementation(async (ref) => {
+      const result = await real(ref);
+      if (!added && (ref as unknown as { path: string }).path.endsWith('/characters')) {
+        added = true;
+        firestoreStore.setQuietly(`${V2}/characters/late`, { id: 'late', name: 'Late', playbook: 'heavy', order: 9 });
+      }
+      return result;
+    });
+    await act(async () => {
+      await moved.result.current.replaceGameData({ name: 'Back', createdAt: 1, characters: [char('z')] });
+    });
+    vi.mocked(getDocs).mockImplementation(real);
+    expect(stored(`${V2}/characters`).map((c) => c.id)).toEqual(['z']);
+  });
+});
+
+describe('exporting a moved game', () => {
+  it('reads again until two passes agree, so a restore running meanwhile cannot leave a mix', async () => {
+    seed();
+    const { readMovedGame } = await import('../gameV2');
+    const { getDocs } = await import('firebase/firestore');
+    const real = vi.mocked(getDocs).getMockImplementation()!;
+    let calls = 0;
+    vi.mocked(getDocs).mockImplementation(async (ref) => {
+      // Changes the game between the first pass and the second.
+      if (++calls === 3) firestoreStore.setQuietly(`${V2}/characters/mid`, { id: 'mid', name: 'Mid', playbook: 'heavy', order: 9 });
+      return real(ref);
+    });
+    const out = await readMovedGame('new');
+    vi.mocked(getDocs).mockImplementation(real);
+    expect((out.characters as { id: string }[]).map((c) => c.id)).toContain('mid');
+  });
+
+  it('gives up with a clear message if the game never stops changing', async () => {
+    seed();
+    const { readMovedGame } = await import('../gameV2');
+    const { getDocs } = await import('firebase/firestore');
+    const real = vi.mocked(getDocs).getMockImplementation()!;
+    let n = 0;
+    vi.mocked(getDocs).mockImplementation(async (ref) => {
+      firestoreStore.setQuietly(`${V2}/rolls/churn${n++}`, { id: `churn${n}`, characterId: 'a', createdAt: n, order: n });
+      return real(ref);
+    });
+    await expect(readMovedGame('new')).rejects.toThrow('kept changing');
+    vi.mocked(getDocs).mockImplementation(real);
   });
 });

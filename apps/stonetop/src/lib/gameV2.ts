@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDocs, runTransaction, writeBatch } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, runTransaction, setDoc, writeBatch } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { GAMES_COLLECTION } from '@/lib/constants';
 import { joinGame, splitGame } from '@/lib/gameShape';
@@ -6,8 +6,7 @@ import { parseCharacters, ROLL_LOG_CAP } from '@/lib/gameParsing';
 import { stripUndefined } from '@/lib/gameMutations';
 import type { Character, LoggedRoll } from '@/model';
 
-// Reads and writes for a game moved to subcollections (schemaVersion 2; see MIGRATION.md). The game document keeps the
-// steading, notes and the rest and is written by useGame as before; characters and rolls are one document each.
+// Reads and writes for a game moved to subcollections (schemaVersion 2; see MIGRATION.md).
 
 type Raw = Record<string, unknown>;
 export interface Stored {
@@ -30,10 +29,32 @@ const storedDocs = async (col: ReturnType<typeof collection>): Promise<Stored[]>
 
 const nextOrder = (items: Stored[]) => Math.max(-1, ...items.map((i) => Number(i.data.order) || 0)) + 1;
 
-/** The game as the v1 shape, from its document plus both subcollections. Used for exports. */
-export const readMovedGame = async (gameId: string, game: Raw): Promise<Raw> => {
-  const [characters, rolls] = await Promise.all([storedDocs(charactersCol(gameId)), storedDocs(rollsCol(gameId))]);
-  return joinGame({ game, characters, rolls });
+/** The game as the old one-document shape, with rolls newest-last: rolls are ordered by `createdAt`, since an edited roll gets a new one. */
+export const assembleGame = (game: Raw, characters: Stored[], rolls: Stored[]): Raw => {
+  const joined = joinGame({ game, characters, rolls });
+  const byTime = (r: Raw) => Number(r.createdAt) || 0;
+  return Array.isArray(joined.diceRolls)
+    ? { ...joined, diceRolls: [...(joined.diceRolls as Raw[])].sort((a, b) => byTime(a) - byTime(b)) }
+    : joined;
+};
+
+const readOnce = async (gameId: string): Promise<{ game: Raw; characters: Stored[]; rolls: Stored[] } | undefined> => {
+  const [game, characters, rolls] = await Promise.all([
+    getDoc(doc(db, GAMES_COLLECTION, gameId)),
+    storedDocs(charactersCol(gameId)),
+    storedDocs(rollsCol(gameId)),
+  ]);
+  return game.exists() ? { game: game.data() as Raw, characters, rolls } : undefined;
+};
+
+/** The game as the one-document shape, for exports. Reads until two passes agree, so a restore running meanwhile cannot give a mix of old and new. */
+export const readMovedGame = async (gameId: string): Promise<Raw> => {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const [first, second] = [await readOnce(gameId), await readOnce(gameId)];
+    if (!first || !second) throw new Error('Game not found — it may have been deleted.');
+    if (JSON.stringify(first) === JSON.stringify(second)) return assembleGame(first.game, first.characters, first.rolls);
+  }
+  throw new Error('The game kept changing while it was being read. Try again in a moment.');
 };
 
 /** Changes one character on the freshly-read document, so a save only ever touches that character. */
@@ -73,18 +94,22 @@ export const reorderCharacters = async (gameId: string, ids: string[]): Promise<
   await batch.commit();
 };
 
-/** Writes a roll (a new one, or an existing one edited in place) and in the same batch trims the log to the newest ROLL_LOG_CAP. */
+/** Writes a roll (new, or an existing one edited in place), then trims the log to the newest ROLL_LOG_CAP. */
 export const logRoll = async (gameId: string, roll: LoggedRoll): Promise<void> => {
-  const current = await storedDocs(rollsCol(gameId));
-  const prior = current.find((r) => r.id === roll.id);
-  const batch = writeBatch(db);
-  batch.set(rollRef(gameId, roll.id), stripUndefined({ ...roll, order: prior ? Number(prior.data.order) : nextOrder(current) }));
-  const all = [...current.filter((r) => r.id !== roll.id).map((r) => ({ id: r.id, createdAt: Number(r.data.createdAt) || 0 })), roll];
-  all
-    .sort((a, b) => a.createdAt - b.createdAt)
-    .slice(0, Math.max(0, all.length - ROLL_LOG_CAP))
-    .forEach((old) => batch.delete(rollRef(gameId, old.id)));
-  await batch.commit();
+  const prior = (await storedDocs(rollsCol(gameId))).find((r) => r.id === roll.id);
+  const order = prior ? Number(prior.data.order) : nextOrder(await storedDocs(rollsCol(gameId)));
+  await setDoc(rollRef(gameId, roll.id), stripUndefined({ ...roll, order }));
+  const all = (await storedDocs(rollsCol(gameId))).map((r) => ({ id: r.id, createdAt: Number(r.data.createdAt) || 0 }));
+  const oldest = all.sort((a, b) => a.createdAt - b.createdAt).slice(0, Math.max(0, all.length - ROLL_LOG_CAP));
+  // Each delete re-checks the roll it saw: one edited since (new createdAt) is fresh again and stays; one already gone is fine.
+  await Promise.all(
+    oldest.map((old) =>
+      runTransaction(db, async (tx) => {
+        const snap = await tx.get(rollRef(gameId, old.id));
+        if (snap.exists() && Number(snap.data().createdAt) === old.createdAt) tx.delete(rollRef(gameId, old.id));
+      }),
+    ),
+  );
 };
 
 /** Replaces a moved game with the contents of a backup, in one batch: nothing is left of the old characters and rolls, and no half-restored game is ever visible. */
@@ -103,4 +128,15 @@ export const replaceGame = async (gameId: string, backup: Raw): Promise<void> =>
   split.characters.forEach((c) => batch.set(characterRef(gameId, c.id), c.data));
   split.rolls.forEach((r) => batch.set(rollRef(gameId, r.id), r.data));
   await batch.commit();
+
+  // shortcut: strays added before this read are swept, one added after survives; upgrade with a shared write guard if restores run during play.
+  const [kept, keptRolls] = [new Set(split.characters.map((c) => c.id)), new Set(split.rolls.map((r) => r.id))];
+  const [nowCharacters, nowRolls] = await Promise.all([storedDocs(charactersCol(gameId)), storedDocs(rollsCol(gameId))]);
+  const stray = writeBatch(db);
+  const strays = [
+    ...nowCharacters.filter((c) => !kept.has(c.id)).map((c) => characterRef(gameId, c.id)),
+    ...nowRolls.filter((r) => !keptRolls.has(r.id)).map((r) => rollRef(gameId, r.id)),
+  ];
+  strays.forEach((ref) => stray.delete(ref));
+  if (strays.length) await stray.commit();
 };

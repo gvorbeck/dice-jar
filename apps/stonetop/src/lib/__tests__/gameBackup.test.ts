@@ -270,6 +270,19 @@ describe('readImportFile — rejections', () => {
     expect(check).toEqual({ ok: false, error: expect.stringContaining('KB limit for a single game') });
   });
 
+  // A moved game stores one document per character and roll, so its export can be well over one document in total.
+  it('accepts a backup whose total is over one document but whose every piece fits', () => {
+    const big = 'x'.repeat(300_000);
+    const characters = Array.from({ length: 4 }, (_, i) => character(`c${i}`, big));
+    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters }))));
+    expect(check.ok).toBe(true);
+  });
+
+  it('refuses a backup with a single character over the document limit', () => {
+    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters: [character('c0', 'x'.repeat(1_000_001))] }))));
+    expect(check).toEqual({ ok: false, error: expect.stringContaining('KB limit') });
+  });
+
   it('rejects a payload the app parser cannot read', () => {
     parseState.throws = true;
     const check = readImportFile(JSON.stringify(envelopeFor(gameDoc())));
