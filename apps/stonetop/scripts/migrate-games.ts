@@ -51,9 +51,12 @@ const tally = new Map<string, number>();
 for (const o of outcomes) tally.set(o.status, (tally.get(o.status) ?? 0) + 1);
 for (const o of outcomes) {
   if (o.status === 'refused') console.log(`REFUSED ${o.id}\n${o.problems.map((p) => `  - ${p}`).join('\n')}`);
+  else if (o.status === 'failed') console.log(`FAILED ${o.id}: ${o.error}`);
   else if (o.status === 'changed since backup' || o.status === 'missing') console.log(`${o.status.toUpperCase()} ${o.id}`);
+  else if (o.status === 'moved' && o.changedAfter)
+    console.log(`NOTE ${o.id} moved, and a player saved right after: ${o.changedAfter.join(', ')}`);
 }
 console.log(`\n${outcomes.length} games: ${[...tally].map(([status, n]) => `${n} ${status}`).join(', ') || 'none'}.`);
 if (tally.has('changed since backup'))
   console.log('Games changed since the backup were left alone. Take a fresh backup and run again to move them.');
-process.exit(tally.has('refused') || tally.has('changed since backup') || tally.has('missing') ? 1 : 0);
+process.exit(['refused', 'failed', 'changed since backup', 'missing'].some((s) => tally.has(s)) ? 1 : 0);

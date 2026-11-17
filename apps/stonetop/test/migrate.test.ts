@@ -1,7 +1,7 @@
 // Runs the migration against the Firestore emulator: `npm run test:rules` (needs Java 21+). No real project is involved.
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { backupGames } from '../scripts/backupCore.ts';
 import { migrationStatus } from '../scripts/migrationStatus.ts';
 import { migrateAll, migrateGame, unmigrateGame } from '../scripts/migrateCore.ts';
@@ -116,6 +116,40 @@ describe('migrateGame', () => {
     await seed('g');
     await migrateGame(db, 'g');
     expect(await read('g')).toMatchObject({ steading: { size: 'village' }, notes: { gm: '<p>hi</p>' } });
+  });
+});
+
+describe('a move that something interrupts or a player touches', () => {
+  it('still reports the move, and what a player saved right after it', async () => {
+    await seed('g');
+    const real = db.runTransaction.bind(db) as Firestore['runTransaction'];
+    const spy = vi.spyOn(db, 'runTransaction').mockImplementation((async (...args: Parameters<Firestore['runTransaction']>) => {
+      const result = await real(...args);
+      await db.doc('games/g/characters/a').update({ name: 'Saved by a player a moment later' });
+      return result;
+    }) as Firestore['runTransaction']);
+    const outcome = await migrateGame(db, 'g', { expected: game() });
+    spy.mockRestore();
+    expect(outcome).toEqual({ id: 'g', status: 'moved', characters: 3, rolls: 2, changedAfter: ['characters/a edited'] });
+    expect((await read('g')).schemaVersion).toBe(2);
+  });
+
+  it('carries on with the other games when one fails, and says which', async () => {
+    await seed('a');
+    await seed('b');
+    const real = db.runTransaction.bind(db) as Firestore['runTransaction'];
+    let calls = 0;
+    const spy = vi.spyOn(db, 'runTransaction').mockImplementation((async (...args: Parameters<Firestore['runTransaction']>) => {
+      if (++calls === 1) throw new Error('connection dropped');
+      return real(...args);
+    }) as Firestore['runTransaction']);
+    const outcomes = await migrateAll(db, { write: true, backup: { a: game(), b: game() } });
+    spy.mockRestore();
+    expect(outcomes).toEqual([
+      { id: 'a', status: 'failed', error: 'connection dropped' },
+      { id: 'b', status: 'moved', characters: 3, rolls: 2 },
+    ]);
+    expect((await read('a')).schemaVersion).toBeUndefined();
   });
 });
 
@@ -246,6 +280,29 @@ describe('backupGames', () => {
     expect(sameGame(backup.new!, game())).toBe(true);
     expect(sameGame(backup.old!, game())).toBe(true);
     expect(backup.new).not.toHaveProperty('schemaVersion');
+  });
+
+  it('never loses a game while it is being put back at the same moment', async () => {
+    for (let i = 0; i < 25; i++) {
+      await db.recursiveDelete(db.collection('games'));
+      await seed('g');
+      await migrateGame(db, 'g');
+      const [backup] = await Promise.all([backupGames(db, { only: ['g'] }), unmigrateGame(db, 'g')]);
+      expect(sameGame(backup.g!, game())).toBe(true);
+    }
+  });
+
+  it('reads each game and its characters and rolls in one read-only transaction, so they are from the same moment', async () => {
+    await seed('a');
+    await seed('b');
+    await migrateGame(db, 'b');
+    const spy = vi.spyOn(db, 'runTransaction');
+    await backupGames(db);
+    const calls = spy.mock.calls.length;
+    const optionsUsed = spy.mock.calls.map((c) => c[1]);
+    spy.mockRestore();
+    expect(calls).toBe(2);
+    expect(optionsUsed).toEqual([{ readOnly: true }, { readOnly: true }]);
   });
 
   it('can save just the games named, so one busy game can be backed up in a moment', async () => {

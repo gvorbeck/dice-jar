@@ -20,16 +20,20 @@ export const backupGames = async (
   for (let i = 0; i < refs.length; i += READ_AT_ONCE) {
     await Promise.all(
       refs.slice(i, i + READ_AT_ONCE).map(async (ref) => {
-        const snap = await ref.get();
-        if (!snap.exists) {
-          if (options.only) throw new Error(`No game found with ID: ${ref.id}`);
-          return; // a bare parent of subcollections, not a game
-        }
-        const game = snap.data() as Raw;
-        data[ref.id] =
-          game.schemaVersion === 2
-            ? assembleGame(game, stored(await ref.collection('characters').get()), stored(await ref.collection('rolls').get()))
-            : game;
+        // One read-only transaction, so the game and its characters and rolls come from the same moment, whatever players or a restore do meanwhile.
+        const copy = await db.runTransaction(
+          async (tx) => {
+            const snap = await tx.get(ref);
+            if (!snap.exists) return undefined;
+            const game = snap.data() as Raw;
+            if (game.schemaVersion !== 2) return game;
+            const [characters, rolls] = [await tx.get(ref.collection('characters')), await tx.get(ref.collection('rolls'))];
+            return assembleGame(game, stored(characters), stored(rolls));
+          },
+          { readOnly: true },
+        );
+        if (!copy && options.only) throw new Error(`No game found with ID: ${ref.id}`);
+        if (copy) data[ref.id] = copy; // a missing one is a bare parent of subcollections, not a game
         options.onProgress?.(++done, refs.length);
       }),
     );
