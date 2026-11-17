@@ -48,7 +48,8 @@ const deleteGame = async () => {
     process.exit(0);
   }
 
-  await ref.delete();
+  // Also removes a moved game's characters and rolls subcollections.
+  await db.recursiveDelete(ref);
   console.log(`Deleted game ${gameId}.`);
 };
 

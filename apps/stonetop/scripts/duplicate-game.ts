@@ -36,18 +36,17 @@ const duplicate = async () => {
   const data = snap.data() as Record<string, unknown>;
   console.log(`Source game: ${data['name'] ?? '(unnamed)'} (${sourceId})`);
 
-  // If a target ID was supplied, use it; otherwise let Firestore mint a new one.
   const destRef = process.argv[3] ? db.collection('games').doc(process.argv[3]) : db.collection('games').doc();
 
-  // Refuse to clobber an existing doc — this is a copy, not an overwrite.
-  const existing = await destRef.get();
-  if (existing.exists) {
-    console.error(`Target game ${destRef.id} already exists — refusing to overwrite.`);
+  // Characters and rolls of a moved game live in subcollections that a document copy would leave behind.
+  if (data.schemaVersion === 2) {
+    console.error('This game has moved to subcollections; duplicating only its document would give a game with no characters.');
     process.exit(1);
   }
 
   const copy = { ...data, name: `${data['name'] ?? 'Stonetop Game'} (copy)` };
-  await destRef.set(copy);
+  // create() fails if the target exists, so a game made since we looked is never overwritten.
+  await destRef.create(copy);
 
   console.log(`\nDuplicated to game ${destRef.id}`);
   console.log(`Open at: /game/${destRef.id}`);
