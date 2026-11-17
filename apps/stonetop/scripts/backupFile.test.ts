@@ -1,6 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { EXPORT_FORMAT, EXPORT_VERSION } from '../src/lib/gameBackupFormat.ts';
-import { gamesFromBackup, isMoved, movedIds, pendingIds, readCheckpoint } from './backupFile.ts';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import {
+  clearCheckpoint,
+  gamesFromBackup,
+  isMoved,
+  loadCheckpoint,
+  movedIds,
+  pendingIds,
+  readCheckpoint,
+  saveCheckpoint,
+} from './backupFile.ts';
 
 const envelope = (over: Record<string, unknown> = {}) => ({
   format: EXPORT_FORMAT,
@@ -78,5 +90,37 @@ describe('pendingIds', () => {
 describe('movedIds', () => {
   it('lists only the games that have moved, so a restore can refuse them', () => {
     expect(movedIds({ a: { schemaVersion: 2 }, b: { name: 'old' }, c: undefined })).toEqual(['a']);
+  });
+});
+
+describe('checkpoint file', () => {
+  let file: string;
+  beforeEach(() => {
+    file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'restore-')), 'backup.json.restore-checkpoint.json');
+  });
+  afterEach(() => fs.rmSync(path.dirname(file), { recursive: true, force: true }));
+
+  it('starts empty when no run has saved one', () => {
+    expect(loadCheckpoint(file).size).toBe(0);
+  });
+
+  it('gives back what was saved, so an interrupted run resumes where it stopped', () => {
+    saveCheckpoint(file, new Set(['a', 'b']));
+    expect([...loadCheckpoint(file)]).toEqual(['a', 'b']);
+    saveCheckpoint(file, new Set(['a', 'b', 'c']));
+    expect([...loadCheckpoint(file)]).toEqual(['a', 'b', 'c']);
+  });
+
+  it('is gone after a clean run, and clearing twice is fine', () => {
+    saveCheckpoint(file, new Set(['a']));
+    clearCheckpoint(file);
+    expect(fs.existsSync(file)).toBe(false);
+    expect(() => clearCheckpoint(file)).not.toThrow();
+    expect(loadCheckpoint(file).size).toBe(0);
+  });
+
+  it('treats a checkpoint file left damaged on disk as none restored', () => {
+    fs.writeFileSync(file, '{"half');
+    expect(loadCheckpoint(file).size).toBe(0);
   });
 });

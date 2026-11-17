@@ -2,7 +2,7 @@ import { initializeApp, cert, type ServiceAccount } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as path from 'path';
 import * as fs from 'fs';
-import { gamesFromBackup, movedIds, pendingIds, readCheckpoint } from './backupFile.ts';
+import { clearCheckpoint, gamesFromBackup, loadCheckpoint, movedIds, pendingIds, saveCheckpoint } from './backupFile.ts';
 
 const serviceKeyPath = path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS ?? '');
 if (!process.env.GOOGLE_APPLICATION_CREDENTIALS || !fs.existsSync(serviceKeyPath)) {
@@ -31,16 +31,6 @@ const WRITE = process.argv.includes('--write');
 // Keyed to the backup file, so resuming a different backup starts clean.
 const CHECKPOINT_PATH = path.resolve(`${backupPath}.restore-checkpoint.json`);
 
-const loadCheckpoint = () => readCheckpoint(fs.existsSync(CHECKPOINT_PATH) ? fs.readFileSync(CHECKPOINT_PATH, 'utf8') : null);
-
-const saveCheckpoint = (done: Set<string>): void => {
-  fs.writeFileSync(CHECKPOINT_PATH, JSON.stringify([...done], null, 2));
-};
-
-const clearCheckpoint = (): void => {
-  if (fs.existsSync(CHECKPOINT_PATH)) fs.rmSync(CHECKPOINT_PATH);
-};
-
 const restore = async () => {
   console.log(`Mode: ${WRITE ? 'WRITE' : 'DRY RUN (pass --write to commit)'}`);
   console.log(`Backup file: ${backupPath}\n`);
@@ -49,7 +39,7 @@ const restore = async () => {
   const ids = Object.keys(data);
   console.log(`Found ${ids.length} documents in backup.\n`);
 
-  const done = WRITE ? loadCheckpoint() : new Set<string>();
+  const done = WRITE ? loadCheckpoint(CHECKPOINT_PATH) : new Set<string>();
   if (WRITE && done.size > 0) {
     console.log(`Resuming: ${done.size} doc(s) already restored in a prior run will be skipped.\n`);
   }
@@ -83,7 +73,7 @@ const restore = async () => {
         .doc(id)
         .set(data[id] as Record<string, unknown>);
       done.add(id);
-      saveCheckpoint(done);
+      saveCheckpoint(CHECKPOINT_PATH, done);
       restored++;
       console.log(`  restored: ${id}`);
     } else {
@@ -91,7 +81,7 @@ const restore = async () => {
     }
   }
 
-  if (WRITE) clearCheckpoint();
+  if (WRITE) clearCheckpoint(CHECKPOINT_PATH);
 
   console.log(`\nDone. ${WRITE ? `${restored} documents restored` : `${ids.length} documents would be restored`}.`);
 };

@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { EXPORT_FORMAT, EXPORT_VERSION } from '../src/lib/gameBackupFormat.ts';
 
 /**
@@ -37,3 +38,9 @@ export const pendingIds = (ids: string[], done: Set<string>) => ids.filter((id) 
 
 /** The ids among `live` (id to stored document) that have moved to subcollections. */
 export const movedIds = (live: Record<string, Record<string, unknown> | undefined>) => Object.keys(live).filter((id) => isMoved(live[id]));
+
+export const loadCheckpoint = (file: string) => readCheckpoint(fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
+
+export const saveCheckpoint = (file: string, done: Set<string>) => fs.writeFileSync(file, JSON.stringify([...done], null, 2));
+
+export const clearCheckpoint = (file: string) => fs.rmSync(file, { force: true });
