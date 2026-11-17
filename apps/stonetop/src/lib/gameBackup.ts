@@ -4,6 +4,7 @@ import { GAMES_COLLECTION } from '@/lib/constants';
 import { downloadJson } from '@dice-jar/browser';
 import { slugifyGameId } from '@dice-jar/game-id';
 import { parseGameSession } from '@/lib/gameParsing';
+import { isMoved, readMovedGame } from '@/lib/gameV2';
 import { isNumber, isPlainObject, isString } from '@/lib/typeGuards';
 import { EXPORT_FORMAT, EXPORT_VERSION } from '@/lib/gameBackupFormat';
 
@@ -50,7 +51,9 @@ const hasNestedArray = (v: unknown): boolean => {
 export const readRawGame = async (gameId: string): Promise<Record<string, unknown>> => {
   const snap = await getDoc(doc(db, GAMES_COLLECTION, gameId));
   if (!snap.exists()) throw new Error('Game not found — it may have been deleted.');
-  return snap.data() as Record<string, unknown>;
+  const game = snap.data() as Record<string, unknown>;
+  // A moved game is exported in the same one-document shape, so a file imports into either kind of game.
+  return isMoved(game) ? readMovedGame(gameId, game) : game;
 };
 
 export const buildEnvelope = (gameId: string, game: Record<string, unknown>, exportedAt = new Date()): GameExportEnvelope => ({

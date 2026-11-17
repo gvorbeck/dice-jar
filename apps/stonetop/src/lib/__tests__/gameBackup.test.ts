@@ -19,6 +19,7 @@ vi.mock('@/lib/gameParsing', async (importOriginal) => {
 });
 
 import { EXPORT_FORMAT, EXPORT_VERSION } from '../gameBackupFormat';
+import { splitGame } from '../gameShape';
 import { buildEnvelope, exportFilename, exportGame, readImportFile, readRawGame } from '../gameBackup';
 
 const EXPORTED_AT = new Date('2026-08-17T14:30:00.000Z');
@@ -165,6 +166,23 @@ describe('exportGame', () => {
     if (!check.ok) return;
     expect(check.envelope.gameId).toBe('long-winter');
     expect(check.envelope.game).toEqual(raw);
+  });
+
+  it('exports a moved game as the one-document shape, so the file imports into either kind of game', async () => {
+    const original = gameDoc({ steading: { size: 'village' } });
+    const split = splitGame(original);
+    if (!split.ok) throw new Error('fixture does not split');
+    firestoreStore.set('games/long-winter', split.split.game);
+    split.split.characters.forEach((c) => firestoreStore.set(`games/long-winter/characters/${c.id}`, c.data));
+
+    await exportGame('long-winter');
+
+    const blob = createObjectURL.mock.calls[0]![0]! as Blob;
+    const check = readImportFile(await blob.text());
+    expect(check.ok).toBe(true);
+    if (!check.ok) return;
+    expect(check.envelope.game).toEqual(original);
+    expect(check.envelope.game).not.toHaveProperty('schemaVersion');
   });
 
   it('applies the suffix to the safety copy', async () => {

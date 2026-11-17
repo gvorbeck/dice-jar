@@ -80,6 +80,12 @@ describe('splitGame / joinGame', () => {
     expect(joinGame(shuffled)).toEqual(v1());
   });
 
+  it('puts two characters that ended up with the same order in a steady order', () => {
+    const s = split(v1());
+    const clash = { ...s, characters: s.characters.map((c, i) => ({ ...c, data: { ...c.data, order: i < 2 ? 0 : 5 } })).reverse() };
+    expect((joinGame(clash).characters as { id: string }[]).map((c) => c.id)).toEqual(['c1', 'c2', 'c3']);
+  });
+
   it('does not change the input', () => {
     const raw = v1();
     const copy = structuredClone(raw);

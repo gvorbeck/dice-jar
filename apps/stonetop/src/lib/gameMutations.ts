@@ -2,9 +2,9 @@ import { doc, runTransaction } from 'firebase/firestore';
 import type { FirestoreError } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { INVALID_WRITE_MESSAGE } from '@/lib/constants';
-import { isRecord, isString } from '@/lib/typeGuards';
+import { isPlainObject, isRecord, isString } from '@/lib/typeGuards';
 import { parseCharacters } from '@/lib/gameParsing';
-import type { Character } from '@/model';
+import type { Character, CharacterData } from '@/model';
 
 // Map raw Firestore error codes to messages a player can act on — the raw
 // strings (e.g. "Missing or insufficient permissions") are infra noise. Any
@@ -62,6 +62,10 @@ export const STEADING_ID_ARRAY_FIELDS = {
   gmImprovements: 'removedGmImprovementIds',
 } as const;
 
+// Thrown by a write that found, on the freshly-read document, that the game has moved to subcollections (MIGRATION.md).
+// A tab can still hold a cached copy from before the move, so the caller carries on the new way instead of failing.
+export class GameMovedError extends Error {}
+
 export const withCharacters = async (ref: ReturnType<typeof doc>, transform: (characters: Character[]) => Character[]): Promise<void> => {
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(ref);
@@ -69,6 +73,7 @@ export const withCharacters = async (ref: ReturnType<typeof doc>, transform: (ch
     // deleted mid-session, so returning would let reportSave flag "Saved." for a
     // write that never happened. Throwing routes it through the save-error path.
     if (!snap.exists()) throw new Error('Game not found — it may have been deleted.');
+    if (snap.data()?.schemaVersion === 2) throw new GameMovedError();
     // parseCharacterData sets every unrecognized/absent optional CharacterData field to `undefined`
     // explicitly (rather than omitting the key), so every character read here already carries some.
     // Firestore's tx.update rejects the whole write the moment any value anywhere in the payload is
@@ -76,4 +81,32 @@ export const withCharacters = async (ref: ReturnType<typeof doc>, transform: (ch
     // single choke point every character write passes through, rather than in each transform.
     tx.update(ref, { characters: stripUndefined(transform(parseCharacters(snap.data()))) });
   });
+};
+
+// Applies a partial CharacterData save to the freshly-read character, so a save built from a (possibly stale) prop
+// snapshot only touches what it names.
+export const patchCharacterData = (c: Character, data: Partial<CharacterData>): Character => {
+  // Shallow-merge every plain-object field (typeMoves, specialPossessions, appearance, etc.) so a concurrent save to a
+  // sibling key on the same field can't be clobbered. Arrays (e.g. arcanaMinor) are id-merged below instead.
+  const next = { ...c.data, ...data };
+  for (const key of Object.keys(data) as (keyof CharacterData)[]) {
+    const incoming = data[key];
+    const existing = c.data?.[key];
+    if (isPlainObject(incoming) && isPlainObject(existing)) {
+      (next as Record<string, unknown>)[key] = { ...existing, ...incoming };
+    }
+  }
+  // playbookFeatures additionally supports key deletion via the explicit deleteFeatureKeys sentinel; omitting a key
+  // from the patch merges as "unchanged", not "deleted".
+  if (data.deleteFeatureKeys?.length && next.playbookFeatures) {
+    next.playbookFeatures = { ...next.playbookFeatures };
+    for (const key of data.deleteFeatureKeys) delete next.playbookFeatures[key];
+  }
+  delete next.deleteFeatureKeys;
+  // Id-merge arcana entries so a concurrent edit to a different entry survives; removal uses the removedArcana*Ids sentinels.
+  if (data.arcanaMinor) next.arcanaMinor = mergeById(c.data?.arcanaMinor, data.arcanaMinor, data.removedArcanaMinorIds);
+  if (data.arcanaMajor) next.arcanaMajor = mergeById(c.data?.arcanaMajor, data.arcanaMajor, data.removedArcanaMajorIds);
+  delete next.removedArcanaMinorIds;
+  delete next.removedArcanaMajorIds;
+  return { ...c, data: next };
 };

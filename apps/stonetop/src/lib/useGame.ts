@@ -1,6 +1,6 @@
+import { collection, doc, onSnapshot, runTransaction, setDoc, updateDoc } from 'firebase/firestore';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLatest } from './useLatest';
-import { doc, onSnapshot, runTransaction, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useSaveStatusOptional } from '@/ui/SaveStatus/SaveStatusContext';
 import { useToastOptional } from '@/ui/Toast/ToastContext';
@@ -13,11 +13,15 @@ import {
   friendlyFirestoreError,
   isFirestoreError,
   mergeById,
+  GameMovedError,
+  patchCharacterData,
   STEADING_ID_ARRAY_FIELDS,
   stripUndefined,
   withCharacters,
 } from '@/lib/gameMutations';
 import { applyStatDeltas, type SheetGuard } from '@/lib/statDeltas';
+import { joinGame } from '@/lib/gameShape';
+import * as v2 from '@/lib/gameV2';
 import type { AdditiveStat, Character, CharacterData, ContentLists, GameSession, LoggedRoll, SteadingData } from '@/model';
 
 // Re-exported from their new home in lib/gameParsing so existing consumers and tests
@@ -47,11 +51,15 @@ export interface UseGameResult {
 }
 
 export const useGame = (gameId: string): UseGameResult => {
-  const [game, setGame] = useState<GameSession | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [docRaw, setDocRaw] = useState<Record<string, unknown> | null | undefined>(undefined);
+  const [characterDocs, setCharacterDocs] = useState<v2.Stored[] | undefined>(undefined);
+  const [rollDocs, setRollDocs] = useState<v2.Stored[] | undefined>(undefined);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const gameRef = useMemo(() => doc(db, GAMES_COLLECTION, gameId), [gameId]);
+  // A game moved to subcollections (MIGRATION.md) keeps its characters and rolls in their own documents.
+  const moved = v2.isMoved(docRaw ?? undefined);
+  const movedRef = useLatest(moved);
 
   // Report every persisted write to the app-wide save-status indicator and the
   // error Toast. Held in refs so wrapping a mutation doesn't add the (per-render)
@@ -90,41 +98,51 @@ export const useGame = (gameId: string): UseGameResult => {
   );
 
   useEffect(() => {
-    const ref = gameRef;
-    // Reset to the loading state before (re)subscribing to a new game's snapshot
-    // stream. This is a store-subscription effect keyed on gameRef, not a
-    // derived-state cascade — the reset must happen so stale data from the prior
-    // game doesn't show while the new snapshot is in flight.
-    setLoading(true);
-    setGame(null);
-
-    const unsubscribe = onSnapshot(
-      ref,
+    // Back to the loading state before (re)subscribing, so a previous game's data never shows for the new one.
+    setDocRaw(undefined);
+    setCharacterDocs(undefined);
+    setRollDocs(undefined);
+    setLoadError(null);
+    return onSnapshot(
+      gameRef,
       (snapshot) => {
-        if (!snapshot.exists()) {
-          setGame(null);
-          setError(null);
-        } else {
-          try {
-            const raw = snapshot.data() as Record<string, unknown>;
-            setGame(parseGameSession(raw, snapshot.id));
-            setError(null);
-          } catch {
-            // A parse failure means the stored document is malformed — surface a
-            // player-readable line rather than the raw thrown message.
-            setError("This game's data couldn't be read. Please try again or contact your GM.");
-          }
-        }
-        setLoading(false);
+        setDocRaw(snapshot.exists() ? (snapshot.data() as Record<string, unknown>) : null);
+        setLoadError(null);
       },
-      (err) => {
-        setError(friendlyFirestoreError(err));
-        setLoading(false);
-      },
+      (err) => setLoadError(friendlyFirestoreError(err)),
     );
-
-    return unsubscribe;
   }, [gameRef]);
+
+  useEffect(() => {
+    if (!moved) return;
+    const stored = (snap: { docs: { id: string; data: () => unknown }[] }) =>
+      snap.docs.map((d) => ({ id: d.id, data: d.data() as Record<string, unknown> }));
+    const fail = (err: Parameters<typeof friendlyFirestoreError>[0]) => setLoadError(friendlyFirestoreError(err));
+    const stopCharacters = onSnapshot(
+      collection(db, GAMES_COLLECTION, gameId, 'characters'),
+      (snap) => setCharacterDocs(stored(snap)),
+      fail,
+    );
+    const stopRolls = onSnapshot(collection(db, GAMES_COLLECTION, gameId, 'rolls'), (snap) => setRollDocs(stored(snap)), fail);
+    return () => {
+      stopCharacters();
+      stopRolls();
+    };
+  }, [gameId, moved]);
+
+  // shortcut: when a game is moved while open, the page shows loading until both subcollections have arrived; upgrade by keeping the last game on screen.
+  const { game, loading, parseFailed } = useMemo(() => {
+    const waiting = docRaw === undefined || (moved && (characterDocs === undefined || rollDocs === undefined));
+    if (waiting || !docRaw) return { game: null, loading: waiting && !loadError, parseFailed: false };
+    try {
+      const raw = moved ? joinGame({ game: docRaw, characters: characterDocs ?? [], rolls: rollDocs ?? [] }) : docRaw;
+      return { game: parseGameSession(raw, gameId), loading: false, parseFailed: false };
+    } catch {
+      return { game: null, loading: false, parseFailed: true };
+    }
+  }, [docRaw, characterDocs, rollDocs, moved, gameId, loadError]);
+  // A parse failure means the stored document is malformed: say so in words a player can use.
+  const error = loadError ?? (parseFailed ? "This game's data couldn't be read. Please try again or contact your GM." : null);
 
   const updateGameName = useCallback(
     async (name: string) => {
@@ -147,112 +165,97 @@ export const useGame = (gameId: string): UseGameResult => {
     [gameRef, reportSave],
   );
 
+  // A tab can act on a cached copy from before the game was moved; the first write finds out from the server and carries on the new way.
+  const either = useCallback(
+    async <T>(inOneDocument: () => Promise<T>, inSubcollections: () => Promise<T>): Promise<T> => {
+      if (movedRef.current) return inSubcollections();
+      try {
+        return await inOneDocument();
+      } catch (e) {
+        if (e instanceof GameMovedError) return inSubcollections();
+        throw e;
+      }
+    },
+    [movedRef],
+  );
+
+  // Changes one character on the freshly-read data: in the game's array, or on the character's own document once moved.
+  const editCharacter = useCallback(
+    (characterId: string, transform: (c: Character) => Character) =>
+      either(
+        () => withCharacters(gameRef, (chars) => chars.map((c) => (c.id === characterId ? transform(c) : c))),
+        () => v2.editCharacter(gameId, characterId, transform),
+      ),
+    [gameId, gameRef, either],
+  );
+
   const addCharacter = useCallback(
     async (character: Character) => {
-      // Read-modify-write so a double-tap or post-blip retry can't append the
-      // same id twice — arrayUnion treats each Character object as unique.
+      // Read-modify-write so a double-tap or post-blip retry can't append the same id twice.
       await reportSave(() =>
-        withCharacters(gameRef, (chars) => (chars.some((c) => c.id === character.id) ? chars : [...chars, character])),
+        either(
+          () => withCharacters(gameRef, (chars) => (chars.some((c) => c.id === character.id) ? chars : [...chars, character])),
+          () => v2.addCharacter(gameId, character),
+        ),
       );
     },
-    [gameRef, reportSave],
+    [gameId, gameRef, reportSave, either],
   );
 
   const removeCharacter = useCallback(
     async (characterId: string) => {
-      await reportSave(() => withCharacters(gameRef, (chars) => chars.filter((c) => c.id !== characterId)));
+      await reportSave(() =>
+        either(
+          () => withCharacters(gameRef, (chars) => chars.filter((c) => c.id !== characterId)),
+          () => v2.removeCharacter(gameId, characterId),
+        ),
+      );
     },
-    [gameRef, reportSave],
+    [gameId, gameRef, reportSave, either],
   );
 
   const reorderCharacters = useCallback(
     async (characters: Character[]) => {
       const ids = characters.map((c) => c.id);
       await reportSave(() =>
-        withCharacters(gameRef, (current) => {
-          const lookup = new Map(current.map((c) => [c.id, c]));
-          const reordered = ids.map((id) => lookup.get(id)).filter(Boolean) as Character[];
-          // A character concurrently added by another player won't be in the dragging
-          // client's stale `ids` list — append it rather than silently dropping it.
-          const idSet = new Set(ids);
-          const added = current.filter((c) => !idSet.has(c.id));
-          return [...reordered, ...added];
-        }),
+        either(
+          () =>
+            withCharacters(gameRef, (current) => {
+              const lookup = new Map(current.map((c) => [c.id, c]));
+              const reordered = ids.map((id) => lookup.get(id)).filter(Boolean) as Character[];
+              // A character concurrently added by another player won't be in the dragging client's stale `ids`: append it, don't drop it.
+              const idSet = new Set(ids);
+              const added = current.filter((c) => !idSet.has(c.id));
+              return [...reordered, ...added];
+            }),
+          () => v2.reorderCharacters(gameId, ids),
+        ),
       );
     },
-    [gameRef, reportSave],
+    [gameId, gameRef, reportSave, either],
   );
 
   const updateCharacterName = useCallback(
     async (characterId: string, name: string) => {
-      await reportSave(() => withCharacters(gameRef, (chars) => chars.map((c) => (c.id === characterId ? { ...c, name } : c))));
+      await reportSave(() => editCharacter(characterId, (c) => ({ ...c, name })));
     },
-    [gameRef, reportSave],
+    [editCharacter, reportSave],
   );
 
   const updateCharacterData = useCallback(
     async (characterId: string, data: Partial<CharacterData>) => {
-      await reportSave(() =>
-        withCharacters(gameRef, (chars) =>
-          chars.map((c) => {
-            if (c.id !== characterId) return c;
-            // Shallow-merge every plain-object field (typeMoves, specialPossessions,
-            // appearance, etc.) against the freshly-read doc so a save built from a
-            // (possibly stale) prop snapshot only touches the keys it actually changed —
-            // a concurrent save to a sibling key on the same field can't be clobbered.
-            // Arrays (e.g. arcanaMinor) are excluded here; they're id-merged below instead.
-            const next = { ...c.data, ...data };
-            for (const key of Object.keys(data) as (keyof CharacterData)[]) {
-              const incoming = data[key];
-              const existing = c.data?.[key];
-              if (isPlainObject(incoming) && isPlainObject(existing)) {
-                (next as Record<string, unknown>)[key] = { ...existing, ...incoming };
-              }
-            }
-            // playbookFeatures additionally supports key deletion via the explicit
-            // deleteFeatureKeys sentinel — omitting a key from the patch merges as
-            // "unchanged" (see above), not "deleted".
-            if (data.deleteFeatureKeys?.length && next.playbookFeatures) {
-              next.playbookFeatures = { ...next.playbookFeatures };
-              for (const key of data.deleteFeatureKeys) delete next.playbookFeatures[key];
-            }
-            delete next.deleteFeatureKeys;
-            // Id-merge arcana entries instead of overwriting the whole array, so a
-            // concurrent edit to a different entry (or a different field on the same
-            // entry) survives rather than being reverted by a stale snapshot. Removal
-            // uses the explicit removedArcana*Ids sentinel (see the type definition).
-            if (data.arcanaMinor) {
-              next.arcanaMinor = mergeById(c.data?.arcanaMinor, data.arcanaMinor, data.removedArcanaMinorIds);
-            }
-            if (data.arcanaMajor) {
-              next.arcanaMajor = mergeById(c.data?.arcanaMajor, data.arcanaMajor, data.removedArcanaMajorIds);
-            }
-            delete next.removedArcanaMinorIds;
-            delete next.removedArcanaMajorIds;
-            return { ...c, data: next };
-          }),
-        ),
-      );
+      await reportSave(() => editCharacter(characterId, (c) => patchCharacterData(c, data)));
     },
-    [gameRef, reportSave],
+    [editCharacter, reportSave],
   );
 
-  // Add a signed delta to a character's Armor/HP inside the transaction, reading each stat off the
-  // freshly-read doc rather than a caller-supplied snapshot. Arcana consequence actions use this so a
-  // rapid check-then-uncheck (or a snapshot that hasn't echoed the last edit) can't compute the new
-  // value from a stale number and strand the stat on the wrong total.
+  // Add a signed delta to a character's Armor/HP, reading each stat off the freshly-read data rather than a caller-supplied
+  // snapshot, so a rapid check-then-uncheck can't compute the new value from a stale number.
   const adjustCharacterStats = useCallback(
     async (characterId: string, deltas: Partial<Record<AdditiveStat, number>>, guard?: SheetGuard) => {
-      await reportSave(() =>
-        withCharacters(gameRef, (chars) =>
-          chars.map((c) => {
-            if (c.id !== characterId) return c;
-            return { ...c, data: applyStatDeltas(c.data ?? {}, deltas, guard) };
-          }),
-        ),
-      );
+      await reportSave(() => editCharacter(characterId, (c) => ({ ...c, data: applyStatDeltas(c.data ?? {}, deltas, guard) })));
     },
-    [gameRef, reportSave],
+    [editCharacter, reportSave],
   );
 
   const updateSteading = useCallback(
@@ -313,19 +316,24 @@ export const useGame = (gameId: string): UseGameResult => {
   const logRoll = useCallback(
     async (roll: LoggedRoll) => {
       await reportSave(() =>
-        runTransaction(db, async (tx) => {
-          const snap = await tx.get(gameRef);
-          if (!snap.exists()) throw new Error('Game not found — it may have been deleted.');
-          const existing = parseDiceRolls(snap.data().diceRolls) ?? [];
-          // mergeById is add/edit-by-id; our roll is always new, so this reduces to "keep everyone's rolls".
-          const merged = mergeById(existing, [roll])
-            .sort((a, b) => a.createdAt - b.createdAt)
-            .slice(-ROLL_LOG_CAP);
-          tx.update(gameRef, { diceRolls: stripUndefined(merged) });
-        }),
+        either(
+          () =>
+            runTransaction(db, async (tx) => {
+              const snap = await tx.get(gameRef);
+              if (!snap.exists()) throw new Error('Game not found — it may have been deleted.');
+              if (snap.data().schemaVersion === 2) throw new GameMovedError();
+              const existing = parseDiceRolls(snap.data().diceRolls) ?? [];
+              // mergeById is add/edit-by-id; our roll is always new, so this reduces to "keep everyone's rolls".
+              const merged = mergeById(existing, [roll])
+                .sort((a, b) => a.createdAt - b.createdAt)
+                .slice(-ROLL_LOG_CAP);
+              tx.update(gameRef, { diceRolls: stripUndefined(merged) });
+            }),
+          () => v2.logRoll(gameId, roll),
+        ),
       );
     },
-    [gameRef, reportSave],
+    [gameId, gameRef, reportSave, either],
   );
 
   // Shared notes: a plain save (on blur) plus a typing lock so only one tab edits a given notes key at
@@ -410,9 +418,9 @@ export const useGame = (gameId: string): UseGameResult => {
   // through a destructive-action dialog and downloads a safety copy of the live doc first.
   const replaceGameData = useCallback(
     async (game: Record<string, unknown>) => {
-      await reportSave(() => setDoc(gameRef, game));
+      await reportSave(() => (movedRef.current ? v2.replaceGame(gameId, game) : setDoc(gameRef, game)));
     },
-    [gameRef, reportSave],
+    [gameId, gameRef, reportSave, movedRef],
   );
 
   return {
