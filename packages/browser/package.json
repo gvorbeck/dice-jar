@@ -8,11 +8,13 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@dice-jar/stale-build": "*"
+  },
   "peerDependencies": {
     "react": "^19.3.1"
   },
   "devDependencies": {
-    "@dice-jar/stale-build": "*",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.3.0",
     "@vitest/coverage-v8": "^5.1.0",

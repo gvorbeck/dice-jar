@@ -7,7 +7,7 @@ import { CODENAMES } from '../rules/data/random';
 import { Win } from '../ui/Win';
 import { Page } from './Page';
 import { Alert, Hint } from '../ui/bits';
-import { gameUrl } from '../lib/paths';
+import { gameUrl, MAX_ID } from '../lib/paths';
 
 const Hero = () => (
   <header className="hero">
@@ -45,7 +45,7 @@ export default function Home() {
   const [raw, setRaw] = useState('');
   const { busy, err, run } = useRun('Could not create a game. Check your connection and try again.');
   const inputId = useId();
-  const slug = slugifyGameId(raw);
+  const slug = slugifyGameId(raw, MAX_ID);
   const recent = recentGames();
 
   const open = (e: FormEvent) => {

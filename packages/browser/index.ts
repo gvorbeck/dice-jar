@@ -40,22 +40,22 @@ export function downloadJson(name: string, data: unknown) {
 export type CopyState = 'idle' | 'ok' | 'fail';
 
 /** Clipboard write with a short-lived result, so a button can show "copied" or "failed" instead of a blocking alert. */
-export function useCopy(): [CopyState, (text: string) => void] {
+export function useCopy(): [CopyState, (text: string) => Promise<boolean>] {
   const [state, setState] = useState<CopyState>('idle');
   const timer = useRef<number>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
-  const copy = (text: string) => {
-    Promise.resolve()
+  /** Resolves to whether the write worked, so a caller can react to every failure, not only the first. */
+  const copy = async (text: string) => {
+    const ok = await Promise.resolve()
       .then(() => navigator.clipboard.writeText(text))
       .then(
-        () => 'ok' as const,
-        () => 'fail' as const,
-      )
-      .then((s) => {
-        setState(s);
-        clearTimeout(timer.current);
-        timer.current = window.setTimeout(() => setState('idle'), s === 'ok' ? 1500 : 4000);
-      });
+        () => true,
+        () => false,
+      );
+    setState(ok ? 'ok' : 'fail');
+    clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setState('idle'), ok ? 1500 : 4000);
+    return ok;
   };
   return [state, copy];
 }

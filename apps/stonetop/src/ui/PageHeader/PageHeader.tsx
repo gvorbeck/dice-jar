@@ -85,10 +85,6 @@ export const PageHeader = (props: Props) => {
     }
   }, [editing]);
 
-  useEffect(() => {
-    if (copyState === 'fail') addToast('Failed to copy game ID.', 'error');
-  }, [copyState, addToast]);
-
   const startEditing = useCallback(() => {
     if (simple) return;
     setValue((props as FullProps).title);
@@ -125,7 +121,7 @@ export const PageHeader = (props: Props) => {
   );
 
   const copyGameId = () => {
-    if (!simple) copy((props as FullProps).gameId);
+    if (!simple) void copy((props as FullProps).gameId).then((ok) => ok || addToast('Failed to copy game ID.', 'error'));
   };
 
   const copyLabel = copied ? 'Copied!' : 'Copy game ID';

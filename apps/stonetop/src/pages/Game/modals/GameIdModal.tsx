@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { useCopy } from '@dice-jar/browser';
 import { Button, Heading, Modal, Text } from '@/ui';
 
@@ -13,6 +13,7 @@ export const GameIdModal = ({ gameId, open, onClose }: GameIdModalProps) => {
   // The parent mounts this modal only while open, so copy feedback resets
   // naturally on each open — no reset effect needed.
   const [copyState, copy] = useCopy();
+  const [copyFailed, setCopyFailed] = useState(false); // stays up: this is the one place a player must save the ID
   const copied = copyState === 'ok';
 
   return (
@@ -29,13 +30,13 @@ export const GameIdModal = ({ gameId, open, onClose }: GameIdModalProps) => {
           variant="ghost"
           size="sm"
           icon={copied ? 'check' : 'copy'}
-          onClick={() => copy(gameId)}
+          onClick={() => void copy(gameId).then((ok) => setCopyFailed(!ok))}
           aria-label={copied ? 'Copied!' : 'Copy game ID'}
           title={copied ? 'Copied!' : 'Copy game ID'}
         />
       </div>
 
-      {copyState === 'fail' && (
+      {copyFailed && (
         <Text size="xs" color="muted" role="alert">
           Could not copy — please copy the ID manually.
         </Text>

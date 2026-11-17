@@ -9,8 +9,7 @@ import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { overBudget, type BudgetAlert } from './budget.js';
 import { handle, privately, type Interaction } from './bot.js';
-import { gamePath, secretPath } from '../../src/lib/paths';
-import { isGameId } from '../../src/lib/gameId';
+import { gamePath, isGameId, secretPath } from '../../src/lib/paths';
 import { formatEntry, isWebhookUrl, postWebhook, verifyDiscord, webhookName, type Roll } from './discord.js';
 
 // Cost caps for every Function in this project (docs/discord-plan.md, phase 0).

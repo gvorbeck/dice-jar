@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { isStaleChunk, reloadForNewBuild } from './index';
 
 describe('stale build recovery', () => {
-  beforeEach(() => sessionStorage.clear());
+  beforeEach(() => {
+    window.name = '';
+  });
 
   it('recognises a failed dynamic import in each browser', () => {
     for (const m of [
@@ -25,28 +27,17 @@ describe('stale build recovery', () => {
     expect(reload).toHaveBeenCalledTimes(2);
   });
 
-  it('keeps the cooldown in window.name when storage is blocked', () => {
+  it('holds the cooldown even when sessionStorage is blocked or full', () => {
     const reload = vi.fn();
-    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+    const blocked = () => {
       throw new Error('blocked');
-    });
+    };
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(blocked);
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(blocked);
     expect(reloadForNewBuild(reload, 1_000_000)).toBe(true);
     expect(reloadForNewBuild(reload, 1_005_000)).toBe(false); // would loop without a stored cooldown
     expect(reload).toHaveBeenCalledTimes(1);
     vi.restoreAllMocks();
-    window.name = '';
-  });
-
-  it('falls back to window.name when storage is full', () => {
-    const reload = vi.fn();
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('quota');
-    });
-    expect(reloadForNewBuild(reload, 1_000_000)).toBe(true);
-    expect(reloadForNewBuild(reload, 1_005_000)).toBe(false);
-    expect(reload).toHaveBeenCalledTimes(1);
-    vi.restoreAllMocks();
-    window.name = '';
   });
 
   it('calls location.reload by default', () => {

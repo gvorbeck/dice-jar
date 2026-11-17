@@ -52,7 +52,9 @@ describe('useCopy', () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText } });
     const { result } = renderHook(() => useCopy());
-    await act(async () => result.current[1]('hello'));
+    let ok: boolean | undefined;
+    await act(async () => void (ok = await result.current[1]('hello')));
+    expect(ok).toBe(true);
     expect(writeText).toHaveBeenCalledWith('hello');
     expect(result.current[0]).toBe('ok');
     await act(async () => void vi.advanceTimersByTime(1500));
@@ -63,7 +65,9 @@ describe('useCopy', () => {
   it('says fail when the clipboard refuses', async () => {
     vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockRejectedValue(new Error('no')) } });
     const { result } = renderHook(() => useCopy());
-    await act(async () => result.current[1]('x'));
+    let ok: boolean | undefined;
+    await act(async () => void (ok = await result.current[1]('x')));
+    expect(ok).toBe(false);
     expect(result.current[0]).toBe('fail');
     vi.unstubAllGlobals();
   });

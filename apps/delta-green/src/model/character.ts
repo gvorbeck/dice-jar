@@ -1,8 +1,6 @@
 import { z } from 'zod';
 import { STATS } from '../rules/data/creation';
 import { BONUS_PICKS } from '../rules/data/skills';
-import { downloadJson, store } from '@dice-jar/browser';
-import { SAVED_AGENT_BAK, SAVED_AGENT_KEY } from '../lib/storage';
 import { fromGreenAgent, isGreenAgent } from './greenagent';
 
 const CHARACTER_VERSION = 1;
@@ -126,21 +124,6 @@ export function parseCharacter(raw: unknown): Character {
   while (c && typeof c.version === 'number' && c.version < CHARACTER_VERSION) c = migrations[c.version]!(c);
   return characterSchema.parse(c);
 }
-
-export const loadCharacter = (): Character => {
-  const s = store.get(SAVED_AGENT_KEY);
-  if (s) {
-    try {
-      return parseCharacter(JSON.parse(s));
-    } catch {
-      store.set(SAVED_AGENT_BAK, s);
-    } // unreadable: keep the raw copy
-  }
-  return newCharacter();
-};
-
-export const exportJson = (c: Character) =>
-  downloadJson(`${c.details.name.trim().replace(/\W+/g, '-').toLowerCase() || 'agent'}.dg.json`, c);
 
 /** An Agent as this app exports it, or as the Green Agent creator does. */
 export const characterFrom = (raw: unknown): Character => parseCharacter(isGreenAgent(raw) ? fromGreenAgent(raw) : raw);

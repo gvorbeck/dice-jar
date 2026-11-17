@@ -40,7 +40,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 
 ## Things that trip people up
 
-- An app's `functions/` is deployed by Firebase on its own, so it keeps its own `package.json` and lockfile and is not an npm workspace. It imports shared code by relative path and esbuild bundles it in. See delta-green's `functions/package.json` and the Functions steps in its deploy workflow.
+- An app's `functions/` is deployed by Firebase on its own, so it keeps its own `package.json` and lockfile and is not an npm workspace. It imports shared code by relative path and esbuild bundles it in. It does not bundle `@dice-jar/*` packages (`--packages=external`), so nothing the Functions import from the app may import them; the Functions build fails if its output mentions one. See delta-green's `functions/package.json` and the Functions steps in its deploy workflow.
 - Saves are diffs against what the tab last read. Shared save code takes a document reference from the app and never builds a path. Never write a whole document, or you'll overwrite changes from another device.
 - Firestore rules deploy before the build, and open tabs keep running the old build. Adding or removing a field takes two releases.
 - E2E tests click a radio's or checkbox's `label.choice`; React Aria hides the input itself.

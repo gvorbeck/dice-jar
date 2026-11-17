@@ -1,15 +1,12 @@
 import { slugifyGameId } from '@dice-jar/game-id';
 import { store } from '@dice-jar/browser';
+import { MAX_ID } from './paths';
 import { SAVED_AGENT_BAK, SAVED_AGENT_KEY } from './storage';
 
 export const MIN_ID = 3;
-const MAX_ID = 100; // slugifyGameId's default limit
-/** Server-side check (Functions): any ID this app could have made, older short ones included. */
-const GAME_ID = new RegExp(`^[a-z0-9-]{1,${MAX_ID}}$`);
-export const isGameId = (s: string) => GAME_ID.test(s);
 
 /** An ID this app would create or open: already in slug form and long enough. */
-export const isOpenableId = (id: string) => id.length >= MIN_ID && slugifyGameId(id) === id;
+export const isOpenableId = (id: string) => id.length >= MIN_ID && slugifyGameId(id, MAX_ID) === id;
 
 // Games this browser has opened, newest first, so the landing page can offer a way back in.
 const RECENT = 'dg.games';

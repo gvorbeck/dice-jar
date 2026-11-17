@@ -153,7 +153,7 @@ export default function Game() {
   // The sheet model is loaded on demand so this page stays small.
   const addAgent = (fromSaved: boolean) =>
     run(async () => {
-      const [{ createAgent }, { loadCharacter }] = await Promise.all([import('../lib/agents'), import('../model/character')]);
+      const [{ createAgent }, { loadCharacter }] = await Promise.all([import('../lib/agents'), import('../lib/savedAgent')]);
       const id = createAgent(gameId, fromSaved ? loadCharacter() : undefined);
       if (fromSaved) forgetSavedAgent();
       nav(agentUrl(gameId, id));
