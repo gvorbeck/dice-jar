@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dice-jar",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "5182", "--strictPort", "apps/dice-jar"],
+      "port": 5182
+    }
+  ]
+}

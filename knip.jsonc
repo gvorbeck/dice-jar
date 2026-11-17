@@ -5,6 +5,7 @@
   // The test glob is needed: the app's vitest runs those tests, but knip can't see that from inside functions/.
   "workspaces": {
     ".": {},
+    "apps/dice-jar": { "entry": ["e2e/*.spec.ts"] },
     "apps/delta-green": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "vitest.rules.config.ts"] },
     "apps/stonetop": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "scripts/*.ts", "vitest.rules.config.ts"] },
     "apps/delta-green/functions": {
