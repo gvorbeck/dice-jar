@@ -10,10 +10,14 @@
 export const SCHEMA_VERSION = 2;
 
 type Raw = Record<string, unknown>;
+export interface Stored {
+  id: string;
+  data: Raw;
+}
 export interface SplitGame {
   game: Raw;
-  characters: { id: string; data: Raw }[];
-  rolls: { id: string; data: Raw }[];
+  characters: Stored[];
+  rolls: Stored[];
 }
 export type SplitResult = { ok: true; split: SplitGame } | { ok: false; problems: string[] };
 
@@ -76,4 +80,14 @@ export const joinGame = ({ game, characters, rolls }: SplitGame): Raw => {
   const { schemaVersion: _version, ...rest } = game;
   // shortcut: an empty `diceRolls: []` and an absent one come back the same (absent); the app reads both as no rolls.
   return { ...rest, characters: inOrder(characters), ...(rolls.length ? { diceRolls: inOrder(rolls) } : {}) };
+};
+
+/** The game as the old one-document shape, with rolls newest-last: rolls are ordered by `createdAt`, since an edited roll gets a new one. */
+export const assembleGame = (game: Raw, characters: Stored[], rolls: Stored[]): Raw => {
+  const { restoreToken: _token, ...visible } = game;
+  const joined = joinGame({ game: visible, characters, rolls });
+  const byTime = (r: Raw) => Number(r.createdAt) || 0;
+  return Array.isArray(joined.diceRolls)
+    ? { ...joined, diceRolls: [...(joined.diceRolls as Raw[])].sort((a, b) => byTime(a) - byTime(b)) }
+    : joined;
 };

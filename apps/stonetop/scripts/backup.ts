@@ -1,6 +1,7 @@
 import { initializeApp, cert, type ServiceAccount } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as path from 'path';
+import { assembleGame, type Stored } from '../src/lib/gameShape.ts';
 import * as fs from 'fs';
 
 const serviceKeyPath = path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS ?? '');
@@ -16,8 +17,14 @@ const db = getFirestore();
 const backup = async () => {
   const snapshot = await db.collection('games').get();
   const data: Record<string, unknown> = {};
+  const stored = (snap: FirebaseFirestore.QuerySnapshot): Stored[] => snap.docs.map((d) => ({ id: d.id, data: d.data() }));
   for (const doc of snapshot.docs) {
-    data[doc.id] = doc.data();
+    const game = doc.data();
+    // A moved game is saved as the one document it was before, so every backup has one shape and any tool can read it.
+    data[doc.id] =
+      game.schemaVersion === 2
+        ? assembleGame(game, stored(await doc.ref.collection('characters').get()), stored(await doc.ref.collection('rolls').get()))
+        : game;
   }
   const outPath = path.resolve(`./firestore-backup-${Date.now()}.json`);
   fs.writeFileSync(outPath, JSON.stringify(data, null, 2));

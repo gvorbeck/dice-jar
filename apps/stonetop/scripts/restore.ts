@@ -53,7 +53,9 @@ const restore = async () => {
   }
   const moved = movedIds(safety as Record<string, Record<string, unknown>>);
   if (moved.length) {
-    throw new Error(`Moved to subcollections, so restoring would orphan their characters and rolls: ${moved.join(', ')}`);
+    throw new Error(
+      `Moved to subcollections, so restoring would orphan their characters and rolls (put them back first with unmigrate-game.ts): ${moved.join(', ')}`,
+    );
   }
   if (WRITE) {
     const safetyPath = path.resolve(`./firestore-pre-restore-${Date.now()}.json`);

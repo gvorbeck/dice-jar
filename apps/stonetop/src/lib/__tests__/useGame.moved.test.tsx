@@ -8,8 +8,7 @@ vi.mock('firebase/firestore', () => firestoreMockModule());
 vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
 
 import { useGame } from '../useGame';
-import { assembleGame } from '../gameV2';
-import { splitGame } from '../gameShape';
+import { assembleGame, splitGame } from '../gameShape';
 import { ROLL_LOG_CAP } from '../gameParsing';
 import type { Character, LoggedRoll } from '@/model';
 

@@ -27,13 +27,17 @@ const withoutEmptyRolls = (raw: Record<string, unknown>) => {
   return Array.isArray(diceRolls) && diceRolls.length === 0 ? rest : raw;
 };
 
+/** Whether two stored games are the same data: key order does not matter, and an empty roll list equals none. */
+export const sameGame = (a: Record<string, unknown>, b: Record<string, unknown>) =>
+  canonical(withoutEmptyRolls(a)) === canonical(withoutEmptyRolls(b));
+
 export const auditGames = (games: Record<string, unknown>): GameAudit[] =>
   Object.entries(games).map(([id, raw]) => {
     const bytes = new TextEncoder().encode(JSON.stringify(raw)).length;
     const result = splitGame(raw as Record<string, unknown>);
     if (!result.ok) return { id, problems: result.problems, characters: 0, rolls: 0, bytes };
     const { split } = result;
-    const same = canonical(joinGame(split)) === canonical(withoutEmptyRolls(raw as Record<string, unknown>));
+    const same = sameGame(joinGame(split), raw as Record<string, unknown>);
     return {
       id,
       problems: same ? [] : ['splitting and joining does not give back the stored document'],

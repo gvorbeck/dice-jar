@@ -1,7 +1,7 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { expect, type Browser, type Page } from '@playwright/test';
-import { splitGame } from '../src/lib/gameShape.ts';
+import { migrateGame } from '../scripts/migrateCore.ts';
 
 /** A page in a new browser context: its own offline cache, so it only sees what reached the server. Close it with `await page.context().close()` when the test is done. */
 export const freshPage = async (browser: Browser) => (await browser.newContext()).newPage();
@@ -30,18 +30,10 @@ const admin = () => {
   return getFirestore();
 };
 
-/** What the migration script will do to a game, run against the emulator: its characters and rolls become documents of their own. */
+/** The real migration, run against the emulator: the game's characters and rolls become documents of their own. */
 export const moveGame = async (id: string) => {
-  const db = admin();
-  const ref = db.doc(`games/${id}`);
-  await db.runTransaction(async (tx) => {
-    const result = splitGame((await tx.get(ref)).data() ?? {});
-    if (!result.ok) throw new Error(result.problems.join('; '));
-    const { split } = result;
-    tx.set(ref, split.game);
-    split.characters.forEach((c) => tx.set(ref.collection('characters').doc(c.id), c.data));
-    split.rolls.forEach((r) => tx.set(ref.collection('rolls').doc(r.id), r.data));
-  });
+  const outcome = await migrateGame(admin(), id);
+  if (outcome.status !== 'moved') throw new Error(`The game did not move: ${outcome.status}`);
 };
 
 /** The game as the server has it: the document, and the names of its characters in order. */
