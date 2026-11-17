@@ -254,8 +254,7 @@ export const useGame = (gameId: string): UseGameResult => {
     [editCharacter, reportSave],
   );
 
-  // Add a signed delta to a character's Armor/HP, reading each stat off the freshly-read data rather than a caller-supplied
-  // snapshot, so a rapid check-then-uncheck can't compute the new value from a stale number.
+  // Reads each stat off the freshly-read data, not a caller's snapshot, so a rapid check-then-uncheck can't start from a stale number.
   const adjustCharacterStats = useCallback(
     async (characterId: string, deltas: Partial<Record<AdditiveStat, number>>, guard?: SheetGuard) => {
       await reportSave(() => editCharacter(characterId, (c) => ({ ...c, data: applyStatDeltas(c.data ?? {}, deltas, guard) })));

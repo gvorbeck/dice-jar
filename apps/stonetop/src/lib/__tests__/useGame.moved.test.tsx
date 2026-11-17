@@ -13,8 +13,7 @@ import { splitGame } from '../gameShape';
 import { ROLL_LOG_CAP } from '../gameParsing';
 import type { Character, LoggedRoll } from '@/model';
 
-// A game stored the old way (v1) and the same game moved to subcollections (v2) must behave identically: run the same
-// saves against both and the moved game, put back together, has to equal the old one.
+// The same saves run on a game in one document and on its moved copy must give the same game once the moved one is put back together.
 
 const V1 = 'games/old';
 const V2 = 'games/new';

@@ -1,5 +1,4 @@
-// A game moved to subcollections (MIGRATION.md) has to behave exactly like any other for the people playing it.
-// Each test builds a game through the app, moves it the way the migration will, then plays on.
+// A game moved to subcollections (MIGRATION.md) must behave like any other: build one in the app, move it as the migration will, play on.
 import { expect, test } from '@playwright/test';
 import { addCharacter, createGame, freshPage, moveGame, serverGame } from './helpers';
 
