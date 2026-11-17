@@ -14,6 +14,7 @@ import {
   isFirestoreError,
   mergeById,
   GameMovedError,
+  UserFacingError,
   patchCharacterData,
   STEADING_ID_ARRAY_FIELDS,
   stripUndefined,
@@ -87,7 +88,11 @@ export const useGame = (gameId: string): UseGameResult => {
         // that actionable message; everything else falls back to SAVE_ERROR_MESSAGE
         // so it still dedupes against the debounce hook's toast on the shared string.
         const message =
-          isFirestoreError(error) && FIRESTORE_ERROR_MESSAGES[error.code] ? FIRESTORE_ERROR_MESSAGES[error.code]! : SAVE_ERROR_MESSAGE;
+          error instanceof UserFacingError
+            ? error.message
+            : isFirestoreError(error) && FIRESTORE_ERROR_MESSAGES[error.code]
+              ? FIRESTORE_ERROR_MESSAGES[error.code]!
+              : SAVE_ERROR_MESSAGE;
         addToastRef.current?.(message, 'error');
         throw error;
       } finally {
@@ -423,7 +428,8 @@ export const useGame = (gameId: string): UseGameResult => {
           () =>
             runTransaction(db, async (tx) => {
               if ((await tx.get(gameRef)).data()?.schemaVersion === 2) throw new GameMovedError();
-              if (!fitsOneDocument(game)) throw new Error('That backup is too large for a single game document.');
+              if (!fitsOneDocument(game))
+                throw new UserFacingError('That backup is too large for a single game. Trim some content from it and try again.');
               tx.set(gameRef, game);
             }),
           () => v2.replaceGame(gameId, game),

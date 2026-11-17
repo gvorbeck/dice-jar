@@ -62,6 +62,9 @@ export const STEADING_ID_ARRAY_FIELDS = {
   gmImprovements: 'removedGmImprovementIds',
 } as const;
 
+/** An error whose message is meant for the player, so a save shows it instead of the generic "couldn't save". */
+export class UserFacingError extends Error {}
+
 // Thrown when a write finds the game has moved to subcollections, so a tab with a stale copy can carry on the new way.
 export class GameMovedError extends Error {}
 

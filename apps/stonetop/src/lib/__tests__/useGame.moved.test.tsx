@@ -365,6 +365,60 @@ describe('two players at once', () => {
   });
 });
 
+describe('two restores at once', () => {
+  it('the clean-up of one never deletes what a later restore wrote', async () => {
+    const { moved } = await renderBoth();
+    const { getDocs } = await import('firebase/firestore');
+    const real = vi.mocked(getDocs).getMockImplementation()!;
+    let reads = 0;
+    vi.mocked(getDocs).mockImplementation(async (ref) => {
+      // Restore A has committed; before it sweeps, restore B commits a different backup.
+      if (++reads === 3) {
+        firestoreStore.setQuietly(V2, { ...firestoreStore.get(V2)!, name: 'From B', restoreToken: 'B' });
+        firestoreStore.delete(`${V2}/characters/z`);
+        firestoreStore.setQuietly(`${V2}/characters/b1`, { id: 'b1', name: 'B', playbook: 'heavy', order: 0 });
+      }
+      return real(ref);
+    });
+    await act(async () => {
+      await moved.result.current.replaceGameData({ name: 'From A', createdAt: 1, characters: [char('z')] });
+    });
+    vi.mocked(getDocs).mockImplementation(real);
+    expect(stored(`${V2}/characters`).map((c) => c.id)).toEqual(['b1']);
+    expect(firestoreStore.get(V2)!.name).toBe('From B');
+  });
+
+  it('keeps the restore marker out of the game the app and exports see', async () => {
+    const { moved } = await renderBoth();
+    await act(async () => {
+      await moved.result.current.replaceGameData({ name: 'Back', createdAt: 1, characters: [] });
+    });
+    expect(firestoreStore.get(V2)!.restoreToken).toEqual(expect.any(String));
+    expect(movedAsOneDocument()).not.toHaveProperty('restoreToken');
+  });
+});
+
+describe('a restore that cannot go ahead says why', () => {
+  it('names the size problem for a game still in one document', async () => {
+    const { old } = await renderBoth();
+    await act(async () => {
+      await expect(
+        old.result.current.replaceGameData({ name: 'x', createdAt: 1, characters: [], threats: 'x'.repeat(1_000_001) }),
+      ).rejects.toThrow();
+    });
+    expect(addToastSpy).toHaveBeenCalledWith(expect.stringContaining('too large'), 'error');
+    expect(addToastSpy).not.toHaveBeenCalledWith(expect.stringContaining('check your connection'), 'error');
+  });
+
+  it('names the problem with a backup a moved game cannot take', async () => {
+    const { moved } = await renderBoth();
+    await act(async () => {
+      await expect(moved.result.current.replaceGameData({ name: 'x', createdAt: 1, characters: [{ name: 'no id' }] })).rejects.toThrow();
+    });
+    expect(addToastSpy).toHaveBeenCalledWith(expect.stringContaining("can't be restored"), 'error');
+  });
+});
+
 describe('exporting a moved game', () => {
   it('reads again until two passes agree, so a restore running meanwhile cannot leave a mix', async () => {
     seed();

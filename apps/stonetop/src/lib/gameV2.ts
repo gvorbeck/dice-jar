@@ -3,7 +3,8 @@ import { db } from '@/lib/firebase';
 import { GAMES_COLLECTION } from '@/lib/constants';
 import { joinGame, splitGame } from '@/lib/gameShape';
 import { parseCharacters, ROLL_LOG_CAP } from '@/lib/gameParsing';
-import { stripUndefined } from '@/lib/gameMutations';
+import { stripUndefined, UserFacingError } from '@/lib/gameMutations';
+import { generateId } from '@/lib/id';
 import type { Character, LoggedRoll } from '@/model';
 
 // Reads and writes for a game moved to subcollections (schemaVersion 2; see MIGRATION.md).
@@ -31,7 +32,8 @@ const nextOrder = (items: Stored[]) => Math.max(-1, ...items.map((i) => Number(i
 
 /** The game as the old one-document shape, with rolls newest-last: rolls are ordered by `createdAt`, since an edited roll gets a new one. */
 export const assembleGame = (game: Raw, characters: Stored[], rolls: Stored[]): Raw => {
-  const joined = joinGame({ game, characters, rolls });
+  const { restoreToken: _token, ...visible } = game;
+  const joined = joinGame({ game: visible, characters, rolls });
   const byTime = (r: Raw) => Number(r.createdAt) || 0;
   return Array.isArray(joined.diceRolls)
     ? { ...joined, diceRolls: [...(joined.diceRolls as Raw[])].sort((a, b) => byTime(a) - byTime(b)) }
@@ -116,27 +118,36 @@ export const logRoll = async (gameId: string, roll: LoggedRoll): Promise<void> =
 export const replaceGame = async (gameId: string, backup: Raw): Promise<void> => {
   const [characters, rolls] = await Promise.all([storedDocs(charactersCol(gameId)), storedDocs(rollsCol(gameId))]);
   const result = splitGame(backup);
-  if (!result.ok) throw new Error(`That backup can't be restored: ${result.problems.join('; ')}`);
+  if (!result.ok) throw new UserFacingError(`That backup can't be restored: ${result.problems.join('; ')}`);
   const { split } = result;
   if (characters.length + rolls.length + split.characters.length + split.rolls.length > MAX_BATCH) {
-    throw new Error('That backup is too large to restore in one step.');
+    throw new UserFacingError('That backup is too large to restore in one step.');
   }
   const batch = writeBatch(db);
-  batch.set(doc(db, GAMES_COLLECTION, gameId), split.game);
+  const gameRef = doc(db, GAMES_COLLECTION, gameId);
+  // Marks this restore as the latest, so the clean-up below never deletes what a later restore wrote.
+  const token = generateId();
+  batch.set(gameRef, { ...split.game, restoreToken: token });
   characters.forEach((c) => batch.delete(characterRef(gameId, c.id)));
   rolls.forEach((r) => batch.delete(rollRef(gameId, r.id)));
   split.characters.forEach((c) => batch.set(characterRef(gameId, c.id), c.data));
   split.rolls.forEach((r) => batch.set(rollRef(gameId, r.id), r.data));
   await batch.commit();
 
-  // shortcut: strays added before this read are swept, one added after survives; upgrade with a shared write guard if restores run during play.
-  const [kept, keptRolls] = [new Set(split.characters.map((c) => c.id)), new Set(split.rolls.map((r) => r.id))];
+  // shortcut: a stray added after this read survives; upgrade with a write guard on the party if restores run during play.
+  const kept = new Set([
+    ...split.characters.map((c) => characterRef(gameId, c.id).path),
+    ...split.rolls.map((r) => rollRef(gameId, r.id).path),
+  ]);
   const [nowCharacters, nowRolls] = await Promise.all([storedDocs(charactersCol(gameId)), storedDocs(rollsCol(gameId))]);
-  const stray = writeBatch(db);
-  const strays = [
-    ...nowCharacters.filter((c) => !kept.has(c.id)).map((c) => characterRef(gameId, c.id)),
-    ...nowRolls.filter((r) => !keptRolls.has(r.id)).map((r) => rollRef(gameId, r.id)),
-  ];
-  strays.forEach((ref) => stray.delete(ref));
-  if (strays.length) await stray.commit();
+  const strays = [...nowCharacters.map((c) => characterRef(gameId, c.id)), ...nowRolls.map((r) => rollRef(gameId, r.id))].filter(
+    (ref) => !kept.has(ref.path),
+  );
+  await Promise.all(
+    strays.map((ref) =>
+      runTransaction(db, async (tx) => {
+        if ((await tx.get(gameRef)).data()?.restoreToken === token) tx.delete(ref);
+      }),
+    ),
+  );
 };
