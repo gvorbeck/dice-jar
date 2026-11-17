@@ -1,27 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-
-export type CopyState = 'idle' | 'ok' | 'fail';
-
-/** Clipboard write with a short-lived result, so a button can show "copied" or "failed" instead of a blocking alert. */
-export function useCopy(): [CopyState, (text: string) => void] {
-  const [state, setState] = useState<CopyState>('idle');
-  const timer = useRef<number>(undefined);
-  useEffect(() => () => clearTimeout(timer.current), []);
-  const copy = (text: string) => {
-    Promise.resolve()
-      .then(() => navigator.clipboard.writeText(text))
-      .then(
-        () => 'ok' as const,
-        () => 'fail' as const,
-      )
-      .then((s) => {
-        setState(s);
-        clearTimeout(timer.current);
-        timer.current = window.setTimeout(() => setState('idle'), s === 'ok' ? 1500 : 4000);
-      });
-  };
-  return [state, copy];
-}
+import type { CopyState } from '@dice-jar/browser';
 
 /** Button label for each copy state; `idle` is the resting text. */
 export const copyLabel = (s: CopyState, idle: string, ok = 'Link copied ✓') => (s === 'ok' ? ok : s === 'fail' ? 'Copy failed' : idle);

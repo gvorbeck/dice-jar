@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { resolvePlaybookFeatures, featurePatch } from '../resolvePlaybookFeatures';
-import type { CharacterData } from '@/types';
+import type { CharacterData } from '@/model';
 
 describe('resolvePlaybookFeatures', () => {
   it('returns {} when data is undefined', () => {

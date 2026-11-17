@@ -1,0 +1,210 @@
+:root {
+  /* Tells the UA which palette to draw its own chrome in — the overscroll
+     gutter, native <select> popups, and any scrollbar our CSS below can't
+     reach. Must live here rather than in a later rule: [data-theme="light"]
+     has equal specificity, so a later :root would win over it. */
+  color-scheme: dark;
+
+  /* Stone — warm neutrals */
+  --color-stone-50: #fafaf9;
+  --color-stone-100: #f5f4f0;
+  --color-stone-200: #e8e5df;
+  --color-stone-300: #d4cfc7;
+  --color-stone-400: #9e9790;
+  /* Half-steps: 450 is the dimmest text that clears WCAG AA on dark surfaces;
+     550 is the dimmest that clears AA on light surfaces. */
+  --color-stone-450: #938a81;
+  --color-stone-500: #72685f;
+  --color-stone-550: #5d544b;
+  --color-stone-600: #524d48;
+  --color-stone-700: #3d3830;
+  --color-stone-800: #242019;
+  --color-stone-900: #131109;
+
+  /* Forge — deep near-black backgrounds */
+  --color-forge-950: #0d0c08;
+  --color-forge-900: #141210;
+  --color-forge-800: #1c1916;
+  --color-forge-700: #26221e;
+  --color-forge-600: #302b26;
+
+  /* Navy — legacy tokens kept for other pages */
+  --color-navy-700: #1e3a5f;
+  --color-navy-800: #162d4a;
+  --color-navy-900: #0f1f33;
+
+  /* Gold — aged, warm, not neon */
+  --color-black: #000;
+  --color-gold-100: #fdf3c8;
+  --color-gold-200: #f9e08a;
+  --color-gold-300: #f2c84b;
+  --color-gold-400: #e6b020;
+  --color-gold-500: #c8950f;
+  --color-gold-600: #9e7209;
+  --color-gold-650: #8f6808;
+  /* Deep golds for body-size accent text on light surfaces, where gold-600
+     only manages ≈3.9:1 (AA needs 4.5:1). */
+  --color-gold-700: #7a5a08;
+  --color-gold-800: #6b4f07;
+
+  /* Ember — danger/warning accent */
+  --color-ember-400: #e86b3a;
+  --color-ember-600: #b84a22;
+  --color-danger: var(--color-ember-400);
+
+  /* Moss — success accent */
+  --color-moss-400: #6abf7a;
+  --color-moss-600: #3d7a49;
+  --color-success: var(--color-moss-400);
+
+  /* Amber — warning accent */
+  --color-amber-400: #f59e0b;
+  --color-amber-600: #8a5607;
+  --color-warning: var(--color-amber-400);
+
+  --font-serif: 'IM Fell English', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Type scale — Major Third (×1.25), base 1rem = 16px.
+     Sub-md steps sit above the strict scale: IM Fell English has a small
+     x-height, so body sizes are bumped for readability (player feedback). */
+  --text-2xs: 0.6875rem; /* 11px — sub-label fine print */
+  --text-xs: 0.8125rem; /* 13px — labels, citations, meta */
+  --text-sm: 0.9375rem; /* 15px — body copy, move text, most content */
+  --text-md: 1rem; /* 16px — UI chrome, collapse headers */
+  --text-lg: 1.25rem; /* 20px — section headings, descriptions */
+  --text-xl: 1.5625rem; /* 25px — stat inputs */
+  --text-2xl: 1.953rem; /* 31px — large stat boxes */
+  --text-3xl: 2.441rem; /* 39px — page/display headings */
+  --text-display: 2.75rem; /* 44px — one-off display title (game name input) */
+
+  --radius-sm: 1px;
+  --radius-md: 3px;
+  --radius-lg: 6px;
+  --radius-pill: 999px; /* fully rounded — pill/chip shapes */
+
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+
+  /* Z-index scale — global overlay layers, ordered bottom to top.
+     Local stacking contexts (e.g. z-index: 1 within a component) stay raw. */
+  --z-sticky: 100; /* sticky tab bars */
+  --z-floating: 200; /* floating buttons (scroll-to-top) */
+  --z-dropdown: 300; /* popover menus, tag-input dropdowns */
+  --z-overlay: 400; /* modal backdrop + dialog */
+  --z-tooltip: 500; /* tooltips, above everything except toasts */
+  --z-toast: 600; /* transient notifications, always on top */
+
+  /* Semantic surface tokens */
+  --surface-page: var(--color-forge-900);
+  --surface-panel: var(--color-forge-800);
+  --surface-raised: var(--color-forge-700);
+  --surface-overlay: var(--color-forge-600);
+
+  /* Control fills that sit under fixed white ink — deliberately the same in both
+     themes, unlike --color-danger, which flips for text-on-surface contrast. */
+  --fill-danger: var(--color-ember-600);
+
+  --border-subtle: var(--color-stone-700);
+  /* stone-500, not 600: control boundaries (unchecked checkboxes, inputs) need
+     ≥3:1 non-text contrast (WCAG 1.4.11); stone-600 sits at ≈2.1:1 on panels.
+     Shared by both themes — no light-mode override needed. */
+  --border-strong: var(--color-stone-500);
+  --border-accent: var(--color-gold-500);
+
+  --text-primary: var(--color-stone-100);
+  --text-secondary: var(--color-stone-400);
+  /* Dimmest text tier — instructions, placeholder labels, drag handles.
+     stone-450, not 500: stone-500 fails WCAG AA on every dark surface (≈3.2:1). */
+  --text-tertiary: var(--color-stone-450);
+  --text-accent: var(--color-gold-300);
+  /* Brighter accent for hover/active emphasis on accent-colored controls */
+  --text-accent-strong: var(--color-gold-200);
+  --text-heading: var(--color-gold-300);
+  /* Status text tiers — alias the theme-aware status colors so error/success/warning
+     copy stays readable in both themes without a separate light-mode override. */
+  --text-danger: var(--color-danger);
+  --text-success: var(--color-success);
+  --text-warning: var(--color-warning);
+  /* Ink for fixed-color fills (gold, --fill-danger). Not overridden in the light theme on
+     purpose: the fills don't flip, so the ink must not either. */
+  --text-on-gold: var(--color-forge-900);
+  --text-on-danger: #fff;
+
+  /* Scrollbars — aged brass on a transparent track. No hover token: browsers
+     derive their own hover and active shades from the thumb color. */
+  --scrollbar-thumb: var(--color-gold-600);
+  --scrollbar-track: transparent;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+
+  /* Glows — colored box-shadow halos for hover emphasis on accent/danger controls */
+  --glow-gold: 0 0 16px color-mix(in srgb, var(--color-gold-400) 25%, transparent);
+  --glow-gold-subtle: 0 0 16px color-mix(in srgb, var(--color-gold-400) 15%, transparent);
+  --glow-danger: 0 0 16px color-mix(in srgb, var(--color-danger) 30%, transparent);
+
+  /* Breakpoints — reference values only; CSS custom properties cannot be used inside @media conditions.
+     Copy the raw px value into each media query and note the token name as a comment. */
+  --bp-sm: 640px; /* large phone landscape */
+  --bp-md: 768px; /* tablet portrait */
+  --bp-lg: 1024px; /* tablet landscape / small desktop */
+  --bp-xl: 1280px; /* desktop */
+
+  --content-width: 1200px; /* max width for page content and header alignment */
+
+  /* Hero display size — for the Home wordmark only; outside the Major Third scale */
+  --text-hero: clamp(3rem, 8vw, 5rem);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --surface-page: var(--color-stone-50);
+  --surface-panel: var(--color-stone-100);
+  --surface-raised: var(--color-stone-200);
+  --surface-overlay: var(--color-stone-300);
+
+  --border-subtle: var(--color-stone-300);
+  /* --border-strong intentionally not overridden: stone-500 clears the 3:1
+     non-text minimum (WCAG 1.4.11) on both themes' surfaces. */
+
+  --text-primary: var(--color-stone-800);
+  --text-secondary: var(--color-stone-600);
+  /* stone-550: keeps a distinct dim tier while still clearing WCAG AA (≈4.8:1)
+     on the overlay surface, where stone-500 fails (≈3.5:1). */
+  --text-tertiary: var(--color-stone-550);
+  /* gold-700, not 600: accent text also renders at body size (selected move
+     names, labels), which needs 4.5:1 — gold-600 only manages ≈3.9:1 on panels. */
+  --text-accent: var(--color-gold-700);
+  /* Deeper than --text-accent so hover/active still darkens; passes AA on all surfaces. */
+  --text-accent-strong: var(--color-gold-800);
+  /* gold-650: headings can render at 20px regular, which needs 4.5:1; gold-600 only reaches 3.9:1. */
+  --text-heading: var(--color-gold-650);
+
+  /* Status-accent tiers: source hues (ember/moss/amber-400) fall below 3:1 on
+     light stone surfaces. Darker shades restore AA contrast for text usage. */
+  --color-danger: var(--color-ember-600);
+  --color-success: var(--color-moss-600);
+  --color-warning: var(--color-amber-600);
+
+  /* gold-700, not 600: a styled scrollbar is an author-drawn UI component, so
+     the thumb needs ≥3:1 against every surface it can sit on (WCAG 1.4.11).
+     gold-600 only manages ≈2.8:1 on the overlay surface behind dropdown lists,
+     and gold-400 is ≈1.9:1 — invisible on light stone. */
+  --scrollbar-thumb: var(--color-gold-700);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+}

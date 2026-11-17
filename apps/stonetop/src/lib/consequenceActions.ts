@@ -1,5 +1,5 @@
-import type { ArcanaConsequence, CharacterData, ConsequenceAction, DebilityType, MajorArcanum } from '@/types';
-import { MAJOR_ARCANA } from '@/lib/arcana/major';
+import type { ArcanaConsequence, CharacterData, ConsequenceAction, DebilityType, MajorArcanum } from '@/model';
+import { MAJOR_ARCANA } from '@/rules/arcana/major';
 
 // The central place where a consequence checkbox's side effects are applied. A consequence can carry
 // `actions` (see ConsequenceAction); marking the box runs them and unmarking reverses them. Each action

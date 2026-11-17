@@ -1,4 +1,4 @@
-import type { CharacterData, RollBand, RollStat } from '@/types';
+import type { CharacterData, RollBand, RollStat } from '@/model';
 import { STATS } from './constants';
 
 export type RollMode = 'normal' | 'adv' | 'dis';

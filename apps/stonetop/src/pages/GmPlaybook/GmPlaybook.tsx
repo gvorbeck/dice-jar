@@ -1,14 +1,14 @@
 import { useCallback, useMemo, useRef } from 'react';
-import { useHashTabs } from '@/hooks/useHashTabs';
+import { useHashTabs } from '@/lib/useHashTabs';
 import { useParams } from 'react-router-dom';
-import { PageMeta } from '@/components/app/PageMeta/PageMeta';
-import { useGame } from '@/hooks/useGame';
-import { useNotesActions } from '@/hooks/useNotesActions';
-import { SharedNotes, type NotesActions } from '@/components/playbook/SharedNotes/SharedNotes';
-import { ScrollToTop, Tabs, PlaybookColumns } from '@/components/ui';
-import { PageLayout } from '@/components/app/PageLayout/PageLayout';
-import { buildGameNav } from '@/components/app/PageHeader/gameNav';
-import { PlaybookSection } from '@/components/playbook/PlaybookSection';
+import { useTitle } from '@/lib/useTitle';
+import { useGame } from '@/lib/useGame';
+import { useNotesActions } from '@/lib/useNotesActions';
+import { SharedNotes, type NotesActions } from '@/playbook/SharedNotes/SharedNotes';
+import { ScrollToTop, Tabs, PlaybookColumns } from '@/ui';
+import { PageLayout } from '@/ui/PageLayout/PageLayout';
+import { buildGameNav } from '@/ui/PageHeader/gameNav';
+import { PlaybookSection } from '@/playbook/PlaybookSection';
 import {
   CoreLoop,
   GmMoves,
@@ -27,11 +27,10 @@ import {
   Homefront,
   FlowOfPlay,
   MoveSearch,
-} from '@/components/gm-playbook/sections';
-import { GameGuard } from '@/components/app/GameGuard/GameGuard';
+} from '@/gm-playbook/sections';
+import { GameGuard } from '@/ui/GameGuard/GameGuard';
 import { DEFAULT_GAME_NAME } from '@/lib/constants';
-import type { ContentLists, GameSession, LoggedRoll } from '@/types';
-import styles from './GmPlaybook.module.css';
+import type { ContentLists, GameSession, LoggedRoll } from '@/model';
 
 const ReferenceTabContent = () => (
   <PlaybookColumns
@@ -107,6 +106,7 @@ interface GmPlaybookContentProps {
 const GmPlaybookContent = ({ g, id, updateContent, updateField, logRoll, notesActions }: GmPlaybookContentProps) => {
   const headerRef = useRef<HTMLDivElement>(null);
   const gameName = g.name || DEFAULT_GAME_NAME;
+  useTitle(`GM Playbook — ${gameName} — Hearthfire`);
   const saveIWonder = useCallback((value: string) => updateField('iWonder', value), [updateField]);
 
   const tabs = useMemo(
@@ -163,16 +163,11 @@ const GmPlaybookContent = ({ g, id, updateContent, updateField, logRoll, notesAc
 
   return (
     <PageLayout title="GM Playbook" gameId={id} nav={nav} diceRoller={{ rollerId: 'gm', rollerName: 'GM', onRoll: logRoll }}>
-      <PageMeta
-        noindex
-        title={`GM Playbook — ${gameName} — Hearthfire`}
-        description={`GM playbook for ${gameName}. Core loop, moves, principles, and session tools.`}
-      />
       <ScrollToTop sentinelRef={headerRef} />
       <div ref={headerRef} />
       <Tabs
         aria-label="GM Playbook sections"
-        className={styles.tabs}
+        className="gm-playbook-tabs"
         tabs={tabs}
         activeIndex={activeIndex}
         onActiveChange={handleActiveChange}

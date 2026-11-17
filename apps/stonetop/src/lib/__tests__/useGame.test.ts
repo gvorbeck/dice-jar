@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseCharacterData, parseCharacters, parseContent, parseSteading } from '../../hooks/useGame';
+import { parseCharacterData, parseCharacters, parseContent, parseSteading } from '../useGame';
 
 describe('parseCharacters', () => {
   it('filters out null/undefined entries', () => {

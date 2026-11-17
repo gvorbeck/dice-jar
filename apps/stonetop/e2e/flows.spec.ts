@@ -70,11 +70,13 @@ test('a character sheet edit is saved for the next visitor', async ({ page, brow
   await other.context().close();
 });
 
-test('game pages ask search engines to skip them, and the home page does not', async ({ page }) => {
+test('each page sets its own tab title', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
-  await createGame(page);
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+  await expect(page).toHaveTitle('Hearthfire — Stonetop Party Tracker');
+  const id = await createGame(page);
+  await expect(page).toHaveTitle(/ — Hearthfire$/);
+  await page.goto(`/game/${id}/gm`);
+  await expect(page).toHaveTitle(/^GM Playbook — /);
 });
 
 test('Burn Brightly spends 2 XP for +1 once the character can level up, and the XP is saved', async ({ page, browser }) => {

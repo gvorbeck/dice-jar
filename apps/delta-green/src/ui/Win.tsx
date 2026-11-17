@@ -1,4 +1,5 @@
 import { useEffect, useId, useState, type ReactNode, type Ref } from 'react';
+import { cn } from '@dice-jar/cn';
 
 // Apart from ui/index.tsx so pages that need no form controls don't pull in react-aria-components.
 interface WinProps {
@@ -17,7 +18,7 @@ export const Win = ({ title, right, children, headingRef, className, collapsible
   const H = sub ? 'h3' : 'h2';
   const [open, setOpen] = useState(!collapsible);
   return (
-    <section className={className ? `win ${className}` : 'win'} aria-labelledby={id}>
+    <section className={cn('win', className)} aria-labelledby={id}>
       <header>
         <H id={id} tabIndex={headingRef ? -1 : undefined} ref={headingRef}>
           {collapsible ? (

@@ -1,9 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
-import { Button, Tooltip } from '@/components/ui';
-import { useToast } from '@/components/app';
+import { Button, Tooltip } from '@/ui';
+import { useToast } from '@/ui/Toast/ToastContext';
 import { exportGame, readImportFile, type GameExportEnvelope, type ImportSummary } from '@/lib/gameBackup';
 import { ImportGameModal } from './modals/ImportGameModal';
-import styles from './GameDataActions.module.css';
 
 interface GameDataActionsProps {
   gameId: string;
@@ -95,7 +94,7 @@ export const GameDataActions = ({ gameId, gameName, onReplaceGameData }: GameDat
           variant="ghost"
           icon="download"
           size="sm"
-          className={styles.actionBtn}
+          className="game-data-actions-action-btn field-focus-visible"
           onClick={handleExport}
           disabled={exporting}
           aria-label="Export game data"
@@ -107,7 +106,7 @@ export const GameDataActions = ({ gameId, gameName, onReplaceGameData }: GameDat
           variant="ghost"
           icon="upload"
           size="sm"
-          className={styles.actionBtn}
+          className="game-data-actions-action-btn field-focus-visible"
           onClick={handleImportClick}
           aria-label="Import game data from a backup file"
         />
@@ -117,7 +116,7 @@ export const GameDataActions = ({ gameId, gameName, onReplaceGameData }: GameDat
         ref={fileInputRef}
         type="file"
         accept="application/json,.json"
-        className={styles.fileInput}
+        className="game-data-actions-file-input"
         onChange={handleFileChange}
         tabIndex={-1}
         aria-hidden="true"

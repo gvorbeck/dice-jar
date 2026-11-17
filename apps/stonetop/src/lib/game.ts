@@ -11,13 +11,6 @@ export const gameIdExists = async (id: string): Promise<boolean> => {
   return snap.exists();
 };
 
-export const slugifyGameId = (raw: string): string =>
-  raw
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
 export const createGameWithId = async (id: string): Promise<void> => {
   const ref = doc(db, GAMES_COLLECTION, id);
   await runTransaction(db, async (tx) => {

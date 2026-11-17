@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { loadCharacter, newCharacter, parseCharacter } from '../model/character';
+import { loadCharacter } from '../lib/savedAgent';
+import { newCharacter, parseCharacter } from '../model/character';
 import {
   blocking,
   filterSkills,

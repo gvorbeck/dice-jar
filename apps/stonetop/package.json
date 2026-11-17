@@ -31,8 +31,11 @@
   },
   "devDependencies": {
     "@dice-jar/e2e-helpers": "*",
+    "@dice-jar/browser": "*",
     "@dice-jar/cn": "*",
+    "@dice-jar/firebase": "*",
     "@dice-jar/game-id": "*",
+    "@dice-jar/stale-build": "*",
     "@firebase/rules-unit-testing": "^6.0.0",
     "@playwright/test": "^1.65.0",
     "@testing-library/jest-dom": "^6.9.1",

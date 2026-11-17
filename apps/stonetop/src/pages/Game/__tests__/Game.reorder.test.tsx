@@ -3,7 +3,7 @@ import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderRoute } from '@/test/renderWithProviders';
 import { Game } from '../Game';
-import type { GameSession } from '@/types';
+import type { GameSession } from '@/model';
 
 const store = vi.hoisted(() => {
   let current: unknown;
@@ -22,7 +22,7 @@ const store = vi.hoisted(() => {
 });
 const reorderCharacters = vi.hoisted(() => vi.fn<(next: unknown[]) => Promise<void>>());
 
-vi.mock('@/hooks/useGame', async () => {
+vi.mock('@/lib/useGame', async () => {
   const { useSyncExternalStore } = await import('react');
   return {
     useGame: () => ({

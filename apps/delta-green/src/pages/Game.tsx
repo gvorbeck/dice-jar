@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { asLoss, pad2, diceLabel, lowHp, testText, wpNote } from '../rules/outcome';
 import { UNNAMED } from '../model/names';
 import { useRun } from '../lib/useRun';
-import { downloadJson } from '../lib/download';
+import { downloadJson } from '@dice-jar/browser';
 import {
   createGame,
   deleteAgent,
@@ -153,7 +153,7 @@ export default function Game() {
   // The sheet model is loaded on demand so this page stays small.
   const addAgent = (fromSaved: boolean) =>
     run(async () => {
-      const [{ createAgent }, { loadCharacter }] = await Promise.all([import('../lib/agents'), import('../model/character')]);
+      const [{ createAgent }, { loadCharacter }] = await Promise.all([import('../lib/agents'), import('../lib/savedAgent')]);
       const id = createAgent(gameId, fromSaved ? loadCharacter() : undefined);
       if (fromSaved) forgetSavedAgent();
       nav(agentUrl(gameId, id));

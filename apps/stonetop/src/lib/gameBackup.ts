@@ -1,7 +1,8 @@
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { GAMES_COLLECTION } from '@/lib/constants';
-import { slugifyGameId } from '@/lib/game';
+import { downloadJson } from '@dice-jar/browser';
+import { slugifyGameId } from '@dice-jar/game-id';
 import { parseGameSession } from '@/lib/gameParsing';
 import { isNumber, isPlainObject, isString } from '@/lib/typeGuards';
 import { EXPORT_FORMAT, EXPORT_VERSION } from '@/lib/gameBackupFormat';
@@ -67,19 +68,6 @@ export const exportFilename = (gameId: string, gameName: string, exportedAt = ne
   const slug = slugifyGameId(gameName) || slugifyGameId(gameId) || 'game';
   const date = exportedAt.toISOString().slice(0, 10);
   return `hearthfire-${slug}${suffix ? `-${suffix}` : ''}-${date}.json`;
-};
-
-const downloadJson = (filename: string, payload: unknown): void => {
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  // Revoking in the same tick can cancel the download in some browsers; one task is enough.
-  setTimeout(() => URL.revokeObjectURL(url), 0);
 };
 
 // Read the live doc, wrap it, and hand the browser a file. Returns the filename so the
