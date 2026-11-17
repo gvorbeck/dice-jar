@@ -104,7 +104,7 @@ export const SAVE_ERROR_MESSAGE = "Couldn't save your changes — check your con
 // problem. Both save paths (useGame's reportSave and useDebouncedSave's handler) map the code to
 // this same string so the Toast dedupe collapses them to one — same reason SAVE_ERROR_MESSAGE is shared.
 export const INVALID_WRITE_MESSAGE =
-  "Couldn't save that change — the game may have grown too large, or something went wrong on our end. Try again, and if it keeps happening, trim some content (long notes, unused characters) or report it at github.com/gvorbeck/hearthfire/issues.";
+  "Couldn't save that change — the game may have grown too large, or something went wrong on our end. Try again, and if it keeps happening, trim some content (long notes, unused characters) or report it at github.com/gvorbeck/dice-jar/issues.";
 
 export interface PlaybookOption {
   value: PlaybookType;

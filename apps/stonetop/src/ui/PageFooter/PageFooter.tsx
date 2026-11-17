@@ -22,7 +22,7 @@ export const PageFooter = () => (
       J. Garrett Vorbeck
     </a>
     {' · '}
-    <a className="page-footer-link field-focus-visible" href="https://github.com/gvorbeck/hearthfire" target="_blank" rel="noreferrer">
+    <a className="page-footer-link field-focus-visible" href="https://github.com/gvorbeck/dice-jar" target="_blank" rel="noreferrer">
       GitHub
     </a>
   </footer>
