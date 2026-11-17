@@ -24,8 +24,8 @@ service cloud.firestore {
     }
 
     // A game is schemaVersion 1 (characters and rolls are arrays inside the document) or 2 (they live in the
-    // characters/ and rolls/ subcollections; see MIGRATION.md). Browsers never set or change the version: only the
-    // migration script (the Admin SDK, which ignores these rules) moves a game to 2.
+    // characters/ and rolls/ subcollections; see MIGRATION.md). A browser may create a game as either, but never changes
+    // an existing game's version: only the migration script (the Admin SDK, which ignores these rules) moves one.
     function versionOf(data) {
       return data.get('schemaVersion', 1);
     }
@@ -39,7 +39,8 @@ service cloud.firestore {
     match /games/{id} {
       allow get:    if true;
       allow list:   if false;
-      allow create: if isValidGame(request.resource.data) && versionOf(request.resource.data) == 1;
+      allow create: if isValidGame(request.resource.data)
+        && (versionOf(request.resource.data) == 1 || (versionOf(request.resource.data) == 2 && isValidV2(request.resource.data)));
       allow update: if isValidGame(request.resource.data)
         && versionOf(request.resource.data) == versionOf(resource.data)
         && (versionOf(resource.data) == 1 || isValidV2(request.resource.data));

@@ -1,6 +1,6 @@
 # Moving a game to subcollections
 
-Status: steps 1 and 2 are done, Release A (rules) is deployed, and Release B (the app) is deployed and the migration script is written; **no game has been moved.** This file is the plan; each step is its own change and none starts until the one before has passed.
+Status: every game has been moved to subcollections (step 4 is done). Cleanup is in progress: Release C (rules) is written. This file is the plan; each step is its own change and none starts until the one before has passed.
 
 ## Why
 
@@ -47,7 +47,10 @@ Every step before the first live write is local: the emulator, test fixtures and
 
    Each game moves in one transaction and is read back and compared before it counts as moved. To put a game back in one document, with whatever was saved since it moved: `npm run unmigrate-game -- <id> --write`. Restoring from a backup into a moved game is refused: put it back first.
 
-5. **Clean up** (not started). Once every game is v2 and old builds are gone: new games are v2, the v1 code paths and `mergeById` go, and the rules tighten (no numeric `createdAt`, no unknown top-level keys, no `characters` list).
+5. **Clean up**, in three releases. Done so far: step 4, every game is on subcollections.
+   - **Release C, rules only (written).** A browser may create a game as version 2 (empty `characters`, no `diceRolls`). Creating version 1 still works, and a browser still cannot change an existing game's version.
+   - **Release D, the app (not started).** New games are created as version 2. Deploy only after C is live. The old-shape code stays: old tabs, and games a stale build creates meanwhile, still need it.
+   - **Release E, later.** Once old builds are gone and `npm run migration-status` says 0 not yet: remove the old-shape code paths and `mergeById`, and tighten the rules (no numeric `createdAt`, no unknown top-level keys, no `characters` list).
 
 Each release follows the two-release rule in `AGENTS.md`: rules deploy before the build that uses a field.
 
