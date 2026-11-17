@@ -14,6 +14,12 @@ interface Props {
   children: (game: GameSession) => React.ReactNode;
 }
 
+// Mounted only while there is no game, so it never overwrites the title the content sets once a game exists.
+const PageTitle = ({ title }: { title: string }) => {
+  useTitle(title);
+  return null;
+};
+
 export const GameGuard = ({
   loading,
   error,
@@ -24,8 +30,6 @@ export const GameGuard = ({
   errorBackLabel = 'Back to Home',
   children,
 }: Props) => {
-  useTitle(loading ? undefined : error ? 'Something went wrong — Hearthfire' : !game ? 'Game not found — Hearthfire' : undefined);
-
   if (loading) {
     return (
       <main className="game-guard-centered" aria-live="polite" aria-busy={true}>
@@ -37,6 +41,7 @@ export const GameGuard = ({
   if (error) {
     return (
       <main className="game-guard-centered">
+        <PageTitle title="Something went wrong — Hearthfire" />
         <Heading as="h1" size="md">
           Something went wrong
         </Heading>
@@ -51,6 +56,7 @@ export const GameGuard = ({
   if (!game) {
     return (
       <main className="game-guard-centered">
+        <PageTitle title="Game not found — Hearthfire" />
         <Heading as="h1" size="md">
           Game not found
         </Heading>
