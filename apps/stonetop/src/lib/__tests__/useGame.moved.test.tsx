@@ -364,7 +364,57 @@ describe('two players at once', () => {
   });
 });
 
+describe('a reorder while another player removes someone', () => {
+  it('still saves the order of everyone who is left', async () => {
+    const { moved } = await renderBoth();
+    const { getDocs } = await import('firebase/firestore');
+    const real = vi.mocked(getDocs).getMockImplementation()!;
+    let removed = false;
+    vi.mocked(getDocs).mockImplementation(async (ref) => {
+      const result = await real(ref);
+      // The other player removes "b" after this tab has read the party and before it writes.
+      if (!removed && (ref as unknown as { path: string }).path.endsWith('/characters')) {
+        removed = true;
+        firestoreStore.delete(`${V2}/characters/b`);
+      }
+      return result;
+    });
+    await act(async () => {
+      await moved.result.current.reorderCharacters([char('c'), char('b'), char('a')] as unknown as Character[]);
+    });
+    vi.mocked(getDocs).mockImplementation(real);
+    expect(addToastSpy).not.toHaveBeenCalled();
+    expect(
+      stored(`${V2}/characters`)
+        .sort((x, y) => Number(x.data.order) - Number(y.data.order))
+        .map((c) => c.id),
+    ).toEqual(['c', 'a']);
+  });
+});
+
 describe('two restores at once', () => {
+  it('the second one stops without changing anything when another restore landed after it started reading', async () => {
+    const { moved } = await renderBoth();
+    const { getDocs } = await import('firebase/firestore');
+    const real = vi.mocked(getDocs).getMockImplementation()!;
+    let reads = 0;
+    vi.mocked(getDocs).mockImplementation(async (ref) => {
+      // Restore B commits while A is still reading the party.
+      if (++reads === 1) firestoreStore.setQuietly(V2, { ...firestoreStore.get(V2)!, name: 'From B', restoreToken: 'B' });
+      return real(ref);
+    });
+    const before = stored(`${V2}/characters`).map((c) => c.id);
+    await act(async () => {
+      await expect(moved.result.current.replaceGameData({ name: 'From A', createdAt: 1, characters: [char('z')] })).rejects.toThrow();
+    });
+    vi.mocked(getDocs).mockImplementation(real);
+    expect(addToastSpy).toHaveBeenCalledWith(expect.stringContaining('Someone else restored'), 'error');
+    expect(firestoreStore.get(V2)!.name).toBe('From B');
+    expect(stored(`${V2}/characters`).map((c) => c.id)).toEqual(before);
+  });
+});
+
+describe('two restores at once, cleaning up', () => {
   it('the clean-up of one never deletes what a later restore wrote', async () => {
     const { moved } = await renderBoth();
     const { getDocs } = await import('firebase/firestore');

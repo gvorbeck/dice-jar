@@ -278,6 +278,11 @@ describe('readImportFile — rejections', () => {
     expect(check.ok).toBe(true);
   });
 
+  it('reads a backup with a very long list of rolls without running out of arguments', () => {
+    const rolls = Array.from({ length: 200_000 }, (_, i) => ({ id: `r${i}` }));
+    expect(() => readImportFile(JSON.stringify(envelopeFor(gameDoc({ diceRolls: rolls }))))).not.toThrow();
+  });
+
   it('refuses a backup with a single character over the document limit', () => {
     const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters: [character('c0', 'x'.repeat(1_000_001))] }))));
     expect(check).toEqual({ ok: false, error: expect.stringContaining('KB limit') });

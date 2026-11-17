@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, runTransaction, setDoc, writeBatch } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, runTransaction, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { GAMES_COLLECTION } from '@/lib/constants';
 import { joinGame, splitGame } from '@/lib/gameShape';
@@ -89,11 +89,14 @@ export const reorderCharacters = async (gameId: string, ids: string[]): Promise<
   const named = new Set(ids);
   const known = new Set(current.map((c) => c.id));
   const rest = [...current].sort((a, b) => Number(a.data.order) - Number(b.data.order)).filter((c) => !named.has(c.id));
-  const batch = writeBatch(db);
-  [...ids.filter((id) => known.has(id)), ...rest.map((c) => c.id)].forEach((id, order) =>
-    batch.update(characterRef(gameId, id), { order }),
-  );
-  await batch.commit();
+  const inOrder = [...ids.filter((id) => known.has(id)), ...rest.map((c) => c.id)];
+  // A transaction, so a character removed meanwhile just drops out of the order instead of failing the whole reorder.
+  await runTransaction(db, async (tx) => {
+    const snaps = await Promise.all(inOrder.map((id) => tx.get(characterRef(gameId, id))));
+    inOrder.forEach((id, order) => {
+      if (snaps[order]!.exists()) tx.update(characterRef(gameId, id), { order });
+    });
+  });
 };
 
 /** Writes a roll (new, or an existing one edited in place), then trims the log to the newest ROLL_LOG_CAP. */
@@ -116,6 +119,9 @@ export const logRoll = async (gameId: string, roll: LoggedRoll): Promise<void> =
 
 /** Replaces a moved game with the contents of a backup, in one batch: nothing is left of the old characters and rolls, and no half-restored game is ever visible. */
 export const replaceGame = async (gameId: string, backup: Raw): Promise<void> => {
+  const gameRef = doc(db, GAMES_COLLECTION, gameId);
+  // Read before the party: a restore that lands after this makes the transaction below refuse, so two restores never mix.
+  const before = (await getDoc(gameRef)).data()?.restoreToken;
   const [characters, rolls] = await Promise.all([storedDocs(charactersCol(gameId)), storedDocs(rollsCol(gameId))]);
   const result = splitGame(backup);
   if (!result.ok) throw new UserFacingError(`That backup can't be restored: ${result.problems.join('; ')}`);
@@ -123,16 +129,18 @@ export const replaceGame = async (gameId: string, backup: Raw): Promise<void> =>
   if (characters.length + rolls.length + split.characters.length + split.rolls.length > MAX_BATCH) {
     throw new UserFacingError('That backup is too large to restore in one step.');
   }
-  const batch = writeBatch(db);
-  const gameRef = doc(db, GAMES_COLLECTION, gameId);
   // Marks this restore as the latest, so the clean-up below never deletes what a later restore wrote.
   const token = generateId();
-  batch.set(gameRef, { ...split.game, restoreToken: token });
-  characters.forEach((c) => batch.delete(characterRef(gameId, c.id)));
-  rolls.forEach((r) => batch.delete(rollRef(gameId, r.id)));
-  split.characters.forEach((c) => batch.set(characterRef(gameId, c.id), c.data));
-  split.rolls.forEach((r) => batch.set(rollRef(gameId, r.id), r.data));
-  await batch.commit();
+  await runTransaction(db, async (tx) => {
+    if ((await tx.get(gameRef)).data()?.restoreToken !== before) {
+      throw new UserFacingError('Someone else restored this game while this was running. Nothing was changed; try again.');
+    }
+    tx.set(gameRef, { ...split.game, restoreToken: token });
+    characters.forEach((c) => tx.delete(characterRef(gameId, c.id)));
+    rolls.forEach((r) => tx.delete(rollRef(gameId, r.id)));
+    split.characters.forEach((c) => tx.set(characterRef(gameId, c.id), c.data));
+    split.rolls.forEach((r) => tx.set(rollRef(gameId, r.id), r.data));
+  });
 
   // shortcut: a stray added after this read survives; upgrade with a write guard on the party if restores run during play.
   const kept = new Set([

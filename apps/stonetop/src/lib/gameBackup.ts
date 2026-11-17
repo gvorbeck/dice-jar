@@ -17,9 +17,10 @@ const MAX_PAYLOAD_BYTES = 1_000_000;
 const jsonBytes = (v: unknown) => new TextEncoder().encode(JSON.stringify(v)).length;
 const largestPiece = (game: Record<string, unknown>) => {
   const { characters, diceRolls, ...rest } = game;
-  return Math.max(
+  // A loop, not Math.max(...list): a backup with a huge roll list would overflow the argument limit.
+  return [...(Array.isArray(characters) ? characters : []), ...(Array.isArray(diceRolls) ? diceRolls : [])].reduce(
+    (most: number, piece) => Math.max(most, jsonBytes(piece)),
     jsonBytes(rest),
-    ...[...(Array.isArray(characters) ? characters : []), ...(Array.isArray(diceRolls) ? diceRolls : [])].map(jsonBytes),
   );
 };
 /** Whether the whole game fits one Firestore document, which a game on the old shape needs. */
