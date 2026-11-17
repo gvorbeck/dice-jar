@@ -71,7 +71,7 @@ describe('deleting and other paths', () => {
   });
 });
 
-// Games moved to subcollections (schemaVersion 2). Only the migration script sets that, and it ignores the rules.
+// Games on subcollections (schemaVersion 2): a browser can create one, but only the migration script (which ignores the rules) moves an existing game.
 describe('schemaVersion', () => {
   const V2 = 'games/v2';
   const v2Game = (over: Record<string, unknown> = {}) => ({ name: 'Moved', createdAt: 1, characters: [], schemaVersion: 2, ...over });
@@ -81,7 +81,22 @@ describe('schemaVersion', () => {
     await assertSucceeds(setDoc(doc(db(), 'games/a'), game()));
     await assertSucceeds(setDoc(doc(db(), 'games/b'), game({ schemaVersion: 1 })));
   });
-  it.each([2, 3, '1', null])('does not let a browser create a game with schemaVersion %s', async (v) => {
+  it('lets a browser create a version 2 game: an empty characters list and no rolls', async () => {
+    await assertSucceeds(setDoc(doc(db(), 'games/fresh'), v2Game()));
+  });
+  it('lets the first character be saved into a game created as version 2', async () => {
+    await assertSucceeds(setDoc(doc(db(), 'games/fresh'), v2Game()));
+    await assertSucceeds(setDoc(doc(db(), 'games/fresh/characters/c1'), { id: 'c1', name: 'Ada', playbook: 'blessed', order: 0 }));
+  });
+  it.each([
+    ['characters already in the list', { characters: [{ id: 'c1', name: 'x', playbook: 'blessed' }] }],
+    ['a diceRolls list', { diceRolls: [] }],
+    ['a name that is not a string', { name: 7 }],
+    ['a createdAt that is not a number', { createdAt: 'now' }],
+  ])('does not let a browser create a version 2 game with %s', async (_label, over) => {
+    await assertFails(setDoc(doc(db(), 'games/fresh'), v2Game(over)));
+  });
+  it.each([3, '1', '2', null])('does not let a browser create a game with schemaVersion %s', async (v) => {
     await assertFails(setDoc(doc(db(), 'games/new'), game({ schemaVersion: v })));
   });
   it('does not let a browser move a game to version 2, or back', async () => {

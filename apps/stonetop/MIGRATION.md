@@ -1,6 +1,6 @@
 # Moving a game to subcollections
 
-Status: steps 1 and 2 are done, Release A (rules) is deployed, and Release B (the app) is written; **no game has been moved.** This file is the plan; each step is its own change and none starts until the one before has passed.
+Status: every game has been moved to subcollections (step 4 is done). Cleanup is in progress: Release C (rules) is written. This file is the plan; each step is its own change and none starts until the one before has passed.
 
 ## Why
 
@@ -36,9 +36,21 @@ Every step before the first live write is local: the emulator, test fixtures and
 3. **Rules, then the dual-reading app.**
    - **Release A, rules only (written, not deployed).** `firestore.rules` accepts the subcollections and `schemaVersion`. Browsers cannot create, change or restore a game into version 2, and a version 2 game refuses characters or rolls written back as arrays. The app is unchanged, so players see nothing.
    - **Release A, rules only (deployed).** Merged to `main` in PR 43.
-   - **Release B, the app (written, not merged).** It reads both shapes and writes by the game's `schemaVersion`; new games are still v1. A tab holding a cached copy from before a game was moved finds out on its first write and carries on the new way, so the move can happen while people are playing. Tests run the same saves on a v1 and a v2 copy of one game and require identical results, and the emulator e2e moves a real game and plays on it. Merge it to `dev` only once Release A's deploy has finished.
-4. **Migrate** (not started), game by game, against the emulator first with a copy of the backup, then live: back up, dry run, move one game and check it, then the rest. Re-running skips games already moved. A reverse script rebuilds the v1 document from v2 (`joinGame`) for any game.
-5. **Clean up** (not started). Once every game is v2 and old builds are gone: new games are v2, the v1 code paths and `mergeById` go, and the rules tighten (no numeric `createdAt`, no unknown top-level keys, no `characters` list).
+   - **Release B, the app (deployed).** It reads both shapes and writes by the game's `schemaVersion`; new games are still v1. A tab holding a cached copy from before a game was moved finds out on its first write and carries on the new way, so the move can happen while people are playing. Tests run the same saves on a v1 and a v2 copy of one game and require identical results, and the emulator e2e moves a real game and plays on it. Merge it to `dev` only once Release A's deploy has finished.
+4. **Migrate** (script written, not run on live data). Run order, all from `apps/stonetop`:
+   1. **Rehearse on a copy.** `BACKUP=./firestore-backup-<timestamp>.json npm run rehearse-migration` loads the backup into the emulator only, moves every game, checks each reads back exactly as in the backup, puts every game back and checks again. It refuses to run unless the emulator is in use. Last run, on the cleaned backup of 1,476 games: all moved, all identical, all put back identical.
+   2. **Back up, then audit.** `npm run backup`, then `npm run audit-backup -- <file>` must say 0 refused. Moved games are backed up as the one document they were, so every backup has the same shape.
+   3. **Dry run.** `npm run migrate-games -- --backup <file>` reports what would move and writes nothing.
+   4. **One game.** `npm run migrate-games -- --backup <file> --write --only <id>`, then open it in the app and use it.
+   5. **A small batch, then the rest.** `--write --limit 25`, then without `--limit`. The backup must be less than a day old, a game not in it or changed since is left alone and reported (take a fresh backup and run again), and games already moved are skipped, so the run can be repeated.
+   6. **Take a final backup and audit it.**
+
+   Each game moves in one transaction and is read back and compared before it counts as moved. To put a game back in one document, with whatever was saved since it moved: `npm run unmigrate-game -- <id> --write`. Restoring from a backup into a moved game is refused: put it back first.
+
+5. **Clean up**, in three releases. Done so far: step 4, every game is on subcollections.
+   - **Release C, rules only (written).** A browser may create a game as version 2 (empty `characters`, no `diceRolls`). Creating version 1 still works, and a browser still cannot change an existing game's version.
+   - **Release D, the app (not started).** New games are created as version 2. Deploy only after C is live. The old-shape code stays: old tabs, and games a stale build creates meanwhile, still need it.
+   - **Release E, later.** Once old builds are gone and `npm run migration-status` says 0 not yet: remove the old-shape code paths and `mergeById`, and tighten the rules (no numeric `createdAt`, no unknown top-level keys, no `characters` list).
 
 Each release follows the two-release rule in `AGENTS.md`: rules deploy before the build that uses a field.
 

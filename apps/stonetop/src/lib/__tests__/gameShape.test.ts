@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { joinGame, splitGame, SCHEMA_VERSION } from '../gameShape';
+import { assembleGame, joinGame, splitGame, SCHEMA_VERSION } from '../gameShape';
 import { parseGameSession } from '../gameParsing';
 
 // A game as v1 stores it, with the awkward parts real data has: nested maps and arrays, a field this build
@@ -139,5 +139,21 @@ describe('splitGame refuses what it cannot carry over exactly', () => {
 
   it('refuses something that is not a document', () => {
     expect(problems(null)).toEqual(['the document is not an object']);
+  });
+});
+
+describe('assembleGame', () => {
+  it('lists rolls by when they were made and leaves out the restore marker', () => {
+    const s = split(v1());
+    const rolls = s.rolls.map((r) => (r.id === 'r-a' ? { ...r, data: { ...r.data, createdAt: 99 } } : r));
+    const out = assembleGame({ ...s.game, restoreToken: 'abc' }, s.characters, rolls);
+    expect((out.diceRolls as { id: string }[]).map((r) => r.id)).toEqual(['r-b', 'r-c', 'r-a']);
+    expect(out).not.toHaveProperty('restoreToken');
+    expect(out).not.toHaveProperty('schemaVersion');
+  });
+
+  it('gives back the original game when nothing has changed', () => {
+    const raw = v1();
+    expect(assembleGame(split(raw).game, split(raw).characters, split(raw).rolls)).toEqual(raw);
   });
 });

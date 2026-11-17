@@ -22,6 +22,7 @@ import {
 } from '@/lib/gameMutations';
 import { applyStatDeltas, type SheetGuard } from '@/lib/statDeltas';
 import * as v2 from '@/lib/gameV2';
+import { assembleGame, type Stored } from '@/lib/gameShape';
 import { fitsOneDocument } from '@/lib/gameBackup';
 import type { AdditiveStat, Character, CharacterData, ContentLists, GameSession, LoggedRoll, SteadingData } from '@/model';
 
@@ -53,8 +54,8 @@ export interface UseGameResult {
 
 export const useGame = (gameId: string): UseGameResult => {
   const [docRaw, setDocRaw] = useState<Record<string, unknown> | null | undefined>(undefined);
-  const [characterDocs, setCharacterDocs] = useState<v2.Stored[] | undefined>(undefined);
-  const [rollDocs, setRollDocs] = useState<v2.Stored[] | undefined>(undefined);
+  const [characterDocs, setCharacterDocs] = useState<Stored[] | undefined>(undefined);
+  const [rollDocs, setRollDocs] = useState<Stored[] | undefined>(undefined);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const gameRef = useMemo(() => doc(db, GAMES_COLLECTION, gameId), [gameId]);
@@ -140,7 +141,7 @@ export const useGame = (gameId: string): UseGameResult => {
     const waiting = docRaw === undefined || (moved && (characterDocs === undefined || rollDocs === undefined));
     if (waiting || !docRaw) return { game: null, loading: waiting && !loadError, parseFailed: false };
     try {
-      const raw = moved ? v2.assembleGame(docRaw, characterDocs ?? [], rollDocs ?? []) : docRaw;
+      const raw = moved ? assembleGame(docRaw, characterDocs ?? [], rollDocs ?? []) : docRaw;
       return { game: parseGameSession(raw, gameId), loading: false, parseFailed: false };
     } catch {
       return { game: null, loading: false, parseFailed: true };

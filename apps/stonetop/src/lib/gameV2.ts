@@ -1,7 +1,7 @@
 import { collection, deleteDoc, doc, getDoc, getDocs, runTransaction, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { GAMES_COLLECTION } from '@/lib/constants';
-import { joinGame, splitGame } from '@/lib/gameShape';
+import { assembleGame, splitGame, type Stored } from '@/lib/gameShape';
 import { parseCharacters, ROLL_LOG_CAP } from '@/lib/gameParsing';
 import { stripUndefined, UserFacingError } from '@/lib/gameMutations';
 import { generateId } from '@/lib/id';
@@ -10,10 +10,6 @@ import type { Character, LoggedRoll } from '@/model';
 // Reads and writes for a game moved to subcollections (schemaVersion 2; see MIGRATION.md).
 
 type Raw = Record<string, unknown>;
-export interface Stored {
-  id: string;
-  data: Raw;
-}
 
 export const isMoved = (game: Raw | undefined) => game?.schemaVersion === 2;
 
@@ -29,16 +25,6 @@ const storedDocs = async (col: ReturnType<typeof collection>): Promise<Stored[]>
   (await getDocs(col)).docs.map((d) => ({ id: d.id, data: d.data() as Raw }));
 
 const nextOrder = (items: Stored[]) => Math.max(-1, ...items.map((i) => Number(i.data.order) || 0)) + 1;
-
-/** The game as the old one-document shape, with rolls newest-last: rolls are ordered by `createdAt`, since an edited roll gets a new one. */
-export const assembleGame = (game: Raw, characters: Stored[], rolls: Stored[]): Raw => {
-  const { restoreToken: _token, ...visible } = game;
-  const joined = joinGame({ game: visible, characters, rolls });
-  const byTime = (r: Raw) => Number(r.createdAt) || 0;
-  return Array.isArray(joined.diceRolls)
-    ? { ...joined, diceRolls: [...(joined.diceRolls as Raw[])].sort((a, b) => byTime(a) - byTime(b)) }
-    : joined;
-};
 
 const readOnce = async (gameId: string): Promise<{ game: Raw; characters: Stored[]; rolls: Stored[] } | undefined> => {
   const [game, characters, rolls] = await Promise.all([
