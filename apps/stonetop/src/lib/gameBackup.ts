@@ -4,6 +4,7 @@ import { GAMES_COLLECTION } from '@/lib/constants';
 import { downloadJson } from '@dice-jar/browser';
 import { slugifyGameId } from '@dice-jar/game-id';
 import { parseGameSession } from '@/lib/gameParsing';
+import { isMoved, readMovedGame } from '@/lib/gameV2';
 import { isNumber, isPlainObject, isString } from '@/lib/typeGuards';
 import { EXPORT_FORMAT, EXPORT_VERSION } from '@/lib/gameBackupFormat';
 
@@ -12,6 +13,17 @@ import { EXPORT_FORMAT, EXPORT_VERSION } from '@/lib/gameBackupFormat';
 // import fails here with an explanation instead of as an opaque `invalid-argument` from
 // the server (see INVALID_WRITE_MESSAGE for why that code is ambiguous).
 const MAX_PAYLOAD_BYTES = 1_000_000;
+
+const jsonBytes = (v: unknown) => new TextEncoder().encode(JSON.stringify(v)).length;
+const largestPiece = (game: Record<string, unknown>) => {
+  const { characters, diceRolls, ...rest } = game;
+  return Math.max(
+    jsonBytes(rest),
+    ...[...(Array.isArray(characters) ? characters : []), ...(Array.isArray(diceRolls) ? diceRolls : [])].map(jsonBytes),
+  );
+};
+/** Whether the whole game fits one Firestore document, which a game on the old shape needs. */
+export const fitsOneDocument = (game: Record<string, unknown>) => jsonBytes(game) <= MAX_PAYLOAD_BYTES;
 
 export interface GameExportEnvelope {
   format: typeof EXPORT_FORMAT;
@@ -50,7 +62,9 @@ const hasNestedArray = (v: unknown): boolean => {
 export const readRawGame = async (gameId: string): Promise<Record<string, unknown>> => {
   const snap = await getDoc(doc(db, GAMES_COLLECTION, gameId));
   if (!snap.exists()) throw new Error('Game not found — it may have been deleted.');
-  return snap.data() as Record<string, unknown>;
+  const game = snap.data() as Record<string, unknown>;
+  // A moved game is exported in the same one-document shape, so a file imports into either kind of game.
+  return isMoved(game) ? readMovedGame(gameId) : game;
 };
 
 export const buildEnvelope = (gameId: string, game: Record<string, unknown>, exportedAt = new Date()): GameExportEnvelope => ({
@@ -132,8 +146,9 @@ export const readImportFile = (text: string): ImportCheck => {
     };
   }
 
-  const bytes = new TextEncoder().encode(JSON.stringify(game)).length;
-  if (bytes > MAX_PAYLOAD_BYTES) {
+  // Only the largest piece can be judged here (a moved game stores one document each); the old shape's whole-game limit is checked on write.
+  const bytes = jsonBytes(game);
+  if (largestPiece(game) > MAX_PAYLOAD_BYTES) {
     return {
       ok: false,
       error: `That backup is ${Math.round(bytes / 1024)} KB, over the ${Math.round(MAX_PAYLOAD_BYTES / 1024)} KB limit for a single game. Trim some content from it and try again.`,

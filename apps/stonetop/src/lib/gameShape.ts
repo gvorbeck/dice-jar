@@ -65,7 +65,7 @@ export const splitGame = (raw: Raw): SplitResult => {
 
 const inOrder = (docs: { id: string; data: Raw }[]) =>
   [...docs]
-    .sort((a, b) => Number(a.data[ORDER]) - Number(b.data[ORDER]))
+    .sort((a, b) => (Number(a.data[ORDER]) || 0) - (Number(b.data[ORDER]) || 0) || a.id.localeCompare(b.id))
     .map(({ data }) => {
       const { [ORDER]: _order, ...item } = data;
       return item;

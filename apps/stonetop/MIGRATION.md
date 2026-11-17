@@ -1,6 +1,6 @@
 # Moving a game to subcollections
 
-Status: steps 1 and 2 are done, and the rules half of step 3 is written; **nothing is deployed and no game has been moved.** This file is the plan; each step is its own change and none starts until the one before has passed.
+Status: steps 1 and 2 are done, Release A (rules) is deployed, and Release B (the app) is written; **no game has been moved.** This file is the plan; each step is its own change and none starts until the one before has passed.
 
 ## Why
 
@@ -35,7 +35,8 @@ Every step before the first live write is local: the emulator, test fixtures and
 2. **Prove it on real data, offline** (done). `npm run audit-backup` reads a backup JSON and writes nothing. On the live data, 10 games from May 2026 were refused: no name and only character fragments. They were deleted, and a fresh backup audits clean: every game splits and rejoins exactly. Re-run it on a new backup before step 4.
 3. **Rules, then the dual-reading app.**
    - **Release A, rules only (written, not deployed).** `firestore.rules` accepts the subcollections and `schemaVersion`. Browsers cannot create, change or restore a game into version 2, and a version 2 game refuses characters or rolls written back as arrays. The app is unchanged, so players see nothing.
-   - **Release B, the app (not started).** It reads both shapes and writes by the game's `schemaVersion`; new games are still v1. Rules tests and emulator e2e cover both shapes.
+   - **Release A, rules only (deployed).** Merged to `main` in PR 43.
+   - **Release B, the app (written, not merged).** It reads both shapes and writes by the game's `schemaVersion`; new games are still v1. A tab holding a cached copy from before a game was moved finds out on its first write and carries on the new way, so the move can happen while people are playing. Tests run the same saves on a v1 and a v2 copy of one game and require identical results, and the emulator e2e moves a real game and plays on it. Merge it to `dev` only once Release A's deploy has finished.
 4. **Migrate** (not started), game by game, against the emulator first with a copy of the backup, then live: back up, dry run, move one game and check it, then the rest. Re-running skips games already moved. A reverse script rebuilds the v1 document from v2 (`joinGame`) for any game.
 5. **Clean up** (not started). Once every game is v2 and old builds are gone: new games are v2, the v1 code paths and `mergeById` go, and the rules tighten (no numeric `createdAt`, no unknown top-level keys, no `characters` list).
 

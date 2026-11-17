@@ -17,9 +17,11 @@ type DocData = Record<string, unknown>;
 // path -> document data. A missing key means the doc does not exist.
 const docs = new Map<string, DocData>();
 
-// path -> set of snapshot listeners registered through onSnapshot.
+// path -> set of snapshot listeners registered through onSnapshot. A collection listener gets a query snapshot.
 type Listener = (snap: ReturnType<typeof makeSnapshot>) => void;
+type CollectionListener = (snap: ReturnType<typeof makeQuerySnapshot>) => void;
 const listeners = new Map<string, Set<Listener>>();
+const collectionListeners = new Map<string, Set<CollectionListener>>();
 
 const makeSnapshot = (path: string) => {
   const data = docs.get(path);
@@ -33,9 +35,24 @@ const makeSnapshot = (path: string) => {
   };
 };
 
+// The documents directly under a collection path, like a getDocs(collection(...)) result.
+const makeQuerySnapshot = (collectionPath: string) => {
+  const docsHere = [...docs.keys()]
+    .filter((p) => p.startsWith(`${collectionPath}/`) && !p.slice(collectionPath.length + 1).includes('/'))
+    .sort()
+    .map((p) => makeSnapshot(p));
+  return { docs: docsHere, size: docsHere.length, empty: docsHere.length === 0 };
+};
+
 const emit = (path: string) => {
   const snap = makeSnapshot(path);
   listeners.get(path)?.forEach((l) => l(snap));
+  const parent = path.slice(0, path.lastIndexOf('/'));
+  const collection = collectionListeners.get(parent);
+  if (collection?.size) {
+    const query = makeQuerySnapshot(parent);
+    collection.forEach((l) => l(query));
+  }
 };
 
 // A doc/collection reference is just its path plus a discriminator; the mocked
@@ -82,6 +99,7 @@ export const firestoreStore = {
   reset() {
     docs.clear();
     listeners.clear();
+    collectionListeners.clear();
   },
   set(path: string, data: DocData) {
     docs.set(path, structuredClone(data));
@@ -90,6 +108,14 @@ export const firestoreStore = {
   get(path: string): DocData | undefined {
     const data = docs.get(path);
     return data === undefined ? undefined : structuredClone(data);
+  },
+  /** Writes without telling listeners, so a test can leave a client holding a copy that is out of date. */
+  setQuietly(path: string, data: DocData) {
+    docs.set(path, structuredClone(data));
+  },
+  /** The documents directly under a collection path, with their ids. */
+  list(collectionPath: string): { id: string; data: DocData }[] {
+    return makeQuerySnapshot(collectionPath).docs.map((d) => ({ id: d.id, data: d.data() as DocData }));
   },
   has(path: string): boolean {
     return docs.has(path);
@@ -105,15 +131,22 @@ export const firestoreStore = {
 export const firestoreMockModule = () => {
   let autoId = 0;
 
-  const doc = vi.fn((_db: unknown, collectionPath: string, id: string): Ref => ({
-    path: `${collectionPath}/${id}`,
+  const doc = vi.fn((_db: unknown, ...segments: string[]): Ref => ({
+    path: segments.join('/'),
     __kind: 'doc',
   }));
 
-  const collection = vi.fn((_db: unknown, path: string): Ref => ({
-    path,
+  const collection = vi.fn((_db: unknown, ...segments: string[]): Ref => ({
+    path: segments.join('/'),
     __kind: 'collection',
   }));
+
+  const getDocs = vi.fn(async (ref: Ref) => makeQuerySnapshot(ref.path));
+
+  const deleteDoc = vi.fn(async (ref: Ref) => {
+    docs.delete(ref.path);
+    emit(ref.path);
+  });
 
   const getDoc = vi.fn(async (ref: Ref) => makeSnapshot(ref.path));
 
@@ -137,18 +170,51 @@ export const firestoreMockModule = () => {
     return { id, path };
   });
 
-  const onSnapshot = vi.fn<(ref: Ref, onNext: Listener, onError?: (e: Error) => void) => () => void>((ref, onNext) => {
+  const onSnapshot = vi.fn((ref: Ref, onNext: Listener | CollectionListener): (() => void) => {
+    if (ref.__kind === 'collection') {
+      let set = collectionListeners.get(ref.path);
+      if (!set) {
+        set = new Set();
+        collectionListeners.set(ref.path, set);
+      }
+      set.add(onNext as CollectionListener);
+      (onNext as CollectionListener)(makeQuerySnapshot(ref.path));
+      return () => void set!.delete(onNext as CollectionListener);
+    }
     let set = listeners.get(ref.path);
     if (!set) {
       set = new Set();
       listeners.set(ref.path, set);
     }
-    set.add(onNext);
-    // Fire once synchronously with the current state, matching Firestore's
-    // initial-snapshot behavior.
-    onNext(makeSnapshot(ref.path));
-    return () => {
-      set!.delete(onNext);
+    set.add(onNext as Listener);
+    // Fire once synchronously with the current state, matching Firestore's initial-snapshot behavior.
+    (onNext as Listener)(makeSnapshot(ref.path));
+    return () => void set!.delete(onNext as Listener);
+  });
+
+  // Writes queue up and apply together on commit, like a real batch.
+  const writeBatch = vi.fn(() => {
+    const ops: (() => void)[] = [];
+    return {
+      set: (ref: Ref, data: DocData) => void ops.push(() => docs.set(ref.path, structuredClone(data))),
+      update: (ref: Ref, payload: DocData) =>
+        void ops.push(() => {
+          const existing = docs.get(ref.path);
+          if (existing === undefined) throw new Error(`No document to update: ${ref.path}`);
+          docs.set(ref.path, applyUpdate(existing, payload));
+        }),
+      delete: (ref: Ref) => void ops.push(() => docs.delete(ref.path)),
+      commit: async () => {
+        const before = new Map(docs);
+        try {
+          ops.forEach((op) => op());
+        } catch (e) {
+          docs.clear();
+          before.forEach((v, k) => docs.set(k, v));
+          throw e;
+        }
+        new Set([...before.keys(), ...docs.keys()]).forEach(emit);
+      },
     };
   });
 
@@ -160,6 +226,10 @@ export const firestoreMockModule = () => {
       get: async (ref: Ref) => makeSnapshot(ref.path),
       set: (ref: Ref, data: DocData) => {
         docs.set(ref.path, structuredClone(data));
+        emit(ref.path);
+      },
+      delete: (ref: Ref) => {
+        docs.delete(ref.path);
         emit(ref.path);
       },
       update: (ref: Ref, payload: DocData) => {
@@ -187,6 +257,9 @@ export const firestoreMockModule = () => {
     doc,
     collection,
     getDoc,
+    getDocs,
+    deleteDoc,
+    writeBatch,
     updateDoc,
     setDoc,
     addDoc,
@@ -203,4 +276,5 @@ interface Transaction {
   get: (ref: Ref) => Promise<ReturnType<typeof makeSnapshot>>;
   set: (ref: Ref, data: DocData) => void;
   update: (ref: Ref, payload: DocData) => void;
+  delete: (ref: Ref) => void;
 }
