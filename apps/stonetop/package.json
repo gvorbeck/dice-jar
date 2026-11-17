@@ -20,6 +20,7 @@
     "migrate:write": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/migrate-playbook-features.ts --write",
     "recover:dry": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/recover-characters-array.ts",
     "recover:write": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/recover-characters-array.ts --write",
+    "audit-backup": "node scripts/audit-backup.ts",
     "backup": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/backup.ts",
     "restore": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/restore.ts",
     "delete-game": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/delete-game.ts",

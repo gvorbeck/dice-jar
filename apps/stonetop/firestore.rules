@@ -23,12 +23,55 @@ service cloud.firestore {
         && data.characters.size() <= 20;
     }
 
+    // A game is schemaVersion 1 (characters and rolls are arrays inside the document) or 2 (they live in the
+    // characters/ and rolls/ subcollections; see MIGRATION.md). Browsers never set or change the version: only the
+    // migration script (the Admin SDK, which ignores these rules) moves a game to 2.
+    function versionOf(data) {
+      return data.get('schemaVersion', 1);
+    }
+
+    // A v2 game keeps an empty characters list (v1 builds require one) and no diceRolls, so a tab still running a
+    // v1 build gets an error instead of silently saving into arrays that nothing reads any more.
+    function isValidV2(data) {
+      return data.characters.size() == 0 && !('diceRolls' in data);
+    }
+
     match /games/{id} {
       allow get:    if true;
       allow list:   if false;
-      allow create: if isValidGame(request.resource.data);
-      allow update: if isValidGame(request.resource.data);
+      allow create: if isValidGame(request.resource.data) && versionOf(request.resource.data) == 1;
+      allow update: if isValidGame(request.resource.data)
+        && versionOf(request.resource.data) == versionOf(resource.data)
+        && (versionOf(resource.data) == 1 || isValidV2(request.resource.data));
       allow delete: if false;
+
+      function isV2Game() {
+        let game = get(/databases/$(database)/documents/games/$(id));
+        return versionOf(game.data) == 2;
+      }
+
+      // shortcut: the party size is no longer capped here (a rule cannot count a subcollection); the app stops at 20.
+      // Upgrade: keep a character count in the game document and check it in a transaction if abuse shows up.
+      function isValidCharacter(data, cid) {
+        return data.id == cid && data.name is string && data.playbook is string && data.order is number && data.keys().size() <= 40;
+      }
+
+      // Rolls are edited in place (changing advantage or disadvantage on a roll keeps its id) and the oldest are deleted to keep the log short.
+      function isValidRoll(data, rid) {
+        return data.id == rid && data.characterId is string && data.createdAt is number && data.order is number && data.keys().size() <= 30;
+      }
+
+      match /characters/{cid} {
+        allow get, list: if true;
+        allow create, update: if isV2Game() && isValidCharacter(request.resource.data, cid);
+        allow delete: if isV2Game();
+      }
+
+      match /rolls/{rid} {
+        allow get, list: if true;
+        allow create, update: if isV2Game() && isValidRoll(request.resource.data, rid);
+        allow delete: if isV2Game();
+      }
     }
 
     // Everything outside /games is denied by default (no matching rule).
