@@ -2,7 +2,7 @@ import { initializeApp, cert, type ServiceAccount } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as path from 'path';
 import * as fs from 'fs';
-import { gamesFromBackup, isMoved } from './backupFile.ts';
+import { gamesFromBackup, movedIds, pendingIds, readCheckpoint } from './backupFile.ts';
 
 const serviceKeyPath = path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS ?? '');
 if (!process.env.GOOGLE_APPLICATION_CREDENTIALS || !fs.existsSync(serviceKeyPath)) {
@@ -28,23 +28,10 @@ const db = getFirestore();
 
 const WRITE = process.argv.includes('--write');
 
-// ---------------------------------------------------------------------------
-// Checkpoint — records ids already restored so an interrupted run can resume.
-// Keyed to the backup file so resuming a different backup starts clean.
-// ---------------------------------------------------------------------------
-
+// Keyed to the backup file, so resuming a different backup starts clean.
 const CHECKPOINT_PATH = path.resolve(`${backupPath}.restore-checkpoint.json`);
 
-const loadCheckpoint = (): Set<string> => {
-  if (!fs.existsSync(CHECKPOINT_PATH)) return new Set();
-  try {
-    const ids = JSON.parse(fs.readFileSync(CHECKPOINT_PATH, 'utf8')) as string[];
-    return new Set(ids);
-  } catch {
-    console.warn(`  ⚠ checkpoint at ${CHECKPOINT_PATH} is unreadable — ignoring it.`);
-    return new Set();
-  }
-};
+const loadCheckpoint = () => readCheckpoint(fs.existsSync(CHECKPOINT_PATH) ? fs.readFileSync(CHECKPOINT_PATH, 'utf8') : null);
 
 const saveCheckpoint = (done: Set<string>): void => {
   fs.writeFileSync(CHECKPOINT_PATH, JSON.stringify([...done], null, 2));
@@ -66,17 +53,15 @@ const restore = async () => {
   if (WRITE && done.size > 0) {
     console.log(`Resuming: ${done.size} doc(s) already restored in a prior run will be skipped.\n`);
   }
-  const pending = ids.filter((id) => !done.has(id));
+  const pending = pendingIds(ids, done);
 
   // A stale or partial backup would otherwise replace live data with no undo path.
   const safety: Record<string, unknown> = {};
-  const moved: string[] = [];
   for (const id of pending) {
     const snap = await db.collection('games').doc(id).get();
-    if (!snap.exists) continue;
-    safety[id] = snap.data();
-    if (isMoved(snap.data())) moved.push(id);
+    if (snap.exists) safety[id] = snap.data();
   }
+  const moved = movedIds(safety as Record<string, Record<string, unknown>>);
   if (moved.length) {
     throw new Error(`Moved to subcollections, so restoring would orphan their characters and rolls: ${moved.join(', ')}`);
   }

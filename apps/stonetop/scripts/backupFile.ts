@@ -20,3 +20,20 @@ export const gamesFromBackup = (parsed: Record<string, unknown>): Record<string,
 
 /** A game moved to subcollections (MIGRATION.md): overwriting its document would leave its characters and rolls behind. */
 export const isMoved = (doc: Record<string, unknown> | undefined) => doc?.schemaVersion === 2;
+
+/** The ids a previous, interrupted run already restored. An unreadable checkpoint counts as none: restoring twice is harmless, skipping a game is not. */
+export const readCheckpoint = (text: string | null): Set<string> => {
+  if (text === null) return new Set();
+  try {
+    const ids: unknown = JSON.parse(text);
+    return Array.isArray(ids) ? new Set(ids.filter((id): id is string => typeof id === 'string')) : new Set();
+  } catch {
+    return new Set();
+  }
+};
+
+/** The ids left to restore, in backup order. */
+export const pendingIds = (ids: string[], done: Set<string>) => ids.filter((id) => !done.has(id));
+
+/** The ids among `live` (id to stored document) that have moved to subcollections. */
+export const movedIds = (live: Record<string, Record<string, unknown> | undefined>) => Object.keys(live).filter((id) => isMoved(live[id]));

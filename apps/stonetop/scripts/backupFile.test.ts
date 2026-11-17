@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { EXPORT_FORMAT, EXPORT_VERSION } from '../src/lib/gameBackupFormat.ts';
-import { gamesFromBackup, isMoved } from './backupFile.ts';
+import { gamesFromBackup, isMoved, movedIds, pendingIds, readCheckpoint } from './backupFile.ts';
 
 const envelope = (over: Record<string, unknown> = {}) => ({
   format: EXPORT_FORMAT,
@@ -44,5 +44,39 @@ describe('isMoved', () => {
     expect(isMoved({ schemaVersion: 1 })).toBe(false);
     expect(isMoved({ name: 'old' })).toBe(false);
     expect(isMoved(undefined)).toBe(false);
+  });
+});
+
+describe('readCheckpoint', () => {
+  it('reads the ids a previous run saved', () => {
+    expect([...readCheckpoint('["a","b"]')]).toEqual(['a', 'b']);
+  });
+
+  it('starts clean when there is no checkpoint file', () => {
+    expect(readCheckpoint(null).size).toBe(0);
+  });
+
+  it.each([
+    ['not json', 'nope'],
+    ['not a list', '{"a":1}'],
+    ['empty', ''],
+  ])('treats a checkpoint that is %s as none', (_name, text) => {
+    expect(readCheckpoint(text).size).toBe(0);
+  });
+
+  it('ignores entries that are not ids', () => {
+    expect([...readCheckpoint('["a",1,null,"b"]')]).toEqual(['a', 'b']);
+  });
+});
+
+describe('pendingIds', () => {
+  it('skips what is already restored and keeps the backup order', () => {
+    expect(pendingIds(['c', 'a', 'b'], new Set(['a']))).toEqual(['c', 'b']);
+  });
+});
+
+describe('movedIds', () => {
+  it('lists only the games that have moved, so a restore can refuse them', () => {
+    expect(movedIds({ a: { schemaVersion: 2 }, b: { name: 'old' }, c: undefined })).toEqual(['a']);
   });
 });
