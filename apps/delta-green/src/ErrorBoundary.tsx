@@ -1,6 +1,6 @@
 import { Component, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { isStaleChunk, reloadForNewBuild } from './lib/staleBuild';
+import { isStaleChunk, reloadForNewBuild } from '@dice-jar/stale-build';
 import { Notice } from './pages/Page';
 
 /** Catches a crash while rendering, so the visitor gets a way out instead of a blank page. Keyed by path in App, so navigating resets it. */

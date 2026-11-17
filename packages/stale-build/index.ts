@@ -11,12 +11,20 @@ export const isStaleChunk = (e: unknown) => e instanceof Error && STALE_CHUNK.te
  * deploy shows its error instead of looping.
  */
 export function reloadForNewBuild(reload = () => location.reload(), now = Date.now()): boolean {
-  try {
-    if (now - Number(sessionStorage.getItem(KEY)) < WINDOW_MS) return false;
-    sessionStorage.setItem(KEY, String(now));
-  } catch {
-    /* storage blocked: reload anyway */
-  }
+  // window.name survives a reload and works when sessionStorage is blocked, so the cooldown still holds.
+  const store = (() => {
+    try {
+      sessionStorage.getItem(KEY);
+      return { get: () => sessionStorage.getItem(KEY), set: (v: string) => sessionStorage.setItem(KEY, v) };
+    } catch {
+      return {
+        get: () => (window.name.startsWith(`${KEY}=`) ? window.name.slice(KEY.length + 1) : null),
+        set: (v: string) => (window.name = `${KEY}=${v}`),
+      };
+    }
+  })();
+  if (now - Number(store.get()) < WINDOW_MS) return false;
+  store.set(String(now));
   reload();
   return true;
 }

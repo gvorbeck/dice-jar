@@ -44,7 +44,7 @@ export const CheckboxGroup = ({
           ? 'checkbox-group-grid4'
           : columns === 2
             ? 'checkbox-group-grid2'
-            : 'col gap-2',
+            : 'checkbox-group-list',
     itemGap === 'md' && 'checkbox-group-gap-md',
     itemGap === 'lg' && 'checkbox-group-gap-lg',
   );

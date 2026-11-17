@@ -1,6 +1,7 @@
 import { useId, useRef, type ReactNode } from 'react';
 import { copyLabel, copyNote, useCopy } from '../lib/useCopy';
 import { outcomeClass } from '../rules/outcome';
+import { cn } from '@dice-jar/cn';
 
 // Small shared pieces with no react-aria, so the landing and game pages can use them without the form-control chunk.
 
@@ -20,7 +21,7 @@ export const Alert = ({ children, inline }: { children: ReactNode; inline?: bool
 
 /** A small dim note under a control. */
 export const Hint = ({ children, className }: { children: ReactNode; className?: string }) => (
-  <p className={className ? `dim ${className}` : 'dim'}>
+  <p className={cn('dim', className)}>
     <small>{children}</small>
   </p>
 );

@@ -30,7 +30,7 @@ export const MARSHAL_MOVES: MoveDefinition[] = [
     ],
   },
   {
-    id: 'col gap-6',
+    id: 'marshal-crew',
     name: 'Crew',
     leftControl: 1,
     startingMove: true,
@@ -45,7 +45,7 @@ export const MARSHAL_MOVES: MoveDefinition[] = [
     id: 'marshal-veteran-crew',
     name: 'Veteran Crew',
     leftControl: 2,
-    requires: ['col gap-6'],
+    requires: ['marshal-crew'],
     body: [
       { kind: 'para', text: 'Each time you take this move, pick 1. You can also choose to reselect their Instinct and Cost.' },
       {

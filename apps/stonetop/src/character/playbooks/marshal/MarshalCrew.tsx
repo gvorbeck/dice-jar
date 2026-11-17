@@ -610,7 +610,7 @@ export const MarshalCrew = ({ data, prosperity, onSave }: MarshalCrewProps) => {
 
       <div className="marshal-crew-columns">
         <OptionSelect
-          name="col gap-6"
+          name="marshal-crew"
           options={INSTINCT_OPTIONS}
           value={toCustomSentinel(features.crewInstinct)}
           customValue={features.crewInstinctCustom ?? ''}

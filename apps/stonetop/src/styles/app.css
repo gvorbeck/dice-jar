@@ -1522,6 +1522,12 @@ textarea.input {
 }
 
 /* ── ui/CheckboxGroup/CheckboxGroup ── */
+.checkbox-group-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
 .checkbox-group-gap-md {
   gap: var(--spacing-3);
 }

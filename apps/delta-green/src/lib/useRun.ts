@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { isStaleChunk, reloadForNewBuild } from './staleBuild';
+import { isStaleChunk, reloadForNewBuild } from '@dice-jar/stale-build';
 
 /** Runs a button's async work: disables while busy, shows `failMsg` (or its message for the error) on error, and reloads once if the error is a stale build. */
 export function useRun(failMsg: string | ((e: unknown) => string)) {

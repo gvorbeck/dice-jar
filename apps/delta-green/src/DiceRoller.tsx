@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import { rollExpression } from './rules';
 import { diceLabel } from './rules/outcome';
-import { randomInt } from './rules/data/random';
+import { randomInt } from '@dice-jar/game-id';
 import { Btn } from './ui';
 
 /** Plain dice like /dg roll test:2D6+1 (damage you deal, anything outward). */

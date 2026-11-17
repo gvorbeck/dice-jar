@@ -19,7 +19,7 @@ export const RANGER_MOVES: MoveDefinition[] = [
     ],
   },
   {
-    id: 'col gap-6',
+    id: 'ranger-animal-companion',
     name: 'Animal Companion',
     leftControl: 1,
     body: [
@@ -34,7 +34,7 @@ export const RANGER_MOVES: MoveDefinition[] = [
     name: 'Magnificent Specimen',
     leftControl: 2,
     requiresLevel: 2,
-    requires: ['col gap-6'],
+    requires: ['ranger-animal-companion'],
     body: [{ kind: 'para', text: 'Each time you take this move, your companion gains 2 additional options of your choice.' }],
   },
   {
@@ -225,7 +225,7 @@ export const RANGER_MOVES: MoveDefinition[] = [
     name: 'Alpha',
     leftControl: 1,
     requiresLevel: 6,
-    requires: ['col gap-6', 'ranger-wild-speech'],
+    requires: ['ranger-animal-companion', 'ranger-wild-speech'],
     body: [
       {
         kind: 'para',

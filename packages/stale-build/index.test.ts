@@ -25,15 +25,23 @@ describe('stale build recovery', () => {
     expect(reload).toHaveBeenCalledTimes(2);
   });
 
-  it('still reloads when storage is blocked, using location.reload by default', () => {
+  it('keeps the cooldown in window.name when storage is blocked', () => {
     const reload = vi.fn();
-    vi.stubGlobal('location', { reload });
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('blocked');
     });
-    expect(reloadForNewBuild()).toBe(true);
+    expect(reloadForNewBuild(reload, 1_000_000)).toBe(true);
+    expect(reloadForNewBuild(reload, 1_005_000)).toBe(false); // would loop without a stored cooldown
     expect(reload).toHaveBeenCalledTimes(1);
     vi.restoreAllMocks();
+    window.name = '';
+  });
+
+  it('calls location.reload by default', () => {
+    const reload = vi.fn();
+    vi.stubGlobal('location', { reload });
+    expect(reloadForNewBuild()).toBe(true);
+    expect(reload).toHaveBeenCalledTimes(1);
     vi.unstubAllGlobals();
   });
 });

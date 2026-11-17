@@ -150,7 +150,7 @@ const GmPlaybookContent = ({ g, id, updateContent, updateField, logRoll, notesAc
         content: <WorldTabContent />,
       },
       {
-        id: 'col gap-3',
+        id: 'move-search',
         label: 'Move Search',
         content: <MoveSearch />,
       },

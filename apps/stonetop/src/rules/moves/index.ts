@@ -30,7 +30,7 @@ export const BACKGROUND_FORCED_MOVES: Partial<Record<PlaybookType, Record<string
   ranger: {
     'mighty-hunter': ['ranger-expert-tracker', 'ranger-stalker'],
     'wide-wanderer': ['ranger-mental-map'],
-    'beast-bonded': ['col gap-6'],
+    'beast-bonded': ['ranger-animal-companion'],
   },
   seeker: {
     patriot: ['seeker-lets-make-a-deal'],
