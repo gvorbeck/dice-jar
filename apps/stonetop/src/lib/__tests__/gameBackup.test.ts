@@ -19,6 +19,7 @@ vi.mock('@/lib/gameParsing', async (importOriginal) => {
 });
 
 import { EXPORT_FORMAT, EXPORT_VERSION } from '../gameBackupFormat';
+import { splitGame } from '../gameShape';
 import { buildEnvelope, exportFilename, exportGame, readImportFile, readRawGame } from '../gameBackup';
 
 const EXPORTED_AT = new Date('2026-08-17T14:30:00.000Z');
@@ -167,6 +168,23 @@ describe('exportGame', () => {
     expect(check.envelope.game).toEqual(raw);
   });
 
+  it('exports a moved game as the one-document shape, so the file imports into either kind of game', async () => {
+    const original = gameDoc({ steading: { size: 'village' } });
+    const split = splitGame(original);
+    if (!split.ok) throw new Error('fixture does not split');
+    firestoreStore.set('games/long-winter', split.split.game);
+    split.split.characters.forEach((c) => firestoreStore.set(`games/long-winter/characters/${c.id}`, c.data));
+
+    await exportGame('long-winter');
+
+    const blob = createObjectURL.mock.calls[0]![0]! as Blob;
+    const check = readImportFile(await blob.text());
+    expect(check.ok).toBe(true);
+    if (!check.ok) return;
+    expect(check.envelope.game).toEqual(original);
+    expect(check.envelope.game).not.toHaveProperty('schemaVersion');
+  });
+
   it('applies the suffix to the safety copy', async () => {
     firestoreStore.set('games/long-winter', gameDoc());
 
@@ -250,6 +268,24 @@ describe('readImportFile — rejections', () => {
   it('rejects a payload over the Firestore document ceiling', () => {
     const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ threats: 'x'.repeat(1_000_001) }))));
     expect(check).toEqual({ ok: false, error: expect.stringContaining('KB limit for a single game') });
+  });
+
+  // A moved game stores one document per character and roll, so its export can be well over one document in total.
+  it('accepts a backup whose total is over one document but whose every piece fits', () => {
+    const big = 'x'.repeat(300_000);
+    const characters = Array.from({ length: 4 }, (_, i) => character(`c${i}`, big));
+    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters }))));
+    expect(check.ok).toBe(true);
+  });
+
+  it('reads a backup with a very long list of rolls without running out of arguments', () => {
+    const rolls = Array.from({ length: 200_000 }, (_, i) => ({ id: `r${i}` }));
+    expect(() => readImportFile(JSON.stringify(envelopeFor(gameDoc({ diceRolls: rolls }))))).not.toThrow();
+  });
+
+  it('refuses a backup with a single character over the document limit', () => {
+    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters: [character('c0', 'x'.repeat(1_000_001))] }))));
+    expect(check).toEqual({ ok: false, error: expect.stringContaining('KB limit') });
   });
 
   it('rejects a payload the app parser cannot read', () => {
