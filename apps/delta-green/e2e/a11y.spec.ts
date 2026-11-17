@@ -1,6 +1,7 @@
 // Every page, scanned with axe: the home page, each creation step, the review, the live sheet, the game page and a standalone sheet.
 import { expect, test } from '@playwright/test';
-import { createAgent, expectAccessible, finishAgent, startAgent } from './helpers';
+import { expectAccessible } from '@dice-jar/e2e-helpers';
+import { createAgent, finishAgent, startAgent } from './helpers';
 import { newCharacter } from '../src/model/character';
 import { encodeSheet, freshLive } from '../src/model/live';
 

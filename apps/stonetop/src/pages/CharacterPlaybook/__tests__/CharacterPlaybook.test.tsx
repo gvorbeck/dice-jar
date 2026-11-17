@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderRoute } from '@/test/renderWithProviders';
 import { CharacterPlaybook } from '../CharacterPlaybook';
-import type { GameSession, LoggedRoll } from '@/types';
+import type { GameSession, LoggedRoll } from '@/model';
 
 const logRoll = vi.fn<(roll: LoggedRoll) => Promise<void>>();
 
@@ -14,7 +14,7 @@ const mockGame: GameSession = {
   characters: [{ id: 'char-1', name: 'Aldric', playbook: 'heavy', level: 1 }],
 };
 
-vi.mock('@/hooks/useGame', () => ({
+vi.mock('@/lib/useGame', () => ({
   useGame: () => ({
     game: mockGame,
     loading: false,

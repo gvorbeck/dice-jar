@@ -1,7 +1,8 @@
 import { UNNATURAL_DISORDERS, VETERANS } from '../rules/data/creation';
 import { veteranOf, professionOf } from '../rules';
 import * as R from '../rules/data/random';
-import { pick, randomInt } from '../rules/data/random';
+import { randomInt } from '@dice-jar/game-id';
+import { pick } from '../rules/data/random';
 import { Choice, Rule, RadioGroup, Label, SkillPicker, Text, TypeInput, type StepProps } from '../ui';
 import { DETAIL_FIELDS, type DetailKey } from '../model/character';
 

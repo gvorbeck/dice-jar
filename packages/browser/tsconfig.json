@@ -1,0 +1,4 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["index.ts", "ErrorBoundary.tsx", "ErrorBoundary.test.tsx", "index.test.tsx", "vitest.config.ts"]
+}

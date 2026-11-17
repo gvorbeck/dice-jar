@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { rollAction, remodeRoll, statModifier, resolveRollStat, bandFor, effectiveMode } from '../rollDice';
-import type { CharacterData, RollBand } from '@/types';
+import type { CharacterData, RollBand } from '@/model';
 
 const BANDS: RollBand[] = [
   { label: '10+', min: 10, max: null },

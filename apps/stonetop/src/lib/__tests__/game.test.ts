@@ -4,24 +4,10 @@ import { firestoreMockModule, firestoreStore } from '@/test/firestoreMock';
 vi.mock('firebase/app', () => ({ initializeApp: () => ({}) }));
 vi.mock('firebase/firestore', () => firestoreMockModule());
 
-import { createGame, createGameWithId, slugifyGameId, gameIdExists } from '../game';
+import { createGame, createGameWithId, gameIdExists } from '../game';
 
 beforeEach(() => {
   firestoreStore.reset();
-});
-
-describe('slugifyGameId', () => {
-  it('lowercases, trims, and hyphenates non-alphanumerics', () => {
-    expect(slugifyGameId('  My Cool Game!  ')).toBe('my-cool-game');
-  });
-
-  it('collapses runs of separators and strips leading/trailing hyphens', () => {
-    expect(slugifyGameId('--a   b__c--')).toBe('a-b-c');
-  });
-
-  it('returns an empty string when nothing alphanumeric remains', () => {
-    expect(slugifyGameId('!!!')).toBe('');
-  });
 });
 
 describe('createGame', () => {

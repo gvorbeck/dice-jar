@@ -1,4 +1,4 @@
-import type { AdditiveStat, CharacterData } from '@/types';
+import type { AdditiveStat, CharacterData } from '@/model';
 
 // Apply additive changes (armor, HP, XP) to a freshly read sheet. XP can't be overspent: two devices can each try to
 // spend 2 XP (Burn Brightly) from a total that only covers one, and the second must fail rather than be waved through.

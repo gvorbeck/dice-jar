@@ -1,4 +1,4 @@
-import type { CharacterData } from '@/types';
+import type { CharacterData } from '@/model';
 
 export const BURN_BRIGHTLY_COST = 2;
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { Link } from 'react-router-dom';
 import { importJson, nameOf, type Character } from './model/character';
-import { store } from './lib/storage';
+import { store } from '@dice-jar/browser';
 import { gameUrl } from './lib/paths';
 import { Alert, useJsonPicker } from './ui/bits';
 import { blocking, clamp, plural, type validate } from './rules';

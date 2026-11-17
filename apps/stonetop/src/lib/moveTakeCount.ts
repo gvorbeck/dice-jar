@@ -1,4 +1,4 @@
-import type { CharacterData } from '@/types';
+import type { CharacterData } from '@/model';
 
 // Times a repeatable move has been taken: the select box counts as the first take, and each
 // checked take box (bitmask, see Move.tsx) as another.

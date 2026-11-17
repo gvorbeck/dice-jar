@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { addTag, removeTag, replaceTag, addMove, replaceQuality, applyEffects, projectCreature } from '../creatureMutations';
-import type { Creature, ArcanaConsequence } from '@/types';
+import type { Creature, ArcanaConsequence } from '@/model';
 
 const servant = (): Creature => ({
   id: 'the-mighty-servant',

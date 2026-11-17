@@ -8,10 +8,12 @@
     <meta name="description" content="Track your Stonetop TTRPG campaign — manage characters, GM playbook, and game sessions." />
     <!--
       Link-preview (Open Graph + Twitter Card) tags. These live in the static
-      index.html — not react-helmet — because unfurlers (Discord, Slack,
-      iMessage) don't run JavaScript, so runtime-injected tags never reach them.
+      index.html because unfurlers (Discord, Slack, iMessage) don't run
+      JavaScript, so runtime-injected tags never reach them. Pages only set
+      their title (useTitle).
       og:image must be an absolute URL. The card is 1200×630 (public/og-image.png).
     -->
+    <link rel="canonical" href="https://hearthfire.camp/" />
     <meta property="og:site_name" content="Hearthfire" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Hearthfire — Stonetop Party Tracker" />

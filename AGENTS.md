@@ -5,8 +5,8 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 ## Rules
 
 - Make the smallest change that fully works. Reuse what's in `packages/` and the app's own `src/lib`, `src/rules`, `src/model` before writing anything new. No abstractions, options, wrappers or "for later" code nobody asked for.
-- A PR changes one app. A change needed in two apps is two PRs, one per app. (A release PR from `dev` to `main` carries whatever was merged, so it is the exception.) The `checks` job fails a PR that touches more than one app, and a workflow labels each PR with the name of every app it touches.
-- An app never imports from another app. Code used by two apps moves to `packages/`; code used by one stays in that app.
+- A PR may change more than one app, for example to move shared code into `packages/` and switch every app to it. A workflow still labels each PR with the name of every app it touches.
+- An app never imports from another app. Code used by two apps moves to `packages/`, and the same PR switches every app that has its own copy over to it and deletes the copy; code used by one stays in that app.
 - A change in `packages/` must pass the checks of every app that uses it.
 - UI: React Aria Components, the shared UI components and the CSS tokens. No inline styles, no new hex colors, no other UI or CSS library. Add a token if one is missing.
 - Ask before adding a dependency. The same dependency has the same version in every workspace.
@@ -40,7 +40,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 
 ## Things that trip people up
 
-- An app's `functions/` is deployed by Firebase on its own, so it keeps its own `package.json` and lockfile and is not an npm workspace. It imports shared code by relative path and esbuild bundles it in. See delta-green's `functions/package.json` and the Functions steps in its deploy workflow.
+- An app's `functions/` is deployed by Firebase on its own, so it keeps its own `package.json` and lockfile and is not an npm workspace. It imports shared code by relative path and esbuild bundles it in. It does not bundle `@dice-jar/*` packages (`--packages=external`), so nothing the Functions import from the app may import them; the Functions build fails if its output mentions one. See delta-green's `functions/package.json` and the Functions steps in its deploy workflow.
 - Saves are diffs against what the tab last read. Shared save code takes a document reference from the app and never builds a path. Never write a whole document, or you'll overwrite changes from another device.
 - Firestore rules deploy before the build, and open tabs keep running the old build. Adding or removing a field takes two releases.
 - E2E tests click a radio's or checkbox's `label.choice`; React Aria hides the input itself.
@@ -71,6 +71,5 @@ An app is ready when all of these are true:
 The owner does not track these. When an import finishes, or the owner asks what is next, say which of them are now due.
 
 - **Strictness ratchet:** raise TypeScript strictness in `tsconfig.base.json` one more flag at a time (`jsx-a11y` is on `strict` and `noUncheckedIndexedAccess` is on). One PR per change, and only when every app passes.
-- **Next PR, delta-green only (open until done):** two shared packages exist that delta-green does not use yet. (1) `packages/e2e-helpers` holds `expectAccessible`, but delta-green's `e2e/helpers.ts` keeps its own copy and its own `@axe-core/playwright`: switch it to `@dice-jar/e2e-helpers`, delete the copy and the dependency. (2) `packages/game-id` holds `newGameId(words)` and `randomInt`, but delta-green's `src/lib/gameId.ts` and `src/rules/data/random.ts` keep their own: switch them to `@dice-jar/game-id` (pass `CODENAMES`), delete the copies, and move `random.ts`'s `pick` use over to the package if it needs `randomInt`. Remove this item when both are done. It is a separate PR because one PR may change only one app.
-- **Right after stonetop is in:** delta-green and stonetop share a lot of architecture (the old hearthfire app, which stonetop replaces, inspired it), so look for what to move to `packages/` now that two apps use it. Start with the axe helper (`expectAccessible` in delta-green's `e2e/helpers.ts`, and `@axe-core/playwright`): stonetop needs the same check to be ready, so it uses the shared helper from the start and does not copy it. Then the items the brief lists: `src/ui`, the tokens, Firebase init, diff saves, autosave, stale-build reload.
+- **After the delta-green PR above:** stonetop and delta-green now share the axe helper, game IDs, `cn`, stale-build reload and Firebase init through `packages/`. Still per-app, and worth moving once the two agree: `src/ui` and the tokens (stonetop's `src/ui` is the larger kit), diff saves and autosave. Those two differ in design (delta-green's `diff.ts` and `useAutosave` write leaf paths of one document; stonetop's `useDebouncedSave` and `gameMutations` queue, retry and merge by id), so reconcile them with the Firestore data-shape migration, not before.
 - **Before the first app is released:** confirm the GitHub settings in README.md "GitHub settings" are all on, and that the `checks` job is required on `dev` and `main`.

@@ -14,3 +14,12 @@ export const newGameId = (words: readonly string[]) => {
   const word = () => words[randomInt(words.length)]!.toLowerCase();
   return `${word()}-${word()}-${Array.from({ length: 6 }, () => ALPHABET[randomInt(ALPHABET.length)]).join('')}`;
 };
+
+/** What an Open box accepts: lowercase letters, digits and single dashes, so an ID is always a safe URL segment. */
+export const slugifyGameId = (raw: string, max = 100) =>
+  raw
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .slice(0, max)
+    .replace(/^-+|-+$/g, '');

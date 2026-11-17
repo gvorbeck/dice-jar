@@ -3,7 +3,6 @@ import { randomInt } from 'node:crypto';
 import { FieldPath, FieldValue, getFirestore, Timestamp, type DocumentData, type DocumentReference } from 'firebase-admin/firestore';
 import { REMOVED, type Change } from '../../src/lib/diff';
 import { SAN_KINDS, type SanKind } from '../../src/model/live';
-import { isGameId } from '../../src/lib/gameId';
 import { agentLabel } from '../../src/model/names';
 import { canImprove, diceText, isSuccess, matches, parseDice, rollExpression, sameText } from '../../src/rules';
 import {
@@ -26,7 +25,7 @@ import {
 } from './dg.js';
 import { bold, formatEntry, formatRoll, plain, type Roll } from './discord.js';
 import { ALIASES } from './commands.js';
-import { agentPath, agentsPath, gamePath, pendingSanPath, rollsPath, secretPath } from '../../src/lib/paths';
+import { agentPath, agentsPath, gamePath, isGameId, pendingSanPath, rollsPath, secretPath } from '../../src/lib/paths';
 
 interface Option {
   name: string;

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseMoveRoll } from '../parseMoveRoll';
-import type { MoveDefinition } from '@/types';
+import type { MoveDefinition } from '@/model';
 
 const move = (body: MoveDefinition['body']): MoveDefinition => ({ id: 'm', name: 'M', body });
 

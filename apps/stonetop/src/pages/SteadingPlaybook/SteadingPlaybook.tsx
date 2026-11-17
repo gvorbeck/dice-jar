@@ -1,30 +1,25 @@
 import { useMemo, useRef, useState } from 'react';
-import { useHashTabs } from '@/hooks/useHashTabs';
+import { useHashTabs } from '@/lib/useHashTabs';
 import { useParams } from 'react-router-dom';
-import { PageMeta } from '@/components/app/PageMeta/PageMeta';
-import { useGame } from '@/hooks/useGame';
-import { useNotesActions } from '@/hooks/useNotesActions';
-import { SharedNotes, type NotesActions } from '@/components/playbook/SharedNotes/SharedNotes';
-import { ScrollToTop, Tabs, Dropdown, Button, PlaybookColumns } from '@/components/ui';
-import type { DropdownGroup } from '@/components/ui';
-import { PageLayout } from '@/components/app/PageLayout/PageLayout';
-import { buildGameNav } from '@/components/app/PageHeader/gameNav';
-import {
-  SteadingImprovementList,
-  RESOURCES_CONFIG,
-  FORTIFICATIONS_CONFIG,
-} from '@/components/gm-playbook/sections/SteadingImprovementList';
-import { PlaybookSection } from '@/components/playbook/PlaybookSection';
-import { GameGuard } from '@/components/app/GameGuard/GameGuard';
+import { useTitle } from '@/lib/useTitle';
+import { useGame } from '@/lib/useGame';
+import { useNotesActions } from '@/lib/useNotesActions';
+import { SharedNotes, type NotesActions } from '@/playbook/SharedNotes/SharedNotes';
+import { ScrollToTop, Tabs, Dropdown, Button, PlaybookColumns } from '@/ui';
+import type { DropdownGroup } from '@/ui';
+import { PageLayout } from '@/ui/PageLayout/PageLayout';
+import { buildGameNav } from '@/ui/PageHeader/gameNav';
+import { SteadingImprovementList, RESOURCES_CONFIG, FORTIFICATIONS_CONFIG } from '@/gm-playbook/sections/SteadingImprovementList';
+import { PlaybookSection } from '@/playbook/PlaybookSection';
+import { GameGuard } from '@/ui/GameGuard/GameGuard';
 import { DEFAULT_GAME_NAME, getPlaybook } from '@/lib/constants';
-import { SteadingStats } from '@/components/gm-playbook/sections/SteadingStats';
-import { SteadingImprovements } from '@/components/gm-playbook/sections/SteadingImprovements';
-import { SteadingAssets } from '@/components/gm-playbook/sections/SteadingAssets';
-import { SteadingNPCs } from '@/components/gm-playbook/sections/SteadingNPCs/SteadingNPCs';
-import { RelationshipGraph } from '@/components/gm-playbook/sections/SteadingNPCs/RelationshipGraph';
-import { PlacesOfInterest, ReferenceNames, NpcTraits } from '@/components/gm-playbook/sections/SteadingReference';
-import type { GameSession, LoggedRoll, SteadingData, SteadingNPC } from '@/types';
-import styles from './SteadingPlaybook.module.css';
+import { SteadingStats } from '@/gm-playbook/sections/SteadingStats';
+import { SteadingImprovements } from '@/gm-playbook/sections/SteadingImprovements';
+import { SteadingAssets } from '@/gm-playbook/sections/SteadingAssets';
+import { SteadingNPCs } from '@/gm-playbook/sections/SteadingNPCs/SteadingNPCs';
+import { RelationshipGraph } from '@/gm-playbook/sections/SteadingNPCs/RelationshipGraph';
+import { PlacesOfInterest, ReferenceNames, NpcTraits } from '@/gm-playbook/sections/SteadingReference';
+import type { GameSession, LoggedRoll, SteadingData, SteadingNPC } from '@/model';
 
 interface SteadingContentProps {
   g: GameSession;
@@ -44,7 +39,7 @@ const NpcFilterRow = ({ g, npcFilter, onFilterChange }: NpcFilterRowProps) => {
   const groups = useMemo(() => buildFilterGroups(g), [g]);
   if (groups.length === 0) return null;
   return (
-    <div className={styles.npcFilterRow}>
+    <div className="row gap-3">
       <Dropdown
         id="npc-relationship-filter"
         aria-label="Filter NPCs by relationship"
@@ -52,10 +47,10 @@ const NpcFilterRow = ({ g, npcFilter, onFilterChange }: NpcFilterRowProps) => {
         value={npcFilter}
         onChange={onFilterChange}
         placeholder="Filter by relationship…"
-        className={styles.npcFilterDropdown}
+        className="steading-playbook-npc-filter-dropdown"
       />
       {npcFilter && (
-        <Button variant="ghost" size="sm" className={styles.npcFilterClear} onClick={() => onFilterChange('')}>
+        <Button variant="ghost" size="sm" className="steading-playbook-npc-filter-clear" onClick={() => onFilterChange('')}>
           Clear filter
         </Button>
       )}
@@ -146,7 +141,7 @@ interface NpcsTabProps {
 }
 
 const NpcsTab = ({ g, steading, updateSteading, npcFilter, onFilterChange }: NpcsTabProps) => (
-  <div className={styles.npcsLayout}>
+  <div className="col gap-6">
     <NpcFilterRow g={g} npcFilter={npcFilter} onFilterChange={onFilterChange} />
     <PlaybookColumns
       left={
@@ -188,6 +183,7 @@ const ReferenceTab = () => (
 const SteadingContent = ({ g, id, updateSteading, logRoll, notesActions }: SteadingContentProps) => {
   const headerRef = useRef<HTMLDivElement>(null);
   const gameName = g.name || DEFAULT_GAME_NAME;
+  useTitle(`Steading Playbook — ${gameName} — Hearthfire`);
   const steading = useMemo(() => g.steading ?? {}, [g.steading]);
   const [npcFilter, setNpcFilter] = useState('');
 
@@ -227,16 +223,11 @@ const SteadingContent = ({ g, id, updateSteading, logRoll, notesActions }: Stead
       nav={nav}
       diceRoller={{ rollerId: 'steading', rollerName: 'Steading', onRoll: logRoll }}
     >
-      <PageMeta
-        noindex
-        title={`Steading Playbook — ${gameName} — Hearthfire`}
-        description={`Stonetop steading playbook for ${gameName}. Track stats, improvements, assets, and NPCs.`}
-      />
       <ScrollToTop sentinelRef={headerRef} />
       <div ref={headerRef} />
       <Tabs
         aria-label="Steading sections"
-        className={styles.tabs}
+        className="steading-playbook-tabs"
         tabs={tabs}
         activeIndex={activeIndex}
         onActiveChange={handleActiveChange}

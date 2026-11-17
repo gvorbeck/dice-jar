@@ -23,6 +23,7 @@ export { Win } from './Win';
 import { MAX_LINE, MAX_PROSE, type Character } from '../model/character';
 import { SKILL_FAMILIES, TYPED_SKILLS, TYPE_SUGGESTIONS, familyOf, makeKey, typeOf } from '../rules/data/skills';
 import { clamp, filterSkills, skillsOf } from '../rules';
+import { cn } from '@dice-jar/cn';
 
 export type Up = (fn: (draft: Character) => void) => void;
 export interface StepProps {
@@ -100,7 +101,7 @@ export const Btn = ({
   className?: string;
   label?: string;
 }) => (
-  <Button className={className ? `btn ${className}` : 'btn'} onPress={onPress} isDisabled={disabled} aria-label={label}>
+  <Button className={cn('btn', className)} onPress={onPress} isDisabled={disabled} aria-label={label}>
     {children}
   </Button>
 );

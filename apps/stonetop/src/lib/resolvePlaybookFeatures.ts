@@ -1,5 +1,5 @@
 import { isBoolean, isNumber, isString } from '@/lib/typeGuards';
-import type { CharacterData, PlaybookFeatures } from '@/types';
+import type { CharacterData, PlaybookFeatures } from '@/model';
 
 // Stricter than isRecord — excludes arrays so a nested feature object can be
 // told apart from a feature array below.

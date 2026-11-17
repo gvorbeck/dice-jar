@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BURN_BRIGHTLY_COST, canBurnBrightly, requireBurnBrightly } from './burnBrightly';
-import type { CharacterData } from '@/types';
+import type { CharacterData } from '@/model';
 
 const at = (statXp: string, statLevel: string, over: Partial<CharacterData> = {}) => ({ statXp, statLevel, ...over }) as CharacterData;
 

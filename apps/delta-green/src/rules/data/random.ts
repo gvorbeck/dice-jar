@@ -1,12 +1,6 @@
 // Flavor lists for the "Randomize details" button. Not from the Handbook.
-/** A uniform integer in [0, n). Draws at or above the largest multiple of n are redrawn, so no result is more likely than another. */
-export const randomInt = (n: number) => {
-  const limit = 2 ** 32 - (2 ** 32 % n),
-    buf = new Uint32Array(1);
-  do crypto.getRandomValues(buf);
-  while (buf[0]! >= limit);
-  return buf[0]! % n;
-};
+import { randomInt } from '@dice-jar/game-id';
+
 export const pick = <T>(a: readonly T[]): T => {
   const x = a[randomInt(a.length)];
   if (x === undefined) throw new Error('pick from an empty list');

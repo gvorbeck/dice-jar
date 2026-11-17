@@ -4,7 +4,7 @@ import { db } from '@/lib/firebase';
 import { INVALID_WRITE_MESSAGE } from '@/lib/constants';
 import { isRecord, isString } from '@/lib/typeGuards';
 import { parseCharacters } from '@/lib/gameParsing';
-import type { Character } from '@/types';
+import type { Character } from '@/model';
 
 // Map raw Firestore error codes to messages a player can act on — the raw
 // strings (e.g. "Missing or insufficient permissions") are infra noise. Any

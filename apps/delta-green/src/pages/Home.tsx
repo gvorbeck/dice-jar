@@ -1,11 +1,13 @@
 import { useId, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRun } from '../lib/useRun';
-import { isOpenableId, MIN_ID, newGameId, recentGames, slugifyGameId } from '../lib/gameId';
+import { newGameId, slugifyGameId } from '@dice-jar/game-id';
+import { isOpenableId, MIN_ID, recentGames } from '../lib/gameId';
+import { CODENAMES } from '../rules/data/random';
 import { Win } from '../ui/Win';
 import { Page } from './Page';
 import { Alert, Hint } from '../ui/bits';
-import { gameUrl } from '../lib/paths';
+import { gameUrl, MAX_ID } from '../lib/paths';
 
 const Hero = () => (
   <header className="hero">
@@ -43,7 +45,7 @@ export default function Home() {
   const [raw, setRaw] = useState('');
   const { busy, err, run } = useRun('Could not create a game. Check your connection and try again.');
   const inputId = useId();
-  const slug = slugifyGameId(raw);
+  const slug = slugifyGameId(raw, MAX_ID);
   const recent = recentGames();
 
   const open = (e: FormEvent) => {
@@ -53,7 +55,7 @@ export default function Home() {
   // Firestore loads on click, not with the landing page.
   const generate = () =>
     run(async () => {
-      const id = newGameId();
+      const id = newGameId(CODENAMES);
       await (await import('../lib/games')).createGame(id);
       nav(gameUrl(id));
     });

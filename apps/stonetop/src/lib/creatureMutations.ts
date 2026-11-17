@@ -1,4 +1,4 @@
-import type { Creature, CreatureEffect, CreatureQuality, ConsequenceAction, ConsequenceTable } from '@/types';
+import type { Creature, CreatureEffect, CreatureQuality, ConsequenceAction, ConsequenceTable } from '@/model';
 
 // The projection reads only the creature-mutating parts of a consequence (never its prose): a back
 // consequence's creature ops are extracted from `actions` (a superset that also holds PC ops); PC ops

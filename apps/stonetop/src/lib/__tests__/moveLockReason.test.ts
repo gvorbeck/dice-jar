@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getLockReason } from '../moveLockReason';
-import type { MoveDefinition } from '@/types';
+import type { MoveDefinition } from '@/model';
 
 const move = (overrides: Partial<MoveDefinition> & { id: string; name: string }): MoveDefinition => overrides;
 

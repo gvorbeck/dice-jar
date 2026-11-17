@@ -1,7 +1,8 @@
 import { STATS, STAT_NAMES } from '../rules/data/creation';
 import { activeBonds, derived, disorderOf, featureOf, motivationsOf, professionOf, veteranOf, blocking, type Issue } from '../rules';
 import { asciiSheet } from '../model/sheet';
-import { DETAIL_FIELDS, exportJson } from '../model/character';
+import { exportJson } from '../lib/savedAgent';
+import { DETAIL_FIELDS } from '../model/character';
 import { Btn, SkillTable, Rule, type StepProps } from '../ui';
 import { CopyButton } from '../ui/bits';
 

@@ -1,20 +1,19 @@
 import { useState, useCallback, useMemo, useEffect, useRef, memo } from 'react';
 import { Button as AriaButton, GridList, GridListItem, useDragAndDrop } from 'react-aria-components';
-import clsx from 'clsx';
+import { cn } from '@dice-jar/cn';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { PageMeta } from '@/components/app/PageMeta/PageMeta';
-import { useGame } from '@/hooks/useGame';
+import { useTitle } from '@/lib/useTitle';
+import { useGame } from '@/lib/useGame';
 import { DEFAULT_GAME_NAME, getPlaybook, PLAYBOOKS } from '@/lib/constants';
-import { Button, Heading, Icon, Text } from '@/components/ui';
+import { Button, Heading, Icon, Text } from '@/ui';
 import { GameIdModal } from './modals/GameIdModal';
 import { AddCharacterModal } from './modals/AddCharacterModal';
 import { RemoveCharacterModal } from './modals/RemoveCharacterModal';
-import { GameGuard } from '@/components/app/GameGuard/GameGuard';
-import { PageLayout } from '@/components/app/PageLayout/PageLayout';
-import { RollLog } from '@/components/character/RollLog/RollLog';
+import { GameGuard } from '@/ui/GameGuard/GameGuard';
+import { PageLayout } from '@/ui/PageLayout/PageLayout';
+import { RollLog } from '@/character/RollLog/RollLog';
 import { GameDataActions } from './GameDataActions';
-import type { Character, GameSession } from '@/types';
-import styles from './Game.module.css';
+import type { Character, GameSession } from '@/model';
 
 interface LocationState {
   isNew?: boolean;
@@ -38,23 +37,23 @@ const CharacterRow = memo(({ character, gameId, showGrip, canMoveUp, canMoveDown
   const handleRemove = useCallback(() => onRemove(character), [onRemove, character]);
   const handleMoveUp = useCallback(() => onMove(character.id, -1), [onMove, character.id]);
   const handleMoveDown = useCallback(() => onMove(character.id, 1), [onMove, character.id]);
-  const linkCx = clsx(styles.characterLink, styles.characterLinkBtn);
+  const linkCx = cn('game-character-link', 'grow');
 
   return (
-    <GridListItem id={character.id} textValue={buttonLabel} className={styles.characterRow}>
+    <GridListItem id={character.id} textValue={buttonLabel} className="game-character-row">
       {showGrip && (
-        <span className={styles.reorderControls}>
-          <AriaButton slot="drag" className={styles.gripHandle}>
+        <span className="game-reorder-controls">
+          <AriaButton slot="drag" className="game-grip-handle">
             <Icon name="grip" size="small" />
           </AriaButton>
           {/* Collapsed by default; expands when an arrow gains keyboard focus so the
               row stays uncluttered for mouse users while keyboard users can still reorder. */}
-          <span className={styles.moveButtons}>
+          <span className="game-move-buttons">
             <Button
               variant="ghost"
               icon="chevron-up"
               size="sm"
-              className={styles.moveBtn}
+              className="game-move-btn"
               aria-label={`Move ${buttonLabel} up`}
               disabled={!canMoveUp}
               onClick={handleMoveUp}
@@ -63,7 +62,7 @@ const CharacterRow = memo(({ character, gameId, showGrip, canMoveUp, canMoveDown
               variant="ghost"
               icon="chevron-down"
               size="sm"
-              className={styles.moveBtn}
+              className="game-move-btn"
               aria-label={`Move ${buttonLabel} down`}
               disabled={!canMoveDown}
               onClick={handleMoveDown}
@@ -72,12 +71,12 @@ const CharacterRow = memo(({ character, gameId, showGrip, canMoveUp, canMoveDown
         </span>
       )}
       <Button as={Link} to={`/game/${gameId}/${character.playbook}`} variant="secondary" size="xl" fullWidth className={linkCx}>
-        <span className={styles.characterBtnText}>{buttonLabel}</span>
+        <span className="game-character-btn-text">{buttonLabel}</span>
       </Button>
       <Button
         variant="ghost"
         icon="trash"
-        className={styles.removeCharacterBtn}
+        className="game-remove-character-btn"
         aria-label={`Remove ${buttonLabel}`}
         onClick={handleRemove}
       />
@@ -115,6 +114,7 @@ const GameContent = ({
   onReplaceGameData,
 }: GameContentProps) => {
   const gameName = g.name || DEFAULT_GAME_NAME;
+  useTitle(`${gameName} — Hearthfire`);
   const [removingCharacter, setRemovingCharacter] = useState<Character | null>(null);
   const [orderedCharacters, setOrderedCharacters] = useState<Character[]>(g.characters);
   const [moveAnnouncement, setMoveAnnouncement] = useState('');
@@ -194,11 +194,6 @@ const GameContent = ({
 
   return (
     <>
-      <PageMeta
-        noindex
-        title={`${gameName} — Hearthfire`}
-        description={`Party tracker for ${gameName}. Manage characters and GM playbook.`}
-      />
       {/* Mounted only while open so per-open UI state (spinners, copy feedback)
           resets on each open without a reset effect. */}
       {showIdModal && <GameIdModal gameId={id} open={showIdModal} onClose={onCloseIdModal} />}
@@ -225,25 +220,20 @@ const GameContent = ({
         onSaveTitle={onSaveTitle}
         actions={<GameDataActions gameId={id} gameName={gameName} onReplaceGameData={onReplaceGameData} />}
       >
-        <div className={styles.sections}>
-          <div className={styles.sectionCharacters}>
+        <div className="game-sections">
+          <div className="game-section-characters game-section">
             <Heading as="h2" size="label">
               Characters
             </Heading>
-            <div className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
+            <div className="game-sr-only field-sr-only" role="status" aria-live="polite" aria-atomic="true">
               {moveAnnouncement}
             </div>
             {orderedCharacters.length === 0 ? (
-              <div className={styles.placeholder}>
+              <div className="game-placeholder">
                 <Text color="muted">Your party roster is empty. Add a character to get started.</Text>
               </div>
             ) : (
-              <GridList
-                aria-label="Characters"
-                items={orderedCharacters}
-                dragAndDropHooks={dragAndDropHooks}
-                className={styles.characterList}
-              >
+              <GridList aria-label="Characters" items={orderedCharacters} dragAndDropHooks={dragAndDropHooks} className="col gap-3">
                 {(character) => (
                   <CharacterRow
                     character={character}
@@ -268,8 +258,8 @@ const GameContent = ({
             </Button>
           </div>
 
-          <div className={styles.sectionRight}>
-            <div className={styles.section}>
+          <div className="game-section-right">
+            <div className="game-section">
               <Heading as="h2" size="label">
                 Stonetop
               </Heading>
@@ -278,7 +268,7 @@ const GameContent = ({
               </Button>
             </div>
 
-            <div className={styles.section}>
+            <div className="game-section">
               <Heading as="h2" size="label">
                 GM Playbook
               </Heading>
@@ -287,7 +277,7 @@ const GameContent = ({
               </Button>
             </div>
 
-            <div className={styles.section}>
+            <div className="game-section">
               <Heading as="h2" size="label">
                 Recent Rolls
               </Heading>
