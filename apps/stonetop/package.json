@@ -17,6 +17,7 @@
     "test:coverage": "vitest run --coverage",
     "check": "npm run lint && npm run typecheck && npm run knip && npm run test:coverage",
     "audit-backup": "node scripts/audit-backup.ts",
+    "migration-status": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/migration-status.ts",
     "migrate-games": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/migrate-games.ts",
     "unmigrate-game": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/unmigrate-game.ts",
     "rehearse-migration": "firebase emulators:exec --only firestore --project demo-stonetop 'node scripts/rehearse-migration.ts'",

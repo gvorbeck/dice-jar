@@ -88,6 +88,8 @@ export interface RunOptions {
   only?: string[];
   /** Stop after this many games have moved (or would). */
   limit?: number;
+  /** Called after each game, so a long run can show that it is moving. */
+  onProgress?: (done: number, total: number, outcome: Outcome) => void;
 }
 
 export const migrateAll = async (db: Firestore, options: RunOptions): Promise<Outcome[]> => {
@@ -99,12 +101,15 @@ export const migrateAll = async (db: Firestore, options: RunOptions): Promise<Ou
     if (options.limit !== undefined && moved >= options.limit) break;
     const expected = options.backup?.[id];
     if (options.write && !expected) {
-      outcomes.push({ id, status: 'refused', problems: ['not in the backup'] });
+      const refused: Outcome = { id, status: 'refused', problems: ['not in the backup'] };
+      outcomes.push(refused);
+      options.onProgress?.(outcomes.length, ids.length, refused);
       continue;
     }
     const outcome = await migrateGame(db, id, { expected, dryRun: !options.write });
     if (outcome.status === 'moved' || outcome.status === 'would move') moved++;
     outcomes.push(outcome);
+    options.onProgress?.(outcomes.length, ids.length, outcome);
   }
   return outcomes;
 };

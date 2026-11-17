@@ -2,6 +2,8 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { backupGames } from '../scripts/backupCore.ts';
+import { migrationStatus } from '../scripts/migrationStatus.ts';
 import { migrateAll, migrateGame, unmigrateGame } from '../scripts/migrateCore.ts';
 import { sameGame } from '../scripts/gameAudit.ts';
 
@@ -215,10 +217,69 @@ describe('migrateAll', () => {
     expect((await read('b')).schemaVersion).toBeUndefined();
   });
 
+  it('reports each game as it goes, so a long run shows that it is moving', async () => {
+    await seed('a');
+    await seed('b');
+    const seen: [number, number, string][] = [];
+    await migrateAll(db, { write: false, onProgress: (done, total, o) => seen.push([done, total, o.id]) });
+    expect(seen).toEqual([
+      [1, 2, 'a'],
+      [2, 2, 'b'],
+    ]);
+  });
+
   it('can be limited to named games', async () => {
     await seed('a');
     await seed('b');
     const outcomes = await migrateAll(db, { write: true, backup: backup(['a', 'b']), only: ['b'] });
     expect(outcomes.map((o) => o.id)).toEqual(['b']);
+  });
+});
+
+describe('backupGames', () => {
+  it('saves every game, and a moved game as the one document it was', async () => {
+    await seed('old');
+    await seed('new');
+    await migrateGame(db, 'new');
+    const backup = await backupGames(db);
+    expect(Object.keys(backup).sort()).toEqual(['new', 'old']);
+    expect(sameGame(backup.new!, game())).toBe(true);
+    expect(sameGame(backup.old!, game())).toBe(true);
+    expect(backup.new).not.toHaveProperty('schemaVersion');
+  });
+
+  it('can save just the games named, so one busy game can be backed up in a moment', async () => {
+    await seed('a');
+    await seed('b');
+    expect(Object.keys(await backupGames(db, { only: ['b'] }))).toEqual(['b']);
+  });
+
+  it('says when a named game does not exist, instead of writing a backup without it', async () => {
+    await expect(backupGames(db, { only: ['nope'] })).rejects.toThrow('No game found with ID: nope');
+  });
+
+  it('leaves out a path that holds only subcollections, which is not a game', async () => {
+    await seed('a');
+    await db.doc('games/ghost/characters/x').set({ id: 'x' });
+    expect(Object.keys(await backupGames(db))).toEqual(['a']);
+  });
+
+  it('reports progress, however many it reads at once', async () => {
+    for (const id of ['a', 'b', 'c']) await seed(id);
+    const seen: number[] = [];
+    await backupGames(db, { onProgress: (done) => seen.push(done) });
+    expect(seen.sort()).toEqual([1, 2, 3]);
+  });
+});
+
+describe('migrationStatus', () => {
+  it('counts the games that have moved and the ones still to move', async () => {
+    expect(await migrationStatus(db)).toEqual({ total: 0, moved: 0, remaining: 0 });
+    await seed('a');
+    await seed('b');
+    await seed('c');
+    await migrateGame(db, 'a');
+    await migrateGame(db, 'b');
+    expect(await migrationStatus(db)).toEqual({ total: 3, moved: 2, remaining: 1 });
   });
 });

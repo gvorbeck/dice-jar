@@ -35,7 +35,17 @@ const backup = backupFile
   : undefined;
 
 console.log(`Mode: ${write ? 'WRITE' : 'DRY RUN (pass --write to move games)'}\n`);
-const outcomes = await migrateAll(adminDb(), { write, backup, only, limit });
+const started = Date.now();
+const outcomes = await migrateAll(adminDb(), {
+  write,
+  backup,
+  only,
+  limit,
+  onProgress: (done, total) => {
+    if (done === 1 || done % 25 === 0 || done === total)
+      console.log(`  ${done} / ${total} games, ${Math.round((Date.now() - started) / 1000)}s`);
+  },
+});
 
 const tally = new Map<string, number>();
 for (const o of outcomes) tally.set(o.status, (tally.get(o.status) ?? 0) + 1);
