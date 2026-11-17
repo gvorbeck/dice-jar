@@ -134,6 +134,23 @@ describe('a move that something interrupts or a player touches', () => {
     expect((await read('g')).schemaVersion).toBe(2);
   });
 
+  it('keeps a move that cannot be read back as a move, so it still counts toward a limit', async () => {
+    await seed('a');
+    await seed('b');
+    const real = db.runTransaction.bind(db) as Firestore['runTransaction'];
+    const spy = vi.spyOn(db, 'runTransaction').mockImplementation((async (...args: Parameters<Firestore['runTransaction']>) => {
+      const result = await real(...args);
+      await db.doc('games/a').delete(); // the read-back now finds nothing marked as moved
+      return result;
+    }) as Firestore['runTransaction']);
+    const outcomes = await migrateAll(db, { write: true, backup: { a: game(), b: game() }, limit: 1 });
+    spy.mockRestore();
+    expect(outcomes).toEqual([
+      { id: 'a', status: 'moved', characters: 3, rolls: 2, unverified: 'the game is not marked as moved when read back' },
+    ]);
+    expect((await read('b')).schemaVersion).toBeUndefined();
+  });
+
   it('carries on with the other games when one fails, and says which', async () => {
     await seed('a');
     await seed('b');

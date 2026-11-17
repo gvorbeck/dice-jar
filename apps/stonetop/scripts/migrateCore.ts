@@ -8,7 +8,7 @@ import { sameGame } from './gameAudit.ts';
 type Raw = Record<string, unknown>;
 
 export type Outcome =
-  | { id: string; status: 'moved'; characters: number; rolls: number; changedAfter?: string[] }
+  | { id: string; status: 'moved'; characters: number; rolls: number; changedAfter?: string[]; unverified?: string }
   | { id: string; status: 'would move'; characters: number; rolls: number }
   | { id: string; status: 'put back'; characters: number; rolls: number }
   | { id: string; status: 'already moved' | 'not moved' | 'missing' | 'changed since backup' }
@@ -54,13 +54,18 @@ export const migrateGame = async (db: Firestore, id: string, options: { expected
     return { id, status: 'moved', ...counts };
   });
 
-  // The move was checked before it was written. Read it back to confirm it landed, and note (not fail on) anything a player saved since.
+  // The move was checked before it was written. Read it back to confirm it landed; whatever goes wrong here is a note on a game
+  // that did move, never a failure, so it still counts toward a limit and is never reported as not done.
   if (outcome.status === 'moved' && written) {
-    const [game, characters, rolls] = await Promise.all([ref.get(), ref.collection('characters').get(), ref.collection('rolls').get()]);
-    const back = game.data() as Raw | undefined;
-    if (back?.schemaVersion !== 2) throw new Error(`Verification failed for ${id}: the game is not marked as moved.`);
-    const changedAfter = changedAfterMove(written, { game: back, characters: stored(characters), rolls: stored(rolls) });
-    if (changedAfter.length) return { ...outcome, changedAfter };
+    try {
+      const [game, characters, rolls] = await Promise.all([ref.get(), ref.collection('characters').get(), ref.collection('rolls').get()]);
+      const back = game.data() as Raw | undefined;
+      if (back?.schemaVersion !== 2) return { ...outcome, unverified: 'the game is not marked as moved when read back' };
+      const changedAfter = changedAfterMove(written, { game: back, characters: stored(characters), rolls: stored(rolls) });
+      if (changedAfter.length) return { ...outcome, changedAfter };
+    } catch (e) {
+      return { ...outcome, unverified: `could not read it back: ${e instanceof Error ? e.message : String(e)}` };
+    }
   }
   return outcome;
 };
