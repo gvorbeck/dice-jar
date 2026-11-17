@@ -14,7 +14,7 @@ export function reloadForNewBuild(reload = () => location.reload(), now = Date.n
   // window.name survives a reload and works when sessionStorage is blocked, so the cooldown still holds.
   const store = (() => {
     try {
-      sessionStorage.getItem(KEY);
+      sessionStorage.setItem(KEY, sessionStorage.getItem(KEY) ?? '0'); // a write probe also catches a full quota
       return { get: () => sessionStorage.getItem(KEY), set: (v: string) => sessionStorage.setItem(KEY, v) };
     } catch {
       return {

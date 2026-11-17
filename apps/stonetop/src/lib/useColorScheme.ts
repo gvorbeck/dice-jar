@@ -1,16 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
+import { store } from '@dice-jar/browser';
 
 type ColorScheme = 'dark' | 'light';
 
 const STORAGE_KEY = 'hearthfire-color-scheme';
 
 const getInitial = (): ColorScheme => {
-  try {
-    const v = localStorage.getItem(STORAGE_KEY);
-    if (v === 'light' || v === 'dark') return v;
-  } catch {
-    // localStorage unavailable
-  }
+  const v = store.get(STORAGE_KEY);
+  if (v === 'light' || v === 'dark') return v;
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 };
 
@@ -27,11 +24,7 @@ export const useColorScheme = () => {
 
   useEffect(() => {
     applyTheme(scheme);
-    try {
-      localStorage.setItem(STORAGE_KEY, scheme);
-    } catch {
-      // localStorage unavailable
-    }
+    store.set(STORAGE_KEY, scheme);
   }, [scheme]);
 
   const toggle = useCallback(() => {

@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@dice-jar/e2e-helpers": "*",
+    "@dice-jar/browser": "*",
     "@dice-jar/cn": "*",
     "@dice-jar/firebase": "*",
     "@dice-jar/game-id": "*",

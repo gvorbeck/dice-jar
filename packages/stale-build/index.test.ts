@@ -37,6 +37,18 @@ describe('stale build recovery', () => {
     window.name = '';
   });
 
+  it('falls back to window.name when storage is full', () => {
+    const reload = vi.fn();
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('quota');
+    });
+    expect(reloadForNewBuild(reload, 1_000_000)).toBe(true);
+    expect(reloadForNewBuild(reload, 1_005_000)).toBe(false);
+    expect(reload).toHaveBeenCalledTimes(1);
+    vi.restoreAllMocks();
+    window.name = '';
+  });
+
   it('calls location.reload by default', () => {
     const reload = vi.fn();
     vi.stubGlobal('location', { reload });

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { newGameId, randomInt } from './index';
+import { newGameId, randomInt, slugifyGameId } from './index';
 
 describe('newGameId', () => {
   it('is two lowercase words and six characters, safe as a URL segment', () => {
@@ -23,5 +23,16 @@ describe('randomInt', () => {
       return a;
     }) as typeof crypto.getRandomValues);
     expect(randomInt(3)).toBe(1);
+  });
+});
+
+describe('slugifyGameId', () => {
+  it('lowercases and collapses everything else to single dashes', () => {
+    expect(slugifyGameId('  My Cool Game!  ')).toBe('my-cool-game');
+    expect(slugifyGameId('--a   b__c--')).toBe('a-b-c');
+    expect(slugifyGameId('!!!')).toBe('');
+  });
+  it('cuts to the length limit without leaving a trailing dash', () => {
+    expect(slugifyGameId('abc-def', 4)).toBe('abc');
   });
 });

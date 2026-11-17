@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useId } from 'react';
 import { Link } from 'react-router-dom';
+import { useCopy } from '@dice-jar/browser';
 import { Button, Heading, Input, Text, RuleDivider, Tooltip } from '@/ui';
 import { useToast } from '@/ui/Toast/ToastContext';
 import { PageNav } from './PageNav';
@@ -65,10 +66,10 @@ export const PageHeader = (props: Props) => {
   const { addToast } = useToast();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [copyState, copy] = useCopy();
+  const copied = copyState === 'ok';
   const inputRef = useRef<HTMLInputElement>(null);
   const editBtnRef = useRef<HTMLButtonElement>(null);
-  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Set just before a keyboard-driven commit/cancel so the focus-return in `commit` only fires
   // for Enter, not for a blur caused by clicking or tabbing to another element — otherwise we'd
   // steal focus from wherever the user was headed.
@@ -85,10 +86,8 @@ export const PageHeader = (props: Props) => {
   }, [editing]);
 
   useEffect(() => {
-    return () => {
-      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
-    };
-  }, []);
+    if (copyState === 'fail') addToast('Failed to copy game ID.', 'error');
+  }, [copyState, addToast]);
 
   const startEditing = useCallback(() => {
     if (simple) return;
@@ -125,18 +124,9 @@ export const PageHeader = (props: Props) => {
     [commit],
   );
 
-  const copyGameId = useCallback(() => {
-    if (simple) return;
-    const { gameId } = props as FullProps;
-    navigator.clipboard
-      .writeText(gameId)
-      .then(() => {
-        setCopied(true);
-        if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
-        copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
-      })
-      .catch(() => addToast('Failed to copy game ID.', 'error'));
-  }, [simple, props, addToast]);
+  const copyGameId = () => {
+    if (!simple) copy((props as FullProps).gameId);
+  };
 
   const copyLabel = copied ? 'Copied!' : 'Copy game ID';
 

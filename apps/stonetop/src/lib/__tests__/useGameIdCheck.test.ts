@@ -4,13 +4,6 @@ import { renderHook, act } from '@testing-library/react';
 const gameIdExists = vi.fn();
 vi.mock('@/lib/game', () => ({
   gameIdExists: (id: string) => gameIdExists(id),
-  // Reuse the real slug logic so status transitions match production.
-  slugifyGameId: (raw: string) =>
-    raw
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, ''),
 }));
 
 import { useGameIdCheck } from '../useGameIdCheck';

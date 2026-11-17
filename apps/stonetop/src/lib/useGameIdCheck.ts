@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { gameIdExists, slugifyGameId } from '@/lib/game';
+import { slugifyGameId } from '@dice-jar/game-id';
+import { gameIdExists } from '@/lib/game';
 
 export type IdStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
 

@@ -1,8 +1,8 @@
 import { useId, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRun } from '../lib/useRun';
-import { newGameId } from '@dice-jar/game-id';
-import { isOpenableId, MIN_ID, recentGames, slugifyGameId } from '../lib/gameId';
+import { newGameId, slugifyGameId } from '@dice-jar/game-id';
+import { isOpenableId, MIN_ID, recentGames } from '../lib/gameId';
 import { CODENAMES } from '../rules/data/random';
 import { Win } from '../ui/Win';
 import { Page } from './Page';

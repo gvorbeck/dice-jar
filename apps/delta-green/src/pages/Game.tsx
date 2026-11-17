@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { asLoss, pad2, diceLabel, lowHp, testText, wpNote } from '../rules/outcome';
 import { UNNAMED } from '../model/names';
 import { useRun } from '../lib/useRun';
-import { downloadJson } from '../lib/download';
+import { downloadJson } from '@dice-jar/browser';
 import {
   createGame,
   deleteAgent,

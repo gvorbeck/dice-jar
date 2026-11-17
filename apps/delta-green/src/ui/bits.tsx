@@ -1,5 +1,6 @@
 import { useId, useRef, type ReactNode } from 'react';
-import { copyLabel, copyNote, useCopy } from '../lib/useCopy';
+import { useCopy } from '@dice-jar/browser';
+import { copyLabel, copyNote } from '../lib/useCopy';
 import { outcomeClass } from '../rules/outcome';
 import { cn } from '@dice-jar/cn';
 

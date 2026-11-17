@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { STATS } from '../rules/data/creation';
 import { BONUS_PICKS } from '../rules/data/skills';
-import { downloadJson } from '../lib/download';
-import { SAVED_AGENT_BAK, SAVED_AGENT_KEY, store } from '../lib/storage';
+import { downloadJson, store } from '@dice-jar/browser';
+import { SAVED_AGENT_BAK, SAVED_AGENT_KEY } from '../lib/storage';
 import { fromGreenAgent, isGreenAgent } from './greenagent';
 
 const CHARACTER_VERSION = 1;
