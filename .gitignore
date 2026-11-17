@@ -4,6 +4,12 @@ coverage
 test-results
 playwright-report
 .env
+service-account.json
+# Admin script output holds players' game data
+firestore-backup-*.json
+firestore-pre-restore-*.json
+*.restore-checkpoint.json
+game-*-backup-*.json
 .firebase
 *.tsbuildinfo
 **/functions/lib

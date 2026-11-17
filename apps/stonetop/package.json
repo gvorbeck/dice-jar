@@ -15,7 +15,13 @@
     "test:rules": "firebase emulators:exec --only firestore --project demo-stonetop 'vitest run --config vitest.rules.config.ts'",
     "test:e2e": "firebase emulators:exec --only firestore --project demo-stonetop 'playwright test'",
     "test:coverage": "vitest run --coverage",
-    "check": "npm run lint && npm run typecheck && npm run knip && npm run test:coverage"
+    "check": "npm run lint && npm run typecheck && npm run knip && npm run test:coverage",
+    "audit-backup": "node scripts/audit-backup.ts",
+    "backup": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/backup.ts",
+    "restore": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/restore.ts",
+    "delete-game": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/delete-game.ts",
+    "inspect-game": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/inspect-game.ts",
+    "duplicate-game": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/duplicate-game.ts"
   },
   "dependencies": {
     "@fontsource/im-fell-english": "^5.2.6",
@@ -30,9 +36,9 @@
     "react-router-dom": "^7.18.5"
   },
   "devDependencies": {
-    "@dice-jar/e2e-helpers": "*",
     "@dice-jar/browser": "*",
     "@dice-jar/cn": "*",
+    "@dice-jar/e2e-helpers": "*",
     "@dice-jar/firebase": "*",
     "@dice-jar/game-id": "*",
     "@dice-jar/stale-build": "*",
@@ -46,6 +52,7 @@
     "@vitejs/plugin-react": "^6.2.1",
     "@vitest/coverage-v8": "^5.1.0",
     "eslint": "^9.39.5",
+    "firebase-admin": "^14.5.0",
     "firebase-tools": "^15.35.0",
     "jsdom": "^31.0.0",
     "knip": "6.45.1",

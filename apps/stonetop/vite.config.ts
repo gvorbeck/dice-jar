@@ -68,12 +68,12 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     css: false,
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', 'scripts/*.test.ts'],
     // `npm run test:coverage` fails if coverage drops below these. Raise them as tests are added; never lower them to make CI pass.
     coverage: {
       include: ['src/**'],
       exclude: ['**/*.tsx', 'src/test/**'],
-      thresholds: { lines: 93, statements: 91, branches: 82, functions: 86 },
+      thresholds: { lines: 94, statements: 91, branches: 82, functions: 86 },
     },
   },
 });
