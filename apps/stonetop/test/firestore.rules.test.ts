@@ -134,7 +134,7 @@ describe('characters and rolls subcollections', () => {
     ['no order', { order: undefined }],
     ['more than 40 fields', Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`f${i}`, i]))],
   ])('rejects a character with %s', async (_label, over) => {
-    const data = Object.fromEntries(Object.entries(character(over)).filter(([, v]) => v !== undefined));
+    const data = Object.fromEntries(Object.entries(character({ id: 'c9', ...over })).filter(([, v]) => v !== undefined));
     await assertFails(setDoc(doc(db(), `${V2}/characters/c9`), data));
   });
   it.each([
@@ -143,7 +143,7 @@ describe('characters and rolls subcollections', () => {
     ['a createdAt that is not a number', { createdAt: 'now' }],
     ['no order', { order: undefined }],
   ])('rejects a roll with %s', async (_label, over) => {
-    const data = Object.fromEntries(Object.entries(roll(over)).filter(([, v]) => v !== undefined));
+    const data = Object.fromEntries(Object.entries(roll({ id: 'r9', ...over })).filter(([, v]) => v !== undefined));
     await assertFails(setDoc(doc(db(), `${V2}/rolls/r9`), data));
   });
   it('is not writable on a version 1 game, so a game cannot end up with both shapes', async () => {

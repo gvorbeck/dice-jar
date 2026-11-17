@@ -1,6 +1,6 @@
 # Moving a game to subcollections
 
-Status: **step 1 of 5, nothing live is touched.** This file is the plan; each step below is its own change and none starts until the one before has passed.
+Status: steps 1 and 2 are done, and the rules half of step 3 is written; **nothing is deployed and no game has been moved.** This file is the plan; each step is its own change and none starts until the one before has passed.
 
 ## Why
 
@@ -31,11 +31,13 @@ Every step before the first live write is local: the emulator, test fixtures and
 
 ## Steps
 
-1. **Conversion and the plan** (this change). `gameShape.ts` with tests, including the refusals. No app behaviour changes, no rules change.
-2. **Prove it on real data, offline.** A read-only script reads a backup JSON (the existing `backup` script only reads), splits and joins every game, and reports: games refused and why, documents that would not round-trip exactly, sizes and counts. Zero writes to anything.
-3. **Rules and the dual-reading app.** Release A: `firestore.rules` allows the subcollections and `schemaVersion` (the app is unchanged). Release B: the app reads both shapes and writes by the game's `schemaVersion`; new games are still v1. Rules tests and emulator e2e cover both shapes.
-4. **Migrate**, game by game, against the emulator first with a copy of the backup, then live: back up, dry run, move one game and check it, then the rest. Re-running skips games already moved. A reverse script rebuilds the v1 document from v2 (`joinGame`) for any game.
-5. **Clean up.** Once every game is v2 and old builds are gone: new games are v2, the v1 code paths and `mergeById` go, and the rules tighten (no numeric `createdAt`, no unknown top-level keys, no `characters` list).
+1. **Conversion and the plan** (done). `gameShape.ts` with tests, including the refusals. No app behaviour changes.
+2. **Prove it on real data, offline** (done). `npm run audit-backup` reads a backup JSON and writes nothing. On the live data, 10 games from May 2026 were refused: no name and only character fragments. They were deleted, and a fresh backup audits clean: every game splits and rejoins exactly. Re-run it on a new backup before step 4.
+3. **Rules, then the dual-reading app.**
+   - **Release A, rules only (written, not deployed).** `firestore.rules` accepts the subcollections and `schemaVersion`. Browsers cannot create, change or restore a game into version 2, and a version 2 game refuses characters or rolls written back as arrays. The app is unchanged, so players see nothing.
+   - **Release B, the app (not started).** It reads both shapes and writes by the game's `schemaVersion`; new games are still v1. Rules tests and emulator e2e cover both shapes.
+4. **Migrate** (not started), game by game, against the emulator first with a copy of the backup, then live: back up, dry run, move one game and check it, then the rest. Re-running skips games already moved. A reverse script rebuilds the v1 document from v2 (`joinGame`) for any game.
+5. **Clean up** (not started). Once every game is v2 and old builds are gone: new games are v2, the v1 code paths and `mergeById` go, and the rules tighten (no numeric `createdAt`, no unknown top-level keys, no `characters` list).
 
 Each release follows the two-release rule in `AGENTS.md`: rules deploy before the build that uses a field.
 
