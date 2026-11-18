@@ -1,4 +1,5 @@
 import { PLAYBOOKS, STAT_ABBRS } from '@/lib/constants';
+import { restoredLevel } from '@/lib/gameShape';
 import {
   filterByType,
   filterNestedRecordByType,
@@ -141,7 +142,7 @@ export const parseCharacterData = (v: unknown): CharacterData | undefined => {
 export const parseCharacters = (raw: { characters?: unknown }): Character[] =>
   (filterByType(raw?.characters, isCharacter) ?? []).map((c) => ({
     ...c,
-    level: isNumber(c.level) ? c.level : 1,
+    level: restoredLevel(c.level) ?? 1,
     data: parseCharacterData(c.data),
   }));
 

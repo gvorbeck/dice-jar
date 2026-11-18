@@ -43,26 +43,63 @@ service cloud.firestore {
         return game.data.get('schemaVersion', 1) == 2;
       }
 
-      // shortcut: the party size is no longer capped here (a rule cannot count a subcollection); the app stops at 20.
-      // Upgrade: keep a character count in the game document and check it in a transaction if abuse shows up.
+      // shortcut: the party size is not capped here (a rule cannot count a subcollection), upgrade: keep a count in the game document, checked in a transaction, if abuse shows up.
+      // Adding a field to a character or roll means adding it to its key list here first (a release before the app writes it).
+      function characterKeys() {
+        return ['id', 'name', 'playbook', 'level', 'data', 'order'];
+      }
+
+      // shortcut: a stored character or roll that breaks these checks cannot be updated (every live one passes), upgrade: check only the changed fields.
       function isValidCharacter(data, cid) {
-        return data.id == cid && data.name is string && data.playbook is string && data.order is number && data.keys().size() <= 40;
+        return data.id == cid
+          && data.name is string && data.name.size() <= 200
+          && data.playbook is string && data.playbook.size() <= 50
+          && data.level is number && data.level >= 0 && data.level <= 100
+          && data.order is number
+          && (!('data' in data) || (data.data is map && data.data.keys().size() <= 100));
+      }
+
+      function rollKeys() {
+        return ['id', 'characterId', 'characterName', 'moveName', 'stat', 'resource', 'dice', 'dropped', 'mod', 'total', 'mode', 'burned',
+                'band', 'notation', 'breakdown', 'createdAt', 'order'];
+      }
+
+      // A string that may be missing or null (band is null on some rolls) but is bounded when there.
+      function shortOrAbsent(data, key, max) {
+        return !(key in data) || data[key] == null || (data[key] is string && data[key].size() <= max);
+      }
+
+      function numberOrAbsent(data, key) {
+        return !(key in data) || data[key] == null || data[key] is number;
       }
 
       // Rolls are edited in place (changing advantage or disadvantage on a roll keeps its id) and the oldest are deleted to keep the log short.
       function isValidRoll(data, rid) {
-        return data.id == rid && data.characterId is string && data.createdAt is number && data.order is number && data.keys().size() <= 30;
+        return data.id == rid
+          && data.characterId is string && data.characterId.size() <= 100
+          && data.createdAt is number && data.order is number
+          && shortOrAbsent(data, 'characterName', 200) && shortOrAbsent(data, 'moveName', 200) && shortOrAbsent(data, 'stat', 50)
+          && shortOrAbsent(data, 'resource', 200) && shortOrAbsent(data, 'band', 50)
+          && shortOrAbsent(data, 'notation', 2000) && shortOrAbsent(data, 'breakdown', 10000)
+          && numberOrAbsent(data, 'mod') && numberOrAbsent(data, 'total') && numberOrAbsent(data, 'dropped')
+          && (!('mode' in data) || data.mode in ['normal', 'adv', 'dis'])
+          && (!('burned' in data) || data.burned is bool)
+          && (!('dice' in data) || (data.dice is list && data.dice.size() <= 50));
       }
 
       match /characters/{cid} {
         allow get, list: if true;
-        allow create, update: if isV2Game() && isValidCharacter(request.resource.data, cid);
+        allow create: if isV2Game() && isValidCharacter(request.resource.data, cid) && request.resource.data.keys().hasOnly(characterKeys());
+        allow update: if isV2Game() && isValidCharacter(request.resource.data, cid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(characterKeys());
         allow delete: if isV2Game();
       }
 
       match /rolls/{rid} {
         allow get, list: if true;
-        allow create, update: if isV2Game() && isValidRoll(request.resource.data, rid);
+        allow create: if isV2Game() && isValidRoll(request.resource.data, rid) && request.resource.data.keys().hasOnly(rollKeys());
+        allow update: if isV2Game() && isValidRoll(request.resource.data, rid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(rollKeys());
         allow delete: if isV2Game();
       }
     }

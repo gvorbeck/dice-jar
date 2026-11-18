@@ -49,3 +49,16 @@ describe('parseCharacters — custom moves', () => {
     expect(c?.data?.customMoves).toEqual([]);
   });
 });
+
+describe('a character level the reader repairs', () => {
+  it.each([
+    [undefined, 1],
+    [null, 1],
+    ['2', 2],
+    ['high', 1],
+    [3, 3],
+  ])('reads level %j as %j, the same way a restore stores it', (level, expected) => {
+    const [c] = parseCharacters({ characters: [{ id: 'c1', name: 'A', playbook: 'ranger', level }] });
+    expect(c?.level).toBe(expected);
+  });
+});

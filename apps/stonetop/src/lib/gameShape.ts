@@ -9,6 +9,13 @@
 
 export const SCHEMA_VERSION = 2;
 
+/** The level a restore stores: the number a character has, a number written as text, or 1 when it has none. Anything else is undefined: a restore refuses it rather than guess. */
+export const restoredLevel = (level: unknown): number | undefined => {
+  if (typeof level === 'number') return level;
+  if (level === undefined || level === null) return 1;
+  return typeof level === 'string' && level.trim() !== '' && Number.isFinite(Number(level)) ? Number(level) : undefined;
+};
+
 type Raw = Record<string, unknown>;
 export interface Stored {
   id: string;

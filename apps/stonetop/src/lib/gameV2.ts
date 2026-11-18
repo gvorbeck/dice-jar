@@ -1,10 +1,12 @@
 import { collection, deleteDoc, doc, getDoc, getDocs, runTransaction, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { GAMES_COLLECTION } from '@/lib/constants';
-import { assembleGame, splitGame, type Stored } from '@/lib/gameShape';
+import { assembleGame, restoredLevel, splitGame, type Stored } from '@/lib/gameShape';
 import { parseCharacters, ROLL_LOG_CAP } from '@/lib/gameParsing';
 import { stripUndefined, UserFacingError } from '@/lib/gameMutations';
 import { generateId } from '@/lib/id';
+import { ROLL_TEXT_MAX_LENGTH } from '@/lib/constants';
+import { isPlainObject } from '@/lib/typeGuards';
 import type { Character, LoggedRoll } from '@/model';
 
 // Reads and writes for a game moved to subcollections (schemaVersion 2; see MIGRATION.md).
@@ -86,7 +88,18 @@ export const reorderCharacters = async (gameId: string, ids: string[]): Promise<
 };
 
 /** Writes a roll (new, or an existing one edited in place), then trims the log to the newest ROLL_LOG_CAP. */
-export const logRoll = async (gameId: string, roll: LoggedRoll): Promise<void> => {
+export const logRoll = async (gameId: string, logged: LoggedRoll): Promise<void> => {
+  // A custom move can have any name, and the rules refuse a roll with a label over the cap: shorten it so the roll still reaches the log.
+  const clip = (text?: string) => {
+    const cut = text?.slice(0, ROLL_TEXT_MAX_LENGTH);
+    return cut && /[\uD800-\uDBFF]$/.test(cut) ? cut.slice(0, -1) : cut; // never leave half of an emoji
+  };
+  const roll = {
+    ...logged,
+    characterName: clip(logged.characterName) ?? '',
+    moveName: clip(logged.moveName) ?? '',
+    resource: clip(logged.resource),
+  };
   const prior = (await storedDocs(rollsCol(gameId))).find((r) => r.id === roll.id);
   const order = prior ? Number(prior.data.order) : nextOrder(await storedDocs(rollsCol(gameId)));
   await setDoc(rollRef(gameId, roll.id), stripUndefined({ ...roll, order }));
@@ -109,7 +122,11 @@ export const replaceGame = async (gameId: string, backup: Raw): Promise<void> =>
   // Read before the party: a restore that lands after this makes the transaction below refuse, so two restores never mix.
   const before = (await getDoc(gameRef)).data()?.restoreToken;
   const [characters, rolls] = await Promise.all([storedDocs(charactersCol(gameId)), storedDocs(rollsCol(gameId))]);
-  const result = splitGame(backup);
+  // A backup from before characters had a level has none: give it the level the reader would, which the rules require.
+  const repaired = Array.isArray(backup.characters)
+    ? backup.characters.map((c) => (isPlainObject(c) ? { ...c, level: restoredLevel(c.level) ?? c.level } : c))
+    : backup.characters;
+  const result = splitGame({ ...backup, characters: repaired });
   if (!result.ok) throw new UserFacingError(`That backup can't be restored: ${result.problems.join('; ')}`);
   const { split } = result;
   if (characters.length + rolls.length + split.characters.length + split.rolls.length > MAX_BATCH) {

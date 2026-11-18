@@ -46,6 +46,8 @@ Copy `.env.example` to `.env` and fill in your Firebase project's values (never 
 cp .env.example .env
 ```
 
+`VITE_APPCHECK_SITE_KEY` is optional. If you set it, App Check starts up with reCAPTCHA Enterprise, but it does nothing until you also enable it in the Firebase console and enforce it for Firestore (see "App Check" below). If you enforce it, `npm run dev` against production data needs a debug token: Firebase console → App Check → Apps → your web app → ⋮ → Manage debug tokens → Add debug token. Put it in `.env` as `VITE_APPCHECK_DEBUG_TOKEN`. It's only used by the dev server, never in a build. Anyone with it can pass App Check, so keep it out of git and revoke it in the same dialog if it leaks.
+
 ### Development
 
 ```bash
@@ -101,21 +103,29 @@ src/
 
 ## Firebase Setup
 
-Hearthfire uses Firestore (no authentication). The database structure is:
+Hearthfire uses Firestore (no authentication). A game keeps its characters and dice rolls in their own documents (`MIGRATION.md` has the history):
 
 ```
-games (collection)
-└── {gameId} (document)
-    ├── id: string
-    ├── name: string
-    ├── createdAt: timestamp
-    ├── characters: CharacterData[]
-    ├── content: ContentLists
-    ├── threats: string
-    └── iWonder: string
+games/{gameId}                    name, createdAt, schemaVersion: 2, content, threats, iWonder, steading, notes, notesLocks, restoreToken
+                                  characters: []   (kept empty)
+games/{gameId}/characters/{id}    id, name, playbook, level, data, order
+games/{gameId}/rolls/{id}         id, characterId, characterName, moveName, stat, dice, mod, total, mode, band, createdAt, order, and optionally resource, dropped, burned, notation, breakdown
 ```
 
-Access is unrestricted by user account — anyone with a game ID can read and write it. Adjust your Firestore security rules accordingly for your deployment.
+Access is unrestricted by user account: anyone with a game ID can read and write that game. Browsers cannot list games or delete a game. They can create, change and delete that game's characters and rolls (deleting is how a character is removed), and the rules do not cap the party size.
+
+`firestore.rules` limits what can be written. The game document takes only the fields above, and a character or roll only the fields listed for it, with bounded sizes. If you add a field, add it to that list in the rules first and ship that in a release before the app writes it. `src/lib/__tests__/rulesAgree.test.ts` fails when a character or roll the app writes has a field the rules' list lacks, and when the backup import check's limits differ from the rules'. It does not check the fields of the game document.
+
+### App Check
+
+App Check makes Firestore refuse requests that don't come from the real site, which keeps a script from hammering the database with a leaked game ID. The app is ready for it: the shared Firebase setup starts App Check when `VITE_APPCHECK_SITE_KEY` is set. To turn it on:
+
+1. In Google Cloud console, create a reCAPTCHA Enterprise key for the site (hearthfire.camp).
+2. In Firebase console → App Check → Apps, register the web app with that key.
+3. Add the site key as the repository secret `STONETOP_APPCHECK_SITE_KEY` and deploy (a push to `main`, or run the workflow by hand).
+4. In App Check → APIs → Cloud Firestore, look at the request metrics for a few days. Only when almost all requests are verified, choose **Enforce**.
+
+Enforcing blocks every request without a token. Tabs still open on a build from before step 3 stop saving until they refresh, and so does anything else that talks to Firestore as a browser. The admin scripts use the Admin SDK and are not affected.
 
 ---
 
@@ -123,7 +133,7 @@ Access is unrestricted by user account — anyone with a game ID can read and wr
 
 Pushing to `main` runs [the workflow](../../.github/workflows/deploy-stonetop.yml): build, deploy Firestore rules, deploy Hosting to `stonetop-d76fb`. Rules go first, so a field added or removed takes two releases.
 
-The workflow needs these repository secrets: `STONETOP_FIREBASE_API_KEY`, `STONETOP_FIREBASE_AUTH_DOMAIN`, `STONETOP_FIREBASE_PROJECT_ID`, `STONETOP_FIREBASE_STORAGE_BUCKET`, `STONETOP_FIREBASE_MESSAGING_SENDER_ID`, `STONETOP_FIREBASE_APP_ID`, and `FIREBASE_SERVICE_ACCOUNT_STONETOP_D76FB`. The service account needs the Firebase Rules Admin role.
+The workflow needs these repository secrets: `STONETOP_FIREBASE_API_KEY`, `STONETOP_FIREBASE_AUTH_DOMAIN`, `STONETOP_FIREBASE_PROJECT_ID`, `STONETOP_FIREBASE_STORAGE_BUCKET`, `STONETOP_FIREBASE_MESSAGING_SENDER_ID`, `STONETOP_FIREBASE_APP_ID`, and `FIREBASE_SERVICE_ACCOUNT_STONETOP_D76FB`. The service account needs the Firebase Rules Admin role. `STONETOP_APPCHECK_SITE_KEY` is optional: without it App Check stays off.
 
 ---
 

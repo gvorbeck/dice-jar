@@ -3,6 +3,7 @@ import { cn } from '@dice-jar/cn';
 import { Button, Heading, Icon, Input, Text } from '@/ui';
 import { rollNotation, type DiceRollOutcome } from '@/lib/diceNotation';
 import { generateId } from '@/lib/id';
+import { NOTATION_MAX_LENGTH } from '@/lib/constants';
 import type { LoggedRoll } from '@/model';
 
 interface DiceRollerProps {
@@ -188,6 +189,7 @@ export const DiceRoller = ({ rollerId, rollerName, onRoll }: DiceRollerProps) =>
             error={error}
             aria-invalid={error ? true : undefined}
             autoComplete="off"
+            maxLength={NOTATION_MAX_LENGTH}
             autoCapitalize="off"
             spellCheck={false}
             inputMode="text"
