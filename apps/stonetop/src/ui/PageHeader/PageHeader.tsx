@@ -8,6 +8,7 @@ import { ThemeToggle } from './ThemeToggle';
 import type { GameNav } from './gameNav';
 import { SiteBanner } from '@/ui/SiteBanner/SiteBanner';
 import { SITE_BANNER } from '@/lib/siteBanner';
+import { NAME_MAX_LENGTH } from '@/lib/constants';
 
 /*
  * PageHeader — the semantic <header> landmark at the top of every page.
@@ -158,6 +159,7 @@ export const PageHeader = (props: Props) => {
               onBlur={commit}
               onKeyDown={handleKeyDown}
               aria-label={titleLabel}
+              maxLength={NAME_MAX_LENGTH}
             />
           ) : (
             <>

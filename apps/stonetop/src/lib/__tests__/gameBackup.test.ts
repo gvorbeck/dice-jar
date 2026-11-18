@@ -22,7 +22,16 @@ vi.mock('@/lib/gameParsing', async (importOriginal) => {
 
 import { EXPORT_FORMAT, EXPORT_VERSION } from '../gameBackupFormat';
 import { splitGame } from '../gameShape';
-import { buildEnvelope, exportFilename, exportGame, IMPORTABLE_FIELDS, readImportFile, readRawGame } from '../gameBackup';
+import {
+  buildEnvelope,
+  exportFilename,
+  exportGame,
+  IMPORTABLE_CHARACTER_FIELDS,
+  IMPORTABLE_FIELDS,
+  IMPORTABLE_ROLL_FIELDS,
+  readImportFile,
+  readRawGame,
+} from '../gameBackup';
 
 const EXPORTED_AT = new Date('2026-08-17T14:30:00.000Z');
 
@@ -275,7 +284,7 @@ describe('readImportFile — rejections', () => {
   // A moved game stores one document per character and roll, so its export can be well over one document in total.
   it('accepts a backup whose total is over one document but whose every piece fits', () => {
     const big = 'x'.repeat(300_000);
-    const characters = Array.from({ length: 4 }, (_, i) => character(`c${i}`, big));
+    const characters = Array.from({ length: 4 }, (_, i) => ({ ...character(`c${i}`, 'Big'), data: { notes: big } }));
     const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters }))));
     expect(check.ok).toBe(true);
   });
@@ -286,7 +295,9 @@ describe('readImportFile — rejections', () => {
   });
 
   it('refuses a backup with a single character over the document limit', () => {
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters: [character('c0', 'x'.repeat(1_000_001))] }))));
+    const check = readImportFile(
+      JSON.stringify(envelopeFor(gameDoc({ characters: [{ ...character('c0', 'Big'), data: { notes: 'x'.repeat(1_000_001) } }] }))),
+    );
     expect(check).toEqual({ ok: false, error: expect.stringContaining('KB limit') });
   });
 
@@ -328,22 +339,13 @@ describe('readImportFile — success', () => {
     expect(check.summary.hasSteading).toBe(false);
   });
 
-  it('does not count malformed characters or rolls the parser drops', () => {
-    const check = readImportFile(
-      JSON.stringify(
-        envelopeFor(
-          gameDoc({
-            characters: [character('char-1', 'Alder'), { id: 'c2', name: 'No playbook' }],
-            diceRolls: [roll('r1'), { id: 'r2' }],
-          }),
-        ),
-      ),
+  it('refuses a backup with a malformed character or roll, naming it, rather than dropping it silently or failing at restore', () => {
+    const badCharacter = readImportFile(
+      JSON.stringify(envelopeFor(gameDoc({ characters: [character('char-1', 'Alder'), { id: 'c2', name: 'No playbook' }] }))),
     );
-
-    expect(check.ok).toBe(true);
-    if (!check.ok) return;
-    expect(check.summary.characters).toBe(1);
-    expect(check.summary.rolls).toBe(1);
+    expect(badCharacter).toEqual({ ok: false, error: expect.stringContaining('character 2') });
+    const badRoll = readImportFile(JSON.stringify(envelopeFor(gameDoc({ diceRolls: [roll('r1'), { id: 'r2' }] }))));
+    expect(badRoll).toEqual({ ok: false, error: expect.stringContaining('roll 2') });
   });
 
   it('carries the raw game through untouched', () => {
@@ -360,6 +362,72 @@ describe('readImportFile — success', () => {
     expect(check.ok).toBe(false);
     if (check.ok) return;
     expect(check.error).toContain('someFutureField, another');
+  });
+
+  it.each([
+    [
+      'a field the rules do not list',
+      { characters: [{ id: 'c1', name: 'Ada', playbook: 'blessed', level: 1, surprise: 1 }] },
+      'character 1',
+    ],
+    ['a level out of range', { characters: [{ id: 'c1', name: 'Ada', playbook: 'blessed', level: 101 }] }, 'needs a level'],
+    [
+      'a roll notation over 2000 characters',
+      { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, notation: 'x'.repeat(2001) }] },
+      'working that is too long',
+    ],
+    ['dice that are not a list', { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, dice: 'x' }] }, 'not a list of up to 50'],
+    [
+      'a name over 200 characters',
+      { characters: [{ id: 'c1', name: 'x'.repeat(201), playbook: 'blessed', level: 1 }] },
+      'name of up to 200',
+    ],
+    ['a roll with a field the rules do not list', { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, surprise: 1 }] }, 'roll 1'],
+    ['a roll with a mode the rules do not allow', { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, mode: 'lucky' }] }, 'mode'],
+    [
+      'a roll with more than 50 dice',
+      { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, dice: Array.from({ length: 51 }, () => 1) }] },
+      'up to 50',
+    ],
+  ])('refuses a backup with %s, naming the piece, instead of failing at restore', (_label, over, expected) => {
+    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc(over))));
+    expect(check.ok).toBe(false);
+    if (check.ok) return;
+    expect(check.error).toContain("can't be restored");
+    expect(check.error).toContain(expected);
+  });
+
+  it('accepts an old backup whose characters have no level or a level that is not a number, which a restore repairs', () => {
+    const characters = [
+      { id: 'c1', name: 'Ada', playbook: 'blessed' },
+      { id: 'c2', name: 'Bo', playbook: 'fox', level: '2' },
+    ];
+    expect(readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters })))).ok).toBe(true);
+  });
+
+  it('accepts a character and a roll with every field the rules allow', () => {
+    const character = { id: 'c1', name: 'Ada', playbook: 'blessed', level: 2, data: { statStr: '+1' } };
+    const roll = {
+      id: 'r1',
+      characterId: 'c1',
+      characterName: 'Ada',
+      moveName: 'Fight',
+      stat: 'STR',
+      resource: '+Favor',
+      dice: [3, 4],
+      dropped: null,
+      mod: 1,
+      total: 8,
+      mode: 'adv',
+      burned: true,
+      band: null,
+      notation: '2d6',
+      breakdown: '[3, 4]',
+      createdAt: 5,
+    };
+    expect(readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters: [character], diceRolls: [roll] })))).ok).toBe(true);
+    expect(Object.keys(roll).sort()).toEqual([...IMPORTABLE_ROLL_FIELDS].sort());
+    expect(Object.keys(character).sort()).toEqual([...IMPORTABLE_CHARACTER_FIELDS].sort());
   });
 
   it('allows exactly the fields firestore.rules allows, besides the two a restore sets itself', () => {

@@ -36,6 +36,83 @@ export const IMPORTABLE_FIELDS = [
   'notesLocks',
 ];
 
+// The character and roll fields a restore writes: firestore.rules' characterKeys and rollKeys, without `order`, which a restore sets itself. A test keeps them in step.
+export const IMPORTABLE_CHARACTER_FIELDS = ['id', 'name', 'playbook', 'level', 'data'];
+export const IMPORTABLE_ROLL_FIELDS = [
+  'id',
+  'characterId',
+  'characterName',
+  'moveName',
+  'stat',
+  'resource',
+  'dice',
+  'dropped',
+  'mod',
+  'total',
+  'mode',
+  'burned',
+  'band',
+  'notation',
+  'breakdown',
+  'createdAt',
+];
+
+const unknownFields = (piece: Record<string, unknown>, allowed: string[]) => Object.keys(piece).filter((key) => !allowed.includes(key));
+const shortOrAbsent = (v: unknown, max: number) => v === undefined || v === null || (isString(v) && v.length <= max);
+const numberOrAbsent = (v: unknown) => v === undefined || v === null || isNumber(v);
+
+// These mirror the bounds firestore.rules puts on a character and a roll, so a restore the rules would refuse is refused here, naming the piece.
+const characterProblem = (c: unknown): string | undefined => {
+  if (!isPlainObject(c)) return 'is not a character';
+  const extra = unknownFields(c, IMPORTABLE_CHARACTER_FIELDS);
+  if (extra.length) return `has fields this version of Hearthfire cannot store (${extra.join(', ')})`;
+  if (!isString(c.id) || !c.id) return 'has no id';
+  if (!isString(c.name) || c.name.length > 200) return 'needs a name of up to 200 characters';
+  if (!isString(c.playbook) || c.playbook.length > 50) return 'needs a playbook of up to 50 characters';
+  // A missing or non-number level is repaired to 1 on restore, as the reader repairs it (gameParsing.ts), so old backups still restore.
+  if (isNumber(c.level) && (c.level < 0 || c.level > 100)) return 'needs a level from 0 to 100';
+  if ('data' in c && (!isPlainObject(c.data) || Object.keys(c.data).length > 100))
+    return 'has sheet data that is not a set of up to 100 fields';
+  return undefined;
+};
+
+const rollProblem = (r: unknown): string | undefined => {
+  if (!isPlainObject(r)) return 'is not a roll';
+  const extra = unknownFields(r, IMPORTABLE_ROLL_FIELDS);
+  if (extra.length) return `has fields this version of Hearthfire cannot store (${extra.join(', ')})`;
+  if (!isString(r.id) || !r.id) return 'has no id';
+  if (!isString(r.characterId) || r.characterId.length > 100) return 'needs a character id of up to 100 characters';
+  if (!isNumber(r.createdAt)) return 'needs a time it was made';
+  if (
+    ![r.characterName, r.moveName, r.resource].every((v) => shortOrAbsent(v, 200)) ||
+    !shortOrAbsent(r.stat, 50) ||
+    !shortOrAbsent(r.band, 50)
+  ) {
+    return 'has text that is too long';
+  }
+  if (!shortOrAbsent(r.notation, 2000) || !shortOrAbsent(r.breakdown, 10000)) return 'has working that is too long';
+  if (![r.mod, r.total, r.dropped].every(numberOrAbsent)) return 'has a number that is not a number';
+  if (r.mode !== undefined && !['normal', 'adv', 'dis'].includes(r.mode as string)) return 'has a mode that is not normal, adv or dis';
+  if (r.burned !== undefined && typeof r.burned !== 'boolean') return 'has a burned that is not true or false';
+  if (r.dice !== undefined && (!Array.isArray(r.dice) || r.dice.length > 50)) return 'has dice that are not a list of up to 50';
+  return undefined;
+};
+
+const piecesProblem = (game: Record<string, unknown>): string | undefined => {
+  const lists: [string, unknown, (piece: unknown) => string | undefined][] = [
+    ['character', game.characters, characterProblem],
+    ['roll', game.diceRolls, rollProblem],
+  ];
+  for (const [what, list, problem] of lists) {
+    if (!Array.isArray(list)) continue;
+    for (const [i, piece] of list.entries()) {
+      const found = problem(piece);
+      if (found) return `${what} ${i + 1} ${found}`;
+    }
+  }
+  return undefined;
+};
+
 export interface GameExportEnvelope {
   format: typeof EXPORT_FORMAT;
   version: number;
@@ -150,6 +227,9 @@ export const readImportFile = (text: string): ImportCheck => {
       error: `That backup has fields this version of Hearthfire cannot store (${unknown.join(', ')}). It may have been made by a newer version: reload the page to update, then try again.`,
     };
   }
+
+  const pieceProblem = piecesProblem(game);
+  if (pieceProblem) return { ok: false, error: `That backup can't be restored: ${pieceProblem}.` };
 
   // Mirrors isValidGame in firestore.rules: the parser below fills in defaults, but the stored game must pass the rules as written.
   if (!isString(game.name) || !isNumber(game.createdAt) || !Array.isArray(game.characters) || game.characters.length > MAX_CHARACTERS) {

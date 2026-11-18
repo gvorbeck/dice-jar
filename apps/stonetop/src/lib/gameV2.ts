@@ -5,6 +5,7 @@ import { assembleGame, splitGame, type Stored } from '@/lib/gameShape';
 import { parseCharacters, ROLL_LOG_CAP } from '@/lib/gameParsing';
 import { stripUndefined, UserFacingError } from '@/lib/gameMutations';
 import { generateId } from '@/lib/id';
+import { isNumber, isPlainObject } from '@/lib/typeGuards';
 import type { Character, LoggedRoll } from '@/model';
 
 // Reads and writes for a game moved to subcollections (schemaVersion 2; see MIGRATION.md).
@@ -109,7 +110,11 @@ export const replaceGame = async (gameId: string, backup: Raw): Promise<void> =>
   // Read before the party: a restore that lands after this makes the transaction below refuse, so two restores never mix.
   const before = (await getDoc(gameRef)).data()?.restoreToken;
   const [characters, rolls] = await Promise.all([storedDocs(charactersCol(gameId)), storedDocs(rollsCol(gameId))]);
-  const result = splitGame(backup);
+  // A backup from before characters had a level has none: give it the 1 the reader would, which the rules require.
+  const repaired = Array.isArray(backup.characters)
+    ? backup.characters.map((c) => (isPlainObject(c) && !isNumber(c.level) ? { ...c, level: 1 } : c))
+    : backup.characters;
+  const result = splitGame({ ...backup, characters: repaired });
   if (!result.ok) throw new UserFacingError(`That backup can't be restored: ${result.problems.join('; ')}`);
   const { split } = result;
   if (characters.length + rolls.length + split.characters.length + split.rolls.length > MAX_BATCH) {

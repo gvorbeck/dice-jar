@@ -18,6 +18,12 @@ describe('DiceRoller', () => {
     expect(tab).toHaveAttribute('aria-expanded', 'true');
   });
 
+  it('limits the notation field, so a roll stays inside what firestore.rules accepts', async () => {
+    const { user } = setup();
+    await user.click(screen.getByRole('button', { name: 'Dice' }));
+    expect(screen.getByLabelText('Dice notation')).toHaveAttribute('maxlength', '500');
+  });
+
   it('closes on Escape', async () => {
     const { user } = setup();
     const tab = screen.getByRole('button', { name: 'Dice' });
