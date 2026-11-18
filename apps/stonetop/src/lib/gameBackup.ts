@@ -21,6 +21,21 @@ const largestPiece = (game: Record<string, unknown>) => {
   );
 };
 
+// The top-level fields a restore can write: firestore.rules' knownFields, without the two a restore sets itself (schemaVersion, restoreToken) and with
+// diceRolls, which a backup keeps in its one-document shape. A test keeps this and the rules in step.
+export const IMPORTABLE_FIELDS = [
+  'name',
+  'createdAt',
+  'characters',
+  'diceRolls',
+  'content',
+  'threats',
+  'iWonder',
+  'steading',
+  'notes',
+  'notesLocks',
+];
+
 export interface GameExportEnvelope {
   format: typeof EXPORT_FORMAT;
   version: number;
@@ -124,6 +139,15 @@ export const readImportFile = (text: string): ImportCheck => {
     return {
       ok: false,
       error: "That backup contains a value the database can't store (an array inside an array). It may have been edited by hand.",
+    };
+  }
+
+  // The rules refuse a field the app does not write, so a restore would fail with only a save error: say why here.
+  const unknown = Object.keys(game).filter((key) => !IMPORTABLE_FIELDS.includes(key));
+  if (unknown.length) {
+    return {
+      ok: false,
+      error: `That backup has fields this version of Hearthfire cannot store (${unknown.join(', ')}). It may have been made by a newer version: reload the page to update, then try again.`,
     };
   }
 

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { firestoreMockModule, firestoreStore } from '@/test/firestoreMock';
 
@@ -20,7 +22,7 @@ vi.mock('@/lib/gameParsing', async (importOriginal) => {
 
 import { EXPORT_FORMAT, EXPORT_VERSION } from '../gameBackupFormat';
 import { splitGame } from '../gameShape';
-import { buildEnvelope, exportFilename, exportGame, readImportFile, readRawGame } from '../gameBackup';
+import { buildEnvelope, exportFilename, exportGame, IMPORTABLE_FIELDS, readImportFile, readRawGame } from '../gameBackup';
 
 const EXPORTED_AT = new Date('2026-08-17T14:30:00.000Z');
 
@@ -153,8 +155,8 @@ describe('exportGame', () => {
     expect(document.querySelector('a')).toBeNull();
   });
 
-  it('round-trips through readImportFile with unknown fields intact', async () => {
-    const raw = gameDoc({ someFutureField: { nested: [1, 2] } });
+  it('round-trips through readImportFile with every field intact', async () => {
+    const raw = gameDoc({ steading: { size: 'village', fortunes: [1, 2] } });
     firestoreStore.setGame('games/long-winter', raw);
 
     await exportGame('long-winter');
@@ -344,13 +346,27 @@ describe('readImportFile — success', () => {
     expect(check.summary.rolls).toBe(1);
   });
 
-  it('carries the raw game through untouched, including unknown fields', () => {
-    const game = gameDoc({ someFutureField: { nested: true } });
+  it('carries the raw game through untouched', () => {
+    const game = gameDoc({ steading: { size: 'village' }, threats: 'Ogres' });
     const check = readImportFile(JSON.stringify(envelopeFor(game)));
 
     expect(check.ok).toBe(true);
     if (!check.ok) return;
     expect(check.envelope.game).toEqual(game);
+  });
+
+  it('refuses a field the rules would reject, naming it, instead of failing at restore', () => {
+    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ someFutureField: 1, another: 2 }))));
+    expect(check.ok).toBe(false);
+    if (check.ok) return;
+    expect(check.error).toContain('someFutureField, another');
+  });
+
+  it('allows exactly the fields firestore.rules allows, besides the two a restore sets itself', () => {
+    const rules = readFileSync(join(import.meta.dirname, '../../../firestore.rules'), 'utf8');
+    const list = /function knownFields\(\) \{\s*return \[([^\]]*)\]/.exec(rules)![1]!;
+    const fields = [...list.matchAll(/'([^']+)'/g)].map((m) => m[1]!).filter((f) => f !== 'schemaVersion' && f !== 'restoreToken');
+    expect([...IMPORTABLE_FIELDS].sort()).toEqual([...fields, 'diceRolls'].sort());
   });
 
   it('defaults missing envelope metadata to empty strings rather than failing', () => {
