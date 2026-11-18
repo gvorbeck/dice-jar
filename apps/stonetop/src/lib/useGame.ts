@@ -7,23 +7,20 @@ import { useToastOptional } from '@/ui/Toast/ToastContext';
 import { GAMES_COLLECTION, SAVE_ERROR_MESSAGE } from '@/lib/constants';
 import { isBoolean, isNumber, isPlainObject, isRecord } from '@/lib/typeGuards';
 import { NOTES_CLIENT_ID, NOTES_STALE_MS } from '@/lib/sharedNotes';
-import { parseDiceRolls, parseGameSession, parseSteading, ROLL_LOG_CAP } from '@/lib/gameParsing';
+import { parseGameSession, parseSteading } from '@/lib/gameParsing';
 import {
   FIRESTORE_ERROR_MESSAGES,
   friendlyFirestoreError,
   isFirestoreError,
   mergeById,
-  GameMovedError,
   UserFacingError,
   patchCharacterData,
   STEADING_ID_ARRAY_FIELDS,
   stripUndefined,
-  withCharacters,
 } from '@/lib/gameMutations';
 import { applyStatDeltas, type SheetGuard } from '@/lib/statDeltas';
 import * as v2 from '@/lib/gameV2';
 import { assembleGame, type Stored } from '@/lib/gameShape';
-import { fitsOneDocument } from '@/lib/gameBackup';
 import type { AdditiveStat, Character, CharacterData, ContentLists, GameSession, LoggedRoll, SteadingData } from '@/model';
 
 // Re-exported from their new home in lib/gameParsing so existing consumers and tests
@@ -59,9 +56,8 @@ export const useGame = (gameId: string): UseGameResult => {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const gameRef = useMemo(() => doc(db, GAMES_COLLECTION, gameId), [gameId]);
-  // A game moved to subcollections (MIGRATION.md) keeps its characters and rolls in their own documents.
+  // A game keeps its characters and rolls in their own documents (MIGRATION.md).
   const moved = v2.isMoved(docRaw ?? undefined);
-  const movedRef = useLatest(moved);
 
   // Report every persisted write to the app-wide save-status indicator and the
   // error Toast. Held in refs so wrapping a mutation doesn't add the (per-render)
@@ -140,9 +136,14 @@ export const useGame = (gameId: string): UseGameResult => {
   const { game, loading, parseFailed } = useMemo(() => {
     const waiting = docRaw === undefined || (moved && (characterDocs === undefined || rollDocs === undefined));
     if (waiting || !docRaw) return { game: null, loading: waiting && !loadError, parseFailed: false };
+    // Every game was moved to subcollections (MIGRATION.md); a document still in the old shape is not read, so its characters are never shown as missing.
+    if (!moved) return { game: null, loading: false, parseFailed: true };
     try {
-      const raw = moved ? assembleGame(docRaw, characterDocs ?? [], rollDocs ?? []) : docRaw;
-      return { game: parseGameSession(raw, gameId), loading: false, parseFailed: false };
+      return {
+        game: parseGameSession(assembleGame(docRaw, characterDocs ?? [], rollDocs ?? []), gameId),
+        loading: false,
+        parseFailed: false,
+      };
     } catch {
       return { game: null, loading: false, parseFailed: true };
     }
@@ -171,74 +172,32 @@ export const useGame = (gameId: string): UseGameResult => {
     [gameRef, reportSave],
   );
 
-  // A tab can act on a cached copy from before the game was moved; the first write finds out from the server and carries on the new way.
-  const either = useCallback(
-    async <T>(inOneDocument: () => Promise<T>, inSubcollections: () => Promise<T>): Promise<T> => {
-      if (movedRef.current) return inSubcollections();
-      try {
-        return await inOneDocument();
-      } catch (e) {
-        if (e instanceof GameMovedError) return inSubcollections();
-        throw e;
-      }
-    },
-    [movedRef],
-  );
-
-  // Changes one character on the freshly-read data: in the game's array, or on the character's own document once moved.
+  // Changes one character on its own freshly-read document.
   const editCharacter = useCallback(
-    (characterId: string, transform: (c: Character) => Character) =>
-      either(
-        () => withCharacters(gameRef, (chars) => chars.map((c) => (c.id === characterId ? transform(c) : c))),
-        () => v2.editCharacter(gameId, characterId, transform),
-      ),
-    [gameId, gameRef, either],
+    (characterId: string, transform: (c: Character) => Character) => v2.editCharacter(gameId, characterId, transform),
+    [gameId],
   );
 
   const addCharacter = useCallback(
     async (character: Character) => {
-      // Read-modify-write so a double-tap or post-blip retry can't append the same id twice.
-      await reportSave(() =>
-        either(
-          () => withCharacters(gameRef, (chars) => (chars.some((c) => c.id === character.id) ? chars : [...chars, character])),
-          () => v2.addCharacter(gameId, character),
-        ),
-      );
+      await reportSave(() => v2.addCharacter(gameId, character));
     },
-    [gameId, gameRef, reportSave, either],
+    [gameId, reportSave],
   );
 
   const removeCharacter = useCallback(
     async (characterId: string) => {
-      await reportSave(() =>
-        either(
-          () => withCharacters(gameRef, (chars) => chars.filter((c) => c.id !== characterId)),
-          () => v2.removeCharacter(gameId, characterId),
-        ),
-      );
+      await reportSave(() => v2.removeCharacter(gameId, characterId));
     },
-    [gameId, gameRef, reportSave, either],
+    [gameId, reportSave],
   );
 
   const reorderCharacters = useCallback(
     async (characters: Character[]) => {
       const ids = characters.map((c) => c.id);
-      await reportSave(() =>
-        either(
-          () =>
-            withCharacters(gameRef, (current) => {
-              const lookup = new Map(current.map((c) => [c.id, c]));
-              const reordered = ids.map((id) => lookup.get(id)).filter(Boolean) as Character[];
-              // A character concurrently added by another player won't be in the dragging client's stale `ids`: append it, don't drop it.
-              const idSet = new Set(ids);
-              const added = current.filter((c) => !idSet.has(c.id));
-              return [...reordered, ...added];
-            }),
-          () => v2.reorderCharacters(gameId, ids),
-        ),
-      );
+      await reportSave(() => v2.reorderCharacters(gameId, ids));
     },
-    [gameId, gameRef, reportSave, either],
+    [gameId, reportSave],
   );
 
   const updateCharacterName = useCallback(
@@ -315,30 +274,12 @@ export const useGame = (gameId: string): UseGameResult => {
     [gameRef, reportSave],
   );
 
-  // Append a roll to the shared log. A discrete event — written straight through (not debounced) inside a
-  // transaction so a stale snapshot can't drop a concurrent roll, then capped to the most recent
-  // ROLL_LOG_CAP. Id-merge keeps another client's just-added roll; the trailing slice trims the oldest.
+  // Append a roll to the shared log: a discrete event, written straight through (not debounced), then the log is trimmed to the newest ROLL_LOG_CAP.
   const logRoll = useCallback(
     async (roll: LoggedRoll) => {
-      await reportSave(() =>
-        either(
-          () =>
-            runTransaction(db, async (tx) => {
-              const snap = await tx.get(gameRef);
-              if (!snap.exists()) throw new Error('Game not found — it may have been deleted.');
-              if (snap.data().schemaVersion === 2) throw new GameMovedError();
-              const existing = parseDiceRolls(snap.data().diceRolls) ?? [];
-              // mergeById is add/edit-by-id; our roll is always new, so this reduces to "keep everyone's rolls".
-              const merged = mergeById(existing, [roll])
-                .sort((a, b) => a.createdAt - b.createdAt)
-                .slice(-ROLL_LOG_CAP);
-              tx.update(gameRef, { diceRolls: stripUndefined(merged) });
-            }),
-          () => v2.logRoll(gameId, roll),
-        ),
-      );
+      await reportSave(() => v2.logRoll(gameId, roll));
     },
-    [gameId, gameRef, reportSave, either],
+    [gameId, reportSave],
   );
 
   // Shared notes: a plain save (on blur) plus a typing lock so only one tab edits a given notes key at
@@ -416,27 +357,14 @@ export const useGame = (gameId: string): UseGameResult => {
     [gameRef, reportSave],
   );
 
-  // Replace the whole document with a validated backup payload (see readImportFile).
-  // Deliberately a `setDoc` overwrite, not a merge: restoring a backup has to be able to
-  // remove things too — a merge would leave characters, NPCs, and improvements added since
-  // the backup was taken sitting alongside the restored ones. The only caller confirms
-  // through a destructive-action dialog and downloads a safety copy of the live doc first.
+  // Replace the whole game with a validated backup payload (see readImportFile). Deliberately an overwrite, not a merge:
+  // restoring a backup has to be able to remove things too. The only caller confirms through a destructive-action dialog
+  // and downloads a safety copy of the live game first.
   const replaceGameData = useCallback(
     async (game: Record<string, unknown>) => {
-      await reportSave(() =>
-        either(
-          () =>
-            runTransaction(db, async (tx) => {
-              if ((await tx.get(gameRef)).data()?.schemaVersion === 2) throw new GameMovedError();
-              if (!fitsOneDocument(game))
-                throw new UserFacingError('That backup is too large for a single game. Trim some content from it and try again.');
-              tx.set(gameRef, game);
-            }),
-          () => v2.replaceGame(gameId, game),
-        ),
-      );
+      await reportSave(() => v2.replaceGame(gameId, game));
     },
-    [gameId, gameRef, reportSave, either],
+    [gameId, reportSave],
   );
 
   return {

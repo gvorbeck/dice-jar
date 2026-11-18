@@ -1,10 +1,7 @@
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { GAMES_COLLECTION } from '@/lib/constants';
 import { downloadJson } from '@dice-jar/browser';
 import { slugifyGameId } from '@dice-jar/game-id';
 import { parseGameSession } from '@/lib/gameParsing';
-import { isMoved, readMovedGame } from '@/lib/gameV2';
+import { readMovedGame } from '@/lib/gameV2';
 import { isNumber, isPlainObject, isString } from '@/lib/typeGuards';
 import { EXPORT_FORMAT, EXPORT_VERSION } from '@/lib/gameBackupFormat';
 
@@ -23,8 +20,6 @@ const largestPiece = (game: Record<string, unknown>) => {
     jsonBytes(rest),
   );
 };
-/** Whether the whole game fits one Firestore document, which a game on the old shape needs. */
-export const fitsOneDocument = (game: Record<string, unknown>) => jsonBytes(game) <= MAX_PAYLOAD_BYTES;
 
 export interface GameExportEnvelope {
   format: typeof EXPORT_FORMAT;
@@ -57,16 +52,10 @@ const hasNestedArray = (v: unknown): boolean => {
   return false;
 };
 
-// Read the game document unparsed. Every other read in the app goes through
+// Read the game unparsed, put together as one document. Every other read in the app goes through
 // parseGameSession; this one deliberately doesn't, because a backup has to carry the
 // fields the current build doesn't know about too.
-export const readRawGame = async (gameId: string): Promise<Record<string, unknown>> => {
-  const snap = await getDoc(doc(db, GAMES_COLLECTION, gameId));
-  if (!snap.exists()) throw new Error('Game not found — it may have been deleted.');
-  const game = snap.data() as Record<string, unknown>;
-  // A moved game is exported in the same one-document shape, so a file imports into either kind of game.
-  return isMoved(game) ? readMovedGame(gameId) : game;
-};
+export const readRawGame = (gameId: string): Promise<Record<string, unknown>> => readMovedGame(gameId);
 
 export const buildEnvelope = (gameId: string, game: Record<string, unknown>, exportedAt = new Date()): GameExportEnvelope => ({
   format: EXPORT_FORMAT,
@@ -147,7 +136,7 @@ export const readImportFile = (text: string): ImportCheck => {
     };
   }
 
-  // Only the largest piece can be judged here (a moved game stores one document each); the old shape's whole-game limit is checked on write.
+  // Only the largest piece can be judged here: each character and roll is a document of its own.
   const bytes = jsonBytes(game);
   if (largestPiece(game) > MAX_PAYLOAD_BYTES) {
     return {

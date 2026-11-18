@@ -50,7 +50,9 @@ Every step before the first live write is local: the emulator, test fixtures and
 5. **Clean up**, in three releases. Done so far: step 4, every game is on subcollections.
    - **Release C, rules only (written).** A browser may create a game as version 2 (empty `characters`, no `diceRolls`). Creating version 1 still works, and a browser still cannot change an existing game's version.
    - **Release D, the app (not started).** New games are created as version 2. Deploy only after C is live. The old-shape code stays: old tabs, and games a stale build creates meanwhile, still need it.
-   - **Release E, later.** Once old builds are gone and `npm run migration-status` says 0 not yet: remove the old-shape code paths and `mergeById`, and tighten the rules (no numeric `createdAt`, no unknown top-level keys, no `characters` list).
+   - **Release D, the app (deployed).** New games are created as version 2.
+   - **Release E1, the app (written).** The old-shape write paths are gone (`withCharacters`, `GameMovedError`, the one-document roll log and restore), and a game still in the old shape is refused instead of shown with its characters missing. `mergeById` stays: steading lists and arcana still id-merge inside one document.
+   - **Release E2, rules only (later).** Deploy after E1 is live: no creating version 1 games, no numeric `createdAt`, no unknown top-level keys, no `characters` list. Tabs still running an old build then fail to save until they refresh.
 
 Each release follows the two-release rule in `AGENTS.md`: rules deploy before the build that uses a field.
 
