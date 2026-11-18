@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import { assembleGame, splitGame } from '@/lib/gameShape';
 
 // In-memory Firestore stand-in. Hooks and src/lib/game.ts import the real
 // firebase/firestore functions (doc/getDoc/updateDoc/runTransaction/onSnapshot/
@@ -112,6 +113,21 @@ export const firestoreStore = {
   /** Writes without telling listeners, so a test can leave a client holding a copy that is out of date. */
   setQuietly(path: string, data: DocData) {
     docs.set(path, structuredClone(data));
+  },
+  /** Stores a game the way the app keeps it: the game document, with each character and roll in its own document. `game` is written as one document, as older fixtures are. */
+  setGame(path: string, game: DocData) {
+    const r = splitGame({ createdAt: 0, ...game });
+    if (!r.ok) throw new Error(`fixture does not split: ${r.problems.join('; ')}`);
+    firestoreStore.set(path, r.split.game);
+    r.split.characters.forEach((c) => firestoreStore.set(`${path}/characters/${c.id}`, c.data));
+    r.split.rolls.forEach((c) => firestoreStore.set(`${path}/rolls/${c.id}`, c.data));
+  },
+  /** The stored game put back together as one document, to assert on. */
+  getGame(path: string): DocData | undefined {
+    const game = docs.get(path);
+    if (game === undefined) return undefined;
+    const stored = (col: string) => firestoreStore.list(`${path}/${col}`);
+    return assembleGame(game, stored('characters'), stored('rolls'));
   },
   /** The documents directly under a collection path, with their ids. */
   list(collectionPath: string): { id: string; data: DocData }[] {

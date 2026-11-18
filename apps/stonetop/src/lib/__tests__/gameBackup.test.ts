@@ -110,7 +110,7 @@ describe('exportFilename', () => {
 describe('readRawGame', () => {
   it('returns the document verbatim, including fields the parser would drop', async () => {
     const raw = gameDoc({ someFutureField: { nested: true }, threats: 'Ogres' });
-    firestoreStore.set('games/long-winter', raw);
+    firestoreStore.setGame('games/long-winter', raw);
 
     await expect(readRawGame('long-winter')).resolves.toEqual(raw);
   });
@@ -143,7 +143,7 @@ describe('exportGame', () => {
   });
 
   it('downloads a named file and leaves nothing in the DOM', async () => {
-    firestoreStore.set('games/long-winter', gameDoc({ someFutureField: 'kept' }));
+    firestoreStore.setGame('games/long-winter', gameDoc({ someFutureField: 'kept' }));
 
     const filename = await exportGame('long-winter');
 
@@ -155,7 +155,7 @@ describe('exportGame', () => {
 
   it('round-trips through readImportFile with unknown fields intact', async () => {
     const raw = gameDoc({ someFutureField: { nested: [1, 2] } });
-    firestoreStore.set('games/long-winter', raw);
+    firestoreStore.setGame('games/long-winter', raw);
 
     await exportGame('long-winter');
 
@@ -168,7 +168,7 @@ describe('exportGame', () => {
     expect(check.envelope.game).toEqual(raw);
   });
 
-  it('exports a moved game as the one-document shape, so the file imports into either kind of game', async () => {
+  it('exports the game in the one-document shape, so the file imports into any game', async () => {
     const original = gameDoc({ steading: { size: 'village' } });
     const split = splitGame(original);
     if (!split.ok) throw new Error('fixture does not split');
@@ -186,7 +186,7 @@ describe('exportGame', () => {
   });
 
   it('applies the suffix to the safety copy', async () => {
-    firestoreStore.set('games/long-winter', gameDoc());
+    firestoreStore.setGame('games/long-winter', gameDoc());
 
     await expect(exportGame('long-winter', 'before-import')).resolves.toMatch(
       /^hearthfire-the-long-winter-before-import-\d{4}-\d{2}-\d{2}\.json$/,

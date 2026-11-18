@@ -1,9 +1,6 @@
-import { doc, runTransaction } from 'firebase/firestore';
 import type { FirestoreError } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { INVALID_WRITE_MESSAGE } from '@/lib/constants';
 import { isPlainObject, isRecord, isString } from '@/lib/typeGuards';
-import { parseCharacters } from '@/lib/gameParsing';
 import type { Character, CharacterData } from '@/model';
 
 // Map raw Firestore error codes to messages a player can act on — the raw
@@ -64,26 +61,6 @@ export const STEADING_ID_ARRAY_FIELDS = {
 
 /** An error whose message is meant for the player, so a save shows it instead of the generic "couldn't save". */
 export class UserFacingError extends Error {}
-
-// Thrown when a write finds the game has moved to subcollections, so a tab with a stale copy can carry on the new way.
-export class GameMovedError extends Error {}
-
-export const withCharacters = async (ref: ReturnType<typeof doc>, transform: (characters: Character[]) => Character[]): Promise<void> => {
-  await runTransaction(db, async (tx) => {
-    const snap = await tx.get(ref);
-    // Fail loud rather than silently no-op: a missing doc here means the game was
-    // deleted mid-session, so returning would let reportSave flag "Saved." for a
-    // write that never happened. Throwing routes it through the save-error path.
-    if (!snap.exists()) throw new Error('Game not found — it may have been deleted.');
-    if (snap.data()?.schemaVersion === 2) throw new GameMovedError();
-    // parseCharacterData sets every unrecognized/absent optional CharacterData field to `undefined`
-    // explicitly (rather than omitting the key), so every character read here already carries some.
-    // Firestore's tx.update rejects the whole write the moment any value anywhere in the payload is
-    // `undefined` (see INVALID_WRITE_MESSAGE for how that surfaces to the player). Strip them at this
-    // single choke point every character write passes through, rather than in each transform.
-    tx.update(ref, { characters: stripUndefined(transform(parseCharacters(snap.data()))) });
-  });
-};
 
 // Applies a partial CharacterData save to the freshly-read character, so a stale save only touches what it names.
 export const patchCharacterData = (c: Character, data: Partial<CharacterData>): Character => {
