@@ -30,6 +30,11 @@ const admin = () => {
   return getFirestore();
 };
 
+/** A game as the app created it before Release D: no schemaVersion, characters in the document. */
+export const createOldShapeGame = async (id: string) => {
+  await admin().doc(`games/${id}`).set({ name: '', createdAt: Date.now(), characters: [] });
+};
+
 /** The real migration, run against the emulator: the game's characters and rolls become documents of their own. */
 export const moveGame = async (id: string) => {
   const outcome = await migrateGame(admin(), id);

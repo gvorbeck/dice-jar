@@ -1,12 +1,11 @@
-// A game moved to subcollections (MIGRATION.md) must behave like any other: build one in the app, move it as the migration will, play on.
+// New games live in subcollections (MIGRATION.md) and must behave like any other; a game still in the old shape must keep working, and move under a player's feet.
 import { expect, test } from '@playwright/test';
-import { addCharacter, createGame, freshPage, moveGame, serverGame } from './helpers';
+import { addCharacter, createGame, createOldShapeGame, freshPage, moveGame, serverGame } from './helpers';
 
-test('a moved game shows its party to another device, and that device can change it', async ({ page, browser }) => {
+test('a new game shows its party to another device, and that device can change it', async ({ page, browser }) => {
   const id = await createGame(page);
   await addCharacter(page, 'The Blessed');
   await addCharacter(page, 'The Fox');
-  await moveGame(id);
 
   const other = await freshPage(browser);
   await other.goto(`/game/${id}`);
@@ -26,19 +25,13 @@ test('a moved game shows its party to another device, and that device can change
   await other.context().close();
 });
 
-test('the order of a moved game party can be changed and is saved', async ({ page, browser }) => {
+test('the order of a new game party can be changed and is saved', async ({ page, browser }) => {
   const id = await createGame(page);
   await addCharacter(page, 'The Blessed');
   await addCharacter(page, 'The Fox');
-  await moveGame(id); // the open page finds out from its own listener, as a table would mid-session
   await expect(page.getByRole('link', { name: /The Fox Playbook/ })).toBeVisible();
 
-  // The page re-renders once while it switches to the moved game, so keep trying until the focus holds.
-  const down = page.getByRole('button', { name: /^Move The Blessed .* down$/ });
-  await expect(async () => {
-    await down.focus();
-    await expect(down).toBeFocused();
-  }).toPass();
+  await page.getByRole('button', { name: /^Move The Blessed .* down$/ }).focus();
   await page.keyboard.press('Enter');
   const links = (p: typeof page) => p.getByRole('gridcell').getByRole('link');
   await expect(links(page).first()).toContainText('The Fox');
@@ -50,11 +43,10 @@ test('the order of a moved game party can be changed and is saved', async ({ pag
   await other.context().close();
 });
 
-test('a character can be removed from a moved game', async ({ page }) => {
+test('a character can be removed from a new game', async ({ page }) => {
   const id = await createGame(page);
   await addCharacter(page, 'The Blessed');
   await addCharacter(page, 'The Fox');
-  await moveGame(id); // the open page finds out from its own listener, as a table would mid-session
   await expect(page.getByRole('link', { name: /The Fox Playbook/ })).toBeVisible();
 
   await page.getByRole('button', { name: /^Remove The Blessed/ }).click();
@@ -66,10 +58,9 @@ test('a character can be removed from a moved game', async ({ page }) => {
   await expect.poll(async () => (await serverGame(id)).characters.map((c) => c.playbook)).toEqual(['fox']);
 });
 
-test('a character sheet edit on a moved game is saved to that character', async ({ page, browser }) => {
+test('a character sheet edit on a new game is saved to that character', async ({ page, browser }) => {
   const id = await createGame(page);
   await addCharacter(page, 'The Blessed');
-  await moveGame(id);
 
   await page.goto(`/game/${id}/blessed`);
   const xp = page.getByLabel('XP', { exact: true });
@@ -80,5 +71,23 @@ test('a character sheet edit on a moved game is saved to that character', async 
   await other.goto(`/game/${id}/blessed`);
   await expect(other.getByLabel('XP', { exact: true })).toHaveValue('3');
   await expect.poll(async () => (await serverGame(id)).characters[0]?.data?.statXp).toBe('3');
+  await other.context().close();
+});
+
+test('a game in the old shape keeps working, and carries on when it is moved while open', async ({ page, browser }) => {
+  const id = `old-shape-${Date.now()}`;
+  await createOldShapeGame(id);
+  await page.goto(`/game/${id}`);
+  await addCharacter(page, 'The Blessed');
+  expect((await serverGame(id)).game?.characters).toHaveLength(1);
+
+  await moveGame(id); // the open page finds out from its own listener, as a table would mid-session
+  await expect(page.getByRole('link', { name: /The Blessed Playbook/ })).toBeVisible();
+  await addCharacter(page, 'The Fox');
+
+  const other = await freshPage(browser);
+  await other.goto(`/game/${id}`);
+  await expect(other.getByRole('link', { name: /The Fox Playbook/ })).toBeVisible();
+  expect((await serverGame(id)).characters.map((c) => c.playbook)).toEqual(['blessed', 'fox']);
   await other.context().close();
 });

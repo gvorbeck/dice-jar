@@ -15,7 +15,7 @@ describe('createGame', () => {
     const id = await createGame();
     expect(id).toMatch(/^[a-z]+-[a-z]+-[a-z0-9]{6}$/);
     const stored = firestoreStore.get(`games/${id}`);
-    expect(stored).toMatchObject({ name: '', characters: [] });
+    expect(stored).toMatchObject({ name: '', characters: [], schemaVersion: 2 });
     expect(typeof stored?.createdAt).toBe('number');
   });
 });
@@ -24,7 +24,7 @@ describe('createGameWithId', () => {
   it('creates a game at the requested id', async () => {
     await createGameWithId('my-game');
     expect(firestoreStore.has('games/my-game')).toBe(true);
-    expect(firestoreStore.get('games/my-game')).toMatchObject({ name: '', characters: [] });
+    expect(firestoreStore.get('games/my-game')).toMatchObject({ name: '', characters: [], schemaVersion: 2 });
   });
 
   it('throws when the id is already taken and leaves the existing doc intact', async () => {
