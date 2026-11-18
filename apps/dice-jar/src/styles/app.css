@@ -1,0 +1,325 @@
+* {
+  box-sizing: border-box;
+}
+html {
+  font: 1.0625rem/1.6 var(--font-body);
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+/* Film grain over everything, text included, so the whole page reads as printed. Static tile, not a live filter. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+  background-image: var(--tex-grain);
+}
+.wrap {
+  position: relative;
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding-inline: var(--gap);
+}
+
+a {
+  color: var(--link);
+  text-underline-offset: 0.2em;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  font: 400 0.8125rem/1.4 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+h2.eyebrow {
+  color: var(--dj-turquoise);
+}
+h2.eyebrow::before {
+  content: '// ';
+  color: var(--dj-magenta);
+}
+
+/* Hero: the art fills the stage and is cropped by its edges. */
+.stage {
+  position: relative;
+  overflow: clip;
+}
+.art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  mask-image: linear-gradient(black 80%, transparent); /* fade into the page instead of a hard cut */
+}
+.a-aubergine {
+  fill: var(--dj-aubergine);
+}
+.a-blue {
+  fill: var(--dj-blue);
+}
+.a-magenta {
+  fill: var(--dj-magenta);
+}
+.a-purple {
+  fill: var(--dj-purple);
+}
+.a-pink {
+  fill: var(--dj-pink);
+}
+.a-midnight {
+  fill: var(--dj-midnight);
+}
+.a-arc {
+  fill: none;
+  stroke: var(--dj-turquoise);
+  stroke-width: 34;
+}
+.a-ring {
+  fill: none;
+  stroke: var(--dj-pink);
+  stroke-width: 16;
+}
+
+.hero {
+  display: grid;
+  align-items: center;
+  gap: var(--gap);
+  padding-block: 4rem 3rem;
+}
+.hero-text {
+  position: relative;
+  z-index: 1; /* the wordmark prints over the logo */
+}
+.wordmark {
+  width: max-content; /* the mask covers the whole word, so no letter is cut off where it overflows its column */
+  padding-inline: 0.06em; /* room for the offset plates */
+  font: 800 clamp(2.5rem, 14vw, 9rem) / 0.95 var(--font-display);
+  letter-spacing: -0.04em;
+  white-space: nowrap; /* never break at the hyphen */
+  /* Misregistered print: magenta and turquoise plates slipped off the white one, all worn by the same speckle. */
+  text-shadow:
+    -0.035em 0.025em 0 var(--dj-magenta),
+    0.03em -0.02em 0 var(--dj-turquoise);
+  mask-image: var(--tex-speckle), var(--tex-blot);
+  mask-composite: intersect;
+}
+.lede {
+  max-width: 30ch;
+  margin: 1.25rem 0 0;
+  font-size: 1.25rem;
+}
+/* Narrow: the logo comes first and the wordmark overlaps its lower edge. Wide: the wordmark runs on into the logo's column. */
+.hero-mark {
+  order: -1;
+  justify-self: end;
+  width: min(75vw, 28rem);
+  height: auto;
+  margin-bottom: -4rem;
+}
+@media (min-width: 60rem) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) 28rem;
+    padding-block: 6rem 4rem;
+  }
+  .hero-mark {
+    order: 0;
+    margin-bottom: 0;
+  }
+}
+
+/* App cards */
+section {
+  padding-block: 2.5rem;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); /* one card may shrink below 15rem on a narrow screen */
+  gap: var(--gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.card {
+  --accent: var(--dj-turquoise);
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  /* Grain worked into the card stock. */
+  background: var(--tex-grain), var(--surface);
+  background-blend-mode: soft-light;
+}
+.card:nth-child(4n + 2) {
+  --accent: var(--dj-magenta);
+}
+.card:nth-child(4n + 3) {
+  --accent: var(--dj-orchid);
+}
+.card:nth-child(4n + 4) {
+  --accent: var(--dj-aqua);
+}
+/* A die facet in the corner, printed in the card's accent with worn ink, and halftone dots spilling from it. */
+.card::before,
+.card::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  pointer-events: none;
+}
+.card::before {
+  width: 6rem;
+  height: 5rem;
+  background: var(--accent);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 40%);
+  mask-image: var(--tex-speckle);
+}
+.card::after {
+  width: 11rem;
+  height: 9rem;
+  background-image: radial-gradient(circle, var(--accent) 1.2px, transparent 1.7px);
+  background-size: 7px 7px;
+  mask-image: radial-gradient(ellipse at 100% 0, black, transparent 70%);
+  opacity: 0.45;
+}
+.card h3 {
+  /* Sized to the card, so YOURCODENA.ME, one long word, fits on one line. */
+  font: 700 clamp(1rem, 8.5cqi, 1.5rem) / 1.2 var(--font-display);
+}
+.card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+/* The whole card is the link's hit area; its focus ring goes round the card. */
+.card h3 a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+}
+.card h3 a:focus-visible {
+  outline: none;
+}
+.card h3 a:focus-visible::after {
+  outline: 2px solid var(--focus);
+  outline-offset: -4px;
+}
+.card p:not(.eyebrow) {
+  margin: 0.75rem 0 0;
+}
+.card p.card-meta {
+  /* p.card-meta outranks .card p:not(.eyebrow), so margin-top: auto pins the label to the bottom */
+  margin-top: auto;
+  padding-top: 1rem;
+  font: 400 0.8125rem/1.4 var(--font-mono);
+  color: var(--dim); /* not the accent: magenta and orchid fail AA at this size */
+}
+.card:hover:has(a) {
+  background-color: color-mix(in srgb, var(--surface) 82%, var(--accent));
+}
+.card.soon {
+  --accent: var(--dim);
+  outline: 1px dashed var(--dim);
+  outline-offset: -1px;
+  background: color-mix(in srgb, var(--bg) 85%, transparent); /* the page's shapes show through, but not enough to hurt the text */
+}
+.card.soon::before {
+  opacity: 0.35;
+}
+
+.about p {
+  max-width: 60ch;
+  margin: 0;
+}
+
+/* Compact technical labels. */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin-top: 4rem;
+  padding-block: 2.5rem 2rem;
+  font: 400 0.8125rem/1.4 var(--font-mono);
+  color: var(--dim);
+}
+
+/* Loose shapes down the page, behind the content. */
+.defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.lower {
+  position: relative;
+  overflow-x: clip; /* sideways only: the lowest shapes run on behind the footer instead of stopping at a hard edge */
+  padding-bottom: 2rem;
+}
+.shape {
+  position: absolute;
+  pointer-events: none;
+}
+.s-violet {
+  top: 1rem;
+  left: -15rem;
+  opacity: 0.55;
+}
+.s-arc {
+  top: 12%;
+  right: -14rem;
+}
+.s-facet {
+  top: 52%;
+  right: 6%;
+  opacity: 0.85;
+}
+.s-ring {
+  top: -2rem;
+  right: 28%;
+}
+.s-plane {
+  bottom: -8rem;
+  left: -18rem;
+  opacity: 0.9;
+}
+.s-navy {
+  right: -20rem;
+  bottom: -9rem;
+  opacity: 0.6;
+}
+.s-shard {
+  bottom: 1rem;
+  left: 46%;
+  opacity: 0.8;
+}
+.a-violet {
+  fill: var(--dj-violet);
+}
+.a-raspberry {
+  fill: var(--dj-raspberry);
+}
+.a-orchid {
+  fill: var(--dj-orchid);
+}

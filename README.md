@@ -2,12 +2,13 @@
 
 Tabletop RPG character apps, one per game, sharing their tooling and, once a second app needs it, their code. Package scope: `@dice-jar/*`.
 
-delta-green and stonetop are in so far (stonetop is the app behind hearthfire.camp). The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
+delta-green and stonetop are in so far (stonetop is the app behind hearthfire.camp). `apps/dice-jar` is the landing page at dicejar.games, listing the apps. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
 
 | App         | Game              | Rules MCP server    | Access    |
 | ----------- | ----------------- | ------------------- | --------- |
 | delta-green | Delta Green       | `delta-green-rules` | link-only |
 | stonetop    | Stonetop          | `stonetop-rules`    | link-only |
+| dice-jar    | none (landing)    | none                | public    |
 | codex-quest | Basic Fantasy RPG | `bfrpg-rules`       | accounts  |
 | glyph-quest | Knave             | `knave-rules`       | accounts  |
 
@@ -49,7 +50,7 @@ npm ci
 npm run check
 ```
 
-`npm ci` also installs the git hooks. One app's script: `npm run dev -w apps/<app>`. To start an app's dev server: `npm run dg` (delta-green) or `npm run st` (stonetop).
+`npm ci` also installs the git hooks. One app's script: `npm run dev -w apps/<app>`. To start an app's dev server: `npm run dj` (the landing page), `npm run dg` (delta-green) or `npm run st` (stonetop).
 
 | Root script                                                                     |                                                                                                                                                    |
 | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -101,6 +102,7 @@ The repo is public. In Settings:
 - **General → Pull Requests:** turn on "Automatically delete head branches".
 - **Advanced Security:** turn on Dependabot alerts, Dependabot security updates, secret scanning with push protection, and CodeQL (default setup, JavaScript/TypeScript: scans pushes and PRs on `dev` and `main`, and weekly).
 - **Rules → Rulesets:** one ruleset per branch, as in "Branch protection" above. Both are saved in [.github/rulesets/](.github/rulesets/) and can be imported (New ruleset → Import a ruleset). If you change a ruleset in GitHub, update its file. On `main`, set the pull request rule's allowed merge methods to **merge commit only**, so a release can't be squashed by mistake.
+- **Pages:** set Source to "GitHub Actions" and the custom domain to `dicejar.games`, then turn on Enforce HTTPS. In Environments → `github-pages`, allow deployments from `main` (by default only the default branch, `dev`, may deploy). DNS for dicejar.games: the four GitHub Pages `A` records (and `AAAA` for IPv6) on the apex, as GitHub's custom-domain docs list them.
 - **Private vulnerability reporting:** turn it on in Advanced Security. [SECURITY.md](SECURITY.md) sends reporters there.
 - **Actions → General → Fork pull request workflows:** require approval for all external contributors (already set).
 - **Greptile:** install the GitHub app on this repo only, at greptile.com. `greptile.json` is its config, and it reads [AGENTS.md](AGENTS.md).

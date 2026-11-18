@@ -12,6 +12,7 @@
   },
   "scripts": {
     "prepare": "husky",
+    "dj": "npm run dev -w apps/dice-jar -- --open",
     "dg": "npm run dev -w apps/delta-green -- --open",
     "st": "npm run dev -w apps/stonetop -- --open",
     "format": "prettier --write .",

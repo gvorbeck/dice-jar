@@ -1,9 +1,9 @@
-/* Departure Mono: drop DepartureMono-Regular.woff2 (OFL) into public/fonts/. Falls back to system mono. */
+/* Departure Mono (OFL). Imported from src/ so Vite hashes it into /assets/, which Hosting caches for a year. */
 @font-face {
   font-family: 'Departure Mono';
   src:
     local('Departure Mono'),
-    url('/fonts/DepartureMono-Regular.woff2') format('woff2');
+    url('./fonts/DepartureMono-Regular.woff2') format('woff2');
   font-display: swap;
 }
 
