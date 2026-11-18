@@ -150,7 +150,7 @@ section {
 }
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); /* one card may shrink below 15rem on a narrow screen */
   gap: var(--gap);
   margin: 0;
   padding: 0;
@@ -229,7 +229,8 @@ section {
 .card p:not(.eyebrow) {
   margin: 0.75rem 0 0;
 }
-.card .card-meta {
+.card p.card-meta {
+  /* p.card-meta outranks .card p:not(.eyebrow), so margin-top: auto pins the label to the bottom */
   margin-top: auto;
   padding-top: 1rem;
   font: 400 0.8125rem/1.4 var(--font-mono);
