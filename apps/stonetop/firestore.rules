@@ -24,17 +24,18 @@ service cloud.firestore {
       return data.get('schemaVersion', 1) == 2 && data.characters.size() == 0 && !('diceRolls' in data);
     }
 
-    // The fields the app writes. A game with any other top-level key cannot be written, so new fields need a release that allows them first.
-    function hasKnownFields(data) {
-      return data.keys().hasOnly(['name', 'createdAt', 'characters', 'schemaVersion', 'content', 'threats', 'iWonder', 'steading', 'notes', 'notesLocks', 'restoreToken']);
+    // The fields the app writes. A write cannot add or change any other top-level key, so new fields need a release that allows them first.
+    // An update only looks at the keys it changes, so a field a migration or restore preserved does not block saves.
+    function knownFields() {
+      return ['name', 'createdAt', 'characters', 'schemaVersion', 'content', 'threats', 'iWonder', 'steading', 'notes', 'notesLocks', 'restoreToken'];
     }
 
     match /games/{id} {
       allow get:    if true;
       allow list:   if false;
-      allow create: if isValidGame(request.resource.data) && isValidV2(request.resource.data) && hasKnownFields(request.resource.data);
-      allow update: if isValidGame(request.resource.data) && isValidV2(request.resource.data) && hasKnownFields(request.resource.data)
-        && isValidV2(resource.data);
+      allow create: if isValidGame(request.resource.data) && isValidV2(request.resource.data) && request.resource.data.keys().hasOnly(knownFields());
+      allow update: if isValidGame(request.resource.data) && isValidV2(request.resource.data) && isValidV2(resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(knownFields());
       allow delete: if false;
 
       function isV2Game() {

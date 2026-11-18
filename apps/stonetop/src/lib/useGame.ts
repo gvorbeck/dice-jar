@@ -49,6 +49,14 @@ export interface UseGameResult {
   replaceGameData: (game: Record<string, unknown>) => Promise<void>;
 }
 
+// A game saved without a name fails firestore.rules on every write but a rename: give it the empty name the parser already shows.
+// A transaction, so a copy from the offline cache cannot overwrite a name another device has set since; a failure retries on the next open.
+const nameMissingGame = (gameRef: ReturnType<typeof doc>) =>
+  runTransaction(db, async (tx) => {
+    const snap = await tx.get(gameRef);
+    if (snap.exists() && typeof snap.data().name !== 'string') tx.update(gameRef, { name: '' });
+  }).catch(() => {});
+
 export const useGame = (gameId: string): UseGameResult => {
   const [docRaw, setDocRaw] = useState<Record<string, unknown> | null | undefined>(undefined);
   const [characterDocs, setCharacterDocs] = useState<Stored[] | undefined>(undefined);
@@ -105,12 +113,15 @@ export const useGame = (gameId: string): UseGameResult => {
     setCharacterDocs(undefined);
     setRollDocs(undefined);
     setLoadError(null);
+    let nameTried = false;
     return onSnapshot(
       gameRef,
       (snapshot) => {
         const data = snapshot.exists() ? (snapshot.data() as Record<string, unknown>) : null;
-        // A game saved without a name fails firestore.rules on every write but a rename: give it the empty name the parser already shows. A failure retries on the next open.
-        if (data?.schemaVersion === 2 && typeof data.name !== 'string') updateDoc(gameRef, { name: '' }).catch(() => {});
+        if (data?.schemaVersion === 2 && typeof data.name !== 'string' && !nameTried) {
+          nameTried = true; // once per open: a write the rules refuse is not retried on every snapshot
+          nameMissingGame(gameRef);
+        }
         setDocRaw(data);
         setLoadError(null);
       },

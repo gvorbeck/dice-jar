@@ -75,6 +75,11 @@ describe('updating', () => {
   it('rejects a key the app does not write', async () => {
     await assertFails(updateDoc(doc(db(), G), { surprise: 1 }));
   });
+  it('keeps saving a game that carries a field the app does not write, as long as the save does not touch it', async () => {
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'games/kept'), game({ preserved: 'x' })));
+    await assertSucceeds(updateDoc(doc(db(), 'games/kept'), { name: 'Renamed' }));
+    await assertFails(updateDoc(doc(db(), 'games/kept'), { preserved: 'y' }));
+  });
   it('rejects writing a whole game over it in the old shape', async () => {
     const { schemaVersion: _version, ...old } = game({ name: 'Overwritten' });
     await assertFails(setDoc(doc(db(), G), old)); // a whole-document restore would drop the version
