@@ -3,8 +3,9 @@ import { newGameId } from '@dice-jar/game-id';
 import { db } from './firebase';
 import { GAMES_COLLECTION } from './constants';
 import { GAME_ID_WORDS } from './gameIdWords';
+import { SCHEMA_VERSION } from './gameShape';
 
-const newGame = () => ({ name: '', createdAt: Date.now(), characters: [] });
+const newGame = () => ({ name: '', createdAt: Date.now(), characters: [], schemaVersion: SCHEMA_VERSION });
 
 export const gameIdExists = async (id: string): Promise<boolean> => {
   const snap = await getDoc(doc(db, GAMES_COLLECTION, id));
