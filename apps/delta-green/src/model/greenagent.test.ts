@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parseCharacter } from './character';
 import { fromGreenAgent } from './greenagent';
-import { skillsOf } from '../rules';
+import { skillsOf } from '@/rules';
 
 describe('Green Agent import', () => {
   it('converts a custom-profession export', () => {

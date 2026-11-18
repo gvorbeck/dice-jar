@@ -31,6 +31,21 @@ describe('SaveStatus', () => {
     vi.useRealTimers();
   });
 
+  it('stops saying "Saved" when the server refuses a write that had already been reported as saved', () => {
+    renderWithProvider();
+    act(() => {
+      api.reportSaveStart();
+    });
+    act(() => {
+      api.reportSaveSettled(true);
+    });
+    expect(screen.getByText(/Saved · just now/)).toBeInTheDocument();
+    act(() => {
+      api.reportSaveRefused();
+    });
+    expect(screen.queryByText(/Saved/)).not.toBeInTheDocument();
+  });
+
   it('rolls the relative time forward on its own timer', () => {
     renderWithProvider();
     act(() => {

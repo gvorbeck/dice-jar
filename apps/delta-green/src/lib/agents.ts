@@ -10,10 +10,10 @@ import {
   writeBatch,
   type Unsubscribe,
 } from 'firebase/firestore';
-import { characterFrom, newCharacter, parseCharacter, type Character } from '../model/character';
-import { advanceSkills, parseLive, type Live } from '../model/live';
-import { professionOf } from '../rules';
-import { REMOVED, at, diffPaths, setDelta } from './diff';
+import { characterFrom, newCharacter, parseCharacter, type Character } from '@/model/character';
+import { advanceSkills, parseLive, type Live } from '@/model/live';
+import { professionOf } from '@/rules';
+import { REMOVED, at, diffPaths, setDelta } from '@dice-jar/diff';
 import { db } from './firebase';
 import { agentRef, agentsCol } from './games';
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { STATS } from '../rules/data/creation';
-import { BONUS_PICKS } from '../rules/data/skills';
+import { STATS } from '@/rules/data/creation';
+import { BONUS_PICKS } from '@/rules/data/skills';
 import { fromGreenAgent, isGreenAgent } from './greenagent';
 
 const CHARACTER_VERSION = 1;

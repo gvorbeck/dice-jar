@@ -20,9 +20,9 @@ import {
 } from 'react-aria-components';
 import { useContext, useId, type ReactNode } from 'react';
 export { Win } from './Win';
-import { MAX_LINE, MAX_PROSE, type Character } from '../model/character';
-import { SKILL_FAMILIES, TYPED_SKILLS, TYPE_SUGGESTIONS, familyOf, makeKey, typeOf } from '../rules/data/skills';
-import { clamp, filterSkills, skillsOf } from '../rules';
+import { MAX_LINE, MAX_PROSE, type Character } from '@/model/character';
+import { SKILL_FAMILIES, TYPED_SKILLS, TYPE_SUGGESTIONS, familyOf, makeKey, typeOf } from '@/rules/data/skills';
+import { clamp, filterSkills, skillsOf } from '@/rules';
 import { cn } from '@dice-jar/cn';
 
 export type Up = (fn: (draft: Character) => void) => void;

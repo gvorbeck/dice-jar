@@ -28,6 +28,7 @@
   "devDependencies": {
     "@dice-jar/browser": "*",
     "@dice-jar/cn": "*",
+    "@dice-jar/diff": "*",
     "@dice-jar/e2e-helpers": "*",
     "@dice-jar/firebase": "*",
     "@dice-jar/game-id": "*",

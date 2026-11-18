@@ -1,6 +1,6 @@
 // Browser-only: the Functions bundle imports model/character.ts, so nothing here may live there.
 import { downloadJson, store } from '@dice-jar/browser';
-import { newCharacter, parseCharacter, type Character } from '../model/character';
+import { newCharacter, parseCharacter, type Character } from '@/model/character';
 import { SAVED_AGENT_BAK, SAVED_AGENT_KEY } from './storage';
 
 export const loadCharacter = (): Character => {

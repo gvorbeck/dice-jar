@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { STATS, STAT_NAMES, STAT_SETS, POINT_BUY_TOTAL } from '../rules/data/creation';
-import { featureOf, roll4d6dl, sum } from '../rules';
+import { STATS, STAT_NAMES, STAT_SETS, POINT_BUY_TOTAL } from '@/rules/data/creation';
+import { featureOf, roll4d6dl, sum } from '@/rules';
 import { DerivedTable } from './DerivedTable';
-import { Btn, Choice, Num, Rule, RadioGroup, Label, type StepProps } from '../ui';
+import { Btn, Choice, Num, Rule, RadioGroup, Label, type StepProps } from '@/ui';
 
 export function StatsStep({ c, up }: StepProps) {
   const total = sum(STATS.map((s) => c.stats[s]));

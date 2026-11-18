@@ -1,6 +1,6 @@
-import { SAMPLE_BONDS } from '../rules/data/creation';
-import { bondCount, derived, professionOf } from '../rules';
-import { Rule, Text, type StepProps } from '../ui';
+import { SAMPLE_BONDS } from '@/rules/data/creation';
+import { bondCount, derived, professionOf } from '@/rules';
+import { Rule, Text, type StepProps } from '@/ui';
 import { stepNo } from '.';
 
 export function BondsStep({ c, up }: StepProps) {

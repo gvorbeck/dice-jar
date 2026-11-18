@@ -1,0 +1,16 @@
+{
+  "name": "@dice-jar/diff",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^5.1.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.4"
+  }
+}

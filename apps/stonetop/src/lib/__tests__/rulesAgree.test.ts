@@ -25,7 +25,12 @@ describe('what the app writes against firestore.rules', () => {
   it('writes only the character fields the rules list', async () => {
     const character: Character = { id: 'c1', name: 'Ada', playbook: 'blessed', level: 2, data: { statStr: '+1' } };
     await addCharacter('g1', character);
-    await editCharacter('g1', 'c1', (c) => ({ ...c, name: 'Renamed', level: 3, data: { ...c.data, statHp: '4' } }));
+    await editCharacter(
+      'g1',
+      'c1',
+      (c) => ({ ...c, name: 'Renamed', level: 3, data: { ...c.data, statHp: '4' } }),
+      () => {},
+    );
     expect(Object.keys(firestoreStore.get('games/g1/characters/c1')!).sort()).toEqual(keysIn('characterKeys').sort());
   });
 

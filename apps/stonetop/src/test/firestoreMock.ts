@@ -69,6 +69,29 @@ interface ArrayUnionOp {
   values: unknown[];
 }
 
+const deleteFieldMarker = Symbol('deleteField');
+
+// A field path of exact steps, as the real FieldPath: no step is read as a dotted path.
+class FieldPath {
+  readonly segments: string[];
+  constructor(...segments: string[]) {
+    this.segments = segments;
+  }
+}
+
+// Set (or delete) the value at `segments` inside `target`.
+const setAtPath = (target: Record<string, unknown>, segments: string[], value: unknown) => {
+  const isDelete = value !== null && typeof value === 'object' && (value as Record<symbol, unknown>)[deleteFieldMarker] === true;
+  let cursor = target;
+  for (const part of segments.slice(0, -1)) {
+    if (typeof cursor[part] !== 'object' || cursor[part] === null) cursor[part] = {};
+    cursor = cursor[part] as Record<string, unknown>;
+  }
+  const last = segments[segments.length - 1]!;
+  if (isDelete) delete cursor[last];
+  else cursor[last] = value;
+};
+
 // Apply an updateDoc payload onto a target object, honoring `a.b.c` dot-paths
 // (Firestore's nested-field syntax) and arrayUnion sentinels.
 const applyUpdate = (target: DocData, payload: DocData): DocData => {
@@ -79,18 +102,7 @@ const applyUpdate = (target: DocData, payload: DocData): DocData => {
       next[key] = [...existing, ...(value as ArrayUnionOp).values];
       continue;
     }
-    if (key.includes('.')) {
-      const parts = key.split('.');
-      let cursor = next as Record<string, unknown>;
-      for (let i = 0; i < parts.length - 1; i++) {
-        const part = parts[i]!;
-        if (typeof cursor[part] !== 'object' || cursor[part] === null) cursor[part] = {};
-        cursor = cursor[part] as Record<string, unknown>;
-      }
-      cursor[parts[parts.length - 1]!] = value;
-      continue;
-    }
-    next[key] = value;
+    setAtPath(next, key.split('.'), value);
   }
   return next;
 };
@@ -165,11 +177,25 @@ export const firestoreMockModule = () => {
   });
 
   const getDoc = vi.fn(async (ref: Ref) => makeSnapshot(ref.path));
+  // The store is the local cache as well as the server, so a cache read is the same read.
+  const getDocFromCache = vi.fn(async (ref: Ref) => makeSnapshot(ref.path));
+  const deleteField = vi.fn(() => ({ [deleteFieldMarker]: true }));
 
-  const updateDoc = vi.fn(async (ref: Ref, payload: DocData) => {
+  // Either an object of changes, or the real (field, value, field, value, ...) form.
+  const updateDoc = vi.fn(async (ref: Ref, first: DocData | FieldPath | string, ...rest: unknown[]) => {
     const existing = docs.get(ref.path);
     if (existing === undefined) throw new Error(`No document to update: ${ref.path}`);
-    docs.set(ref.path, applyUpdate(existing, payload));
+    if (first instanceof FieldPath || typeof first === 'string') {
+      const next = structuredClone(existing);
+      const pairs = [first, ...rest];
+      for (let i = 0; i < pairs.length; i += 2) {
+        const field = pairs[i] as FieldPath | string;
+        setAtPath(next, field instanceof FieldPath ? field.segments : field.split('.'), pairs[i + 1]);
+      }
+      docs.set(ref.path, next);
+    } else {
+      docs.set(ref.path, applyUpdate(existing, first));
+    }
     emit(ref.path);
   });
 
@@ -272,7 +298,10 @@ export const firestoreMockModule = () => {
   return {
     doc,
     collection,
+    FieldPath,
     getDoc,
+    getDocFromCache,
+    deleteField,
     getDocs,
     deleteDoc,
     writeBatch,
