@@ -1,0 +1,41 @@
+/* Brand palette, sampled from the logo (brand design document, section 02). */
+:root {
+  color-scheme: dark;
+
+  --dj-midnight: #181731; /* page canvas */
+  --dj-aubergine: #2d1e51; /* cards, deep planes */
+  --dj-purple: #4e2281;
+  --dj-violet: #7a22b0;
+  --dj-orchid: #ac41cb;
+  --dj-magenta: #e7278d;
+  --dj-raspberry: #961763;
+  --dj-turquoise: #29cdbe;
+  --dj-aqua: #68d2ce;
+  --dj-blue: #24486e;
+  --dj-pink: #e8b7c6;
+  /* Text neutrals, missing from the palette: ink for body text, ink-dim for labels (7:1 on aubergine). */
+  --dj-ink: #f3eef8;
+  --dj-ink-dim: #b7afd0;
+
+  /* Contrast on midnight: turquoise, aqua, pink and ink pass AA for any text; magenta and orchid only for large text.
+     Violet, raspberry, blue and purple are for shapes, never text. */
+  --bg: var(--dj-midnight);
+  --surface: var(--dj-aubergine);
+  --fg: var(--dj-ink);
+  --dim: var(--dj-ink-dim);
+  --link: var(--dj-turquoise);
+  --focus: var(--dj-aqua);
+
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Print textures, as tiles. grain: grey noise. speckle and blot: alpha masks with fine and broad holes, for worn ink. */
+  --tex-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --tex-speckle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -14 0 0 0 10.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+  --tex-blot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035' numOctaves='4' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -12 0 0 0 9.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)'/%3E%3C/svg%3E");
+
+  --gap: 1.5rem;
+  --page-w: 72rem;
+  --radius: 1rem;
+}
