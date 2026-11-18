@@ -106,13 +106,15 @@ src/
 Hearthfire uses Firestore (no authentication). A game keeps its characters and dice rolls in their own documents (`MIGRATION.md` has the history):
 
 ```
-games/{gameId}                    name, createdAt, schemaVersion: 2, content, threats, iWonder, steading, notes, notesLocks
+games/{gameId}                    name, createdAt, schemaVersion: 2, content, threats, iWonder, steading, notes, notesLocks, restoreToken
                                   characters: []   (kept empty)
 games/{gameId}/characters/{id}    id, name, playbook, level, data, order
 games/{gameId}/rolls/{id}         id, characterId, characterName, moveName, stat, dice, mod, total, mode, band, createdAt, order, and optionally resource, dropped, burned, notation, breakdown
 ```
 
-Access is unrestricted by user account: anyone with a game ID can read and write that game, but cannot list games or delete anything. `firestore.rules` allows only the fields above, with bounded sizes. If you add a field to a document, add it to that document's key list in the rules first and ship that in a release before the app writes it. `src/lib/__tests__/rulesAgree.test.ts` fails when the app writes a field the rules don't list.
+Access is unrestricted by user account: anyone with a game ID can read and write that game. Browsers cannot list games or delete a game. They can create, change and delete that game's characters and rolls (deleting is how a character is removed), and the rules do not cap the party size.
+
+`firestore.rules` limits what can be written. The game document takes only the fields above, and a character or roll only the fields listed for it, with bounded sizes. If you add a field, add it to that list in the rules first and ship that in a release before the app writes it. `src/lib/__tests__/rulesAgree.test.ts` fails when a character or roll the app writes has a field the rules' list lacks, and when the backup import check's limits differ from the rules'. It does not check the fields of the game document.
 
 ### App Check
 
