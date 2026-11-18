@@ -30,6 +30,7 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.STONETOP_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.STONETOP_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.STONETOP_FIREBASE_APP_ID }}
+          VITE_APPCHECK_SITE_KEY: ${{ secrets.STONETOP_APPCHECK_SITE_KEY }} # empty until the secret exists: App Check stays off
       # Rules go first, so a new build never runs against old rules that reject its fields. Open tabs keep running the
       # old build, so rules must accept both builds' writes: add a field in one release, stop allowing it in a later one.
       # The hosting action ships Hosting only. The service account needs the "Firebase Rules Admin" role for this step.
