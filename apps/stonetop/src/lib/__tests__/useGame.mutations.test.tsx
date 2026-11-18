@@ -63,6 +63,47 @@ describe('useGame mutations', () => {
     expect(result.current.error).toBeNull();
   });
 
+  it('gives a game that was saved without a name the empty one, so later saves pass the rules', async () => {
+    firestoreStore.set(GAME_PATH, { createdAt: 5, characters: [], schemaVersion: 2 });
+    const { result } = renderGame();
+    await waitFor(() => expect(firestoreStore.get(GAME_PATH)?.name).toBe(''));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(addToastSpy).not.toHaveBeenCalled();
+  });
+
+  it('does not overwrite a name another device set after this copy was read', async () => {
+    firestoreStore.set(GAME_PATH, { createdAt: 5, characters: [], schemaVersion: 2 });
+    const { runTransaction } = await import('firebase/firestore');
+    const real = vi.mocked(runTransaction).getMockImplementation()!;
+    vi.mocked(runTransaction).mockImplementationOnce(async (...args) => {
+      firestoreStore.setQuietly(GAME_PATH, { name: 'Named elsewhere', createdAt: 5, characters: [], schemaVersion: 2 });
+      return real(...args);
+    });
+    renderGame();
+    await waitFor(() => expect(vi.mocked(runTransaction)).toHaveBeenCalled());
+    await waitFor(() => expect(firestoreStore.get(GAME_PATH)?.name).toBe('Named elsewhere'));
+  });
+
+  it('tries to name a game once per open, even when the write is refused', async () => {
+    firestoreStore.set(GAME_PATH, { createdAt: 5, characters: [], schemaVersion: 2 });
+    const { runTransaction } = await import('firebase/firestore');
+    const before = vi.mocked(runTransaction).mock.calls.length;
+    vi.mocked(runTransaction).mockImplementationOnce(async () => {
+      throw Object.assign(new Error('denied'), { code: 'permission-denied' });
+    });
+    const { result } = renderGame();
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await act(async () => firestoreStore.set(GAME_PATH, { createdAt: 6, characters: [], schemaVersion: 2 }));
+    expect(vi.mocked(runTransaction).mock.calls.length - before).toBe(1);
+  });
+
+  it('leaves a game that has a name alone', async () => {
+    firestoreStore.set(GAME_PATH, { name: 'Kept', createdAt: 5, characters: [], schemaVersion: 2 });
+    const { result } = renderGame();
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(firestoreStore.get(GAME_PATH)?.name).toBe('Kept');
+  });
+
   it('does not show a game still in one document, whose characters would look missing', async () => {
     firestoreStore.set(GAME_PATH, { name: 'Old', createdAt: 5, characters: [char('a')] });
     const { result } = renderGame();
