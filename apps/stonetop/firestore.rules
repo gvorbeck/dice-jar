@@ -9,46 +9,38 @@ service cloud.firestore {
     // campaign), which defeats the by-ID model. Scope to /games, deny list
     // and delete, and validate the write shape.
 
-    // A write must leave the doc looking like a game: core fields well-typed
-    // and the party size bounded (rules can't measure byte size, so cap the
-    // one unbounded list instead). There's one PC per playbook, so 9 today;
-    // 20 leaves generous room for future playbook expansions while still
-    // blocking runaway inflation. New top-level keys are allowed on purpose —
-    // the schema is intentionally flat and grows over time (see the note in
-    // src/types/index.ts).
+    // A write must leave the doc looking like a game: core fields well-typed.
     function isValidGame(data) {
       return data.name is string
         && data.createdAt is number
-        && data.characters is list
-        && data.characters.size() <= 20;
+        && data.characters is list;
     }
 
-    // A game is schemaVersion 1 (characters and rolls are arrays inside the document) or 2 (they live in the
-    // characters/ and rolls/ subcollections; see MIGRATION.md). A browser may create a game as either, but never changes
-    // an existing game's version: only the migration script (the Admin SDK, which ignores these rules) moves one.
-    function versionOf(data) {
-      return data.get('schemaVersion', 1);
-    }
-
-    // A v2 game keeps an empty characters list (v1 builds require one) and no diceRolls, so a tab still running a
-    // v1 build gets an error instead of silently saving into arrays that nothing reads any more.
+    // Every game is schemaVersion 2: characters and rolls live in the characters/ and rolls/ subcollections (see
+    // MIGRATION.md), and the document keeps an empty characters list and no diceRolls. A browser can neither create
+    // nor write a game in any other shape, so a tab still running an old build gets an error instead of saving
+    // into arrays that nothing reads any more.
     function isValidV2(data) {
-      return data.characters.size() == 0 && !('diceRolls' in data);
+      return data.get('schemaVersion', 1) == 2 && data.characters.size() == 0 && !('diceRolls' in data);
+    }
+
+    // The fields the app writes. A write cannot add or change any other top-level key, so new fields need a release that allows them first.
+    // An update only looks at the keys it changes, so a field a migration or restore preserved does not block saves.
+    function knownFields() {
+      return ['name', 'createdAt', 'characters', 'schemaVersion', 'content', 'threats', 'iWonder', 'steading', 'notes', 'notesLocks', 'restoreToken'];
     }
 
     match /games/{id} {
       allow get:    if true;
       allow list:   if false;
-      allow create: if isValidGame(request.resource.data)
-        && (versionOf(request.resource.data) == 1 || (versionOf(request.resource.data) == 2 && isValidV2(request.resource.data)));
-      allow update: if isValidGame(request.resource.data)
-        && versionOf(request.resource.data) == versionOf(resource.data)
-        && (versionOf(resource.data) == 1 || isValidV2(request.resource.data));
+      allow create: if isValidGame(request.resource.data) && isValidV2(request.resource.data) && request.resource.data.keys().hasOnly(knownFields());
+      allow update: if isValidGame(request.resource.data) && isValidV2(request.resource.data) && isValidV2(resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(knownFields());
       allow delete: if false;
 
       function isV2Game() {
         let game = get(/databases/$(database)/documents/games/$(id));
-        return versionOf(game.data) == 2;
+        return game.data.get('schemaVersion', 1) == 2;
       }
 
       // shortcut: the party size is no longer capped here (a rule cannot count a subcollection); the app stops at 20.
