@@ -1,0 +1,11 @@
+dice-jar (dicejar.games)
+
+The contents of this directory, the code and the dice-jar logo and artwork alike,
+are © J. Garrett Vorbeck and released under the MIT license in the LICENSE file
+at the root of this repository.
+
+This directory holds no game content. Delta Green, Stonetop, Basic Fantasy RPG
+and Knave are named on this page only to say which game each app is for. Those
+names and the games behind them belong to their owners, and the MIT license does
+not extend to them. The app built for each game states that game's terms in its
+own directory.
