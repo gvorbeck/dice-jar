@@ -1,3 +1,13 @@
+/* Departure Mono (OFL), copied from delta-green for its card; fontsource doesn't carry it.
+   shortcut: a second copy of delta-green's woff2, move it to packages/ when a third app needs it or the font is upgraded. */
+@font-face {
+  font-family: 'Departure Mono';
+  src:
+    local('Departure Mono'),
+    url('./fonts/DepartureMono-Regular.woff2') format('woff2');
+  font-display: swap;
+}
+
 /* Brand palette, sampled from the logo (brand design document, section 02). */
 :root {
   color-scheme: dark;
@@ -34,6 +44,28 @@
   --tex-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --tex-speckle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -14 0 0 0 10.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
   --tex-blot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035' numOctaves='4' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -12 0 0 0 9.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)'/%3E%3C/svg%3E");
+
+  /* Each live app's card is dressed as a scrap of that app, so these copy its dark theme's tokens.
+     shortcut: hand-copied, so they drift if an app changes its palette; import them from packages/ once the apps' tokens move there. */
+  --dg-bg: #141414; /* delta-green --bg */
+  --dg-panel: #1b1a17;
+  --dg-fg: #ffa133;
+  --dg-dim: #c27d27;
+  --dg-scan-mix: 7%; /* scan line strength; the e2e contrast test reads it */
+  --dg-scan: color-mix(in srgb, var(--dg-fg) var(--dg-scan-mix), transparent);
+  --dg-font: 'Departure Mono', ui-monospace, monospace;
+  --st-panel: #1c1916; /* stonetop --surface-panel (forge-800) */
+  --st-border: #3d3830; /* stone-700 */
+  --st-border-accent: #c8950f; /* gold-500 */
+  --st-fg: #f5f4f0; /* stone-100 */
+  --st-dim: #9e9790; /* stone-400 */
+  --st-heading: #f2c84b; /* gold-300 */
+  --st-radius: 6px; /* --radius-lg */
+  --st-font-serif: 'IM Fell English', Georgia, serif;
+  --st-font-sans: 'Inter', system-ui, sans-serif;
+  /* A torn paper edge, tiled along a card's bottom; --tear is its height. */
+  --tear: 14px;
+  --tex-torn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='151' height='14'%3E%3Cpath d='M0 0H151V8L144 12 137 5 129 11 120 3 112 13 104 7 95 10 87 2 79 12 70 6 62 14 53 4 45 9 36 1 28 11 19 6 11 13 4 4 0 7Z'/%3E%3C/svg%3E");
 
   --gap: 1.5rem;
   --page-w: 72rem;

@@ -2,7 +2,9 @@ dice-jar (dicejar.games)
 
 The contents of this directory, the code and the dice-jar logo and artwork alike,
 are © J. Garrett Vorbeck and released under the MIT license in the LICENSE file
-at the root of this repository.
+at the root of this repository. The one exception is the Departure Mono font
+in src/styles/fonts, which is © 2022–2024 Helena Zhang and released under the
+SIL Open Font License 1.1, whose text is in OFL.txt beside it.
 
 This directory holds no game content. Delta Green, Stonetop, Basic Fantasy RPG
 and Knave are named on this page only to say which game each app is for. Those

@@ -164,7 +164,7 @@ section {
   overflow: clip;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem calc(1.5rem + var(--tear)); /* room for a live card's torn edge; every card keeps it so labels in a row line up */
   border-radius: var(--radius);
   /* Grain worked into the card stock. */
   background: var(--tex-grain), var(--surface);
@@ -247,6 +247,94 @@ section {
 }
 .card.soon::before {
   opacity: 0.35;
+}
+
+/* A live app's card is a scrap torn out of that app: its own colors and type, ripped along the bottom. */
+.card.dg,
+.card.st {
+  mask:
+    linear-gradient(black 0 0) top / 100% calc(100% - var(--tear) + 1px) no-repeat,
+    var(--tex-torn) bottom / 151px var(--tear) repeat-x;
+}
+.card.dg::before,
+.card.dg::after,
+.card.st::before,
+.card.st::after {
+  content: none;
+}
+.card.dg h3 a::after,
+.card.st h3 a::after {
+  bottom: var(--tear); /* above the tear, so the focus ring isn't ripped too */
+  border-radius: 0;
+}
+
+/* yourcodena.me: an amber terminal window with an inverted [ TITLE ] bar and scan lines. */
+.card.dg {
+  padding-inline: 1rem;
+  padding-top: 0;
+  border: 2px solid var(--dg-fg);
+  border-bottom: 0; /* torn off */
+  border-radius: 0;
+  background: repeating-linear-gradient(transparent 0 2px, var(--dg-scan) 2px 3px), var(--dg-panel);
+  color: var(--dg-fg);
+  font: 400 0.875rem/1.5 var(--dg-font);
+}
+.card.dg .eyebrow {
+  margin: 0 -1rem 1rem;
+  padding: 0.125rem 1rem;
+  background: var(--dg-fg);
+  color: var(--dg-bg);
+  font: inherit;
+  letter-spacing: 0;
+}
+.card.dg .eyebrow::before {
+  content: '[ ';
+}
+.card.dg .eyebrow::after {
+  content: ' ]';
+}
+.card.dg h3 {
+  font: 400 clamp(1rem, 8cqi, 1.5rem) / 1.2 var(--dg-font);
+  text-transform: uppercase;
+}
+.card.dg p.card-meta {
+  font-family: var(--dg-font);
+  color: var(--dg-dim);
+}
+.card.dg p.card-meta::before {
+  content: '> ';
+}
+.card.dg:hover {
+  background-color: var(--dg-bg);
+}
+
+/* Hearthfire: a forge-dark panel, gold IM Fell English over Inter. */
+.card.st {
+  border: 1px solid var(--st-border);
+  border-bottom: 0; /* torn off */
+  border-radius: var(--st-radius) var(--st-radius) 0 0;
+  background: var(--st-panel);
+  color: var(--st-fg);
+  font: 400 0.9375rem/1.6 var(--st-font-sans);
+}
+.card.st .eyebrow {
+  font: 600 0.75rem/1.4 var(--st-font-sans);
+  letter-spacing: 0.1em;
+  color: var(--st-dim);
+}
+.card.st h3 {
+  font: 400 clamp(1.5rem, 12cqi, 2.25rem) / 1.1 var(--st-font-serif);
+  color: var(--st-heading);
+}
+.card.st p:not(.eyebrow) {
+  color: var(--st-dim);
+}
+.card.st p.card-meta {
+  font-family: var(--st-font-sans);
+}
+.card.st:hover {
+  background-color: var(--st-panel);
+  border-color: var(--st-border-accent);
 }
 
 .about p {
