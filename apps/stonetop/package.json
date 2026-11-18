@@ -28,8 +28,8 @@
     "duplicate-game": "GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/duplicate-game.ts"
   },
   "dependencies": {
-    "@fontsource/im-fell-english": "^5.2.6",
-    "@fontsource/inter": "^5.2.8",
+    "@fontsource/im-fell-english": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
     "@tiptap/pm": "^3.31.3",
     "@tiptap/react": "^3.31.3",
     "@tiptap/starter-kit": "^3.31.3",

@@ -22,6 +22,37 @@ test('each card stays inside the page gutters on a phone at a larger default fon
   }
 });
 
+// axe skips text over a gradient, so the Delta Green card's scan lines hide its contrast from expectAccessible.
+test('the Delta Green card keeps AA contrast over its scan lines', async ({ page }) => {
+  await page.goto('/');
+  const ratios = await page.locator('.card.dg').evaluate((card) => {
+    const rgb = (c: string) =>
+      c
+        .match(/[\d.]+/g)!
+        .slice(0, 3)
+        .map(Number);
+    const lum = (c: number[]) =>
+      c
+        .map((v) => ((v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+        .reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i]!, 0);
+    const ratio = (a: number[], b: number[]) => {
+      const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
+      return (hi! + 0.05) / (lo! + 0.05);
+    };
+    const panel = rgb(getComputedStyle(card).backgroundColor);
+    const fg = rgb(getComputedStyle(card).color);
+    const mix = parseFloat(getComputedStyle(card).getPropertyValue('--dg-scan-mix')) / 100;
+    if (!(mix > 0)) throw new Error('--dg-scan-mix is missing'); // a renamed token must fail the test, not check 0%
+    const scan = panel.map((p, i) => p * (1 - mix) + fg[i]! * mix); // --dg-scan over the panel
+    // The eyebrow sits on its own solid bar, which axe does check.
+    return [...card.querySelectorAll('p:not(.eyebrow), h3')].flatMap((el) => {
+      const text = rgb(getComputedStyle(el).color);
+      return [ratio(text, panel), ratio(text, scan)];
+    });
+  });
+  for (const r of ratios) expect(r).toBeGreaterThanOrEqual(4.5);
+});
+
 test('the cards in a row line up their address labels at the bottom', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');

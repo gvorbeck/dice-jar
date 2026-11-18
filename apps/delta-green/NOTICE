@@ -11,3 +11,7 @@ The code is released under the MIT license in the LICENSE file at the root of
 this repository. That license does not extend to the Delta Green intellectual
 property (rules text, game data, art, names and trademarks), which stays with
 the Delta Green Partnership and is used here only under their license.
+
+The Departure Mono font in src/styles/fonts is not covered by either: it is
+© 2022–2024 Helena Zhang and released under the SIL Open Font License 1.1,
+whose text is in OFL.txt beside it.

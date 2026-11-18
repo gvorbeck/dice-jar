@@ -33,7 +33,7 @@ export const App = () => (
           </h2>
           <ul className="cards">
             {APPS.map((app) => (
-              <li key={app.name} className={app.url ? 'card' : 'card soon'}>
+              <li key={app.name} className={`card ${app.look ?? 'soon'}`}>
                 <p className="eyebrow">{app.game}</p>
                 <h3>{app.url ? <a href={app.url}>{app.name}</a> : app.name}</h3>
                 <p>{app.blurb}</p>
