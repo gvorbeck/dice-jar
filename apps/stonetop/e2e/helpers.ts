@@ -44,9 +44,16 @@ export const moveGame = async (id: string) => {
 /** The game as the server has it: the document, and the names of its characters in order. */
 export const serverGame = async (id: string) => {
   const ref = admin().doc(`games/${id}`);
-  const [game, characters] = await Promise.all([ref.get(), ref.collection('characters').orderBy('order').get()]);
+  const [game, characters, rolls] = await Promise.all([
+    ref.get(),
+    ref.collection('characters').orderBy('order').get(),
+    ref.collection('rolls').get(),
+  ]);
   return {
     game: game.data(),
-    characters: characters.docs.map((d) => ({ id: d.id, ...d.data() }) as { id: string; playbook: string; data?: { statXp?: string } }),
+    rolls: rolls.docs.map((d) => ({ id: d.id, ...d.data() }) as { id: string; notation?: string }),
+    characters: characters.docs.map(
+      (d) => ({ id: d.id, ...d.data() }) as { id: string; name: string; playbook: string; data?: { statXp?: string } },
+    ),
   };
 };

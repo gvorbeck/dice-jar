@@ -35,7 +35,7 @@ describe('creating', () => {
   });
   it('lets the first character be saved into a new game', async () => {
     await assertSucceeds(setDoc(doc(db(), 'games/new'), game()));
-    await assertSucceeds(setDoc(doc(db(), 'games/new/characters/c1'), { id: 'c1', name: 'Ada', playbook: 'blessed', order: 0 }));
+    await assertSucceeds(setDoc(doc(db(), 'games/new/characters/c1'), { id: 'c1', name: 'Ada', playbook: 'blessed', level: 1, order: 0 }));
   });
   it.each([
     ['a name that is not a string', { name: 7 }],
@@ -138,7 +138,14 @@ describe('characters and rolls subcollections', () => {
     ['a name that is not a string', { name: 7 }],
     ['a playbook that is not a string', { playbook: 7 }],
     ['no order', { order: undefined }],
-    ['more than 40 fields', Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`f${i}`, i]))],
+    ['no level', { level: undefined }],
+    ['a level that is not a number', { level: '1' }],
+    ['a level out of range', { level: 101 }],
+    ['a name over 200 characters', { name: 'x'.repeat(201) }],
+    ['a playbook over 50 characters', { playbook: 'x'.repeat(51) }],
+    ['data that is not a map', { data: 'x' }],
+    ['more than 100 sheet fields', { data: Object.fromEntries(Array.from({ length: 101 }, (_, i) => [`f${i}`, i])) }],
+    ['a key the app does not write', { surprise: 1 }],
   ])('rejects a character with %s', async (_label, over) => {
     const data = Object.fromEntries(Object.entries(character({ id: 'c9', ...over })).filter(([, v]) => v !== undefined));
     await assertFails(setDoc(doc(db(), `${G}/characters/c9`), data));
@@ -148,9 +155,54 @@ describe('characters and rolls subcollections', () => {
     ['no character id', { characterId: undefined }],
     ['a createdAt that is not a number', { createdAt: 'now' }],
     ['no order', { order: undefined }],
+    ['a mode that is not adv, dis or normal', { mode: 'lucky' }],
+    ['more than 50 dice', { dice: Array.from({ length: 51 }, () => 1) }],
+    ['dice that are not a list', { dice: 'x' }],
+    ['a total that is not a number', { total: '8' }],
+    ['a move name over 200 characters', { moveName: 'x'.repeat(201) }],
+    ['a breakdown over 10000 characters', { breakdown: 'x'.repeat(10001) }],
+    ['a burned that is not true or false', { burned: 'yes' }],
+    ['a key the app does not write', { surprise: 1 }],
   ])('rejects a roll with %s', async (_label, over) => {
     const data = Object.fromEntries(Object.entries(roll({ id: 'r9', ...over })).filter(([, v]) => v !== undefined));
     await assertFails(setDoc(doc(db(), `${G}/rolls/r9`), data));
+  });
+  it('accepts the longest working the dice roller can produce', async () => {
+    await assertSucceeds(setDoc(doc(db(), `${G}/rolls/r6`), roll({ id: 'r6', notation: 'x'.repeat(500), breakdown: 'x'.repeat(4000) })));
+  });
+  it('accepts every field the app writes on a character and a roll, including null where the app writes null', async () => {
+    await assertSucceeds(setDoc(doc(db(), `${G}/characters/c5`), character({ id: 'c5', data: { statStr: '+1' } })));
+    await assertSucceeds(
+      setDoc(
+        doc(db(), `${G}/rolls/r5`),
+        roll({
+          id: 'r5',
+          characterName: 'Ada',
+          moveName: 'Fight',
+          stat: 'STR',
+          resource: '+Favor',
+          dice: [3, 4],
+          dropped: null,
+          mod: 1,
+          total: 8,
+          mode: 'adv',
+          burned: true,
+          band: null,
+          notation: '2d6',
+          breakdown: '[3, 4]',
+        }),
+      ),
+    );
+  });
+  it('keeps saving a character or roll that carries a field the app does not write, as long as the save does not touch it', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), `${G}/characters/kept`), character({ id: 'kept', preserved: 'x' }));
+      await setDoc(doc(ctx.firestore(), `${G}/rolls/kept`), roll({ id: 'kept', preserved: 'x' }));
+    });
+    await assertSucceeds(updateDoc(doc(db(), `${G}/characters/kept`), { 'data.statStr': '+2' }));
+    await assertSucceeds(updateDoc(doc(db(), `${G}/rolls/kept`), { mode: 'adv' }));
+    await assertFails(updateDoc(doc(db(), `${G}/characters/kept`), { preserved: 'y' }));
+    await assertFails(updateDoc(doc(db(), `${G}/rolls/kept`), { preserved: 'y' }));
   });
   it('is not writable on a game still in the old shape, so a game cannot end up with both shapes', async () => {
     await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'games/old'), { name: 'Old', createdAt: 1, characters: [] }));
