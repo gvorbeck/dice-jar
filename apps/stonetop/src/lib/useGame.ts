@@ -108,7 +108,10 @@ export const useGame = (gameId: string): UseGameResult => {
     return onSnapshot(
       gameRef,
       (snapshot) => {
-        setDocRaw(snapshot.exists() ? (snapshot.data() as Record<string, unknown>) : null);
+        const data = snapshot.exists() ? (snapshot.data() as Record<string, unknown>) : null;
+        // A game saved without a name fails firestore.rules on every write but a rename: give it the empty name the parser already shows. A failure retries on the next open.
+        if (data?.schemaVersion === 2 && typeof data.name !== 'string') updateDoc(gameRef, { name: '' }).catch(() => {});
+        setDocRaw(data);
         setLoadError(null);
       },
       (err) => setLoadError(friendlyFirestoreError(err)),

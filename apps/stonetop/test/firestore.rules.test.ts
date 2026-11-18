@@ -9,7 +9,7 @@ const db = () => env.unauthenticatedContext().firestore();
 const G = 'games/g1';
 
 // The shape src/lib/game.ts creates.
-const game = (over: Record<string, unknown> = {}) => ({ name: '', createdAt: 1, characters: [], ...over });
+const game = (over: Record<string, unknown> = {}) => ({ name: '', createdAt: 1, characters: [], schemaVersion: 2, ...over });
 
 beforeAll(async () => {
   env = await initializeTestEnvironment({ projectId: 'demo-stonetop', firestore: { rules: readFileSync('firestore.rules', 'utf8') } });
@@ -33,30 +33,63 @@ describe('creating', () => {
   it('accepts a new game', async () => {
     await assertSucceeds(setDoc(doc(db(), 'games/new'), game()));
   });
+  it('lets the first character be saved into a new game', async () => {
+    await assertSucceeds(setDoc(doc(db(), 'games/new'), game()));
+    await assertSucceeds(setDoc(doc(db(), 'games/new/characters/c1'), { id: 'c1', name: 'Ada', playbook: 'blessed', order: 0 }));
+  });
   it.each([
     ['a name that is not a string', { name: 7 }],
     ['a createdAt that is not a number', { createdAt: 'now' }],
     ['characters that are not a list', { characters: {} }],
-    ['more than 20 characters', { characters: Array.from({ length: 21 }, (_, i) => ({ id: String(i) })) }],
+    ['characters already in the list', { characters: [{ id: 'c1', name: 'x', playbook: 'blessed' }] }],
+    ['a diceRolls list', { diceRolls: [] }],
+    ['a key the app does not write', { steadingg: { name: 'Stonetop' } }],
   ])('rejects %s', async (_label, over) => {
     await assertFails(setDoc(doc(db(), 'games/new'), game(over)));
   });
-  it('accepts exactly 20 characters', async () => {
-    await assertSucceeds(setDoc(doc(db(), 'games/new'), game({ characters: Array.from({ length: 20 }, (_, i) => ({ id: String(i) })) })));
+  it('accepts every field the app writes', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(db(), 'games/new'),
+        game({ content: {}, threats: '', iWonder: '', steading: { size: 'village' }, notes: {}, notesLocks: {}, restoreToken: 'x' }),
+      ),
+    );
   });
-  // shortcut: new top-level keys are allowed because the schema grows by adding fields; tighten with the data migration.
-  it('allows an extra top-level key', async () => {
-    await assertSucceeds(setDoc(doc(db(), 'games/new'), game({ steading: { name: 'Stonetop' } })));
+  it('does not accept a game in the old shape: no schemaVersion, or version 1, 3, "2" or null', async () => {
+    const { schemaVersion: _version, ...old } = game();
+    await assertFails(setDoc(doc(db(), 'games/old'), old));
+    for (const v of [1, 3, '2', null]) await assertFails(setDoc(doc(db(), 'games/old'), game({ schemaVersion: v })));
   });
 });
 
 describe('updating', () => {
   it('accepts a change that keeps the game valid', async () => {
-    await assertSucceeds(updateDoc(doc(db(), G), { name: 'Renamed' }));
+    await assertSucceeds(updateDoc(doc(db(), G), { name: 'Renamed', 'steading.size': 'village' }));
   });
   it('rejects a change that breaks the shape', async () => {
     await assertFails(updateDoc(doc(db(), G), { name: 7 }));
-    await assertFails(updateDoc(doc(db(), G), { characters: Array.from({ length: 21 }, (_, i) => ({ id: String(i) })) }));
+    await assertFails(updateDoc(doc(db(), G), { characters: [{ id: 'c1', name: 'x', playbook: 'blessed' }] }));
+    await assertFails(updateDoc(doc(db(), G), { diceRolls: [{ id: 'r1' }] }));
+    await assertFails(updateDoc(doc(db(), G), { schemaVersion: 1 }));
+  });
+  it('rejects a key the app does not write', async () => {
+    await assertFails(updateDoc(doc(db(), G), { surprise: 1 }));
+  });
+  it('rejects writing a whole game over it in the old shape', async () => {
+    const { schemaVersion: _version, ...old } = game({ name: 'Overwritten' });
+    await assertFails(setDoc(doc(db(), G), old)); // a whole-document restore would drop the version
+  });
+  it('lets a game saved without a name get one, and nothing else until it has', async () => {
+    await env.withSecurityRulesDisabled((ctx) =>
+      setDoc(doc(ctx.firestore(), 'games/nameless'), { createdAt: 1, characters: [], schemaVersion: 2 }),
+    );
+    await assertFails(updateDoc(doc(db(), 'games/nameless'), { 'steading.size': 'village' }));
+    await assertSucceeds(updateDoc(doc(db(), 'games/nameless'), { name: '' }));
+    await assertSucceeds(updateDoc(doc(db(), 'games/nameless'), { 'steading.size': 'village' }));
+  });
+  it('does not touch a game still in the old shape', async () => {
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'games/old'), { name: 'Old', createdAt: 1, characters: [] }));
+    await assertFails(updateDoc(doc(db(), 'games/old'), { name: 'Renamed' }));
   });
 });
 
@@ -71,75 +104,28 @@ describe('deleting and other paths', () => {
   });
 });
 
-// Games on subcollections (schemaVersion 2): a browser can create one, but only the migration script (which ignores the rules) moves an existing game.
-describe('schemaVersion', () => {
-  const V2 = 'games/v2';
-  const v2Game = (over: Record<string, unknown> = {}) => ({ name: 'Moved', createdAt: 1, characters: [], schemaVersion: 2, ...over });
-  const seedV2 = () => env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), V2), v2Game()));
-
-  it('lets a browser create a version 1 game, with or without the field', async () => {
-    await assertSucceeds(setDoc(doc(db(), 'games/a'), game()));
-    await assertSucceeds(setDoc(doc(db(), 'games/b'), game({ schemaVersion: 1 })));
-  });
-  it('lets a browser create a version 2 game: an empty characters list and no rolls', async () => {
-    await assertSucceeds(setDoc(doc(db(), 'games/fresh'), v2Game()));
-  });
-  it('lets the first character be saved into a game created as version 2', async () => {
-    await assertSucceeds(setDoc(doc(db(), 'games/fresh'), v2Game()));
-    await assertSucceeds(setDoc(doc(db(), 'games/fresh/characters/c1'), { id: 'c1', name: 'Ada', playbook: 'blessed', order: 0 }));
-  });
-  it.each([
-    ['characters already in the list', { characters: [{ id: 'c1', name: 'x', playbook: 'blessed' }] }],
-    ['a diceRolls list', { diceRolls: [] }],
-    ['a name that is not a string', { name: 7 }],
-    ['a createdAt that is not a number', { createdAt: 'now' }],
-  ])('does not let a browser create a version 2 game with %s', async (_label, over) => {
-    await assertFails(setDoc(doc(db(), 'games/fresh'), v2Game(over)));
-  });
-  it.each([3, '1', '2', null])('does not let a browser create a game with schemaVersion %s', async (v) => {
-    await assertFails(setDoc(doc(db(), 'games/new'), game({ schemaVersion: v })));
-  });
-  it('does not let a browser move a game to version 2, or back', async () => {
-    await assertFails(updateDoc(doc(db(), G), { schemaVersion: 2 }));
-    await seedV2();
-    await assertFails(updateDoc(doc(db(), V2), { schemaVersion: 1 }));
-    await assertFails(setDoc(doc(db(), V2), game({ name: 'Overwritten' }))); // a whole-document restore would drop the version
-  });
-  it('keeps writing a version 2 game as long as it stays empty of characters and rolls', async () => {
-    await seedV2();
-    await assertSucceeds(updateDoc(doc(db(), V2), { name: 'Renamed', 'steading.size': 'village' }));
-  });
-  it('refuses characters or rolls written back into a version 2 game, as a version 1 tab would', async () => {
-    await seedV2();
-    await assertFails(updateDoc(doc(db(), V2), { characters: [{ id: 'c1', name: 'x', playbook: 'blessed' }] }));
-    await assertFails(updateDoc(doc(db(), V2), { diceRolls: [{ id: 'r1' }] }));
-  });
-});
-
 describe('characters and rolls subcollections', () => {
-  const V2 = 'games/v2';
   const character = (over: Record<string, unknown> = {}) => ({ id: 'c1', name: 'Ada', playbook: 'blessed', level: 1, order: 0, ...over });
   const roll = (over: Record<string, unknown> = {}) => ({ id: 'r1', characterId: 'c1', createdAt: 1, order: 0, ...over });
   beforeEach(async () => {
     await env.withSecurityRulesDisabled(async (ctx) => {
-      await setDoc(doc(ctx.firestore(), V2), { name: 'Moved', createdAt: 1, characters: [], schemaVersion: 2 });
-      await setDoc(doc(ctx.firestore(), `${V2}/characters/c1`), character());
-      await setDoc(doc(ctx.firestore(), `${V2}/rolls/r1`), roll());
+      await setDoc(doc(ctx.firestore(), `${G}/characters/c1`), character());
+      await setDoc(doc(ctx.firestore(), `${G}/rolls/r1`), roll());
     });
   });
 
   it('can be read and listed by anyone with the game ID', async () => {
-    await assertSucceeds(getDoc(doc(db(), `${V2}/characters/c1`)));
-    await assertSucceeds(getDocs(collection(db(), `${V2}/characters`)));
-    await assertSucceeds(getDocs(collection(db(), `${V2}/rolls`)));
+    await assertSucceeds(getDoc(doc(db(), `${G}/characters/c1`)));
+    await assertSucceeds(getDocs(collection(db(), `${G}/characters`)));
+    await assertSucceeds(getDocs(collection(db(), `${G}/rolls`)));
   });
   it('can be created, changed and deleted on a version 2 game', async () => {
-    await assertSucceeds(setDoc(doc(db(), `${V2}/characters/c2`), character({ id: 'c2', order: 1 })));
-    await assertSucceeds(updateDoc(doc(db(), `${V2}/characters/c1`), { 'data.statStr': '+2' }));
-    await assertSucceeds(deleteDoc(doc(db(), `${V2}/characters/c2`)));
-    await assertSucceeds(setDoc(doc(db(), `${V2}/rolls/r2`), roll({ id: 'r2', order: 1 })));
-    await assertSucceeds(updateDoc(doc(db(), `${V2}/rolls/r1`), { mode: 'adv' }));
-    await assertSucceeds(deleteDoc(doc(db(), `${V2}/rolls/r2`)));
+    await assertSucceeds(setDoc(doc(db(), `${G}/characters/c2`), character({ id: 'c2', order: 1 })));
+    await assertSucceeds(updateDoc(doc(db(), `${G}/characters/c1`), { 'data.statStr': '+2' }));
+    await assertSucceeds(deleteDoc(doc(db(), `${G}/characters/c2`)));
+    await assertSucceeds(setDoc(doc(db(), `${G}/rolls/r2`), roll({ id: 'r2', order: 1 })));
+    await assertSucceeds(updateDoc(doc(db(), `${G}/rolls/r1`), { mode: 'adv' }));
+    await assertSucceeds(deleteDoc(doc(db(), `${G}/rolls/r2`)));
   });
   it.each([
     ['an id that is not the document id', { id: 'other' }],
@@ -150,7 +136,7 @@ describe('characters and rolls subcollections', () => {
     ['more than 40 fields', Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`f${i}`, i]))],
   ])('rejects a character with %s', async (_label, over) => {
     const data = Object.fromEntries(Object.entries(character({ id: 'c9', ...over })).filter(([, v]) => v !== undefined));
-    await assertFails(setDoc(doc(db(), `${V2}/characters/c9`), data));
+    await assertFails(setDoc(doc(db(), `${G}/characters/c9`), data));
   });
   it.each([
     ['an id that is not the document id', { id: 'other' }],
@@ -159,17 +145,18 @@ describe('characters and rolls subcollections', () => {
     ['no order', { order: undefined }],
   ])('rejects a roll with %s', async (_label, over) => {
     const data = Object.fromEntries(Object.entries(roll({ id: 'r9', ...over })).filter(([, v]) => v !== undefined));
-    await assertFails(setDoc(doc(db(), `${V2}/rolls/r9`), data));
+    await assertFails(setDoc(doc(db(), `${G}/rolls/r9`), data));
   });
-  it('is not writable on a version 1 game, so a game cannot end up with both shapes', async () => {
-    await assertFails(setDoc(doc(db(), `${G}/characters/c1`), character()));
-    await assertFails(setDoc(doc(db(), `${G}/rolls/r1`), roll()));
+  it('is not writable on a game still in the old shape, so a game cannot end up with both shapes', async () => {
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'games/old'), { name: 'Old', createdAt: 1, characters: [] }));
+    await assertFails(setDoc(doc(db(), 'games/old/characters/c1'), character()));
+    await assertFails(setDoc(doc(db(), 'games/old/rolls/r1'), roll()));
   });
   it('is not writable on a game that does not exist', async () => {
     await assertFails(setDoc(doc(db(), 'games/ghost/characters/c1'), character()));
   });
   it('keeps every other subcollection denied', async () => {
-    await assertFails(setDoc(doc(db(), `${V2}/secrets/x`), { a: 1 }));
-    await assertFails(getDoc(doc(db(), `${V2}/secrets/x`)));
+    await assertFails(setDoc(doc(db(), `${G}/secrets/x`), { a: 1 }));
+    await assertFails(getDoc(doc(db(), `${G}/secrets/x`)));
   });
 });

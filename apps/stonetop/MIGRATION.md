@@ -51,8 +51,8 @@ Every step before the first live write is local: the emulator, test fixtures and
    - **Release C, rules only (written).** A browser may create a game as version 2 (empty `characters`, no `diceRolls`). Creating version 1 still works, and a browser still cannot change an existing game's version.
    - **Release D, the app (not started).** New games are created as version 2. Deploy only after C is live. The old-shape code stays: old tabs, and games a stale build creates meanwhile, still need it.
    - **Release D, the app (deployed).** New games are created as version 2.
-   - **Release E1, the app (written).** The old-shape write paths are gone (`withCharacters`, `GameMovedError`, the one-document roll log and restore), and a game still in the old shape is refused instead of shown with its characters missing. `mergeById` stays: steading lists and arcana still id-merge inside one document.
-   - **Release E2, rules only (later).** Deploy after E1 is live: no creating version 1 games, no numeric `createdAt`, no unknown top-level keys, no `characters` list. Tabs still running an old build then fail to save until they refresh.
+   - **Release E1, the app (deployed).** The old-shape write paths are gone (`withCharacters`, `GameMovedError`, the one-document roll log and restore), and a game still in the old shape is refused instead of shown with its characters missing. `mergeById` stays: steading lists and arcana still id-merge inside one document.
+   - **Release E2, rules only (written).** A browser can create and write only version 2 games, and only with the top-level keys the app writes. Tabs still running an old build fail to save until they refresh. `createdAt` stays a number: the app writes `Date.now()`.
 
 Each release follows the two-release rule in `AGENTS.md`: rules deploy before the build that uses a field.
 
