@@ -1,4 +1,4 @@
-// New games live in subcollections (MIGRATION.md) and must behave like any other; a game still in the old shape must keep working, and move under a player's feet.
+// Games live in subcollections (MIGRATION.md); a game still in the old shape is refused rather than shown half-empty.
 import { expect, test } from '@playwright/test';
 import { addCharacter, createGame, createOldShapeGame, freshPage, moveGame, serverGame } from './helpers';
 
@@ -74,20 +74,14 @@ test('a character sheet edit on a new game is saved to that character', async ({
   await other.context().close();
 });
 
-test('a game in the old shape keeps working, and carries on when it is moved while open', async ({ page, browser }) => {
+test('a game still in the old shape is not shown with its characters missing, and opens once it is moved', async ({ page }) => {
   const id = `old-shape-${Date.now()}`;
   await createOldShapeGame(id);
   await page.goto(`/game/${id}`);
-  await addCharacter(page, 'The Blessed');
-  expect((await serverGame(id)).game?.characters).toHaveLength(1);
+  await expect(page.getByText(/couldn't be read/)).toBeVisible();
 
-  await moveGame(id); // the open page finds out from its own listener, as a table would mid-session
-  await expect(page.getByRole('link', { name: /The Blessed Playbook/ })).toBeVisible();
+  await moveGame(id); // the open page finds out from its own listener
+  await expect(page.getByRole('heading', { name: 'Characters' })).toBeVisible();
   await addCharacter(page, 'The Fox');
-
-  const other = await freshPage(browser);
-  await other.goto(`/game/${id}`);
-  await expect(other.getByRole('link', { name: /The Fox Playbook/ })).toBeVisible();
-  expect((await serverGame(id)).characters.map((c) => c.playbook)).toEqual(['blessed', 'fox']);
-  await other.context().close();
+  expect((await serverGame(id)).characters.map((c) => c.playbook)).toEqual(['fox']);
 });

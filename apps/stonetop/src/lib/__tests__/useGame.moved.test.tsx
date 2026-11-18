@@ -12,9 +12,8 @@ import { assembleGame, splitGame } from '../gameShape';
 import { ROLL_LOG_CAP } from '../gameParsing';
 import type { Character, LoggedRoll } from '@/model';
 
-// The same saves run on a game in one document and on its moved copy must give the same game once the moved one is put back together.
+// Saves on a game kept in subcollections: what lands in which document, and what happens when two players act at once.
 
-const V1 = 'games/old';
 const V2 = 'games/new';
 
 const char = (id: string, extra: Record<string, unknown> = {}) => ({
@@ -55,7 +54,6 @@ const game = () => ({
 
 const seed = () => {
   firestoreStore.reset();
-  firestoreStore.set(V1, game());
   const r = splitGame(game());
   if (!r.ok) throw new Error('fixture does not split');
   firestoreStore.set(V2, r.split.game);
@@ -64,28 +62,21 @@ const seed = () => {
 };
 
 const stored = (path: string) => firestoreStore.list(path).map(({ id, data }) => ({ id, data }));
-// The moved game put back into one document, to compare with the old one.
+// The game put back into one document, to assert on.
 const movedAsOneDocument = () => assembleGame(firestoreStore.get(V2)!, stored(`${V2}/characters`), stored(`${V2}/rolls`));
-const oneDocument = () => firestoreStore.get(V1)!;
 
 const renderBoth = async () => {
-  const old = renderHook(() => useGame('old'));
   const moved = renderHook(() => useGame('new'));
-  await waitFor(() => expect(old.result.current.loading).toBe(false));
   await waitFor(() => expect(moved.result.current.loading).toBe(false));
-  return { old, moved };
+  return { moved };
 };
 
 type Api = ReturnType<typeof useGame>;
-// Runs the same save on both games and checks they still agree.
-const both = async (old: { result: { current: Api } }, moved: { result: { current: Api } }, save: (api: Api) => Promise<void>) => {
+// Runs a save on the game.
+const save = async (moved: { result: { current: Api } }, run: (api: Api) => Promise<void>) => {
   await act(async () => {
-    await save(old.result.current);
+    await run(moved.result.current);
   });
-  await act(async () => {
-    await save(moved.result.current);
-  });
-  expect(movedAsOneDocument()).toEqual(oneDocument());
 };
 
 beforeEach(() => {
@@ -93,50 +84,31 @@ beforeEach(() => {
   addToastSpy.mockClear();
 });
 
-describe('a moved game reads the same as the old one', () => {
-  it('gives the same game', async () => {
-    const { old, moved } = await renderBoth();
-    expect(moved.result.current.game).toEqual({ ...old.result.current.game, id: 'new' });
-  });
-
-  it('is loading until the characters and rolls have arrived, and not found when the game is missing', async () => {
-    const { result } = renderHook(() => useGame('nowhere'));
-    await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.game).toBeNull();
-    expect(result.current.error).toBeNull();
-  });
-});
-
-describe('the same saves give the same game', () => {
+describe('saves', () => {
   it('adds a character, once even if added twice', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.addCharacter(char('d') as unknown as Character));
-    await both(old, moved, (api) => api.addCharacter(char('d') as unknown as Character));
+    const { moved } = await renderBoth();
+    await save(moved, (api) => api.addCharacter(char('d') as unknown as Character));
+    await save(moved, (api) => api.addCharacter(char('d') as unknown as Character));
     expect(stored(`${V2}/characters`).map((c) => c.id)).toEqual(['a', 'b', 'c', 'd']);
   });
 
   it('does not rewrite a character that is added a second time', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.addCharacter(char('d') as unknown as Character));
-    await both(old, moved, (api) => api.updateCharacterName('d', 'Renamed since'));
-    await both(old, moved, (api) => api.addCharacter(char('d') as unknown as Character)); // a retry that lands late
+    const { moved } = await renderBoth();
+    await save(moved, (api) => api.addCharacter(char('d') as unknown as Character));
+    await save(moved, (api) => api.updateCharacterName('d', 'Renamed since'));
+    await save(moved, (api) => api.addCharacter(char('d') as unknown as Character)); // a retry that lands late
     expect(firestoreStore.get(`${V2}/characters/d`)).toMatchObject({ name: 'Renamed since', order: 3 });
   });
 
   it('removes a character', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.removeCharacter('b'));
+    const { moved } = await renderBoth();
+    await save(moved, (api) => api.removeCharacter('b'));
     expect(stored(`${V2}/characters`).map((c) => c.id)).toEqual(['a', 'c']);
   });
 
-  it('renames a character', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.updateCharacterName('b', 'Bea'));
-  });
-
   it('merges a data patch: nested maps, arcana by id, and a deleted feature key', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) =>
+    const { moved } = await renderBoth();
+    await save(moved, (api) =>
       api.updateCharacterData('a', {
         statStr: '+2',
         typeMoves: { 'blessed-trackless-step': true },
@@ -151,15 +123,9 @@ describe('the same saves give the same game', () => {
     expect(a[0]!.data.typeMoves).toEqual({ 'blessed-rites-of-the-land': true, 'blessed-trackless-step': true });
   });
 
-  it('adjusts a character stat from the stored value', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.adjustCharacterStats('a', { statHp: 3 }));
-    await both(old, moved, (api) => api.adjustCharacterStats('a', { statHp: -1 }));
-  });
-
   it('reorders the party', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.reorderCharacters([char('c'), char('a'), char('b')] as unknown as Character[]));
+    const { moved } = await renderBoth();
+    await save(moved, (api) => api.reorderCharacters([char('c'), char('a'), char('b')] as unknown as Character[]));
     expect(
       stored(`${V2}/characters`)
         .sort((x, y) => Number(x.data.order) - Number(y.data.order))
@@ -168,23 +134,23 @@ describe('the same saves give the same game', () => {
   });
 
   it('keeps a character another player added while this tab was reordering, after the named ones', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.addCharacter(char('d') as unknown as Character));
-    await both(old, moved, (api) => api.reorderCharacters([char('b'), char('a')] as unknown as Character[]));
+    const { moved } = await renderBoth();
+    await save(moved, (api) => api.addCharacter(char('d') as unknown as Character));
+    await save(moved, (api) => api.reorderCharacters([char('b'), char('a')] as unknown as Character[]));
     expect((movedAsOneDocument().characters as { id: string }[]).map((c) => c.id)).toEqual(['b', 'a', 'c', 'd']);
   });
 
   it('puts the named characters first and moves every other one after them', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.addCharacter(char('d') as unknown as Character));
-    await both(old, moved, (api) => api.reorderCharacters([char('c'), char('b')] as unknown as Character[]));
+    const { moved } = await renderBoth();
+    await save(moved, (api) => api.addCharacter(char('d') as unknown as Character));
+    await save(moved, (api) => api.reorderCharacters([char('c'), char('b')] as unknown as Character[]));
     expect((movedAsOneDocument().characters as { id: string }[]).map((c) => c.id)).toEqual(['c', 'b', 'a', 'd']);
   });
 
   it('logs a roll, and edits it in place by id', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.logRoll(roll('r3', 30) as unknown as LoggedRoll));
-    await both(old, moved, (api) => api.logRoll(roll('r3', 30, { mode: 'adv', dice: [2, 5, 6], total: 12 }) as unknown as LoggedRoll));
+    const { moved } = await renderBoth();
+    await save(moved, (api) => api.logRoll(roll('r3', 30) as unknown as LoggedRoll));
+    await save(moved, (api) => api.logRoll(roll('r3', 30, { mode: 'adv', dice: [2, 5, 6], total: 12 }) as unknown as LoggedRoll));
     expect(
       stored(`${V2}/rolls`)
         .map((r) => r.id)
@@ -193,33 +159,25 @@ describe('the same saves give the same game', () => {
   });
 
   it('lists rolls by when they were made, also after an older one is edited and gets a new time', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.logRoll(roll('r1', 50, { mode: 'adv' }) as unknown as LoggedRoll));
+    const { moved } = await renderBoth();
+    await save(moved, (api) => api.logRoll(roll('r1', 50, { mode: 'adv' }) as unknown as LoggedRoll));
     expect((movedAsOneDocument().diceRolls as { id: string }[]).map((r) => r.id)).toEqual(['r2', 'r1']);
   });
 
   it('keeps only the newest rolls', async () => {
-    const { old, moved } = await renderBoth();
+    const { moved } = await renderBoth();
     for (let i = 0; i < ROLL_LOG_CAP + 5; i++) {
-      await both(old, moved, (api) => api.logRoll(roll(`n${i}`, 100 + i) as unknown as LoggedRoll));
+      await save(moved, (api) => api.logRoll(roll(`n${i}`, 100 + i) as unknown as LoggedRoll));
     }
     expect(stored(`${V2}/rolls`)).toHaveLength(ROLL_LOG_CAP);
     expect(stored(`${V2}/rolls`).some((r) => r.id === 'r1')).toBe(false);
     expect(stored(`${V2}/rolls`).some((r) => r.id === `n${ROLL_LOG_CAP + 4}`)).toBe(true);
   });
 
-  it('saves the fields that stay in the game document', async () => {
-    const { old, moved } = await renderBoth();
-    await both(old, moved, (api) => api.updateGameName('Renamed'));
-    await both(old, moved, (api) => api.updateContent('veiled', 'spiders'));
-    await both(old, moved, (api) => api.updateSteading({ fortunes: 3, improvements: { well: true } }));
-    await both(old, moved, (api) => api.updateNotes('gm', '<p>new</p>'));
-  });
-
   it('restores a backup over the game, leaving nothing of what was there', async () => {
-    const { old, moved } = await renderBoth();
+    const { moved } = await renderBoth();
     const backup = { name: 'Restored', createdAt: 9, characters: [char('x'), char('y')], diceRolls: [roll('q1', 1)] };
-    await both(old, moved, (api) => api.replaceGameData(structuredClone(backup)));
+    await save(moved, (api) => api.replaceGameData(structuredClone(backup)));
     expect(
       stored(`${V2}/characters`)
         .map((c) => c.id)
@@ -229,7 +187,7 @@ describe('the same saves give the same game', () => {
   });
 });
 
-describe('a moved game never saves into the arrays', () => {
+describe('a game never saves into the arrays', () => {
   it('keeps characters and diceRolls out of the game document through every kind of save', async () => {
     const { moved } = await renderBoth();
     const api = () => moved.result.current;
@@ -265,61 +223,6 @@ describe('a moved game never saves into the arrays', () => {
       );
     });
     expect(movedAsOneDocument()).toEqual(before);
-  });
-});
-
-describe('a game that is moved while the page is open', () => {
-  it('switches to reading the subcollections and keeps saving to the right place', async () => {
-    firestoreStore.reset();
-    firestoreStore.set(V1, game());
-    const { result } = renderHook(() => useGame('old'));
-    await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.game?.characters).toHaveLength(3);
-
-    // The migration script's move: subdocuments and the version marker, written together.
-    const r = splitGame(game());
-    if (!r.ok) throw new Error('fixture does not split');
-    r.split.characters.forEach((c) => firestoreStore.set(`${V1}/characters/${c.id}`, c.data));
-    r.split.rolls.forEach((c) => firestoreStore.set(`${V1}/rolls/${c.id}`, c.data));
-    await act(async () => firestoreStore.set(V1, r.split.game));
-
-    await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.game?.characters.map((c) => c.id)).toEqual(['a', 'b', 'c']);
-    await act(async () => {
-      await result.current.updateCharacterName('a', 'After the move');
-    });
-    expect(firestoreStore.get(`${V1}/characters/a`)!.name).toBe('After the move');
-    expect(firestoreStore.get(V1)!.characters).toEqual([]);
-  });
-});
-
-describe('a tab that still holds the game from before it was moved', () => {
-  it.each([
-    ['rename', (api: Api) => api.updateCharacterName('a', 'Renamed')],
-    ['adjust a stat', (api: Api) => api.adjustCharacterStats('a', { statHp: 2 })],
-    ['edit data', (api: Api) => api.updateCharacterData('a', { statStr: '+2' })],
-    ['remove', (api: Api) => api.removeCharacter('b')],
-    ['reorder', (api: Api) => api.reorderCharacters([char('c'), char('a'), char('b')] as unknown as Character[])],
-    ['add', (api: Api) => api.addCharacter(char('d') as unknown as Character)],
-    ['roll', (api: Api) => api.logRoll(roll('r9', 99) as unknown as LoggedRoll)],
-    ['restore a backup', (api: Api) => api.replaceGameData({ name: 'Back', createdAt: 1, characters: [char('z')] })],
-  ])('carries on the new way after the first write finds the game moved: %s', async (_name, save) => {
-    const { result } = renderHook(() => useGame('old'));
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    // The game moves on the server, but this tab's copy (from its cache) has not heard.
-    const r = splitGame(game());
-    if (!r.ok) throw new Error('fixture does not split');
-    r.split.characters.forEach((c) => firestoreStore.setQuietly(`${V1}/characters/${c.id}`, c.data));
-    r.split.rolls.forEach((c) => firestoreStore.setQuietly(`${V1}/rolls/${c.id}`, c.data));
-    firestoreStore.setQuietly(V1, r.split.game);
-
-    await act(async () => {
-      await save(result.current);
-    });
-    expect(addToastSpy).not.toHaveBeenCalled();
-    expect(firestoreStore.get(V1)!.characters).toEqual([]); // never written back into the array
-    expect('diceRolls' in firestoreStore.get(V1)!).toBe(false);
   });
 });
 
@@ -447,17 +350,6 @@ describe('two restores at once, cleaning up', () => {
 });
 
 describe('a restore that cannot go ahead says why', () => {
-  it('names the size problem for a game still in one document', async () => {
-    const { old } = await renderBoth();
-    await act(async () => {
-      await expect(
-        old.result.current.replaceGameData({ name: 'x', createdAt: 1, characters: [], threats: 'x'.repeat(1_000_001) }),
-      ).rejects.toThrow();
-    });
-    expect(addToastSpy).toHaveBeenCalledWith(expect.stringContaining('too large'), 'error');
-    expect(addToastSpy).not.toHaveBeenCalledWith(expect.stringContaining('check your connection'), 'error');
-  });
-
   it('names the problem with a backup a moved game cannot take', async () => {
     const { moved } = await renderBoth();
     await act(async () => {

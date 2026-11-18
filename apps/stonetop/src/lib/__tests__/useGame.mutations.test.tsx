@@ -46,7 +46,7 @@ const renderGame = () => renderHook(() => useGame('g1'));
 
 describe('useGame mutations', () => {
   it('loads and parses the seeded game', async () => {
-    firestoreStore.set(GAME_PATH, { name: 'Test', createdAt: 5, characters: [char('a')] });
+    firestoreStore.setGame(GAME_PATH, { name: 'Test', createdAt: 5, characters: [char('a')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.game?.name).toBe('Test');
@@ -55,12 +55,20 @@ describe('useGame mutations', () => {
 
   it('parseGameSession defaults a missing name to empty string rather than failing the parse (#171)', async () => {
     // A legacy/corrupt doc with no `name` must still load with its characters intact.
-    firestoreStore.set(GAME_PATH, { createdAt: 5, characters: [char('a')] });
+    firestoreStore.setGame(GAME_PATH, { createdAt: 5, characters: [char('a')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.game?.name).toBe('');
     expect(result.current.game?.characters).toHaveLength(1);
     expect(result.current.error).toBeNull();
+  });
+
+  it('does not show a game still in one document, whose characters would look missing', async () => {
+    firestoreStore.set(GAME_PATH, { name: 'Old', createdAt: 5, characters: [char('a')] });
+    const { result } = renderGame();
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.game).toBeNull();
+    expect(result.current.error).toMatch(/couldn't be read/);
   });
 
   it('reports the game as null (not an error) when the doc does not exist', async () => {
@@ -71,19 +79,19 @@ describe('useGame mutations', () => {
   });
 
   it('addCharacter appends without dropping existing characters', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')] });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
       await result.current.addCharacter(char('b'));
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Character[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Character[];
     expect(stored.map((c) => c.id)).toEqual(['a', 'b']);
   });
 
   it('addCharacter does not duplicate a character on a repeat add (#186)', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')] });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -91,37 +99,37 @@ describe('useGame mutations', () => {
     await act(async () => {
       await result.current.addCharacter(char('a'));
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Character[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Character[];
     expect(stored.map((c) => c.id)).toEqual(['a']);
   });
 
   it('removeCharacter deletes only the target and preserves the rest', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a'), char('b'), char('c')] });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a'), char('b'), char('c')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
       await result.current.removeCharacter('b');
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Character[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Character[];
     expect(stored.map((c) => c.id)).toEqual(['a', 'c']);
   });
 
   it('reorderCharacters reorders with no lost or duplicated characters', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a'), char('b'), char('c')] });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a'), char('b'), char('c')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
       await result.current.reorderCharacters([char('c'), char('a'), char('b')]);
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Character[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Character[];
     expect(stored.map((c) => c.id)).toEqual(['c', 'a', 'b']);
     expect(stored).toHaveLength(3);
   });
 
   it('reorderCharacters drops ids that no longer exist rather than inserting undefined', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a'), char('b')] });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a'), char('b')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -129,29 +137,29 @@ describe('useGame mutations', () => {
     await act(async () => {
       await result.current.reorderCharacters([char('b'), char('ghost'), char('a')]);
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Character[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Character[];
     expect(stored.map((c) => c.id)).toEqual(['b', 'a']);
     expect(stored.every(Boolean)).toBe(true);
   });
 
   it('reorderCharacters appends a character concurrently added by another player (#240)', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a'), char('b')] });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a'), char('b')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     // The doc gains 'c' after this client's drag started, so its stale `ids` list
     // only knows about 'a' and 'b'.
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a'), char('b'), char('c')] });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a'), char('b'), char('c')] });
 
     await act(async () => {
       await result.current.reorderCharacters([char('b'), char('a')]);
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Character[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Character[];
     expect(stored.map((c) => c.id)).toEqual(['b', 'a', 'c']);
   });
 
   it('updateCharacterData merges playbookFeatures instead of clobbering sibling keys (#171)', async () => {
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [char('a', { data: { playbookFeatures: { keep: true, old: 1 } } } as Partial<Character>)],
@@ -163,7 +171,7 @@ describe('useGame mutations', () => {
     await act(async () => {
       await result.current.updateCharacterData('a', { playbookFeatures: { old: 2 } as never });
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Array<{
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Array<{
       id: string;
       data?: { playbookFeatures?: Record<string, unknown> };
     }>;
@@ -172,7 +180,7 @@ describe('useGame mutations', () => {
   });
 
   it('updateCharacterData deletes a playbookFeatures key via deleteFeatureKeys (#241)', async () => {
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [char('a', { data: { playbookFeatures: { followers: [{ id: 'f1' }], keep: true } } } as Partial<Character>)],
@@ -186,7 +194,7 @@ describe('useGame mutations', () => {
     await act(async () => {
       await result.current.updateCharacterData('a', { deleteFeatureKeys: ['followers'] } as never);
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Array<{
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Array<{
       id: string;
       data?: { playbookFeatures?: Record<string, unknown>; deleteFeatureKeys?: unknown };
     }>;
@@ -195,7 +203,7 @@ describe('useGame mutations', () => {
   });
 
   it('updateCharacterData merges typeMoves instead of clobbering sibling keys (#244)', async () => {
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [char('a', { data: { typeMoves: { keep: true, old: false } } } as Partial<Character>)],
@@ -207,13 +215,13 @@ describe('useGame mutations', () => {
     await act(async () => {
       await result.current.updateCharacterData('a', { typeMoves: { old: true } } as never);
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Array<{ id: string; data?: { typeMoves?: Record<string, unknown> } }>;
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Array<{ id: string; data?: { typeMoves?: Record<string, unknown> } }>;
     // The concurrently-written `keep` key survives the merge.
     expect(stored[0]!.data?.typeMoves).toEqual({ keep: true, old: true });
   });
 
   it('updateCharacterData id-merges arcanaMinor so a concurrently-added entry survives (#244)', async () => {
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [char('a', { data: { arcanaMinor: [{ id: 'm1', requirementsChecked: {} }] } } as Partial<Character>)],
@@ -223,7 +231,7 @@ describe('useGame mutations', () => {
 
     // Another client concurrently adds a second entry the first client's stale
     // snapshot never saw.
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [
@@ -244,14 +252,14 @@ describe('useGame mutations', () => {
         arcanaMinor: [{ id: 'm1', requirementsChecked: { req1: true } }],
       } as never);
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Array<{ id: string; data?: { arcanaMinor?: Array<{ id: string }> } }>;
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Array<{ id: string; data?: { arcanaMinor?: Array<{ id: string }> } }>;
     const ids = stored[0]!.data?.arcanaMinor?.map((e) => e.id);
     expect(ids).toContain('m1');
     expect(ids).toContain('m2');
   });
 
   it('updateCharacterData does not delete an arcanaMinor entry merely omitted from the patch (#244)', async () => {
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [
@@ -276,12 +284,12 @@ describe('useGame mutations', () => {
         arcanaMinor: [{ id: 'm1', requirementsChecked: { req1: true } }],
       } as never);
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Array<{ id: string; data?: { arcanaMinor?: Array<{ id: string }> } }>;
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Array<{ id: string; data?: { arcanaMinor?: Array<{ id: string }> } }>;
     expect(stored[0]!.data?.arcanaMinor?.map((e) => e.id)).toContain('m2');
   });
 
   it('updateCharacterData removes an arcanaMinor entry via removedArcanaMinorIds (#244)', async () => {
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [
@@ -304,7 +312,7 @@ describe('useGame mutations', () => {
         removedArcanaMinorIds: ['m2'],
       } as never);
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Array<{
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Array<{
       id: string;
       data?: { arcanaMinor?: Array<{ id: string }>; removedArcanaMinorIds?: unknown };
     }>;
@@ -313,7 +321,7 @@ describe('useGame mutations', () => {
   });
 
   it('updateCharacterData leaves other characters untouched', async () => {
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [char('a'), char('b', { name: 'Keep Me' })],
@@ -324,7 +332,7 @@ describe('useGame mutations', () => {
     await act(async () => {
       await result.current.updateCharacterData('a', { notes: 'hi' } as never);
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Character[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Character[];
     expect(stored.find((c) => c.id === 'b')?.name).toBe('Keep Me');
   });
 
@@ -334,7 +342,7 @@ describe('useGame mutations', () => {
     // couple of fields set still round-trips the rest as `undefined` on write. The real Firestore
     // SDK rejects a write outright the moment any value anywhere in the payload is `undefined` —
     // this mock doesn't enforce that (see firestoreMock.ts), so assert on the written shape directly.
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [char('a', { data: { statHp: '18' } as never })],
@@ -345,14 +353,14 @@ describe('useGame mutations', () => {
     await act(async () => {
       await result.current.updateCharacterData('a', { statHp: '20' });
     });
-    const stored = firestoreStore.get(GAME_PATH)!.characters as Character[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.characters as Character[];
     const data = stored.find((c) => c.id === 'a')?.data as Record<string, unknown>;
     expect(data.statHp).toBe('20');
     expect(Object.values(data).some((v) => v === undefined)).toBe(false);
   });
 
   it('updateSteading writes dotted improvement keys and never writes undefined array fields', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [], steading: {} });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [], steading: {} });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -363,7 +371,7 @@ describe('useGame mutations', () => {
         residents: [{ id: 'n1', name: 'Mara', pronouns: undefined }] as never,
       });
     });
-    const steading = firestoreStore.get(GAME_PATH)!.steading as {
+    const steading = firestoreStore.getGame(GAME_PATH)!.steading as {
       improvements?: Record<string, boolean>;
       residents?: Array<Record<string, unknown>>;
     };
@@ -373,7 +381,7 @@ describe('useGame mutations', () => {
   });
 
   it('updateSteading id-merges residents so a concurrently-added NPC survives (#244)', async () => {
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [],
@@ -383,7 +391,7 @@ describe('useGame mutations', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     // The GM concurrently adds a second resident the player's stale snapshot never saw.
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [],
@@ -399,14 +407,14 @@ describe('useGame mutations', () => {
     await act(async () => {
       await result.current.updateSteading({ residents: [{ id: 'n1', name: 'Mara the Wise' }] as never });
     });
-    const steading = firestoreStore.get(GAME_PATH)!.steading as { residents?: Array<{ id: string; name: string }> };
+    const steading = firestoreStore.getGame(GAME_PATH)!.steading as { residents?: Array<{ id: string; name: string }> };
     const byId = new Map(steading.residents?.map((r) => [r.id, r.name]));
     expect(byId.get('n1')).toBe('Mara the Wise');
     expect(byId.get('n2')).toBe('Boro');
   });
 
   it('updateSteading removes a resident via removedResidentIds (#244)', async () => {
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [],
@@ -426,19 +434,19 @@ describe('useGame mutations', () => {
         removedResidentIds: ['n2'],
       });
     });
-    const steading = firestoreStore.get(GAME_PATH)!.steading as { residents?: Array<{ id: string }> };
+    const steading = firestoreStore.getGame(GAME_PATH)!.steading as { residents?: Array<{ id: string }> };
     expect(steading.residents?.map((r) => r.id)).toEqual(['n1']);
   });
 
   it('updateSteading persists removedFixedItems and reads it back (#289)', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [], steading: {} });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [], steading: {} });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
       await result.current.updateSteading({ removedFixedItems: ['Village militia'] });
     });
-    const steading = firestoreStore.get(GAME_PATH)!.steading as { removedFixedItems?: string[] };
+    const steading = firestoreStore.getGame(GAME_PATH)!.steading as { removedFixedItems?: string[] };
     expect(steading.removedFixedItems).toEqual(['Village militia']);
     expect(result.current.game?.steading?.removedFixedItems).toEqual(['Village militia']);
   });
@@ -447,7 +455,7 @@ describe('useGame mutations', () => {
     // Simulates the Fortifications section removing an item from its own stale local copy
     // of the shared removedFixedItems field, after the Resources section already persisted
     // its own removal — the two writes must not clobber each other.
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [],
@@ -459,7 +467,7 @@ describe('useGame mutations', () => {
     await act(async () => {
       await result.current.updateSteading({ removedFixedItems: ['Village militia'] });
     });
-    const steading = firestoreStore.get(GAME_PATH)!.steading as { removedFixedItems?: string[] };
+    const steading = firestoreStore.getGame(GAME_PATH)!.steading as { removedFixedItems?: string[] };
     expect(steading.removedFixedItems).toEqual(expect.arrayContaining(['Farming (beans, potatoes, oats, barley)', 'Village militia']));
     expect(steading.removedFixedItems).toHaveLength(2);
   });
@@ -467,7 +475,7 @@ describe('useGame mutations', () => {
   it('updateSteading id-merges gmImprovements so a concurrently-added slot survives, and removes via removedGmImprovementIds (#244)', async () => {
     const gi1 = { id: 'g1', title: 'Wall', summary: '', requirements: '', effects: '', completed: false };
     const gi2 = { id: 'g2', title: 'Well', summary: '', requirements: '', effects: '', completed: false };
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [],
@@ -477,7 +485,7 @@ describe('useGame mutations', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     // The GM concurrently adds a second slot the player's stale snapshot never saw.
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [],
@@ -489,7 +497,7 @@ describe('useGame mutations', () => {
         gmImprovements: [{ ...gi1, completed: true }] as never,
       });
     });
-    let steading = firestoreStore.get(GAME_PATH)!.steading as { gmImprovements?: Array<{ id: string; completed: boolean }> };
+    let steading = firestoreStore.getGame(GAME_PATH)!.steading as { gmImprovements?: Array<{ id: string; completed: boolean }> };
     let byId = new Map(steading.gmImprovements?.map((g) => [g.id, g.completed]));
     expect(byId.get('g1')).toBe(true);
     expect(byId.has('g2')).toBe(true);
@@ -500,13 +508,13 @@ describe('useGame mutations', () => {
         removedGmImprovementIds: ['g2'],
       });
     });
-    steading = firestoreStore.get(GAME_PATH)!.steading as { gmImprovements?: Array<{ id: string; completed: boolean }> };
+    steading = firestoreStore.getGame(GAME_PATH)!.steading as { gmImprovements?: Array<{ id: string; completed: boolean }> };
     byId = new Map(steading.gmImprovements?.map((g) => [g.id, g.completed]));
     expect(byId.has('g2')).toBe(false);
   });
 
   it('shows the error toast and rethrows when a write fails (#210)', async () => {
-    firestoreStore.set(GAME_PATH, { name: 'Test', createdAt: 0, characters: [char('a')] });
+    firestoreStore.setGame(GAME_PATH, { name: 'Test', createdAt: 0, characters: [char('a')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -523,14 +531,14 @@ describe('useGame mutations', () => {
     expect(addToastSpy).toHaveBeenCalledWith(SAVE_ERROR_MESSAGE, 'error');
   });
 
-  it('withCharacters throws (not silently no-ops) when the game doc is gone (#254)', async () => {
-    firestoreStore.set(GAME_PATH, { name: 'Test', createdAt: 0, characters: [char('a')] });
+  it('a character save throws (not silently no-ops) when the character is gone (#254)', async () => {
+    firestoreStore.setGame(GAME_PATH, { name: 'Test', createdAt: 0, characters: [char('a')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    // The doc is deleted mid-session; a transaction-backed write must fail loud
+    // The character is removed mid-session; a transaction-backed write must fail loud
     // rather than resolve, so reportSave doesn't flag "Saved." for a no-op.
-    firestoreStore.delete(GAME_PATH);
+    firestoreStore.delete(`${GAME_PATH}/characters/a`);
 
     await act(async () => {
       await expect(result.current.updateCharacterName('a', 'Renamed')).rejects.toThrow();
@@ -539,7 +547,7 @@ describe('useGame mutations', () => {
   });
 
   it('surfaces the invalid-write message when a write hits invalid-argument (#254, #268)', async () => {
-    firestoreStore.set(GAME_PATH, { name: 'Test', createdAt: 0, characters: [char('a')] });
+    firestoreStore.setGame(GAME_PATH, { name: 'Test', createdAt: 0, characters: [char('a')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -558,21 +566,21 @@ describe('useGame mutations', () => {
   });
 
   it('updateSteading validates debility booleans pass through as written', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [], steading: {} });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [], steading: {} });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
       await result.current.updateSteading({ defenses: 3 });
     });
-    expect((firestoreStore.get(GAME_PATH)!.steading as { defenses?: number }).defenses).toBe(3);
+    expect((firestoreStore.getGame(GAME_PATH)!.steading as { defenses?: number }).defenses).toBe(3);
   });
 
   it('updateSteading strips undefined keys from a plain-object patch like debilities (#278)', async () => {
     // parseDebilities always fills untouched keys with `undefined` (see useGame.ts),
     // so toggling one debility on then off round-trips the others as `undefined` —
     // the real Firestore SDK rejects `undefined` field values outright.
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [], steading: {} });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [], steading: {} });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -581,14 +589,14 @@ describe('useGame mutations', () => {
         debilities: { diminished: false, lacking: undefined, malcontent: undefined } as never,
       });
     });
-    const steading = firestoreStore.get(GAME_PATH)!.steading as { debilities?: Record<string, unknown> };
+    const steading = firestoreStore.getGame(GAME_PATH)!.steading as { debilities?: Record<string, unknown> };
     expect(steading.debilities).toEqual({ diminished: false });
     expect('lacking' in steading.debilities!).toBe(false);
     expect('malcontent' in steading.debilities!).toBe(false);
   });
 
   it('logRoll round-trips the resource a roll was made against (#302)', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')] });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -603,7 +611,7 @@ describe('useGame mutations', () => {
   });
 
   it('logRoll omits `resource` entirely for a stat roll rather than writing undefined (#302)', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')] });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -613,18 +621,18 @@ describe('useGame mutations', () => {
       await result.current.logRoll({ ...roll('r1'), resource: undefined });
     });
 
-    const stored = firestoreStore.get(GAME_PATH)!.diceRolls as Record<string, unknown>[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.diceRolls as Record<string, unknown>[];
     expect('resource' in stored[0]!).toBe(false);
     expect(result.current.game!.diceRolls![0]!.resource).toBeUndefined();
   });
 
   it('logRoll keeps a roll another player logged concurrently, oldest-first', async () => {
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')] });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')] });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     // Another client's roll lands in the doc after this client's snapshot was taken.
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [char('a')],
@@ -635,13 +643,13 @@ describe('useGame mutations', () => {
       await result.current.logRoll(roll('mine', { createdAt: 9 }));
     });
 
-    const stored = firestoreStore.get(GAME_PATH)!.diceRolls as LoggedRoll[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.diceRolls as LoggedRoll[];
     expect(stored.map((r) => r.id)).toEqual(['theirs', 'mine']);
   });
 
   it('logRoll trims the oldest rolls once the log is full', async () => {
     const full = Array.from({ length: 50 }, (_, i) => roll(`r${i}`, { createdAt: i }));
-    firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')], diceRolls: full });
+    firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [char('a')], diceRolls: full });
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -649,14 +657,14 @@ describe('useGame mutations', () => {
       await result.current.logRoll(roll('newest', { createdAt: 99 }));
     });
 
-    const stored = firestoreStore.get(GAME_PATH)!.diceRolls as LoggedRoll[];
+    const stored = firestoreStore.getGame(GAME_PATH)!.diceRolls as LoggedRoll[];
     expect(stored).toHaveLength(50);
     expect(stored[0]!.id).toBe('r1');
     expect(stored[49]!.id).toBe('newest');
   });
 
   it('drops a malformed persisted roll instead of failing the whole game parse', async () => {
-    firestoreStore.set(GAME_PATH, {
+    firestoreStore.setGame(GAME_PATH, {
       name: '',
       createdAt: 0,
       characters: [char('a')],
@@ -677,11 +685,11 @@ describe('useGame mutations', () => {
   });
 
   describe('shared notes', () => {
-    const locks = () => firestoreStore.get(GAME_PATH)!.notesLocks as Record<string, NotesLock | null> | undefined;
-    const notes = () => firestoreStore.get(GAME_PATH)!.notes as Record<string, string> | undefined;
+    const locks = () => firestoreStore.getGame(GAME_PATH)!.notesLocks as Record<string, NotesLock | null> | undefined;
+    const notes = () => firestoreStore.getGame(GAME_PATH)!.notes as Record<string, string> | undefined;
 
     const loaded = async (seed: Record<string, unknown> = {}) => {
-      firestoreStore.set(GAME_PATH, { name: '', createdAt: 0, characters: [], ...seed });
+      firestoreStore.setGame(GAME_PATH, { name: '', createdAt: 0, characters: [], ...seed });
       const { result } = renderGame();
       await waitFor(() => expect(result.current.loading).toBe(false));
       return result;
