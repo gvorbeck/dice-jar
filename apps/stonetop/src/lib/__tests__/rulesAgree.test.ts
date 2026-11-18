@@ -7,7 +7,8 @@ vi.mock('firebase/app', () => ({ initializeApp: () => ({}) }));
 vi.mock('firebase/firestore', () => firestoreMockModule());
 
 import { addCharacter, editCharacter, logRoll, replaceGame } from '../gameV2';
-import { IMPORTABLE_CHARACTER_FIELDS, IMPORTABLE_ROLL_FIELDS, readImportFile } from '../gameBackup';
+import { ROLL_TEXT_MAX_LENGTH } from '../constants';
+import { IMPORTABLE_CHARACTER_FIELDS, LIMITS, IMPORTABLE_ROLL_FIELDS, readImportFile } from '../gameBackup';
 import type { Character, LoggedRoll } from '@/model';
 
 // What the app writes must be what firestore.rules allows: a field missing from the rules' key list is refused in production, and nothing else catches it before then.
@@ -83,40 +84,94 @@ describe('what the app writes against firestore.rules', () => {
   });
 
   // The size limits are written twice (rules and import check): every one the rules state must be the one the import check enforces.
-  it('refuses, in the import check, exactly what the rules cap: one past each limit, and nothing at the limit', () => {
+  it('refuses, in the import check, exactly what the rules cap: one past each limit, and nothing at the limit (playbook and stat are limited to the values the reader knows, so their caps are not probed)', () => {
     const caps = [...rules.matchAll(/shortOrAbsent\(data, '(\w+)', (\d+)\)/g)].map((m) => [m[1]!, Number(m[2])] as const);
     expect(caps.length).toBeGreaterThan(5);
     const restore = (game: Record<string, unknown>) =>
       readImportFile(JSON.stringify({ format: 'hearthfire-game-export', version: 1, game })).ok;
     const base = { name: 'x', createdAt: 1, characters: [] };
-    const roll = (over: Record<string, unknown>) => ({ ...base, diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, ...over }] });
-    for (const [field, cap] of caps) {
+    const roll = (over: Record<string, unknown>) => ({
+      ...base,
+      diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, stat: 'STR', mode: 'normal', dice: [1], mod: 0, total: 1, ...over }],
+    });
+    // `stat` is also limited to the stats the reader knows, so its length cap cannot be probed with filler text.
+    for (const [field, cap] of caps.filter(([field]) => field !== 'stat')) {
       expect(restore(roll({ [field]: 'x'.repeat(cap) })), `${field} at ${cap}`).toBe(true);
       expect(restore(roll({ [field]: 'x'.repeat(cap + 1) })), `${field} at ${cap + 1}`).toBe(false);
     }
     const name = Number(/data\.name\.size\(\) <= (\d+)/.exec(rules)![1]);
-    const playbook = Number(/data\.playbook\.size\(\) <= (\d+)/.exec(rules)![1]);
     const character = (over: Record<string, unknown>) => ({
       ...base,
-      characters: [{ id: 'c1', name: 'a', playbook: 'b', level: 1, ...over }],
+      characters: [{ id: 'c1', name: 'a', playbook: 'blessed', level: 1, ...over }],
     });
     expect(restore(character({ name: 'x'.repeat(name) }))).toBe(true);
     expect(restore(character({ name: 'x'.repeat(name + 1) }))).toBe(false);
-    expect(restore(character({ playbook: 'x'.repeat(playbook) }))).toBe(true);
-    expect(restore(character({ playbook: 'x'.repeat(playbook + 1) }))).toBe(false);
   });
 
-  it('restores a backup whose characters have no level, giving them the level 1 the rules require', async () => {
+  it('restores a backup whose characters have no level, or a level written as text, with the level the rules require', async () => {
     firestoreStore.set('games/g1', { name: 'x', createdAt: 1, characters: [], schemaVersion: 2 });
-    await replaceGame('g1', {
-      name: 'Back',
-      createdAt: 1,
-      characters: [
-        { id: 'c1', name: 'Ada', playbook: 'blessed' },
-        { id: 'c2', name: 'Bo', playbook: 'fox', level: '2' },
-      ],
+    const characters = [
+      { id: 'c1', name: 'Ada', playbook: 'blessed' },
+      { id: 'c2', name: 'Bo', playbook: 'fox', level: '2' },
+      { id: 'c3', name: 'Cy', playbook: 'fox', level: 4 },
+    ];
+    await replaceGame('g1', { name: 'Back', createdAt: 1, characters });
+    expect([1, 2, 3].map((n) => firestoreStore.get(`games/g1/characters/c${n}`)!.level)).toEqual([1, 2, 4]);
+  });
+
+  it('uses the limits the rules state for a character and a roll', () => {
+    const limit = (pattern: RegExp) => Number(pattern.exec(rules)?.[1]);
+    expect(LIMITS).toEqual({
+      name: limit(/data\.name\.size\(\) <= (\d+)/),
+      playbook: limit(/data\.playbook\.size\(\) <= (\d+)/),
+      level: limit(/data\.level <= (\d+)/),
+      sheetFields: limit(/data\.data\.keys\(\)\.size\(\) <= (\d+)/),
+      characterId: limit(/data\.characterId\.size\(\) <= (\d+)/),
+      dice: limit(/data\.dice\.size\(\) <= (\d+)/),
     });
-    expect(firestoreStore.get('games/g1/characters/c1')!.level).toBe(1);
-    expect(firestoreStore.get('games/g1/characters/c2')!.level).toBe(1);
+  });
+
+  it('shortens a roll label to the length the rules allow, so a long custom move name still reaches the log', async () => {
+    expect(ROLL_TEXT_MAX_LENGTH).toBe(Number(/shortOrAbsent\(data, 'moveName', (\d+)\)/.exec(rules)![1]));
+    const long = 'x'.repeat(ROLL_TEXT_MAX_LENGTH + 50);
+    const roll = {
+      id: 'r9',
+      characterId: 'c1',
+      characterName: long,
+      moveName: long,
+      resource: long,
+      stat: 'STR',
+      dice: [1],
+      mod: 0,
+      total: 1,
+      mode: 'normal',
+      band: null,
+      createdAt: 1,
+    } as LoggedRoll;
+    await logRoll('g1', roll);
+    const stored = firestoreStore.get('games/g1/rolls/r9')!;
+    for (const field of ['characterName', 'moveName', 'resource'])
+      expect((stored[field] as string).length, field).toBe(ROLL_TEXT_MAX_LENGTH);
+  });
+
+  it('does not cut an emoji in half when it shortens a roll label', async () => {
+    const label = `${'x'.repeat(ROLL_TEXT_MAX_LENGTH - 1)}😀tail`; // the emoji straddles the limit
+    const roll = {
+      id: 'r8',
+      characterId: 'c1',
+      characterName: 'Ada',
+      moveName: label,
+      stat: 'STR',
+      dice: [1],
+      mod: 0,
+      total: 1,
+      mode: 'normal',
+      band: null,
+      createdAt: 1,
+    };
+    await logRoll('g1', roll as LoggedRoll);
+    const moveName = firestoreStore.get('games/g1/rolls/r8')!.moveName as string;
+    expect(moveName).toBe('x'.repeat(ROLL_TEXT_MAX_LENGTH - 1));
+    expect(moveName).not.toMatch(/[\uD800-\uDBFF]$/);
   });
 });

@@ -203,6 +203,8 @@ export const PLAYBOOKS: PlaybookOption[] = [
 
 export const getPlaybook = (value: PlaybookType): PlaybookOption | undefined => PLAYBOOKS.find((p) => p.value === value);
 
-// Input limits that keep what a player types inside what firestore.rules accepts (the rules allow more, so older data stays writable).
+// Keep what a player types inside what firestore.rules accepts; the rules allow more, so older data stays writable.
 export const NAME_MAX_LENGTH = 100;
 export const NOTATION_MAX_LENGTH = 500;
+// The longest name or label a roll carries (firestore.rules); logging a roll shortens a longer one rather than losing the roll.
+export const ROLL_TEXT_MAX_LENGTH = 200;

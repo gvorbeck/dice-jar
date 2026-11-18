@@ -4,6 +4,8 @@ import { parseGameSession } from '@/lib/gameParsing';
 import { readMovedGame } from '@/lib/gameV2';
 import { isNumber, isPlainObject, isString } from '@/lib/typeGuards';
 import { EXPORT_FORMAT, EXPORT_VERSION } from '@/lib/gameBackupFormat';
+import { restoredLevel } from '@/lib/gameShape';
+import { ROLL_TEXT_MAX_LENGTH } from '@/lib/constants';
 
 // Firestore's per-document ceiling is 1 MiB including field-name and encoding overhead.
 // The JSON byte length is a close proxy; the margin absorbs the difference so an oversized
@@ -57,6 +59,9 @@ export const IMPORTABLE_ROLL_FIELDS = [
   'createdAt',
 ];
 
+// The bounds firestore.rules puts on a character and a roll. rulesAgree.test.ts reads each one from the rules and fails when they differ.
+export const LIMITS = { name: 200, playbook: 50, level: 100, sheetFields: 100, characterId: 100, dice: 50 };
+
 const unknownFields = (piece: Record<string, unknown>, allowed: string[]) => Object.keys(piece).filter((key) => !allowed.includes(key));
 const shortOrAbsent = (v: unknown, max: number) => v === undefined || v === null || (isString(v) && v.length <= max);
 const numberOrAbsent = (v: unknown) => v === undefined || v === null || isNumber(v);
@@ -67,12 +72,13 @@ const characterProblem = (c: unknown): string | undefined => {
   const extra = unknownFields(c, IMPORTABLE_CHARACTER_FIELDS);
   if (extra.length) return `has fields this version of Hearthfire cannot store (${extra.join(', ')})`;
   if (!isString(c.id) || !c.id) return 'has no id';
-  if (!isString(c.name) || c.name.length > 200) return 'needs a name of up to 200 characters';
-  if (!isString(c.playbook) || c.playbook.length > 50) return 'needs a playbook of up to 50 characters';
-  // A missing or non-number level is repaired to 1 on restore, as the reader repairs it (gameParsing.ts), so old backups still restore.
-  if (isNumber(c.level) && (c.level < 0 || c.level > 100)) return 'needs a level from 0 to 100';
-  if ('data' in c && (!isPlainObject(c.data) || Object.keys(c.data).length > 100))
-    return 'has sheet data that is not a set of up to 100 fields';
+  if (!isString(c.name) || c.name.length > LIMITS.name) return `needs a name of up to ${LIMITS.name} characters`;
+  if (!isString(c.playbook) || c.playbook.length > LIMITS.playbook) return `needs a playbook of up to ${LIMITS.playbook} characters`;
+  // A missing level, or a number written as text, is repaired on restore (restoredLevel), so old backups still restore; anything else is refused, not guessed.
+  const level = restoredLevel(c.level);
+  if (level === undefined || level < 0 || level > LIMITS.level) return `needs a level that is a number from 0 to ${LIMITS.level}`;
+  if ('data' in c && (!isPlainObject(c.data) || Object.keys(c.data).length > LIMITS.sheetFields))
+    return `has sheet data that is not a set of up to ${LIMITS.sheetFields} fields`;
   return undefined;
 };
 
@@ -81,20 +87,21 @@ const rollProblem = (r: unknown): string | undefined => {
   const extra = unknownFields(r, IMPORTABLE_ROLL_FIELDS);
   if (extra.length) return `has fields this version of Hearthfire cannot store (${extra.join(', ')})`;
   if (!isString(r.id) || !r.id) return 'has no id';
-  if (!isString(r.characterId) || r.characterId.length > 100) return 'needs a character id of up to 100 characters';
+  if (!isString(r.characterId) || r.characterId.length > LIMITS.characterId)
+    return `needs a character id of up to ${LIMITS.characterId} characters`;
   if (!isNumber(r.createdAt)) return 'needs a time it was made';
   if (
-    ![r.characterName, r.moveName, r.resource].every((v) => shortOrAbsent(v, 200)) ||
+    ![r.characterName, r.moveName, r.resource].every((v) => shortOrAbsent(v, ROLL_TEXT_MAX_LENGTH)) ||
     !shortOrAbsent(r.stat, 50) ||
     !shortOrAbsent(r.band, 50)
   ) {
     return 'has text that is too long';
   }
   if (!shortOrAbsent(r.notation, 2000) || !shortOrAbsent(r.breakdown, 10000)) return 'has working that is too long';
-  if (![r.mod, r.total, r.dropped].every(numberOrAbsent)) return 'has a number that is not a number';
-  if (r.mode !== undefined && !['normal', 'adv', 'dis'].includes(r.mode as string)) return 'has a mode that is not normal, adv or dis';
+  // What the reader needs (mode, dice, mod, total) is not checked here: a roll it would drop is refused below, by comparing its result with the backup.
+  if (!numberOrAbsent(r.dropped)) return 'has a number that is not a number';
   if (r.burned !== undefined && typeof r.burned !== 'boolean') return 'has a burned that is not true or false';
-  if (r.dice !== undefined && (!Array.isArray(r.dice) || r.dice.length > 50)) return 'has dice that are not a list of up to 50';
+  if (Array.isArray(r.dice) && r.dice.length > LIMITS.dice) return `has more than ${LIMITS.dice} dice`;
   return undefined;
 };
 
@@ -180,7 +187,7 @@ export const exportGame = async (gameId: string, suffix?: string): Promise<strin
 // Validate an uploaded file before it gets anywhere near a write. Every rejection returns a
 // line the player can act on, because the alternative — a half-written game doc — isn't
 // recoverable from the UI.
-// Same cap as firestore.rules.
+// The app's party limit (the rules cannot count a subcollection, so they do not enforce it).
 const MAX_CHARACTERS = 20;
 
 export const readImportFile = (text: string): ImportCheck => {
@@ -254,6 +261,12 @@ export const readImportFile = (text: string): ImportCheck => {
   let summary: ImportSummary;
   try {
     const parsed = parseGameSession(game, isString(raw.gameId) ? raw.gameId : '');
+    // The reader drops a character or roll it cannot read (a roll without its dice, a stat it does not know): refuse rather than restore a game with entries silently missing.
+    const lost = (what: string, kept: number, all: unknown) =>
+      Array.isArray(all) && kept < all.length ? `${all.length - kept} of its ${what} can't be read` : undefined;
+    const unreadable =
+      lost('characters', parsed.characters.length, game.characters) ?? lost('dice rolls', parsed.diceRolls?.length ?? 0, game.diceRolls);
+    if (unreadable) return { ok: false, error: `That backup can't be restored: ${unreadable}.` };
     summary = {
       characters: parsed.characters.length,
       rolls: parsed.diceRolls?.length ?? 0,

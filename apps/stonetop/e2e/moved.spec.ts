@@ -7,6 +7,7 @@ test('a new game shows its party to another device, and that device can change i
   await addCharacter(page, 'The Blessed');
   await addCharacter(page, 'The Fox');
 
+  await expect.poll(async () => (await serverGame(id)).characters.length).toBe(2); // the other device only sees what reached the server
   const other = await freshPage(browser);
   await other.goto(`/game/${id}`);
   await expect(other.getByRole('link', { name: /The Blessed Playbook/ })).toBeVisible();
@@ -36,6 +37,7 @@ test('the order of a new game party can be changed and is saved', async ({ page,
   const links = (p: typeof page) => p.getByRole('gridcell').getByRole('link');
   await expect(links(page).first()).toContainText('The Fox');
 
+  await expect.poll(async () => (await serverGame(id)).characters.map((c) => c.playbook)).toEqual(['fox', 'blessed']);
   const other = await freshPage(browser);
   await other.goto(`/game/${id}`);
   await expect(links(other).first()).toContainText('The Fox');

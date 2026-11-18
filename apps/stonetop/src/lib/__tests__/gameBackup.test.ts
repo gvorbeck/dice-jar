@@ -372,22 +372,25 @@ describe('readImportFile — success', () => {
     ],
     ['a level out of range', { characters: [{ id: 'c1', name: 'Ada', playbook: 'blessed', level: 101 }] }, 'needs a level'],
     [
+      'a level that is not a number, even as text',
+      { characters: [{ id: 'c1', name: 'Ada', playbook: 'blessed', level: 'high' }] },
+      'needs a level',
+    ],
+    [
       'a roll notation over 2000 characters',
       { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, notation: 'x'.repeat(2001) }] },
       'working that is too long',
     ],
-    ['dice that are not a list', { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, dice: 'x' }] }, 'not a list of up to 50'],
     [
       'a name over 200 characters',
       { characters: [{ id: 'c1', name: 'x'.repeat(201), playbook: 'blessed', level: 1 }] },
       'name of up to 200',
     ],
     ['a roll with a field the rules do not list', { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, surprise: 1 }] }, 'roll 1'],
-    ['a roll with a mode the rules do not allow', { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, mode: 'lucky' }] }, 'mode'],
     [
       'a roll with more than 50 dice',
       { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, dice: Array.from({ length: 51 }, () => 1) }] },
-      'up to 50',
+      'more than 50 dice',
     ],
   ])('refuses a backup with %s, naming the piece, instead of failing at restore', (_label, over, expected) => {
     const check = readImportFile(JSON.stringify(envelopeFor(gameDoc(over))));
@@ -395,6 +398,21 @@ describe('readImportFile — success', () => {
     if (check.ok) return;
     expect(check.error).toContain("can't be restored");
     expect(check.error).toContain(expected);
+  });
+
+  it.each([
+    ['no stat, mode, dice, mod or total', { id: 'r1', characterId: 'c1', createdAt: 1 }],
+    [
+      'dice that are not numbers',
+      { id: 'r1', characterId: 'c1', createdAt: 1, stat: 'STR', mode: 'normal', dice: ['a'], mod: 1, total: 8 },
+    ],
+    [
+      'a stat the reader does not know',
+      { id: 'r1', characterId: 'c1', createdAt: 1, stat: 'LUCK', mode: 'normal', dice: [1], mod: 1, total: 8 },
+    ],
+  ])('refuses a backup with a roll the reader would drop (%s), instead of restoring a log with entries missing', (_label, bad) => {
+    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ diceRolls: [roll('r0'), bad] }))));
+    expect(check).toEqual({ ok: false, error: expect.stringContaining("1 of its dice rolls can't be read") });
   });
 
   it('accepts an old backup whose characters have no level or a level that is not a number, which a restore repairs', () => {
