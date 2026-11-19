@@ -22,16 +22,8 @@ vi.mock('@/lib/gameParsing', async (importOriginal) => {
 
 import { EXPORT_FORMAT, EXPORT_VERSION } from '../gameBackupFormat';
 import { splitGame } from '../gameShape';
-import {
-  buildEnvelope,
-  exportFilename,
-  exportGame,
-  IMPORTABLE_CHARACTER_FIELDS,
-  IMPORTABLE_FIELDS,
-  IMPORTABLE_ROLL_FIELDS,
-  readImportFile,
-  readRawGame,
-} from '../gameBackup';
+import { characterSchema, gameSchema, rollSchema } from '../documentSchemas';
+import { buildEnvelope, exportFilename, exportGame, readImportFile, readRawGame } from '../gameBackup';
 
 const EXPORTED_AT = new Date('2026-08-17T14:30:00.000Z');
 
@@ -147,7 +139,7 @@ describe('exportGame', () => {
     click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     Reflect.deleteProperty(URL, 'createObjectURL');
     Reflect.deleteProperty(URL, 'revokeObjectURL');
     click.mockRestore();
@@ -171,7 +163,7 @@ describe('exportGame', () => {
     await exportGame('long-winter');
 
     const blob = createObjectURL.mock.calls[0]![0]! as Blob;
-    const check = readImportFile(await blob.text());
+    const check = await readImportFile(await blob.text());
 
     expect(check.ok).toBe(true);
     if (!check.ok) return;
@@ -189,7 +181,7 @@ describe('exportGame', () => {
     await exportGame('long-winter');
 
     const blob = createObjectURL.mock.calls[0]![0]! as Blob;
-    const check = readImportFile(await blob.text());
+    const check = await readImportFile(await blob.text());
     expect(check.ok).toBe(true);
     if (!check.ok) return;
     expect(check.envelope.game).toEqual(original);
@@ -211,31 +203,31 @@ describe('exportGame', () => {
 });
 
 describe('readImportFile — rejections', () => {
-  it('rejects invalid JSON', () => {
-    const check = readImportFile('{ not json');
+  it('rejects invalid JSON', async () => {
+    const check = await readImportFile('{ not json');
     expect(check).toEqual({ ok: false, error: expect.stringContaining("isn't valid JSON") });
   });
 
-  it('rejects a JSON value that is not an object', () => {
-    expect(readImportFile('[]').ok).toBe(false);
-    expect(readImportFile('"hearthfire-game-export"').ok).toBe(false);
-    expect(readImportFile('null').ok).toBe(false);
+  it('rejects a JSON value that is not an object', async () => {
+    expect((await readImportFile('[]')).ok).toBe(false);
+    expect((await readImportFile('"hearthfire-game-export"')).ok).toBe(false);
+    expect((await readImportFile('null')).ok).toBe(false);
   });
 
-  it('rejects a file with a missing or wrong format marker', () => {
+  it('rejects a file with a missing or wrong format marker', async () => {
     const game = gameDoc();
-    expect(readImportFile(JSON.stringify({ version: 1, game })).ok).toBe(false);
-    const wrong = readImportFile(JSON.stringify(envelopeFor(game, { format: 'something-else' })));
+    expect((await readImportFile(JSON.stringify({ version: 1, game }))).ok).toBe(false);
+    const wrong = await readImportFile(JSON.stringify(envelopeFor(game, { format: 'something-else' })));
     expect(wrong).toEqual({ ok: false, error: expect.stringContaining("doesn't look like a Hearthfire game backup") });
   });
 
-  it('rejects a non-numeric version', () => {
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc(), { version: '1' })));
+  it('rejects a non-numeric version', async () => {
+    const check = await readImportFile(JSON.stringify(envelopeFor(gameDoc(), { version: '1' })));
     expect(check).toEqual({ ok: false, error: expect.stringContaining('missing its version number') });
   });
 
-  it('rejects a version newer than this build understands', () => {
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc(), { version: EXPORT_VERSION + 1 })));
+  it('rejects a version newer than this build understands', async () => {
+    const check = await readImportFile(JSON.stringify(envelopeFor(gameDoc(), { version: EXPORT_VERSION + 1 })));
     expect(check).toEqual({ ok: false, error: expect.stringContaining(`format v${EXPORT_VERSION + 1}`) });
   });
 
@@ -243,28 +235,28 @@ describe('readImportFile — rejections', () => {
     ['a name that is not a string', { name: 7 }],
     ['no createdAt', { createdAt: undefined }],
     ['more than 20 characters', { characters: Array.from({ length: 21 }, (_, i) => ({ id: `c${i}`, playbook: 'blessed' })) }],
-  ])('rejects a backup with %s, which the database rules would refuse', (_label, over) => {
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc(over))));
+  ])('rejects a backup with %s, which the database rules would refuse', async (_label, over) => {
+    const check = await readImportFile(JSON.stringify(envelopeFor(gameDoc(over))));
     expect(check).toEqual({ ok: false, error: expect.stringContaining("can't be restored") });
   });
 
-  it('accepts an older version', () => {
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc(), { version: 0 })));
+  it('accepts an older version', async () => {
+    const check = await readImportFile(JSON.stringify(envelopeFor(gameDoc(), { version: 0 })));
     expect(check.ok).toBe(true);
     if (check.ok) expect(check.envelope.version).toBe(0);
   });
 
-  it('rejects a missing or non-object game payload', () => {
-    expect(readImportFile(JSON.stringify(envelopeFor(gameDoc(), { game: undefined }))).ok).toBe(false);
-    const arrayGame = readImportFile(JSON.stringify(envelopeFor(gameDoc(), { game: [] })));
+  it('rejects a missing or non-object game payload', async () => {
+    expect((await readImportFile(JSON.stringify(envelopeFor(gameDoc(), { game: undefined })))).ok).toBe(false);
+    const arrayGame = await readImportFile(JSON.stringify(envelopeFor(gameDoc(), { game: [] })));
     expect(arrayGame).toEqual({ ok: false, error: expect.stringContaining('no game data') });
   });
 
-  it('rejects an array nested inside an array, however deep', () => {
-    const shallow = readImportFile(JSON.stringify(envelopeFor({ tags: [['a']] })));
+  it('rejects an array nested inside an array, however deep', async () => {
+    const shallow = await readImportFile(JSON.stringify(envelopeFor({ tags: [['a']] })));
     expect(shallow).toEqual({ ok: false, error: expect.stringContaining('array inside an array') });
 
-    const deep = readImportFile(
+    const deep = await readImportFile(
       JSON.stringify(
         envelopeFor(
           gameDoc({
@@ -276,40 +268,40 @@ describe('readImportFile — rejections', () => {
     expect(deep.ok).toBe(false);
   });
 
-  it('rejects a payload over the Firestore document ceiling', () => {
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ threats: 'x'.repeat(1_000_001) }))));
+  it('rejects a payload over the Firestore document ceiling', async () => {
+    const check = await readImportFile(JSON.stringify(envelopeFor(gameDoc({ threats: 'x'.repeat(1_000_001) }))));
     expect(check).toEqual({ ok: false, error: expect.stringContaining('KB limit for a single game') });
   });
 
   // A moved game stores one document per character and roll, so its export can be well over one document in total.
-  it('accepts a backup whose total is over one document but whose every piece fits', () => {
+  it('accepts a backup whose total is over one document but whose every piece fits', async () => {
     const big = 'x'.repeat(300_000);
     const characters = Array.from({ length: 4 }, (_, i) => ({ ...character(`c${i}`, 'Big'), data: { notes: big } }));
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters }))));
+    const check = await readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters }))));
     expect(check.ok).toBe(true);
   });
 
-  it('reads a backup with a very long list of rolls without running out of arguments', () => {
+  it('reads a backup with a very long list of rolls without running out of arguments', async () => {
     const rolls = Array.from({ length: 200_000 }, (_, i) => ({ id: `r${i}` }));
-    expect(() => readImportFile(JSON.stringify(envelopeFor(gameDoc({ diceRolls: rolls }))))).not.toThrow();
+    await expect(readImportFile(JSON.stringify(envelopeFor(gameDoc({ diceRolls: rolls }))))).resolves.toBeDefined();
   });
 
-  it('refuses a backup with a single character over the document limit', () => {
-    const check = readImportFile(
+  it('refuses a backup with a single character over the document limit', async () => {
+    const check = await readImportFile(
       JSON.stringify(envelopeFor(gameDoc({ characters: [{ ...character('c0', 'Big'), data: { notes: 'x'.repeat(1_000_001) } }] }))),
     );
     expect(check).toEqual({ ok: false, error: expect.stringContaining('KB limit') });
   });
 
-  it('rejects a payload the app parser cannot read', () => {
+  it('rejects a payload the app parser cannot read', async () => {
     parseState.throws = true;
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc())));
+    const check = await readImportFile(JSON.stringify(envelopeFor(gameDoc())));
     expect(check).toEqual({ ok: false, error: expect.stringContaining("couldn't be read") });
   });
 });
 
 describe('readImportFile — success', () => {
-  it('summarizes the payload for the confirm dialog', () => {
+  it('summarizes the payload for the confirm dialog', async () => {
     const game = gameDoc({
       characters: [character('char-1', 'Alder'), character('char-2', 'Bram')],
       diceRolls: [roll('r1'), roll('r2'), roll('r3')],
@@ -317,7 +309,7 @@ describe('readImportFile — success', () => {
     });
     const text = JSON.stringify(envelopeFor(game));
 
-    const check = readImportFile(text);
+    const check = await readImportFile(text);
 
     expect(check.ok).toBe(true);
     if (!check.ok) return;
@@ -329,8 +321,8 @@ describe('readImportFile — success', () => {
     });
   });
 
-  it('reports zero counts and no steading for a bare game', () => {
-    const check = readImportFile(JSON.stringify(envelopeFor({ name: 'Empty', createdAt: 1, characters: [] })));
+  it('reports zero counts and no steading for a bare game', async () => {
+    const check = await readImportFile(JSON.stringify(envelopeFor({ name: 'Empty', createdAt: 1, characters: [] })));
 
     expect(check.ok).toBe(true);
     if (!check.ok) return;
@@ -339,26 +331,26 @@ describe('readImportFile — success', () => {
     expect(check.summary.hasSteading).toBe(false);
   });
 
-  it('refuses a backup with a malformed character or roll, naming it, rather than dropping it silently or failing at restore', () => {
-    const badCharacter = readImportFile(
+  it('refuses a backup with a malformed character or roll, naming it, rather than dropping it silently or failing at restore', async () => {
+    const badCharacter = await readImportFile(
       JSON.stringify(envelopeFor(gameDoc({ characters: [character('char-1', 'Alder'), { id: 'c2', name: 'No playbook' }] }))),
     );
     expect(badCharacter).toEqual({ ok: false, error: expect.stringContaining('character 2') });
-    const badRoll = readImportFile(JSON.stringify(envelopeFor(gameDoc({ diceRolls: [roll('r1'), { id: 'r2' }] }))));
+    const badRoll = await readImportFile(JSON.stringify(envelopeFor(gameDoc({ diceRolls: [roll('r1'), { id: 'r2' }] }))));
     expect(badRoll).toEqual({ ok: false, error: expect.stringContaining('roll 2') });
   });
 
-  it('carries the raw game through untouched', () => {
+  it('carries the raw game through untouched', async () => {
     const game = gameDoc({ steading: { size: 'village' }, threats: 'Ogres' });
-    const check = readImportFile(JSON.stringify(envelopeFor(game)));
+    const check = await readImportFile(JSON.stringify(envelopeFor(game)));
 
     expect(check.ok).toBe(true);
     if (!check.ok) return;
     expect(check.envelope.game).toEqual(game);
   });
 
-  it('refuses a field the rules would reject, naming it, instead of failing at restore', () => {
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ someFutureField: 1, another: 2 }))));
+  it('refuses a field the rules would reject, naming it, instead of failing at restore', async () => {
+    const check = await readImportFile(JSON.stringify(envelopeFor(gameDoc({ someFutureField: 1, another: 2 }))));
     expect(check.ok).toBe(false);
     if (check.ok) return;
     expect(check.error).toContain('someFutureField, another');
@@ -390,10 +382,10 @@ describe('readImportFile — success', () => {
     [
       'a roll with more than 50 dice',
       { diceRolls: [{ id: 'r1', characterId: 'c1', createdAt: 1, dice: Array.from({ length: 51 }, () => 1) }] },
-      'more than 50 dice',
+      'a list of up to 50',
     ],
-  ])('refuses a backup with %s, naming the piece, instead of failing at restore', (_label, over, expected) => {
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc(over))));
+  ])('refuses a backup with %s, naming the piece, instead of failing at restore', async (_label, over, expected) => {
+    const check = await readImportFile(JSON.stringify(envelopeFor(gameDoc(over))));
     expect(check.ok).toBe(false);
     if (check.ok) return;
     expect(check.error).toContain("can't be restored");
@@ -410,20 +402,20 @@ describe('readImportFile — success', () => {
       'a stat the reader does not know',
       { id: 'r1', characterId: 'c1', createdAt: 1, stat: 'LUCK', mode: 'normal', dice: [1], mod: 1, total: 8 },
     ],
-  ])('refuses a backup with a roll the reader would drop (%s), instead of restoring a log with entries missing', (_label, bad) => {
-    const check = readImportFile(JSON.stringify(envelopeFor(gameDoc({ diceRolls: [roll('r0'), bad] }))));
+  ])('refuses a backup with a roll the reader would drop (%s), instead of restoring a log with entries missing', async (_label, bad) => {
+    const check = await readImportFile(JSON.stringify(envelopeFor(gameDoc({ diceRolls: [roll('r0'), bad] }))));
     expect(check).toEqual({ ok: false, error: expect.stringContaining("1 of its dice rolls can't be read") });
   });
 
-  it('accepts an old backup whose characters have no level or a level that is not a number, which a restore repairs', () => {
+  it('accepts an old backup whose characters have no level or a level that is not a number, which a restore repairs', async () => {
     const characters = [
       { id: 'c1', name: 'Ada', playbook: 'blessed' },
       { id: 'c2', name: 'Bo', playbook: 'fox', level: '2' },
     ];
-    expect(readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters })))).ok).toBe(true);
+    expect((await readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters }))))).ok).toBe(true);
   });
 
-  it('accepts a character and a roll with every field the rules allow', () => {
+  it('accepts a character and a roll with every field the rules allow', async () => {
     const character = { id: 'c1', name: 'Ada', playbook: 'blessed', level: 2, data: { statStr: '+1' } };
     const roll = {
       id: 'r1',
@@ -443,20 +435,20 @@ describe('readImportFile — success', () => {
       breakdown: '[3, 4]',
       createdAt: 5,
     };
-    expect(readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters: [character], diceRolls: [roll] })))).ok).toBe(true);
-    expect(Object.keys(roll).sort()).toEqual([...IMPORTABLE_ROLL_FIELDS].sort());
-    expect(Object.keys(character).sort()).toEqual([...IMPORTABLE_CHARACTER_FIELDS].sort());
+    expect((await readImportFile(JSON.stringify(envelopeFor(gameDoc({ characters: [character], diceRolls: [roll] }))))).ok).toBe(true);
+    expect(Object.keys(roll).sort()).toEqual(Object.keys(rollSchema.shape).sort());
+    expect(Object.keys(character).sort()).toEqual(Object.keys(characterSchema.shape).sort());
   });
 
   it('allows exactly the fields firestore.rules allows, besides the two a restore sets itself', () => {
     const rules = readFileSync(join(import.meta.dirname, '../../../firestore.rules'), 'utf8');
     const list = /function knownFields\(\) \{\s*return \[([^\]]*)\]/.exec(rules)![1]!;
     const fields = [...list.matchAll(/'([^']+)'/g)].map((m) => m[1]!).filter((f) => f !== 'schemaVersion' && f !== 'restoreToken');
-    expect([...IMPORTABLE_FIELDS].sort()).toEqual([...fields, 'diceRolls'].sort());
+    expect(Object.keys(gameSchema.shape).sort()).toEqual([...fields, 'diceRolls'].sort());
   });
 
-  it('defaults missing envelope metadata to empty strings rather than failing', () => {
-    const check = readImportFile(
+  it('defaults missing envelope metadata to empty strings rather than failing', async () => {
+    const check = await readImportFile(
       JSON.stringify({
         format: EXPORT_FORMAT,
         version: EXPORT_VERSION,

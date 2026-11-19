@@ -85,7 +85,7 @@ test('a game still in the old shape is not shown with its characters missing, an
   await moveGame(id); // the open page finds out from its own listener
   await expect(page.getByRole('heading', { name: 'Characters' })).toBeVisible();
   await addCharacter(page, 'The Fox');
-  expect((await serverGame(id)).characters.map((c) => c.playbook)).toEqual(['fox']);
+  await expect.poll(async () => (await serverGame(id)).characters.map((c) => c.playbook)).toEqual(['fox']);
 });
 
 test('sheet edits made offline are kept, and the last one is saved when the connection returns', async ({ page }) => {

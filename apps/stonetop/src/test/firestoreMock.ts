@@ -170,6 +170,7 @@ export const firestoreMockModule = () => {
   }));
 
   const getDocs = vi.fn(async (ref: Ref) => makeQuerySnapshot(ref.path));
+  const getDocsFromCache = vi.fn(async (ref: Ref) => makeQuerySnapshot(ref.path));
 
   const deleteDoc = vi.fn(async (ref: Ref) => {
     docs.delete(ref.path);
@@ -184,7 +185,7 @@ export const firestoreMockModule = () => {
   // Either an object of changes, or the real (field, value, field, value, ...) form.
   const updateDoc = vi.fn(async (ref: Ref, first: DocData | FieldPath | string, ...rest: unknown[]) => {
     const existing = docs.get(ref.path);
-    if (existing === undefined) throw new Error(`No document to update: ${ref.path}`);
+    if (existing === undefined) throw Object.assign(new Error(`No document to update: ${ref.path}`), { code: 'not-found' });
     if (first instanceof FieldPath || typeof first === 'string') {
       const next = structuredClone(existing);
       const pairs = [first, ...rest];
@@ -242,7 +243,7 @@ export const firestoreMockModule = () => {
       update: (ref: Ref, payload: DocData) =>
         void ops.push(() => {
           const existing = docs.get(ref.path);
-          if (existing === undefined) throw new Error(`No document to update: ${ref.path}`);
+          if (existing === undefined) throw Object.assign(new Error(`No document to update: ${ref.path}`), { code: 'not-found' });
           docs.set(ref.path, applyUpdate(existing, payload));
         }),
       delete: (ref: Ref) => void ops.push(() => docs.delete(ref.path)),
@@ -303,6 +304,7 @@ export const firestoreMockModule = () => {
     getDocFromCache,
     deleteField,
     getDocs,
+    getDocsFromCache,
     deleteDoc,
     writeBatch,
     updateDoc,

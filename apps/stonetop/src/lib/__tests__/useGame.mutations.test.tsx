@@ -114,6 +114,17 @@ describe('useGame mutations', () => {
     expect(result.current.error).toMatch(/couldn't be read/);
   });
 
+  it('does not add a character before the party has loaded, so an empty copy cannot overwrite one that exists', async () => {
+    firestoreStore.set(GAME_PATH, { name: 'Old', createdAt: 5, characters: [] }); // not moved: no party listener, so no party yet
+    firestoreStore.set(`${GAME_PATH}/characters/a`, { id: 'a', name: 'Kept', playbook: 'heavy', level: 1, order: 0 });
+    const { result } = renderGame();
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await act(async () => {
+      await expect(result.current.addCharacter(char('a', { name: 'Fresh' }))).rejects.toThrow('still loading');
+    });
+    expect(firestoreStore.get(`${GAME_PATH}/characters/a`)).toMatchObject({ name: 'Kept' });
+  });
+
   it('reports the game as null (not an error) when the doc does not exist', async () => {
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));

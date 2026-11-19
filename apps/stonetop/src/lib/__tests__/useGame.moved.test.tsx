@@ -269,10 +269,10 @@ describe('two players at once', () => {
 describe('a reorder while another player removes someone', () => {
   it('still saves the order of everyone who is left', async () => {
     const { moved } = await renderBoth();
-    const { getDocs } = await import('firebase/firestore');
-    const real = vi.mocked(getDocs).getMockImplementation()!;
+    const { getDocsFromCache } = await import('firebase/firestore');
+    const real = vi.mocked(getDocsFromCache).getMockImplementation()!;
     let removed = false;
-    vi.mocked(getDocs).mockImplementation(async (ref) => {
+    vi.mocked(getDocsFromCache).mockImplementation(async (ref) => {
       const result = await real(ref);
       // The other player removes "b" after this tab has read the party and before it writes.
       if (!removed && (ref as unknown as { path: string }).path.endsWith('/characters')) {
@@ -284,7 +284,14 @@ describe('a reorder while another player removes someone', () => {
     await act(async () => {
       await moved.result.current.reorderCharacters([char('c'), char('b'), char('a')] as unknown as Character[]);
     });
-    vi.mocked(getDocs).mockImplementation(real);
+    vi.mocked(getDocsFromCache).mockImplementation(real);
+    await waitFor(() =>
+      expect(
+        stored(`${V2}/characters`)
+          .map((c) => c.id)
+          .sort(),
+      ).toEqual(['a', 'c']),
+    );
     expect(addToastSpy).not.toHaveBeenCalled();
     expect(
       stored(`${V2}/characters`)

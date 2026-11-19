@@ -186,29 +186,35 @@ export const useGame = (gameId: string): UseGameResult => {
     [gameRef, reportSave],
   );
 
+  // What a write the server refuses after its save was reported done does: take the "Saved" back and show the error.
+  const refused = useCallback(
+    (error: unknown) => {
+      saveStatusRef.current?.reportSaveRefused();
+      addToastRef.current?.(saveErrorMessage(error), 'error');
+    },
+    [addToastRef, saveStatusRef],
+  );
+
   // Changes one character on this tab's local copy, writing only the fields that changed. The save is reported done once it is queued
   // (shortcut: "Saved" then means queued on this device, so offline it is not on the server yet, upgrade: show a separate offline state);
   // a write the server refuses later takes the "Saved" back and shows the error.
   const editCharacter = useCallback(
     (characterId: string, transform: (c: Character) => Character, confirmed = false) =>
-      v2.editCharacter(
-        gameId,
-        characterId,
-        transform,
-        (error) => {
-          saveStatusRef.current?.reportSaveRefused();
-          addToastRef.current?.(saveErrorMessage(error), 'error');
-        },
-        confirmed,
-      ),
-    [gameId, addToastRef, saveStatusRef],
+      v2.editCharacter(gameId, characterId, transform, refused, confirmed),
+    [gameId, refused],
   );
+
+  const partyLoadedRef = useLatest(characterDocs !== undefined);
 
   const addCharacter = useCallback(
     async (character: Character) => {
-      await reportSave(() => v2.addCharacter(gameId, character));
+      await reportSave(async () => {
+        // Whether the id is taken is read from this tab's copy of the party, and an empty copy that has not loaded yet would say it is free.
+        if (!partyLoadedRef.current) throw new UserFacingError('This game is still loading. Try again in a moment.');
+        await v2.addCharacter(gameId, character, refused);
+      });
     },
-    [gameId, reportSave],
+    [gameId, reportSave, refused, partyLoadedRef],
   );
 
   const removeCharacter = useCallback(
@@ -221,9 +227,9 @@ export const useGame = (gameId: string): UseGameResult => {
   const reorderCharacters = useCallback(
     async (characters: Character[]) => {
       const ids = characters.map((c) => c.id);
-      await reportSave(() => v2.reorderCharacters(gameId, ids));
+      await reportSave(() => v2.reorderCharacters(gameId, ids, refused));
     },
-    [gameId, reportSave],
+    [gameId, reportSave, refused],
   );
 
   const updateCharacterName = useCallback(
@@ -306,9 +312,9 @@ export const useGame = (gameId: string): UseGameResult => {
   // Append a roll to the shared log: a discrete event, written straight through (not debounced), then the log is trimmed to the newest ROLL_LOG_CAP.
   const logRoll = useCallback(
     async (roll: LoggedRoll) => {
-      await reportSave(() => v2.logRoll(gameId, roll));
+      await reportSave(() => v2.logRoll(gameId, roll, refused));
     },
-    [gameId, reportSave],
+    [gameId, reportSave, refused],
   );
 
   // Shared notes: a plain save (on blur) plus a typing lock so only one tab edits a given notes key at
