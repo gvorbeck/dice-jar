@@ -130,15 +130,9 @@ export const reorderCharacters = async (gameId: string, ids: string[], onRejecte
     const known = new Set(current.map((c) => c.id));
     const rest = [...current].sort((a, b) => Number(a.data.order) - Number(b.data.order)).filter((c) => !named.has(c.id));
     const inOrder = [...ids.filter((id) => known.has(id)), ...rest.map((c) => c.id)];
-    const orderOf = new Map(current.map((c) => [c.id, Number(c.data.order)]));
+    // Every position is written, not only the ones this tab's copy says moved: skipping any could leave two characters on one place after another device reordered meanwhile.
     const batch = writeBatch(db);
-    let changes = 0;
-    inOrder.forEach((id, order) => {
-      if (orderOf.get(id) === order) return;
-      batch.update(characterRef(gameId, id), { order });
-      changes++;
-    });
-    if (!changes) return;
+    inOrder.forEach((id, order) => batch.update(characterRef(gameId, id), { order }));
     batch.commit().catch((error) => (isNotFound(error) && retryIfGone ? send(false).catch(onRejected) : onRejected(error)));
   };
   await send(true);

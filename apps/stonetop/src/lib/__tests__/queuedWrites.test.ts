@@ -4,7 +4,7 @@ import { firestoreMockModule, firestoreStore } from '@/test/firestoreMock';
 vi.mock('firebase/app', () => ({ initializeApp: () => ({}) }));
 vi.mock('firebase/firestore', () => firestoreMockModule());
 
-import { deleteDoc, runTransaction, setDoc, writeBatch } from 'firebase/firestore';
+import { deleteDoc, getDocsFromCache, runTransaction, setDoc, writeBatch } from 'firebase/firestore';
 import { addCharacter, logRoll, reorderCharacters } from '../gameV2';
 import { ROLL_LOG_CAP } from '../gameParsing';
 import type { Character, LoggedRoll } from '@/model';
@@ -51,18 +51,24 @@ describe('writes that queue while offline', () => {
     expect(firestoreStore.get(`${G}/characters/d`)).toMatchObject({ order: 3 });
   });
 
-  it('reorders in one batch and resolves before the server answers, writing only the characters that moved', async () => {
+  it('reorders in one batch and resolves before the server answers, writing every position', async () => {
     const update = vi.fn();
     vi.mocked(writeBatch).mockImplementationOnce(() => ({ update, commit: never }) as never);
     await reorderCharacters('g1', ['b', 'a', 'c'], rejected);
     expect(writeBatch).toHaveBeenCalledTimes(1);
-    expect(update).toHaveBeenCalledTimes(2);
+    expect(update).toHaveBeenCalledTimes(3);
   });
 
-  it('writes nothing when the order is already right', async () => {
-    await reorderCharacters('g1', ['a', 'b', 'c'], rejected);
-    expect(writeBatch).toHaveBeenCalledTimes(1); // built, but with nothing to commit
-    expect(firestoreStore.list(`${G}/characters`).map((c) => c.data.order)).toEqual([0, 1, 2]);
+  it('leaves no two characters in one place when another device reordered meanwhile', async () => {
+    // This tab still holds [a, b, c]; another device has saved [c, a, b]; this tab now saves [b, a, c].
+    const stale = firestoreStore.list(`${G}/characters`);
+    ['c', 'a', 'b'].forEach((id, order) => firestoreStore.set(`${G}/characters/${id}`, char(id, order)));
+    vi.mocked(getDocsFromCache).mockImplementationOnce(
+      async () => ({ docs: stale.map((d) => ({ id: d.id, data: () => d.data })) }) as never,
+    );
+    await reorderCharacters('g1', ['b', 'a', 'c'], rejected);
+    const orders = (id: string) => firestoreStore.get(`${G}/characters/${id}`)!.order;
+    expect([orders('b'), orders('a'), orders('c')]).toEqual([0, 1, 2]);
   });
 
   it('tries once more on the party as it is when a character was removed meanwhile, and does not report that', async () => {
