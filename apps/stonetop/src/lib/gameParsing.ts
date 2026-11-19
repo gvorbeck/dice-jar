@@ -213,13 +213,14 @@ const parseGmImprovement = (v: unknown, i: number): GmImprovement | null => {
   };
 };
 
-// Harnessing the Stream's first box once stood for both "water flowing uphill" and "a reservoir" (Book 1, p. 157 lists them as two). A tick
-// saved on it counts for the reservoir too, until the reservoir box is saved for the first time; the aqueduct box is untouched.
+// Harnessing the Stream's first box (saved by position, under `b1i0`) once stood for both "water flowing uphill" and "a reservoir" (Book 1,
+// p. 157 lists them as two). The two now have keys of their own and nothing writes `b1i0` any more, so a tick there is always an old save:
+// it counts for both new boxes until each is saved for the first time. The aqueduct box keeps its key and is untouched.
 const OLD_HARNESSING_BOX = 'harnessing-the-stream__req__b1i0__0';
-const HARNESSING_RESERVOIR_BOX = 'harnessing-the-stream__req__b1i2__0';
+const HARNESSING_BOXES = ['harnessing-the-stream__req__b1iuphill__0', 'harnessing-the-stream__req__b1ireservoir__0'];
 const carryOldHarnessingTick = (improvements: Record<string, boolean>): Record<string, boolean> =>
-  improvements[OLD_HARNESSING_BOX] && !(HARNESSING_RESERVOIR_BOX in improvements)
-    ? { ...improvements, [HARNESSING_RESERVOIR_BOX]: true }
+  improvements[OLD_HARNESSING_BOX]
+    ? { ...Object.fromEntries(HARNESSING_BOXES.filter((k) => !(k in improvements)).map((k) => [k, true])), ...improvements }
     : improvements;
 
 export const parseSteading = (raw: unknown): SteadingData | undefined => {

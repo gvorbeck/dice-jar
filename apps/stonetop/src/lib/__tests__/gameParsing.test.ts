@@ -63,25 +63,32 @@ describe('a character level the reader repairs', () => {
   });
 });
 
-// The old first Harnessing the Stream box meant "a reservoir, and some way for water to flow uphill"; it is now two boxes (Book 1, p. 157).
+// The old first Harnessing the Stream box (saved by position) meant "a reservoir, and some way for water to flow uphill"; it is now two boxes with keys of their own (Book 1, p. 157).
 describe('Harnessing the Stream boxes saved before it was split', () => {
   const OLD = 'harnessing-the-stream__req__b1i0__0';
+  const UPHILL = 'harnessing-the-stream__req__b1iuphill__0';
   const AQUEDUCTS = 'harnessing-the-stream__req__b1i1__0';
-  const RESERVOIR = 'harnessing-the-stream__req__b1i2__0';
+  const RESERVOIR = 'harnessing-the-stream__req__b1ireservoir__0';
 
-  it('counts the old tick for the reservoir too, and leaves the aqueduct box alone', () => {
+  it('counts the old tick for both new boxes, and leaves the aqueduct box alone', () => {
     expect(parseSteading({ improvements: { [OLD]: true, [AQUEDUCTS]: false } })?.improvements).toEqual({
       [OLD]: true,
       [AQUEDUCTS]: false,
+      [UPHILL]: true,
       [RESERVOIR]: true,
     });
   });
 
-  it('keeps a reservoir box the GM has since cleared', () => {
-    expect(parseSteading({ improvements: { [OLD]: true, [RESERVOIR]: false } })?.improvements).toEqual({ [OLD]: true, [RESERVOIR]: false });
+  it('keeps a box the GM has since cleared', () => {
+    expect(parseSteading({ improvements: { [OLD]: true, [RESERVOIR]: false, [UPHILL]: true } })?.improvements).toEqual({
+      [OLD]: true,
+      [RESERVOIR]: false,
+      [UPHILL]: true,
+    });
   });
 
-  it('adds nothing when the old box was never ticked', () => {
+  it('adds nothing when the old box was never ticked, or only the new uphill box is', () => {
     expect(parseSteading({ improvements: { [AQUEDUCTS]: true } })?.improvements).toEqual({ [AQUEDUCTS]: true });
+    expect(parseSteading({ improvements: { [UPHILL]: true } })?.improvements).toEqual({ [UPHILL]: true });
   });
 });

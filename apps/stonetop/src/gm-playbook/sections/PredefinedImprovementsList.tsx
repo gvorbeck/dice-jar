@@ -2,8 +2,8 @@ import { cn } from '@dice-jar/cn';
 import { Heading, List, Text, Checkbox } from '@/ui';
 import { IMPROVEMENTS, type CheckItem } from './steadingImprovementsData';
 
-const makeReqKeys = (impId: string, blockIdx: number, itemIdx: number, count: number) =>
-  Array.from({ length: count }, (_, i) => `${impId}__req__b${blockIdx}i${itemIdx}__${i}`);
+const makeReqKeys = (impId: string, blockIdx: number, slot: number | string, count: number) =>
+  Array.from({ length: count }, (_, i) => `${impId}__req__b${blockIdx}i${slot}__${i}`);
 
 const ReqCheckItem = ({
   item,
@@ -82,7 +82,7 @@ export const PredefinedImprovementsList = ({ improvements, onToggleKey }: Predef
                 return (
                   <div key={`${imp.id}-cb-${blockIdx}`} className="col gap-2">
                     {block.items.map((item, itemIdx) => {
-                      const keys = makeReqKeys(imp.id, blockIdx, itemIdx, item.count ?? 1);
+                      const keys = makeReqKeys(imp.id, blockIdx, item.key ?? itemIdx, item.count ?? 1);
                       const checkedValues = keys.map((k) => !!improvements[k]);
                       return (
                         <ReqCheckItem
