@@ -2,11 +2,11 @@ import type { PlaybookType, RadioOption } from '@/model';
 
 export const INSTINCT_OPTIONS: Partial<Record<PlaybookType, RadioOption[]>> = {
   blessed: [
-    { value: 'delight', label: 'DELIGHT', description: 'To find beauty, in even the ugliest things.' },
+    { value: 'delight', label: 'DELIGHT', description: 'To find beauty, in even the most ugly thing.' },
     { value: 'detachment', label: 'DETACHMENT', description: 'To remain unmoved, to be cold as winter.' },
     { value: 'nurture', label: 'NURTURE', description: 'To help others grow, learn, or improve.' },
     { value: 'preservation', label: 'PRESERVATION', description: 'To protect the natural world.' },
-    { value: 'reverence', label: 'REVERENCE', description: 'To honor the spirits and give them their due.' },
+    { value: 'reverence', label: 'REVERENCE', description: 'To demand sacrifice to the spirits and Danu.' },
   ],
   fox: [
     { value: 'conscience', label: 'CONSCIENCE', description: 'To feel guilty, to try to do right.' },

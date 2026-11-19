@@ -85,5 +85,26 @@ test('a game still in the old shape is not shown with its characters missing, an
   await moveGame(id); // the open page finds out from its own listener
   await expect(page.getByRole('heading', { name: 'Characters' })).toBeVisible();
   await addCharacter(page, 'The Fox');
-  expect((await serverGame(id)).characters.map((c) => c.playbook)).toEqual(['fox']);
+  await expect.poll(async () => (await serverGame(id)).characters.map((c) => c.playbook)).toEqual(['fox']);
+});
+
+test('sheet edits made offline are kept, and the last one is saved when the connection returns', async ({ page }) => {
+  test.setTimeout(90_000); // the client waits out a reconnect backoff
+  const id = await createGame(page);
+  await addCharacter(page, 'The Blessed');
+  await expect.poll(async () => (await serverGame(id)).characters.length).toBe(1);
+
+  await page.goto(`/game/${id}/blessed`);
+  const xp = page.getByLabel('XP', { exact: true });
+  await expect(xp).toBeVisible();
+  await expect.poll(async () => (await serverGame(id)).characters[0]?.data?.statXp).toBe('0'); // the sheet's starting values have been saved
+  await page.context().setOffline(true);
+  for (const value of ['4', '5']) {
+    await xp.fill(value);
+    await xp.blur();
+  }
+  await expect(xp).toHaveValue('5');
+
+  await page.context().setOffline(false);
+  await expect.poll(async () => (await serverGame(id)).characters[0]?.data?.statXp, { timeout: 45_000 }).toBe('5');
 });

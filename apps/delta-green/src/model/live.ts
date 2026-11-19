@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { parseCharacter, type Character } from './character';
-import { bondCount, canImprove, derived, disorderOf, rollExpr, skillsOf, veteranOf, wpPenalty } from '../rules';
-import { STATS, STAT_NAMES, type Stat } from '../rules/data/creation';
-import { MAX_SKILL } from '../rules/data/skills';
+import { bondCount, canImprove, derived, disorderOf, rollExpr, skillsOf, veteranOf, wpPenalty } from '@/rules';
+import { STATS, STAT_NAMES, type Stat } from '@/rules/data/creation';
+import { MAX_SKILL } from '@/rules/data/skills';
 
 /** Play-time state. The whole sheet lives in the URL hash, so no server or database is involved. */
 export const MAX_NOTES = 4000;

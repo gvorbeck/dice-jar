@@ -1,13 +1,13 @@
 import { useId, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useRun } from '../lib/useRun';
+import { useRun } from '@/lib/useRun';
 import { newGameId, slugifyGameId } from '@dice-jar/game-id';
-import { isOpenableId, MIN_ID, recentGames } from '../lib/gameId';
-import { CODENAMES } from '../rules/data/random';
-import { Win } from '../ui/Win';
+import { isOpenableId, MIN_ID, recentGames } from '@/lib/gameId';
+import { CODENAMES } from '@/rules/data/random';
+import { Win } from '@/ui/Win';
 import { Page } from './Page';
-import { Alert, Hint } from '../ui/bits';
-import { gameUrl, MAX_ID } from '../lib/paths';
+import { Alert, Hint } from '@/ui/bits';
+import { gameUrl, MAX_ID } from '@/lib/paths';
 
 const Hero = () => (
   <header className="hero">
@@ -56,7 +56,7 @@ export default function Home() {
   const generate = () =>
     run(async () => {
       const id = newGameId(CODENAMES);
-      await (await import('../lib/games')).createGame(id);
+      await (await import('@/lib/games')).createGame(id);
       nav(gameUrl(id));
     });
 

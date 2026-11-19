@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { asLoss, pad2, diceLabel, lowHp, testText, wpNote } from '../rules/outcome';
-import { UNNAMED } from '../model/names';
-import { useRun } from '../lib/useRun';
+import { asLoss, pad2, diceLabel, lowHp, testText, wpNote } from '@/rules/outcome';
+import { UNNAMED } from '@/model/names';
+import { useRun } from '@/lib/useRun';
 import { downloadJson } from '@dice-jar/browser';
 import {
   createGame,
@@ -14,20 +14,20 @@ import {
   useHeldSan,
   useRolls,
   type RollDoc,
-} from '../lib/games';
-import { forgetSavedAgent, hasSavedAgent, isOpenableId, MIN_ID, rememberGame } from '../lib/gameId';
-import { ScrollRegion } from '../ui/ScrollRegion';
-import { Win } from '../ui/Win';
-import { DiscordPanel } from '../DiscordPanel';
-import GmScreen from '../GmScreen';
+} from '@/lib/games';
+import { forgetSavedAgent, hasSavedAgent, isOpenableId, MIN_ID, rememberGame } from '@/lib/gameId';
+import { ScrollRegion } from '@/ui/ScrollRegion';
+import { Win } from '@/ui/Win';
+import { DiscordPanel } from '@/DiscordPanel';
+import GmScreen from '@/GmScreen';
 import { Notice, Page } from './Page';
-import { Alert, CopyButton, Hint, LineForm, Loading, OutcomeText, SubList, useJsonPicker } from '../ui/bits';
-import { agentUrl, gameUrl } from '../lib/paths';
+import { Alert, CopyButton, Hint, LineForm, Loading, OutcomeText, SubList, useJsonPicker } from '@/ui/bits';
+import { agentUrl, gameUrl } from '@/lib/paths';
 
 // Lazy: ui/index brings in the rules and react-aria, which this page otherwise doesn't load. Delete loads it through run() first, so a failed load shows an inline error instead of crashing the page.
-const ConfirmDialog = lazy(() => import('../ui').then((m) => ({ default: m.ConfirmDialog })));
+const ConfirmDialog = lazy(() => import('@/ui').then((m) => ({ default: m.ConfirmDialog })));
 // Lazy too: it needs the rules to read each sheet.
-const HandlerPanels = lazy(() => import('../HandlerPanels'));
+const HandlerPanels = lazy(() => import('@/HandlerPanels'));
 
 /** Test, Roll and Result cells: a d% test, plain dice from Discord ("2D6+1 (4+4+1) → 9"), or HP/SAN lost ("HP 11 → 4"). */
 function EntryCells({ r }: { r: RollDoc }) {
@@ -127,7 +127,7 @@ export default function Game() {
 
   const advance = (list: AgentCard[]) =>
     run(async () => {
-      const [{ advanceAll }, { gainsText }] = await Promise.all([import('../lib/agents'), import('../model/live')]);
+      const [{ advanceAll }, { gainsText }] = await Promise.all([import('@/lib/agents'), import('@/model/live')]);
       setAdded('');
       const { gains, failed } = await advanceAll(
         gameId,
@@ -153,7 +153,7 @@ export default function Game() {
   // The sheet model is loaded on demand so this page stays small.
   const addAgent = (fromSaved: boolean) =>
     run(async () => {
-      const [{ createAgent }, { loadCharacter }] = await Promise.all([import('../lib/agents'), import('../lib/savedAgent')]);
+      const [{ createAgent }, { loadCharacter }] = await Promise.all([import('@/lib/agents'), import('@/lib/savedAgent')]);
       const id = createAgent(gameId, fromSaved ? loadCharacter() : undefined);
       if (fromSaved) forgetSavedAgent();
       nav(agentUrl(gameId, id));
@@ -173,7 +173,7 @@ export default function Game() {
       setBad('');
       setAdded('');
       setNotice('');
-      const { createAgent, readImport } = await import('../lib/agents');
+      const { createAgent, readImport } = await import('@/lib/agents');
       const found = await f
         .text()
         .then((t) => readImport(JSON.parse(t)))
@@ -189,7 +189,7 @@ export default function Game() {
       setBad('');
       setAdded('');
       setNotice('');
-      const [{ createAgent }, { decodeSheet }] = await Promise.all([import('../lib/agents'), import('../model/live')]);
+      const [{ createAgent }, { decodeSheet }] = await Promise.all([import('@/lib/agents'), import('@/model/live')]);
       const t = sheet.trim();
       const s = decodeSheet(t.slice(Math.max(0, t.indexOf('#sheet='))));
       if (!s) return setBad('That is not a sheet link.');
@@ -266,7 +266,7 @@ export default function Game() {
                     className="btn danger"
                     onClick={() =>
                       run(async () => {
-                        await import('../ui');
+                        await import('@/ui');
                         setDoomed(a);
                       })
                     }
@@ -294,7 +294,7 @@ export default function Game() {
               className="btn"
               onClick={() =>
                 run(async () => {
-                  await import('../ui');
+                  await import('@/ui');
                   setNotice('');
                   setAdvancing(cards);
                 })

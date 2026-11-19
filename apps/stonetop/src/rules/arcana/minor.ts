@@ -167,7 +167,7 @@ export const MINOR_ARCANA: MinorArcanum[] = [
         hp: 13,
         hpCount: 3,
         armor: 1,
-        damage: 'life drain d8 (*band*, ignores armor)',
+        damage: 'life drain d8 (*hand*, ignores armor)',
         instinct: 'to run rampant',
         qualities: [
           'powerless in daylight',
@@ -348,7 +348,7 @@ export const MINOR_ARCANA: MinorArcanum[] = [
     move: {
       name: 'Goldleaf Cloak',
       subtitle: '◊, warm, magical',
-      text: 'When you **wear a goldleaf cloak that you have tanned yourself and that has been fitted to your exact measurements**, then all of these are true:\n\n- You are immune to effects that drain, steal, or snuff out your vitality, energy, or life force.\n- You are immune to effects that calm or dampen your emotions.\n- You are surrounded by a constant golden glow (*band*, *area*), making it nearly impossible to hide.\n\nWhen you **die and are buried in the earth, wrapped in your goldleaf cloak**, you return to life as if you were buried at the roots of the Golden Oak. Your cloak, however, rots away to mulch and tatters.',
+      text: 'When you **wear a goldleaf cloak that you have tanned yourself and that has been fitted to your exact measurements**, then all of these are true:\n\n- You are immune to effects that drain, steal, or snuff out your vitality, energy, or life force.\n- You are immune to effects that calm or dampen your emotions.\n- You are surrounded by a constant golden glow (*hand*, *area*), making it nearly impossible to hide.\n\nWhen you **die and are buried in the earth, wrapped in your goldleaf cloak**, you return to life as if you were buried at the roots of the Golden Oak. Your cloak, however, rots away to mulch and tatters.',
     },
   },
   {
@@ -635,9 +635,9 @@ export const MINOR_ARCANA: MinorArcanum[] = [
         tags: 'Undead, construct, terrifying, clumsy',
         hp: 3,
         armor: 4,
-        damage: 'varies d6 (*band*, maybe others)',
+        damage: 'varies d6 (*hand*, maybe others)',
         instinct: 'to get confused and lash out',
-        qualities: ['Do something one of its component beasts could do', 'Moan, wretchedly and disturbingly'],
+        qualities: ['0 armor vs. bronze', 'Do something one of its component beasts could do', 'Moan, wretchedly and disturbingly'],
         loyalty: 3,
         cost: 'lots of fresh blood',
       },
@@ -925,7 +925,7 @@ export const MINOR_ARCANA: MinorArcanum[] = [
     description:
       "It's like two of those canoes they use in Marshedge, but bigger and with big fins at the back. They're linked with timbers and a platform set on top. One canoe boasts a tall spire, snapped in half, a torn triangle of cloth still attached. Much of the wood is rotted. The canoes are banded in aetherium, weighed down with stones.\n\nYou suspect this is some sort of vehicle, but to unlock its mysteries you…",
     requirements: [
-      '…need a skilled carpenteer, good timber (Value 2), a new sail (Value 1), and a season spent on repairs.',
+      '…need a skilled carpenter, good timber (Value 2), a new sail (Value 1), and a season spent on repairs.',
       '…risk damaging it further, and/or having it/the aetherium float away.',
       '…must attune to the aetherium, so as to control how much it hovers.',
       '…and another must spend a season learning to sail the thing, risking injury and damage to the craft.',
@@ -975,7 +975,7 @@ export const MINOR_ARCANA: MinorArcanum[] = [
         tags: 'Construct, spirit, durable, vigilant, overbearing, mute, gullible',
         hp: 13,
         armor: 3,
-        damage: 'pummel 1d8 (*band*)',
+        damage: 'pummel 1d8 (*hand*)',
         instinct: 'to be overzealous in guarding you',
         qualities: [
           'fireproof; holds +1 Readiness on a 7+ to Defend; requires a smithy and tools to regain HP',
@@ -1046,7 +1046,7 @@ export const MINOR_ARCANA: MinorArcanum[] = [
     ],
     move: {
       name: 'Searing Touch',
-      text: 'When you **call up the fire from your soul and pour it into your hands**, roll +CON: **on a 7+**, your hands blaze like white-hot iron (see below); **but on a 10+**, first pick 1; **and on a 7-9**, first pick 2:\n\n- It takes minutes of intense focus\n- It burns your life force; lose 2d4 HP\n- The pain is terrible; mark a debility\n\n**On a 6-**, whatever else the GM says, you cannot do this again until you Convalesce.\n\nWhile your **hands are ablaze**, your touch deals 1d10 damage (*band*, *messy*, *dangerous*, 1 piercing), sets fire to wood, boils water, heats metal. Your hands are unharmed by the heat, but your gear and the rest of your body has no such protection. Be careful.\n\nYour hands blaze as long as you maintain your focus, up to a minute or maybe two.',
+      text: 'When you **call up the fire from your soul and pour it into your hands**, roll +CON: **on a 7+**, your hands blaze like white-hot iron (see below); **but on a 10+**, first pick 1; **and on a 7-9**, first pick 2:\n\n- It takes minutes of intense focus\n- It burns your life force; lose 2d4 HP\n- The pain is terrible; mark a debility\n\n**On a 6-**, whatever else the GM says, you cannot do this again until you Convalesce.\n\nWhile your **hands are ablaze**, your touch deals 1d10 damage (*hand*, *messy*, *dangerous*, 1 piercing), sets fire to wood, boils water, heats metal. Your hands are unharmed by the heat, but your gear and the rest of your body has no such protection. Be careful.\n\nYour hands blaze as long as you maintain your focus, up to a minute or maybe two.',
     },
   },
   {
@@ -1188,10 +1188,10 @@ export const MINOR_ARCANA: MinorArcanum[] = [
         tags: 'Fae, tiny, magical, devious, arrogant',
         hp: 15,
         armor: 6,
-        damage: 'void touch 1d10 w/advantage (*band*, *grabby*, ignores armor)',
+        damage: 'void touch 1d10 w/advantage (*hand*, *grabby*, ignores armor)',
         instinct: 'to heap abuse on its worshippers',
         qualities: [
-          'inert; disembodied voice',
+          'inert; disembodied voice; 2 armor vs. iron',
           'Make unreasonable demands',
           'Consume the essence of foodstuffs',
           "Sense one's idle thoughts/memories",
@@ -1246,7 +1246,7 @@ export const MINOR_ARCANA: MinorArcanum[] = [
         tags: 'Spirit, primordial, confused, angry',
         hp: 15,
         armor: 1,
-        damage: 'void touch 1d10 w/advantage (*band*, *grabby*, ignores armor)',
+        damage: 'void touch 1d10 w/advantage (*hand*, *grabby*, ignores armor)',
         instinct: 'to rage at all the noise and chaos',
         qualities: [
           'immune to most harm',

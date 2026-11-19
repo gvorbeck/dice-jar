@@ -57,6 +57,13 @@ interface StatDeltas {
   statHp?: number;
 }
 
+// Consequences whose Armor/HP actions were added after players could already have marked them (Redwood Effigy, Wider World
+// p. 571). A mark made before had nothing applied, so only a mark that was applied (see ArcanaMajorEntry.consequencesApplied)
+// is reversed.
+// shortcut: a pre-existing mark that is unchecked and rechecked applies the bonus once more, even if the player had added it by hand,
+// upgrade: nothing to do unless a sheet shows a doubled bonus; the player can correct the stat.
+const ACTIONS_ADDED_LATER = new Set(['effigy-c2']);
+
 export interface ConsequenceActionResult {
   // Absolute fields to write to the character (debility flags). {} when nothing changes. Additive stats
   // are NOT here — they're in `statDeltas`, applied relative to the stored value.
@@ -66,6 +73,8 @@ export interface ConsequenceActionResult {
   // Consequence ids that unchecking this one cascaded into and cleared (its descendants). The caller
   // unmarks these too. Empty when checking, or when the consequence has no children.
   clearedConsequenceIds: string[];
+  // Which ACTIONS_ADDED_LATER consequences this toggle applied (true) or reversed (false); the caller records it on the entry.
+  appliedChange: Record<string, boolean>;
 }
 
 // Every descendant consequence id of the given consequence (children, recursively), excluding itself.
@@ -92,9 +101,10 @@ export const applyConsequenceActions = (
   consequenceId: string,
   checked: boolean,
   markedConsequences: Record<string, boolean>,
+  appliedConsequences: Record<string, boolean> = {},
 ): ConsequenceActionResult => {
   const consequence = findConsequence(arcanum, consequenceId);
-  if (!consequence) return { dataPatch: {}, statDeltas: {}, clearedConsequenceIds: [] };
+  if (!consequence) return { dataPatch: {}, statDeltas: {}, clearedConsequenceIds: [], appliedChange: {} };
 
   // The toggled consequence is always processed (it's the one being flipped). On uncheck we also reverse
   // each descendant — but only those actually marked, so a never-marked child's action isn't "undone".
@@ -103,8 +113,12 @@ export const applyConsequenceActions = (
 
   const dataPatch: Partial<CharacterData> = {};
   const statDeltas: StatDeltas = {};
+  const appliedChange: Record<string, boolean> = {};
 
   for (const id of targetIds) {
+    const late = ACTIONS_ADDED_LATER.has(id);
+    if (late && !checked && !appliedConsequences[id]) continue; // marked before its actions existed: nothing to take back
+    if (late) appliedChange[id] = checked;
     for (const action of findConsequence(arcanum, id)?.actions ?? []) {
       applyOne(action, checked, dataPatch, statDeltas);
     }
@@ -117,6 +131,7 @@ export const applyConsequenceActions = (
     dataPatch,
     statDeltas,
     clearedConsequenceIds: checked ? [] : descendantIds,
+    appliedChange,
   };
 };
 

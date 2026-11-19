@@ -57,6 +57,14 @@ const nameMissingGame = (gameRef: ReturnType<typeof doc>) =>
     if (snap.exists() && typeof snap.data().name !== 'string') tx.update(gameRef, { name: '' });
   }).catch(() => {});
 
+// The line a failed save shows: the one a player can act on if there is one, else the generic one. The debounce hook's toast uses the same strings, so the Toast dedupe collapses the two.
+const saveErrorMessage = (error: unknown): string =>
+  error instanceof UserFacingError
+    ? error.message
+    : isFirestoreError(error) && FIRESTORE_ERROR_MESSAGES[error.code]
+      ? FIRESTORE_ERROR_MESSAGES[error.code]!
+      : SAVE_ERROR_MESSAGE;
+
 export const useGame = (gameId: string): UseGameResult => {
   const [docRaw, setDocRaw] = useState<Record<string, unknown> | null | undefined>(undefined);
   const [characterDocs, setCharacterDocs] = useState<Stored[] | undefined>(undefined);
@@ -89,15 +97,7 @@ export const useGame = (gameId: string): UseGameResult => {
         await write();
         succeeded = true;
       } catch (error) {
-        // A code we have a specific line for (e.g. the 1 MiB doc-size ceiling) gets
-        // that actionable message; everything else falls back to SAVE_ERROR_MESSAGE
-        // so it still dedupes against the debounce hook's toast on the shared string.
-        const message =
-          error instanceof UserFacingError
-            ? error.message
-            : isFirestoreError(error) && FIRESTORE_ERROR_MESSAGES[error.code]
-              ? FIRESTORE_ERROR_MESSAGES[error.code]!
-              : SAVE_ERROR_MESSAGE;
+        const message = saveErrorMessage(error);
         addToastRef.current?.(message, 'error');
         throw error;
       } finally {
@@ -186,17 +186,35 @@ export const useGame = (gameId: string): UseGameResult => {
     [gameRef, reportSave],
   );
 
-  // Changes one character on its own freshly-read document.
-  const editCharacter = useCallback(
-    (characterId: string, transform: (c: Character) => Character) => v2.editCharacter(gameId, characterId, transform),
-    [gameId],
+  // What a write the server refuses after its save was reported done does: take the "Saved" back and show the error.
+  const refused = useCallback(
+    (error: unknown) => {
+      saveStatusRef.current?.reportSaveRefused();
+      addToastRef.current?.(saveErrorMessage(error), 'error');
+    },
+    [addToastRef, saveStatusRef],
   );
+
+  // Changes one character on this tab's local copy, writing only the fields that changed. The save is reported done once it is queued
+  // (shortcut: "Saved" then means queued on this device, so offline it is not on the server yet, upgrade: show a separate offline state);
+  // a write the server refuses later takes the "Saved" back and shows the error.
+  const editCharacter = useCallback(
+    (characterId: string, transform: (c: Character) => Character, confirmed = false) =>
+      v2.editCharacter(gameId, characterId, transform, refused, confirmed),
+    [gameId, refused],
+  );
+
+  const partyLoadedRef = useLatest(characterDocs !== undefined);
 
   const addCharacter = useCallback(
     async (character: Character) => {
-      await reportSave(() => v2.addCharacter(gameId, character));
+      await reportSave(async () => {
+        // Whether the id is taken is read from this tab's copy of the party, and an empty copy that has not loaded yet would say it is free.
+        if (!partyLoadedRef.current) throw new UserFacingError('This game is still loading. Try again in a moment.');
+        await v2.addCharacter(gameId, character, refused);
+      });
     },
-    [gameId, reportSave],
+    [gameId, reportSave, refused, partyLoadedRef],
   );
 
   const removeCharacter = useCallback(
@@ -209,9 +227,9 @@ export const useGame = (gameId: string): UseGameResult => {
   const reorderCharacters = useCallback(
     async (characters: Character[]) => {
       const ids = characters.map((c) => c.id);
-      await reportSave(() => v2.reorderCharacters(gameId, ids));
+      await reportSave(() => v2.reorderCharacters(gameId, ids, refused));
     },
-    [gameId, reportSave],
+    [gameId, reportSave, refused],
   );
 
   const updateCharacterName = useCallback(
@@ -223,15 +241,18 @@ export const useGame = (gameId: string): UseGameResult => {
 
   const updateCharacterData = useCallback(
     async (characterId: string, data: Partial<CharacterData>) => {
-      await reportSave(() => editCharacter(characterId, (c) => patchCharacterData(c, data)));
+      // Arcana lists id-merge, so they must merge into the server's copy, not a stale cached one.
+      const confirmed = !!(data.arcanaMinor || data.arcanaMajor);
+      await reportSave(() => editCharacter(characterId, (c) => patchCharacterData(c, data), confirmed));
     },
     [editCharacter, reportSave],
   );
 
-  // Reads each stat off the freshly-read data, not a caller's snapshot, so a rapid check-then-uncheck can't start from a stale number.
+  // Reads each stat off this tab's local copy (which holds its own unconfirmed writes), not a caller's snapshot, so a rapid check-then-uncheck can't start from a stale number.
   const adjustCharacterStats = useCallback(
     async (characterId: string, deltas: Partial<Record<AdditiveStat, number>>, guard?: SheetGuard) => {
-      await reportSave(() => editCharacter(characterId, (c) => ({ ...c, data: applyStatDeltas(c.data ?? {}, deltas, guard) })));
+      // A guarded change is a payment (Burn Brightly): the caller's bonus must wait for the server to accept it.
+      await reportSave(() => editCharacter(characterId, (c) => ({ ...c, data: applyStatDeltas(c.data ?? {}, deltas, guard) }), !!guard));
     },
     [editCharacter, reportSave],
   );
@@ -291,9 +312,9 @@ export const useGame = (gameId: string): UseGameResult => {
   // Append a roll to the shared log: a discrete event, written straight through (not debounced), then the log is trimmed to the newest ROLL_LOG_CAP.
   const logRoll = useCallback(
     async (roll: LoggedRoll) => {
-      await reportSave(() => v2.logRoll(gameId, roll));
+      await reportSave(() => v2.logRoll(gameId, roll, refused));
     },
-    [gameId, reportSave],
+    [gameId, reportSave, refused],
   );
 
   // Shared notes: a plain save (on blur) plus a typing lock so only one tab edits a given notes key at

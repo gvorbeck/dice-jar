@@ -4,6 +4,8 @@ import { generateId } from '@/lib/id';
 export interface CheckItem {
   label: string;
   count?: number;
+  // Names the saved box instead of its position. Set it when the box's old position meant something else, so old saves cannot be misread.
+  key?: string;
 }
 
 type RequirementBlock = { type: 'text'; content: string } | { type: 'checkboxes'; items: CheckItem[] };
@@ -127,8 +129,9 @@ export const IMPROVEMENTS: Improvement[] = [
       {
         type: 'checkboxes',
         items: [
-          { label: 'A reservoir for the Stream to pool in, and some way for water to flow uphill' },
-          { label: "A series of aqueducts, from the Stream's source to Stonetop" },
+          { label: 'Some method of making water flow uphill', key: 'uphill' },
+          { label: "A series of aqueducts, from the Stream's source back to Stonetop" },
+          { label: 'A reservoir to contain the diverted water', key: 'reservoir' },
         ],
       },
     ],

@@ -16,7 +16,7 @@ import {
   type Test,
 } from '../../src/model/live';
 import { planSanLoss, projectRolled } from '../../src/model/actions';
-import { diffPaths, type Change } from '../../src/lib/diff';
+import { diffPaths, type Change } from '../../../../packages/diff/index';
 import { agentLabel } from '../../src/model/names';
 import {
   activeBonds,

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { LiveSheet } from '../LiveSheet';
-import { decodeSheet } from '../model/live';
+import { LiveSheet } from '@/LiveSheet';
+import { decodeSheet } from '@/model/live';
 import Home from './Home';
 
 /** A sheet shared by an old `/#sheet=…` link: standalone, kept in the URL, no game or database. */

@@ -167,7 +167,7 @@ export const PLAYBOOKS: PlaybookOption[] = [
     value: 'marshal',
     label: 'The Marshal',
     description:
-      "Hoping for peace isn't enough. Trouble always comes knocking. And that's why we need you: to run the drills, to man the towers, to take charge when things get bad. To be cold enough to sendyour neighbors to a sure death in order to keep Stonetop safe. That's the job, Marshal. You up for it?",
+      "Hoping for peace isn't enough. Trouble always comes knocking. And that's why we need you: to run the drills, to man the towers, to take charge when things get bad. To be cold enough to send your neighbors to a sure death in order to keep Stonetop safe. That's the job, Marshal. You up for it?",
     hpMax: 20,
     damage: 'd8',
     helperText: 'You start with Crew, Logistics, any moves from your Background, and 1 move of your choice.',
@@ -176,7 +176,7 @@ export const PLAYBOOKS: PlaybookOption[] = [
     value: 'ranger',
     label: 'The Ranger',
     description:
-      "Your true home is out there. Away from the Old Roads, in the wild places, where you've facedstorm and beast alike. But unknown forces are at work beyond the Ringwall, and you fear for your kith and kin. These are strange times. Guide them, ranger, and keep them safe when darkness falls.",
+      "Your true home is out there. Away from the Old Roads, in the wild places, where you've faced storm and beast alike. But unknown forces are at work beyond the Ringwall, and you fear for your kith and kin. These are strange times. Guide them, ranger, and keep them safe when darkness falls.",
     hpMax: 18,
     damage: 'd8',
     helperText: 'You start with Home on the Range, any moves from your Background, plus 1 of your choice.',

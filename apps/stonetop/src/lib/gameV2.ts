@@ -1,4 +1,19 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, runTransaction, setDoc } from 'firebase/firestore';
+import {
+  FieldPath,
+  collection,
+  deleteDoc,
+  deleteField,
+  doc,
+  getDoc,
+  getDocFromCache,
+  getDocsFromCache,
+  getDocs,
+  runTransaction,
+  setDoc,
+  updateDoc,
+  writeBatch,
+} from 'firebase/firestore';
+import { REMOVED, diffPaths } from '@dice-jar/diff';
 import { db } from '@/lib/firebase';
 import { GAMES_COLLECTION } from '@/lib/constants';
 import { assembleGame, restoredLevel, splitGame, type Stored } from '@/lib/gameShape';
@@ -26,6 +41,12 @@ const MAX_BATCH = 450;
 const storedDocs = async (col: ReturnType<typeof collection>): Promise<Stored[]> =>
   (await getDocs(col)).docs.map((d) => ({ id: d.id, data: d.data() as Raw }));
 
+// The collection as this tab holds it: the page's listener keeps it current and it includes this tab's unconfirmed writes, so it can be read offline.
+const cachedDocs = async (col: ReturnType<typeof collection>): Promise<Stored[]> =>
+  (await getDocsFromCache(col).catch(() => getDocs(col))).docs.map((d) => ({ id: d.id, data: d.data() as Raw }));
+
+const isNotFound = (error: unknown) => (error as { code?: string } | null)?.code === 'not-found';
+
 const nextOrder = (items: Stored[]) => Math.max(-1, ...items.map((i) => Number(i.data.order) || 0)) + 1;
 
 const readOnce = async (gameId: string): Promise<{ game: Raw; characters: Stored[]; rolls: Stored[] } | undefined> => {
@@ -47,48 +68,95 @@ export const readMovedGame = async (gameId: string): Promise<Raw> => {
   throw new Error('The game kept changing while it was being read. Try again in a moment.');
 };
 
-/** Changes one character on the freshly-read document, so a save only ever touches that character. */
-export const editCharacter = (gameId: string, characterId: string, transform: (c: Character) => Character): Promise<void> =>
-  runTransaction(db, async (tx) => {
-    const ref = characterRef(gameId, characterId);
-    const snap = await tx.get(ref);
+// The fields of a character document this build knows. `order` and anything else on the document are not the character's to change.
+const CHARACTER_FIELDS = ['id', 'name', 'playbook', 'level', 'data'];
+
+/**
+ * Changes one character and writes only the fields that changed, so two devices editing different fields never overwrite each other
+ * (the same field goes to whoever writes last, so two devices changing one stat in the same instant keep only one change).
+ * It builds on this tab's local copy, which the page's listener keeps current and which already holds this tab's unconfirmed writes,
+ * so quick edits, and edits made offline, add up. It resolves once the write is queued: the server's answer can take any time
+ * offline, and holding the caller until then would hold every later edit back in memory, where closing the tab loses it.
+ * `onRejected` hears of a write the server later refuses.
+ * `confirmed` is for edits that cannot be merged from a stale copy (an id-merged list) or that a bonus depends on (an XP payment):
+ * it runs `transform` inside a transaction on the server's copy, so it is online-only, and resolves once the server accepts the write, rejecting if it refuses.
+ */
+export const editCharacter = async (
+  gameId: string,
+  characterId: string,
+  transform: (c: Character) => Character,
+  onRejected: (error: unknown) => void,
+  confirmed = false,
+): Promise<void> => {
+  const ref = characterRef(gameId, characterId);
+  // The updateDoc arguments for the edit, or undefined when nothing changed.
+  const plan = (snap: { exists: () => boolean; data: () => Raw | undefined }) => {
     // Fail loud: a missing document means the character was removed mid-session, and "Saved" would be a lie.
     if (!snap.exists()) throw new Error('Character not found — it may have been removed.');
-    const [character] = parseCharacters({ characters: [{ ...snap.data(), id: characterId }] });
-    if (!character) throw new Error("This character's data couldn't be read.");
-    tx.update(ref, stripUndefined(transform(character)));
-  });
+    const raw = snap.data() as Raw;
+    const [before] = parseCharacters({ characters: [{ ...raw, id: characterId }] });
+    if (!before) throw new Error("This character's data couldn't be read.");
+    const after = stripUndefined(transform(before));
+    // Compared with what is stored, not with the parsed copy, so what the reader repairs or drops (a missing level, a key it no longer knows) is written too.
+    const known = (from: Record<string, unknown>) =>
+      Object.fromEntries(CHARACTER_FIELDS.filter((field) => field in from).map((field) => [field, from[field]]));
+    const changes = diffPaths(known(raw), known({ ...after }));
+    if (!changes.length) return undefined;
+    return changes.flatMap(([path, value]) => [new FieldPath(...path), value === REMOVED ? deleteField() : value]) as [
+      FieldPath,
+      unknown,
+      ...unknown[],
+    ];
+  };
+  if (confirmed) {
+    // Read, guard and write in one transaction: the server reruns it on fresh data if another device wrote meanwhile, so two devices can never both pass a check against the same stale copy.
+    await runTransaction(db, async (tx) => {
+      const writes = plan(await tx.get(ref));
+      if (writes) tx.update(ref, ...writes);
+    });
+    return;
+  }
+  const writes = plan(await getDocFromCache(ref).catch(() => getDoc(ref))); // not cached: ask the server
+  if (writes) updateDoc(ref, ...writes).catch(onRejected);
+};
 
-/** Adds a character unless that id is already there, so a double-tap or a retry after a dropped connection cannot add it twice. */
-export const addCharacter = async (gameId: string, character: Character): Promise<void> => {
-  const order = nextOrder(await storedDocs(charactersCol(gameId)));
-  await runTransaction(db, async (tx) => {
-    const ref = characterRef(gameId, character.id);
-    if ((await tx.get(ref)).exists()) return;
-    tx.set(ref, stripUndefined({ ...character, order }));
-  });
+/**
+ * Adds a character unless that id is already there, so a double-tap or a retry after a dropped connection cannot add it twice.
+ * Like `editCharacter`, it resolves once the write is queued, so it works offline, and `onRejected` hears of a refusal.
+ */
+export const addCharacter = async (gameId: string, character: Character, onRejected: (error: unknown) => void): Promise<void> => {
+  const current = await cachedDocs(charactersCol(gameId));
+  if (current.some((c) => c.id === character.id)) return;
+  setDoc(characterRef(gameId, character.id), stripUndefined({ ...character, order: nextOrder(current) })).catch(onRejected);
 };
 
 export const removeCharacter = (gameId: string, characterId: string): Promise<void> => deleteDoc(characterRef(gameId, characterId));
 
-/** Puts `ids` first, in that order; a character another player added meanwhile keeps its place after them. */
-export const reorderCharacters = async (gameId: string, ids: string[]): Promise<void> => {
-  const current = await storedDocs(charactersCol(gameId));
-  const named = new Set(ids);
-  const known = new Set(current.map((c) => c.id));
-  const rest = [...current].sort((a, b) => Number(a.data.order) - Number(b.data.order)).filter((c) => !named.has(c.id));
-  const inOrder = [...ids.filter((id) => known.has(id)), ...rest.map((c) => c.id)];
-  // A transaction, so a character removed meanwhile just drops out of the order instead of failing the whole reorder.
-  await runTransaction(db, async (tx) => {
-    const snaps = await Promise.all(inOrder.map((id) => tx.get(characterRef(gameId, id))));
-    inOrder.forEach((id, order) => {
-      if (snaps[order]!.exists()) tx.update(characterRef(gameId, id), { order });
-    });
-  });
+/**
+ * Puts `ids` first, in that order; a character another player added meanwhile keeps its place after them. Queues offline, like `editCharacter`.
+ * One batch, so the party is never left half reordered. If a character was removed meanwhile the batch is refused as a whole, and is tried once more on the party as it is by then.
+ */
+export const reorderCharacters = async (gameId: string, ids: string[], onRejected: (error: unknown) => void): Promise<void> => {
+  const send = async (retryIfGone: boolean): Promise<void> => {
+    const current = await cachedDocs(charactersCol(gameId));
+    const named = new Set(ids);
+    const known = new Set(current.map((c) => c.id));
+    const rest = [...current].sort((a, b) => Number(a.data.order) - Number(b.data.order)).filter((c) => !named.has(c.id));
+    const inOrder = [...ids.filter((id) => known.has(id)), ...rest.map((c) => c.id)];
+    // Every position is written, not only the ones this tab's copy says moved: skipping any could leave two characters on one place after another device reordered meanwhile.
+    const batch = writeBatch(db);
+    inOrder.forEach((id, order) => batch.update(characterRef(gameId, id), { order }));
+    batch.commit().catch((error) => (isNotFound(error) && retryIfGone ? send(false).catch(onRejected) : onRejected(error)));
+  };
+  await send(true);
 };
 
-/** Writes a roll (new, or an existing one edited in place), then trims the log to the newest ROLL_LOG_CAP. */
-export const logRoll = async (gameId: string, logged: LoggedRoll): Promise<void> => {
+/**
+ * Writes a roll (new, or an existing one edited in place), then trims the log to the newest ROLL_LOG_CAP once the server accepts it. Queues offline, like `editCharacter`.
+ * shortcut: the trim deletes from this tab's copy without re-checking each roll, so a roll another device edits in the same instant it falls
+ * off the log is lost, upgrade: re-check in a transaction if rolls from older entries are ever edited.
+ */
+export const logRoll = async (gameId: string, logged: LoggedRoll, onRejected: (error: unknown) => void): Promise<void> => {
   // A custom move can have any name, and the rules refuse a roll with a label over the cap: shorten it so the roll still reaches the log.
   const clip = (text?: string) => {
     const cut = text?.slice(0, ROLL_TEXT_MAX_LENGTH);
@@ -100,20 +168,16 @@ export const logRoll = async (gameId: string, logged: LoggedRoll): Promise<void>
     moveName: clip(logged.moveName) ?? '',
     resource: clip(logged.resource),
   };
-  const prior = (await storedDocs(rollsCol(gameId))).find((r) => r.id === roll.id);
-  const order = prior ? Number(prior.data.order) : nextOrder(await storedDocs(rollsCol(gameId)));
-  await setDoc(rollRef(gameId, roll.id), stripUndefined({ ...roll, order }));
-  const all = (await storedDocs(rollsCol(gameId))).map((r) => ({ id: r.id, createdAt: Number(r.data.createdAt) || 0 }));
-  const oldest = all.sort((a, b) => a.createdAt - b.createdAt).slice(0, Math.max(0, all.length - ROLL_LOG_CAP));
-  // Each delete re-checks the roll it saw: one edited since (new createdAt) is fresh again and stays; one already gone is fine.
-  await Promise.all(
-    oldest.map((old) =>
-      runTransaction(db, async (tx) => {
-        const snap = await tx.get(rollRef(gameId, old.id));
-        if (snap.exists() && Number(snap.data().createdAt) === old.createdAt) tx.delete(rollRef(gameId, old.id));
-      }),
-    ),
-  );
+  const before = await cachedDocs(rollsCol(gameId));
+  const prior = before.find((r) => r.id === roll.id);
+  const order = prior ? Number(prior.data.order) : nextOrder(before);
+  // The log is trimmed once the server has accepted the roll, so a refused roll never costs the log its oldest one (offline, the trim waits for the connection).
+  const trim = async () => {
+    const all = (await cachedDocs(rollsCol(gameId))).map((r) => ({ id: r.id, createdAt: Number(r.data.createdAt) || 0 }));
+    const oldest = all.sort((a, b) => a.createdAt - b.createdAt).slice(0, Math.max(0, all.length - ROLL_LOG_CAP));
+    oldest.forEach((old) => void deleteDoc(rollRef(gameId, old.id)).catch(() => {})); // best effort: the next roll trims what this misses
+  };
+  setDoc(rollRef(gameId, roll.id), stripUndefined({ ...roll, order })).then(trim, onRejected);
 };
 
 /** Replaces a moved game with the contents of a backup, in one batch: nothing is left of the old characters and rolls, and no half-restored game is ever visible. */

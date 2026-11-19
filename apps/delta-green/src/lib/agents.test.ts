@@ -1,8 +1,8 @@
 // What the browser writes, checked against firestore.rules, and how saves are diffed. Firestore itself is faked.
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { newCharacter } from '../model/character';
-import { freshLive, type Live } from '../model/live';
+import { newCharacter } from '@/model/character';
+import { freshLive, type Live } from '@/model/live';
 
 type Pairs = Record<string, unknown>;
 const writes: { set: Pairs[]; add: Pairs[]; tx: Pairs[]; updates: Pairs[][] } = { set: [], add: [], tx: [], updates: [] };

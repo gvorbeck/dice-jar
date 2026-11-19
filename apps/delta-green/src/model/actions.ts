@@ -1,6 +1,6 @@
 import type { Character } from './character';
-import { canImprove, clamp, parseLoss, rollExpr, rollLoss, type Outcome } from '../rules';
-import type { Stat } from '../rules/data/creation';
+import { canImprove, clamp, parseLoss, rollExpr, rollLoss, type Outcome } from '@/rules';
+import type { Stat } from '@/rules/data/creation';
 import { capsOf as caps, loseStat, withBond, type Live, type SanKind } from './live';
 
 /**

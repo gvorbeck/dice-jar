@@ -27,6 +27,21 @@ describe('canBurnBrightly', () => {
   });
 });
 
+// The Wider World, p. 571, Redwood Effigy: "Alas, you can no longer Burn Brightly."
+describe('canBurnBrightly with the Redwood Effigy heartbeat consequence marked', () => {
+  const effigy = (marked: boolean) =>
+    ({
+      arcanaMajor: [{ id: 'redwood-effigy', marksValue: 3, mysteryMovesChecked: {}, consequencesMarked: { 'effigy-c1': marked } }],
+    }) as Partial<CharacterData>;
+  it('takes it away, even from the Driven Would-be Hero', () => {
+    expect(canBurnBrightly(at('20', '1', effigy(true)))).toBe(false);
+    expect(canBurnBrightly(at('20', '1', { background: 'driven', ...effigy(true) }))).toBe(false);
+  });
+  it('leaves it alone until that consequence is marked', () => {
+    expect(canBurnBrightly(at('20', '1', effigy(false)))).toBe(true);
+  });
+});
+
 describe('requireBurnBrightly', () => {
   it('passes an eligible sheet and refuses one that has fallen below the level-up XP', () => {
     expect(() => requireBurnBrightly(at('8', '1'))).not.toThrow();

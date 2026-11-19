@@ -13,10 +13,10 @@ import {
   type DocumentData,
 } from 'firebase/firestore';
 import { useSub, type Sub } from './useSub';
-import { agentLabel } from '../model/names';
+import { agentLabel } from '@/model/names';
 import { db } from './firebase';
 import { agentPath, agentsPath, gamePath, pendingSanPath, rollsPath } from './paths';
-import type { RollEntry, TestEntry } from '../rules/outcome';
+import type { RollEntry, TestEntry } from '@/rules/outcome';
 
 /*
  * Firestore layout (rules in firestore.rules):

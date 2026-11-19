@@ -1,7 +1,7 @@
 import { useId, useRef, type ReactNode } from 'react';
 import { useCopy } from '@dice-jar/browser';
-import { copyLabel, copyNote } from '../lib/useCopy';
-import { outcomeClass } from '../rules/outcome';
+import { copyLabel, copyNote } from '@/lib/useCopy';
+import { outcomeClass } from '@/rules/outcome';
 import { cn } from '@dice-jar/cn';
 
 // Small shared pieces with no react-aria, so the landing and game pages can use them without the form-control chunk.
