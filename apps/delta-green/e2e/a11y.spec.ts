@@ -1,6 +1,6 @@
 // Every page, scanned with axe: the home page, each creation step, the review, the live sheet, the game page and a standalone sheet.
 import { expect, test } from '@playwright/test';
-import { expectAccessible } from '@dice-jar/e2e-helpers';
+import { expectAccessible, expectDiceJarCredit } from '@dice-jar/e2e-helpers';
 import { createAgent, finishAgent, startAgent } from './helpers';
 import { newCharacter } from '../src/model/character';
 import { encodeSheet, freshLive } from '../src/model/live';
@@ -9,16 +9,19 @@ test('home, creation steps, review, live sheet and game page have no accessibili
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Generate game' })).toBeVisible();
   await expectAccessible(page);
+  await expectDiceJarCredit(page);
 
   const { gameUrl } = await startAgent(page, expectAccessible); // stats, profession, bonds
   await expectAccessible(page); // final details
   await finishAgent(page);
   await expectAccessible(page); // live sheet
+  await expectDiceJarCredit(page);
 
   await page.getByRole('link', { name: '< Game' }).click();
   await expect(page).toHaveURL(new RegExp(`${gameUrl}$`));
   await expect(page.getByRole('region', { name: 'SANITY' })).toBeVisible();
   await expectAccessible(page);
+  await expectDiceJarCredit(page);
 });
 
 test('the review and a standalone sheet have no accessibility violations', async ({ page }) => {
@@ -26,11 +29,15 @@ test('the review and a standalone sheet have no accessibility violations', async
   await page.getByRole('button', { name: 'Edit agent' }).click();
   await expect(page.getByText('All steps complete')).toBeVisible();
   await expectAccessible(page);
+  await expectDiceJarCredit(page);
 
   const c = newCharacter();
   await page.goto('/' + encodeSheet(c, freshLive(c)));
   await expect(page.getByRole('main')).toBeVisible();
   await expectAccessible(page);
+  await expectDiceJarCredit(page);
+  const [main, footer] = await Promise.all([page.getByRole('main').boundingBox(), page.getByRole('contentinfo').boundingBox()]);
+  expect(footer!.y).toBeGreaterThanOrEqual(main!.y + main!.height); // no menu bar here, and the footer must still come last
 });
 
 test('the home page, live sheet and game page have no accessibility violations in dark mode', async ({ page }) => {

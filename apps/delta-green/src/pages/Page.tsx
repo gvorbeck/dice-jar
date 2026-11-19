@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
+import { DiceJarCredit } from '@dice-jar/browser';
 import { Legal } from '@/ui/Legal';
 import { MenuBar } from '@/ui/MenuBar';
 import { Win, useFocusMain } from '@/ui/Win';
@@ -29,6 +30,15 @@ export const Notice = ({ page, title, children }: { page?: string; title: string
   </Page>
 );
 
+/** The status bar at the foot of every page, the live sheet included. */
+export const Footer = ({ children }: { children?: ReactNode }) => (
+  <footer className="statusbar noprint">
+    {children}
+    <Legal />
+    <DiceJarCredit className="legal dim" />
+  </footer>
+);
+
 /** Menu bar, <main> and status bar shared by every page except the live sheet. */
 export const Page = ({ title, heading, subtitle, actions, status, wide, children }: PageProps) => {
   useTitle(title);
@@ -40,10 +50,7 @@ export const Page = ({ title, heading, subtitle, actions, status, wide, children
         {heading ?? <h1 className="sr-only">{title || 'Agent intake'}</h1>}
         {children}
       </main>
-      <footer className="statusbar noprint">
-        {status}
-        <Legal />
-      </footer>
+      <Footer>{status}</Footer>
     </>
   );
 };

@@ -9,3 +9,7 @@ export const expectAccessible = async (page: Page) => {
   const { violations } = await new AxeBuilder({ page }).analyze();
   expect(violations.map((v) => `${v.id}: ${v.nodes.map((n) => `${n.target} (${n.any[0]?.message ?? ''})`).join(' | ')}`)).toEqual([]);
 };
+
+/** Every game app's footer credits the Dice Jar (the landing page itself does not). */
+export const expectDiceJarCredit = (page: Page) =>
+  expect(page.getByRole('link', { name: 'Dice Jar', exact: true })).toHaveAttribute('href', 'https://dicejar.games');
