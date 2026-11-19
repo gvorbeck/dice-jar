@@ -51,7 +51,7 @@ export const GameDataActions = ({ gameId, gameName, onReplaceGameData }: GameDat
         return;
       }
 
-      const check = readImportFile(text);
+      const check = await readImportFile(text);
       if (!check.ok) {
         addToast(check.error, 'error');
         return;
