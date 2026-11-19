@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button, Heading, Icon, Input, Text } from '@/ui';
-import { rollNotation, type DiceRollOutcome } from '@/lib/diceNotation';
+import { rollNotation, withDie, withModifier, type DiceRollOutcome } from '@dice-jar/dice';
 import { generateId } from '@/lib/id';
 import { NOTATION_MAX_LENGTH } from '@/lib/constants';
 import type { LoggedRoll } from '@/model';
@@ -20,33 +20,6 @@ const HISTORY_LIMIT = 6;
 interface HistoryEntry extends DiceRollOutcome {
   id: string;
 }
-
-// A trailing dice term with no modifiers, e.g. the "2d6" in "1d8+2d6", so tapping d6 again can bump it
-// to "3d6" instead of appending "+d6". Group 1 is whatever precedes the count, 2 the count, 3 the sides.
-const TRAILING_DICE = /^(.*?(?:^|[+-]))(\d*)d(\d+)$/;
-// A trailing flat modifier, e.g. the "+2" in "2d6+2".
-const TRAILING_MOD = /([+-])(\d+)$/;
-
-// Fold one die-button press into the notation field.
-const withDie = (notation: string, sides: number): string => {
-  const text = notation.trim();
-  if (!text) return `d${sides}`;
-  const m = TRAILING_DICE.exec(text);
-  if (m && parseInt(m[3]!, 10) === sides) return `${m[1]}${parseInt(m[2] || '1', 10) + 1}d${sides}`;
-  return `${text}+d${sides}`;
-};
-
-// Nudge the trailing flat modifier by `delta`, adding one if there isn't any, and dropping it at zero.
-const withModifier = (notation: string, delta: number): string => {
-  const text = notation.trim();
-  if (!text) return text;
-  const m = TRAILING_MOD.exec(text);
-  const current = m ? parseInt(m[2]!, 10) * (m[1] === '-' ? -1 : 1) : 0;
-  const next = current + delta;
-  const base = m ? text.slice(0, m.index) : text;
-  if (next === 0) return base;
-  return `${base}${next > 0 ? '+' : '-'}${Math.abs(next)}`;
-};
 
 // A slide-out dice roller pinned to the bottom-right of every playbook page, its tab attached to the panel. Takes any dice notation (typed) or
 // builds one from the die buttons; each completed roll shows here and is appended to the shared roll log

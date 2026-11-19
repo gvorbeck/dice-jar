@@ -1,4 +1,4 @@
-// Standard dice notation (https://en.wikipedia.org/wiki/Dice_notation) for the free-form roller.
+// Standard dice notation (https://en.wikipedia.org/wiki/Dice_notation) for every app's free-form roller; game rolls (2d6 moves, d% tests) stay in the app.
 //
 // Supported:
 //   NdS            roll N dice with S sides            3d6, d20
@@ -27,6 +27,8 @@ const MAX_DICE_TOTAL = 300;
 const MAX_SIDES = 1000;
 // Longest plain number accepted, so a typo can't push an absurd total into the shared log.
 const MAX_NUMBER_DIGITS = 6;
+// Also bounds parenthesis nesting, so a pasted wall of "(" can't overflow the stack.
+export const NOTATION_MAX_LENGTH = 500;
 
 type Rng = () => number;
 
@@ -170,14 +172,43 @@ const expression = (ctx: Ctx): Value => {
 export const rollNotation = (input: string, rng: Rng = Math.random): DiceRollParse => {
   const notation = input.toLowerCase().replace(/×/g, '*').replace(/÷/g, '/').replace(/\s+/g, '');
   if (!notation) return { ok: false, error: 'Enter a roll, like 2d6+1.' };
+  if (notation.length > NOTATION_MAX_LENGTH) return { ok: false, error: `Keep the roll under ${NOTATION_MAX_LENGTH} characters.` };
 
   const ctx: Ctx = { src: notation, pos: 0, rng, diceRolled: 0 };
   try {
     const result = expression(ctx);
     if (ctx.pos < notation.length) fail(`Unexpected "${notation[ctx.pos]}".`);
+    if (!Number.isSafeInteger(result.value)) fail('That total is too large.');
     return { ok: true, outcome: { notation, total: result.value, breakdown: result.text } };
   } catch (e) {
     if (e instanceof DiceNotationError) return { ok: false, error: e.message };
     throw e;
   }
+};
+
+// A trailing dice term with no modifiers, e.g. the "2d6" in "1d8+2d6", so tapping d6 again can bump it
+// to "3d6" instead of appending "+d6". Group 1 is whatever precedes the count, 2 the count, 3 the sides.
+const TRAILING_DICE = /^(.*?(?:^|[+-]))(\d*)d(\d+)$/;
+// A trailing flat modifier, e.g. the "+2" in "2d6+2".
+const TRAILING_MOD = /([+-])(\d+)$/;
+
+// Fold one die-button press into the notation field.
+export const withDie = (notation: string, sides: number): string => {
+  const text = notation.trim();
+  if (!text) return `d${sides}`;
+  const m = TRAILING_DICE.exec(text);
+  if (m && parseInt(m[3]!, 10) === sides) return `${m[1]}${parseInt(m[2] || '1', 10) + 1}d${sides}`;
+  return `${text}+d${sides}`;
+};
+
+// Nudge the trailing flat modifier by `delta`, adding one if there isn't any, and dropping it at zero.
+export const withModifier = (notation: string, delta: number): string => {
+  const text = notation.trim();
+  if (!text) return text;
+  const m = TRAILING_MOD.exec(text);
+  const current = m ? parseInt(m[2]!, 10) * (m[1] === '-' ? -1 : 1) : 0;
+  const next = current + delta;
+  const base = m ? text.slice(0, m.index) : text;
+  if (next === 0) return base;
+  return `${base}${next > 0 ? '+' : '-'}${Math.abs(next)}`;
 };
