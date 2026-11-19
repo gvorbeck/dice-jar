@@ -7,6 +7,8 @@ export const BURN_BRIGHTLY_COST = 2;
 export const canBurnBrightly = (data: CharacterData | undefined): boolean => {
   const xp = parseInt(data?.statXp ?? '', 10);
   if (isNaN(xp) || xp < BURN_BRIGHTLY_COST) return false;
+  // The Wider World, p. 571: the Redwood Effigy's first consequence ends it.
+  if (data?.arcanaMajor?.some((a) => a.id === 'redwood-effigy' && a.consequencesMarked?.['effigy-c1'])) return false;
   if (data?.background === 'driven') return true;
   const level = parseInt(data?.statLevel ?? '', 10);
   return !isNaN(level) && xp >= 6 + 2 * level;

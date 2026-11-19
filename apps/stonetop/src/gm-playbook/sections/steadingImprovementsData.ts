@@ -127,8 +127,9 @@ export const IMPROVEMENTS: Improvement[] = [
       {
         type: 'checkboxes',
         items: [
-          { label: 'A reservoir for the Stream to pool in, and some way for water to flow uphill' },
-          { label: "A series of aqueducts, from the Stream's source to Stonetop" },
+          { label: 'Some method of making water flow uphill' },
+          { label: "A series of aqueducts, from the Stream's source back to Stonetop" },
+          { label: 'A reservoir to contain the diverted water' },
         ],
       },
     ],

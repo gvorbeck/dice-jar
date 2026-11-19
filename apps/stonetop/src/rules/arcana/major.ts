@@ -1935,6 +1935,10 @@ export const MAJOR_ARCANA: MajorArcanum[] = [
               id: 'effigy-c2',
               value:
                 'Your blood flows like sap and your muscles become like wood. Gain +1 armor and +4 max HP, but you can no longer regain HP via the Recover move. When you **Make Camp**, you must rest while touching soil or you get no benefit.',
+              actions: [
+                { type: 'armor', amount: 1 },
+                { type: 'maxHp', amount: 4 },
+              ],
             },
             {
               id: 'effigy-c3',

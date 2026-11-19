@@ -7,6 +7,7 @@ const HLAD = MAJOR_ARCANA.find((m) => m.id === 'hungering-maw-of-hlad')!;
 const CODEX = MAJOR_ARCANA.find((m) => m.id === 'hectumel-codex')!;
 const ORB = MAJOR_ARCANA.find((m) => m.id === 'staff-of-the-lidless-orb')!;
 const RING = MAJOR_ARCANA.find((m) => m.id === 'ring-of-daagon')!;
+const EFFIGY = MAJOR_ARCANA.find((m) => m.id === 'redwood-effigy')!;
 
 // A minimal CharacterData carrying a single Major Arcana entry with the given marked map — enough for
 // getMarkedInstinctOverride, which only reads `arcanaMajor`.
@@ -36,6 +37,19 @@ describe('maxHp consequence action (Hungering Maw hlad-c3)', () => {
   it('does not touch statArmor (the sibling setInstinct persists nothing)', () => {
     const { statDeltas } = applyConsequenceActions(HLAD, 'hlad-c3', true, {});
     expect(statDeltas.statArmor).toBeUndefined();
+  });
+});
+
+// Stonetop: The Wider World, p. 571: "Gain +1 armor and +4 max HP, but you can no longer regain HP via the Recover move."
+describe('Redwood Effigy effigy-c2 grants armor and max HP', () => {
+  it('adds +1 armor and +4 max HP on mark', () => {
+    const { statDeltas } = applyConsequenceActions(EFFIGY, 'effigy-c2', true, {});
+    expect(statDeltas).toEqual({ statArmor: 1, statHp: 4 });
+  });
+
+  it('takes both back on unmark', () => {
+    const { statDeltas } = applyConsequenceActions(EFFIGY, 'effigy-c2', false, { 'effigy-c2': true });
+    expect(statDeltas).toEqual({ statArmor: -1, statHp: -4 });
   });
 });
 
