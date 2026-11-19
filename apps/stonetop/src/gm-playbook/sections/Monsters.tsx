@@ -172,7 +172,7 @@ export const Monsters = () => (
                 label: 'Cat-sized or smaller (tiny)',
                 value: '−2 damage, reduce range',
               },
-              { label: 'Like a human shield (small)', value: 'reduce range' },
+              { label: 'Like a human child (small)', value: 'reduce range' },
               { label: 'Adult human-sized', value: '–' },
               {
                 label: 'Like a horse, cart, etc. (large)',
