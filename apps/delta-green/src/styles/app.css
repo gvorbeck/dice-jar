@@ -43,6 +43,16 @@ legend,
   display: grid;
   grid-template-rows: auto 1fr auto;
 }
+/* Fixed rows, so a standalone sheet (no menu bar) keeps its footer at the bottom. */
+#root > .menubar {
+  grid-row: 1;
+}
+#root > main {
+  grid-row: 2;
+}
+#root > .statusbar {
+  grid-row: 3;
+}
 h1,
 h2,
 h3,

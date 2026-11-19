@@ -26,7 +26,7 @@ import { SanSection } from './SanSection';
 import { DiceRoller } from './DiceRoller';
 import { useFocusMain } from './ui/Win';
 import { MenuBar } from './ui/MenuBar';
-import { useTitle } from './pages/Page';
+import { Footer, useTitle } from './pages/Page';
 import { Alert, CopyButton, Hint, OutcomeText } from './ui/bits';
 import { gameUrl } from './lib/paths';
 import type { HeldSan } from './lib/games';
@@ -536,6 +536,7 @@ export function LiveSheet({ c, init, game }: { c: Character; init: Live; game?: 
           </Win>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

@@ -64,6 +64,7 @@ An app is ready when all of these are true:
 - Its Dependabot entries exist (its `functions/` directory, if it has one).
 - Nothing in it imports from another app.
 - It has an `apps/<app>/LICENSE` or `NOTICE` stating the terms its game content is under, and its `package.json` `license` field matches (`SEE LICENSE IN LICENSE` if the terms are custom).
+- Every page's footer shows `<DiceJarCredit />` from `@dice-jar/browser` ("Another app pulled from the Dice Jar"). `scripts/apps.test.js` fails without it; the dice-jar landing page is the exception.
 - Every page has a `lang` attribute, a unique `<title>` and a description. Pages of link-only games (`/g/...`) are `noindex`, since a game is unlisted, not secret.
 - Its e2e tests run the automated accessibility check (axe) on every page. The first app in adds `@axe-core/playwright` (ask the owner first) and the helper moves to `packages/` when a second app needs it.
 
