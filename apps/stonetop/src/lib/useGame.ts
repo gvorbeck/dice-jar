@@ -190,11 +190,17 @@ export const useGame = (gameId: string): UseGameResult => {
   // (shortcut: "Saved" then means queued on this device, so offline it is not on the server yet, upgrade: show a separate offline state);
   // a write the server refuses later takes the "Saved" back and shows the error.
   const editCharacter = useCallback(
-    (characterId: string, transform: (c: Character) => Character) =>
-      v2.editCharacter(gameId, characterId, transform, (error) => {
-        saveStatusRef.current?.reportSaveRefused();
-        addToastRef.current?.(saveErrorMessage(error), 'error');
-      }),
+    (characterId: string, transform: (c: Character) => Character, confirmed = false) =>
+      v2.editCharacter(
+        gameId,
+        characterId,
+        transform,
+        (error) => {
+          saveStatusRef.current?.reportSaveRefused();
+          addToastRef.current?.(saveErrorMessage(error), 'error');
+        },
+        confirmed,
+      ),
     [gameId, addToastRef, saveStatusRef],
   );
 
@@ -229,7 +235,9 @@ export const useGame = (gameId: string): UseGameResult => {
 
   const updateCharacterData = useCallback(
     async (characterId: string, data: Partial<CharacterData>) => {
-      await reportSave(() => editCharacter(characterId, (c) => patchCharacterData(c, data)));
+      // Arcana lists id-merge, so they must merge into the server's copy, not a stale cached one.
+      const confirmed = !!(data.arcanaMinor || data.arcanaMajor);
+      await reportSave(() => editCharacter(characterId, (c) => patchCharacterData(c, data), confirmed));
     },
     [editCharacter, reportSave],
   );
@@ -237,7 +245,8 @@ export const useGame = (gameId: string): UseGameResult => {
   // Reads each stat off this tab's local copy (which holds its own unconfirmed writes), not a caller's snapshot, so a rapid check-then-uncheck can't start from a stale number.
   const adjustCharacterStats = useCallback(
     async (characterId: string, deltas: Partial<Record<AdditiveStat, number>>, guard?: SheetGuard) => {
-      await reportSave(() => editCharacter(characterId, (c) => ({ ...c, data: applyStatDeltas(c.data ?? {}, deltas, guard) })));
+      // A guarded change is a payment (Burn Brightly): the caller's bonus must wait for the server to accept it.
+      await reportSave(() => editCharacter(characterId, (c) => ({ ...c, data: applyStatDeltas(c.data ?? {}, deltas, guard) }), !!guard));
     },
     [editCharacter, reportSave],
   );

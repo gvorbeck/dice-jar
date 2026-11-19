@@ -4,7 +4,7 @@ import { firestoreMockModule, firestoreStore } from '@/test/firestoreMock';
 vi.mock('firebase/app', () => ({ initializeApp: () => ({}) }));
 vi.mock('firebase/firestore', () => firestoreMockModule());
 
-import { FieldPath, getDocFromCache, runTransaction, updateDoc } from 'firebase/firestore';
+import { FieldPath, getDoc, getDocFromCache, runTransaction, updateDoc } from 'firebase/firestore';
 import { editCharacter } from '../gameV2';
 import { patchCharacterData } from '../gameMutations';
 
@@ -130,5 +130,20 @@ describe('editCharacter repairs what the reader repairs', () => {
   it('says so when the character is gone, instead of reporting Saved', async () => {
     firestoreStore.delete(PATH);
     await expect(edit((c) => c)).rejects.toThrow('Character not found');
+  });
+});
+
+describe('editCharacter confirmed', () => {
+  it('reads the server copy, not the cache', async () => {
+    vi.mocked(getDocFromCache).mockClear();
+    await editCharacter('g1', 'c1', (c) => patchCharacterData(c, { statStr: '+2' }), rejected, true);
+    expect(getDocFromCache).not.toHaveBeenCalled();
+    expect(getDoc).toHaveBeenCalled();
+  });
+
+  it('rejects to the caller when the server refuses the write', async () => {
+    vi.mocked(updateDoc).mockRejectedValueOnce(new Error('denied'));
+    await expect(editCharacter('g1', 'c1', (c) => patchCharacterData(c, { statStr: '+2' }), rejected, true)).rejects.toThrow('denied');
+    expect(rejected).not.toHaveBeenCalled();
   });
 });

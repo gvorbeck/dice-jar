@@ -70,15 +70,18 @@ const CHARACTER_FIELDS = ['id', 'name', 'playbook', 'level', 'data'];
  * so quick edits, and edits made offline, add up. It resolves once the write is queued: the server's answer can take any time
  * offline, and holding the caller until then would hold every later edit back in memory, where closing the tab loses it.
  * `onRejected` hears of a write the server later refuses.
+ * `confirmed` is for edits that cannot be merged from a stale copy (an id-merged list) or that a bonus depends on (an XP payment):
+ * it reads the server's copy when online and resolves only once the server accepts the write, rejecting if it refuses.
  */
 export const editCharacter = async (
   gameId: string,
   characterId: string,
   transform: (c: Character) => Character,
   onRejected: (error: unknown) => void,
+  confirmed = false,
 ): Promise<void> => {
   const ref = characterRef(gameId, characterId);
-  const snap = await getDocFromCache(ref).catch(() => getDoc(ref)); // not cached: ask the server
+  const snap = confirmed ? await getDoc(ref) : await getDocFromCache(ref).catch(() => getDoc(ref)); // not cached: ask the server
   // Fail loud: a missing document means the character was removed mid-session, and "Saved" would be a lie.
   if (!snap.exists()) throw new Error('Character not found — it may have been removed.');
   const raw = snap.data();
@@ -91,7 +94,9 @@ export const editCharacter = async (
   const changes = diffPaths(known(raw), known({ ...after }));
   if (!changes.length) return;
   const writes = changes.flatMap(([path, value]) => [new FieldPath(...path), value === REMOVED ? deleteField() : value]);
-  updateDoc(ref, ...(writes as [FieldPath, unknown, ...unknown[]])).catch(onRejected);
+  const write = updateDoc(ref, ...(writes as [FieldPath, unknown, ...unknown[]]));
+  if (confirmed) await write;
+  else write.catch(onRejected);
 };
 
 /** Adds a character unless that id is already there, so a double-tap or a retry after a dropped connection cannot add it twice. */
