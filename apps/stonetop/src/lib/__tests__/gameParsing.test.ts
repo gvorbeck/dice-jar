@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseCharacters, parseDiceRolls } from '../gameParsing';
+import { parseCharacters, parseDiceRolls, parseSteading } from '../gameParsing';
 
 const base = {
   id: 'r1',
@@ -60,5 +60,28 @@ describe('a character level the reader repairs', () => {
   ])('reads level %j as %j, the same way a restore stores it', (level, expected) => {
     const [c] = parseCharacters({ characters: [{ id: 'c1', name: 'A', playbook: 'ranger', level }] });
     expect(c?.level).toBe(expected);
+  });
+});
+
+// The old first Harnessing the Stream box meant "a reservoir, and some way for water to flow uphill"; it is now two boxes (Book 1, p. 157).
+describe('Harnessing the Stream boxes saved before it was split', () => {
+  const OLD = 'harnessing-the-stream__req__b1i0__0';
+  const AQUEDUCTS = 'harnessing-the-stream__req__b1i1__0';
+  const RESERVOIR = 'harnessing-the-stream__req__b1i2__0';
+
+  it('counts the old tick for the reservoir too, and leaves the aqueduct box alone', () => {
+    expect(parseSteading({ improvements: { [OLD]: true, [AQUEDUCTS]: false } })?.improvements).toEqual({
+      [OLD]: true,
+      [AQUEDUCTS]: false,
+      [RESERVOIR]: true,
+    });
+  });
+
+  it('keeps a reservoir box the GM has since cleared', () => {
+    expect(parseSteading({ improvements: { [OLD]: true, [RESERVOIR]: false } })?.improvements).toEqual({ [OLD]: true, [RESERVOIR]: false });
+  });
+
+  it('adds nothing when the old box was never ticked', () => {
+    expect(parseSteading({ improvements: { [AQUEDUCTS]: true } })?.improvements).toEqual({ [AQUEDUCTS]: true });
   });
 });

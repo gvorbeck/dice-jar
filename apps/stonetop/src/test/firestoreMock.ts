@@ -275,9 +275,19 @@ export const firestoreMockModule = () => {
         docs.delete(ref.path);
         emit(ref.path);
       },
-      update: (ref: Ref, payload: DocData) => {
+      update: (ref: Ref, first: DocData | FieldPath | string, ...rest: unknown[]) => {
         const existing = docs.get(ref.path) ?? {};
-        docs.set(ref.path, applyUpdate(existing, payload));
+        if (first instanceof FieldPath || typeof first === 'string') {
+          const next = structuredClone(existing);
+          const pairs = [first, ...rest];
+          for (let i = 0; i < pairs.length; i += 2) {
+            const field = pairs[i] as FieldPath | string;
+            setAtPath(next, field instanceof FieldPath ? field.segments : field.split('.'), pairs[i + 1]);
+          }
+          docs.set(ref.path, next);
+        } else {
+          docs.set(ref.path, applyUpdate(existing, first));
+        }
         emit(ref.path);
       },
     };
@@ -322,6 +332,6 @@ export const firestoreMockModule = () => {
 interface Transaction {
   get: (ref: Ref) => Promise<ReturnType<typeof makeSnapshot>>;
   set: (ref: Ref, data: DocData) => void;
-  update: (ref: Ref, payload: DocData) => void;
+  update: (ref: Ref, first: DocData | FieldPath | string, ...rest: unknown[]) => void;
   delete: (ref: Ref) => void;
 }

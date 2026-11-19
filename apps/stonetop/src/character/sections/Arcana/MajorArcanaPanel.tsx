@@ -171,10 +171,10 @@ export const MajorArcanaPanel = ({
       // patch, the signed stat deltas, and any cascade-cleared descendant ids up front, then persist
       // once — not inside the map below, which React may run twice under StrictMode. The pre-toggle
       // marked map is read from the ref so unchecking a parent reverses only actually-marked descendants.
-      const preToggleMarked = arcanaMajorRef.current.find((a) => a.id === id)?.consequencesMarked ?? {};
+      const preToggle = arcanaMajorRef.current.find((a) => a.id === id);
       const actionChange =
         arcanum && hasConsequenceActions(arcanum, consequenceId)
-          ? applyConsequenceActions(arcanum, consequenceId, checked, preToggleMarked)
+          ? applyConsequenceActions(arcanum, consequenceId, checked, preToggle?.consequencesMarked ?? {}, preToggle?.consequencesApplied)
           : undefined;
       saveMajor(
         arcanaMajorRef.current.map((a) => {
@@ -190,7 +190,10 @@ export const MajorArcanaPanel = ({
             }
           }
           if (actionChange) {
-            return { ...a, consequencesMarked };
+            const applied = Object.keys(actionChange.appliedChange).length
+              ? { consequencesApplied: { ...a.consequencesApplied, ...actionChange.appliedChange } }
+              : {};
+            return { ...a, consequencesMarked, ...applied };
           }
           if (!consequenceId.startsWith('task-')) return { ...a, consequencesMarked };
           // Tasks are authored in the description now (not a fixed marks.tasks array), so count the

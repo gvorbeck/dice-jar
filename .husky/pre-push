@@ -1,7 +1,13 @@
 # Refuse updating main on GitHub; the first push (main doesn't exist there yet) is allowed.
-while read -r _ _ remote_ref remote_sha; do
+# Also refuse pushing any other branch onto dev: a branch cut with `git switch -c x origin/dev` tracks dev, so a plain
+# push would land its commits on dev with no PR. Only the dev branch itself may update dev.
+while read -r local_ref _ remote_ref remote_sha; do
   if [ "$remote_ref" = refs/heads/main ] && echo "$remote_sha" | grep -qv '^0*$'; then
     echo "Don't push to main: open a PR from dev instead." >&2
+    exit 1
+  fi
+  if [ "$remote_ref" = refs/heads/dev ] && [ "$local_ref" != refs/heads/dev ]; then
+    echo "Don't push $local_ref onto dev: push it to its own branch (git push -u origin HEAD:refs/heads/<name>) and open a PR." >&2
     exit 1
   fi
 done

@@ -58,6 +58,19 @@ test('pre-push refuses to update main on GitHub', () => {
   assert.match(stderr, /Don't push to main/);
 });
 
+test('pre-push refuses to push a feature branch onto dev, but dev itself may update dev', () => {
+  // A stand-in `npm` that succeeds at once, so the allowed cases do not run the whole check.
+  const bin = mkdtempSync(join(tmpdir(), 'npm-'));
+  writeFileSync(join(bin, 'npm'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  const push = (input) =>
+    spawnSync('sh', [hook('pre-push')], { input, encoding: 'utf8', env: { ...process.env, PATH: `${bin}:${process.env.PATH}` } });
+  const refused = push('refs/heads/stonetop-x 1111111 refs/heads/dev 2222222\n');
+  assert.equal(refused.status, 1);
+  assert.match(refused.stderr, /onto dev/);
+  assert.equal(push('refs/heads/stonetop-x 1111111 refs/heads/stonetop-x 0000000\n').status, 0);
+  assert.equal(push('refs/heads/dev 1111111 refs/heads/dev 2222222\n').status, 0);
+});
+
 test('pre-commit refuses a commit on main once origin/main exists', () => {
   const repo = mkdtempSync(join(tmpdir(), 'hook-'));
   const git = (...args) =>

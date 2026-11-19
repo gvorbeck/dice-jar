@@ -182,6 +182,9 @@ export interface ArcanaMajorEntry {
   everUnlocked?: boolean;
   mysteryMovesChecked: Record<string, boolean>;
   consequencesMarked: Record<string, boolean>;
+  // Consequences in ACTIONS_ADDED_LATER whose actions this sheet has actually applied: such a box marked before its actions
+  // existed changed no stats, so unmarking it must not take a bonus away that was never given.
+  consequencesApplied?: Record<string, boolean>;
   // Picked row id for a consequence's roll table: consequenceId -> rowId (e.g. the Mindgem's chosen
   // 1d4 purpose). Drives the row's effect on the creature.
   consequenceTableChoice?: Record<string, string>;

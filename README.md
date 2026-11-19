@@ -65,7 +65,7 @@ Every workspace uses the same script names: `dev`, `build`, `test`, `lint`, `typ
 
 `main` is production and deploys. `dev` is where work lands first and never deploys. Nothing reaches `main` except through a PR from `dev`.
 
-1. **Start from `dev`.** `git switch dev && git pull`. For anything bigger than a small fix, cut a branch: `git switch -c <name>`.
+1. **Start from `dev`.** `git switch dev && git pull`. For anything bigger than a small fix, cut a branch: `git switch -c <name>` from `dev`. Starting from `origin/dev` instead? Add `--no-track`, or the branch will push straight to `dev`.
 2. **Work.** Run `npm run check` as you go, plus `npm run test:rules` and `npm run test:e2e` when [AGENTS.md](AGENTS.md) says to.
 3. **Commit and push the branch.** The hooks check formatting and lint on commit, and run the full `npm run check` on push. They can't be skipped, and they refuse `main`.
 4. **PR into `dev`.** It's the default base. The `checks` job runs; merge when it's green. Dependabot's PRs go through the same step. Nothing is live yet.
@@ -76,7 +76,7 @@ Adding or removing a Firestore field takes two releases, because open tabs keep 
 ## Hooks
 
 - `pre-commit`: Prettier (`--check`) and ESLint on staged files. A commit with unformatted or lint-failing code is refused; run `npm run format` and commit again.
-- `pre-push`: `npm run check`.
+- `pre-push`: `npm run check`, after refusing a push of any branch other than `dev` onto `dev` (a branch cut from `origin/dev` tracks `dev` unless you pass `--no-track`).
 - Once `main` is on GitHub, both hooks also refuse a commit on `main` and a push to it. Work on `dev` (or another branch) and open a PR into `main`. The first push of `main` is allowed. Branch protection on GitHub enforces the same rule for everyone.
 
 ## CI

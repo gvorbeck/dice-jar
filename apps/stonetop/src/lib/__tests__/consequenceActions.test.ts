@@ -42,14 +42,23 @@ describe('maxHp consequence action (Hungering Maw hlad-c3)', () => {
 
 // Stonetop: The Wider World, p. 571: "Gain +1 armor and +4 max HP, but you can no longer regain HP via the Recover move."
 describe('Redwood Effigy effigy-c2 grants armor and max HP', () => {
-  it('adds +1 armor and +4 max HP on mark', () => {
-    const { statDeltas } = applyConsequenceActions(EFFIGY, 'effigy-c2', true, {});
+  it('adds +1 armor and +4 max HP on mark, and records that it did', () => {
+    const { statDeltas, appliedChange } = applyConsequenceActions(EFFIGY, 'effigy-c2', true, {});
     expect(statDeltas).toEqual({ statArmor: 1, statHp: 4 });
+    expect(appliedChange).toEqual({ 'effigy-c2': true });
   });
 
-  it('takes both back on unmark', () => {
-    const { statDeltas } = applyConsequenceActions(EFFIGY, 'effigy-c2', false, { 'effigy-c2': true });
+  it('takes both back on unmark when it had applied them', () => {
+    const { statDeltas, appliedChange } = applyConsequenceActions(EFFIGY, 'effigy-c2', false, { 'effigy-c2': true }, { 'effigy-c2': true });
     expect(statDeltas).toEqual({ statArmor: -1, statHp: -4 });
+    expect(appliedChange).toEqual({ 'effigy-c2': false });
+  });
+
+  // A sheet saved before these actions existed: the box is marked but no bonus was ever given, so unmarking must not subtract one.
+  it('takes nothing back from a mark made before the actions existed', () => {
+    const { statDeltas, appliedChange } = applyConsequenceActions(EFFIGY, 'effigy-c2', false, { 'effigy-c2': true });
+    expect(statDeltas).toEqual({});
+    expect(appliedChange).toEqual({});
   });
 });
 

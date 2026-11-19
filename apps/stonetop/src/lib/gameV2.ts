@@ -79,7 +79,7 @@ const CHARACTER_FIELDS = ['id', 'name', 'playbook', 'level', 'data'];
  * offline, and holding the caller until then would hold every later edit back in memory, where closing the tab loses it.
  * `onRejected` hears of a write the server later refuses.
  * `confirmed` is for edits that cannot be merged from a stale copy (an id-merged list) or that a bonus depends on (an XP payment):
- * it reads the server's copy when online and resolves only once the server accepts the write, rejecting if it refuses.
+ * it runs `transform` inside a transaction on the server's copy, so it is online-only, and resolves once the server accepts the write, rejecting if it refuses.
  */
 export const editCharacter = async (
   gameId: string,
@@ -89,22 +89,35 @@ export const editCharacter = async (
   confirmed = false,
 ): Promise<void> => {
   const ref = characterRef(gameId, characterId);
-  const snap = confirmed ? await getDoc(ref) : await getDocFromCache(ref).catch(() => getDoc(ref)); // not cached: ask the server
-  // Fail loud: a missing document means the character was removed mid-session, and "Saved" would be a lie.
-  if (!snap.exists()) throw new Error('Character not found — it may have been removed.');
-  const raw = snap.data();
-  const [before] = parseCharacters({ characters: [{ ...raw, id: characterId }] });
-  if (!before) throw new Error("This character's data couldn't be read.");
-  const after = stripUndefined(transform(before));
-  // Compared with what is stored, not with the parsed copy, so what the reader repairs or drops (a missing level, a key it no longer knows) is written too.
-  const known = (from: Record<string, unknown>) =>
-    Object.fromEntries(CHARACTER_FIELDS.filter((field) => field in from).map((field) => [field, from[field]]));
-  const changes = diffPaths(known(raw), known({ ...after }));
-  if (!changes.length) return;
-  const writes = changes.flatMap(([path, value]) => [new FieldPath(...path), value === REMOVED ? deleteField() : value]);
-  const write = updateDoc(ref, ...(writes as [FieldPath, unknown, ...unknown[]]));
-  if (confirmed) await write;
-  else write.catch(onRejected);
+  // The updateDoc arguments for the edit, or undefined when nothing changed.
+  const plan = (snap: { exists: () => boolean; data: () => Raw | undefined }) => {
+    // Fail loud: a missing document means the character was removed mid-session, and "Saved" would be a lie.
+    if (!snap.exists()) throw new Error('Character not found — it may have been removed.');
+    const raw = snap.data() as Raw;
+    const [before] = parseCharacters({ characters: [{ ...raw, id: characterId }] });
+    if (!before) throw new Error("This character's data couldn't be read.");
+    const after = stripUndefined(transform(before));
+    // Compared with what is stored, not with the parsed copy, so what the reader repairs or drops (a missing level, a key it no longer knows) is written too.
+    const known = (from: Record<string, unknown>) =>
+      Object.fromEntries(CHARACTER_FIELDS.filter((field) => field in from).map((field) => [field, from[field]]));
+    const changes = diffPaths(known(raw), known({ ...after }));
+    if (!changes.length) return undefined;
+    return changes.flatMap(([path, value]) => [new FieldPath(...path), value === REMOVED ? deleteField() : value]) as [
+      FieldPath,
+      unknown,
+      ...unknown[],
+    ];
+  };
+  if (confirmed) {
+    // Read, guard and write in one transaction: the server reruns it on fresh data if another device wrote meanwhile, so two devices can never both pass a check against the same stale copy.
+    await runTransaction(db, async (tx) => {
+      const writes = plan(await tx.get(ref));
+      if (writes) tx.update(ref, ...writes);
+    });
+    return;
+  }
+  const writes = plan(await getDocFromCache(ref).catch(() => getDoc(ref))); // not cached: ask the server
+  if (writes) updateDoc(ref, ...writes).catch(onRejected);
 };
 
 /**

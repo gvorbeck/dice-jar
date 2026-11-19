@@ -4,7 +4,7 @@ import { firestoreMockModule, firestoreStore } from '@/test/firestoreMock';
 vi.mock('firebase/app', () => ({ initializeApp: () => ({}) }));
 vi.mock('firebase/firestore', () => firestoreMockModule());
 
-import { FieldPath, getDoc, getDocFromCache, runTransaction, updateDoc } from 'firebase/firestore';
+import { FieldPath, getDocFromCache, runTransaction, updateDoc } from 'firebase/firestore';
 import { editCharacter } from '../gameV2';
 import { patchCharacterData } from '../gameMutations';
 
@@ -134,15 +134,55 @@ describe('editCharacter repairs what the reader repairs', () => {
 });
 
 describe('editCharacter confirmed', () => {
-  it('reads the server copy, not the cache', async () => {
+  it('reads and writes inside one transaction, not from the cache', async () => {
     vi.mocked(getDocFromCache).mockClear();
+    vi.mocked(updateDoc).mockClear();
     await editCharacter('g1', 'c1', (c) => patchCharacterData(c, { statStr: '+2' }), rejected, true);
+    expect(runTransaction).toHaveBeenCalledTimes(1);
     expect(getDocFromCache).not.toHaveBeenCalled();
-    expect(getDoc).toHaveBeenCalled();
+    expect(updateDoc).not.toHaveBeenCalled(); // a bare updateDoc would write over what another device changed after the read
+    expect(firestoreStore.get(PATH)).toMatchObject({ data: { statStr: '+2' } });
+  });
+
+  // Two devices at 8 XP both passing a "spend 2 XP" guard against the same stale copy was the bug; the transaction reruns the guard on fresh data.
+  it("runs the transform and its guard inside the transaction, so a retry sees the other device's write", async () => {
+    const seen: string[] = [];
+    vi.mocked(runTransaction).mockImplementationOnce(async (_db, updater) => {
+      const tx = {
+        get: async () => ({ exists: () => true, data: () => stored({ data: { statXp: '8' } }) }),
+        update: vi.fn(),
+      };
+      await updater(tx as never);
+      // Firestore reruns the updater when another device wrote meanwhile.
+      const retry = {
+        get: async () => ({ exists: () => true, data: () => stored({ data: { statXp: '6' } }) }),
+        update: vi.fn(),
+      };
+      await updater(retry as never);
+    });
+    await editCharacter(
+      'g1',
+      'c1',
+      (c) => {
+        seen.push(String(c.data?.statXp));
+        return c;
+      },
+      rejected,
+      true,
+    );
+    expect(seen).toEqual(['8', '6']);
+  });
+
+  it('writes nothing, and rejects, when the guard in the transform refuses', async () => {
+    const guard = () => {
+      throw new Error('Not enough XP to Burn Brightly.');
+    };
+    await expect(editCharacter('g1', 'c1', guard, rejected, true)).rejects.toThrow('Not enough XP');
+    expect(firestoreStore.get(PATH)).toMatchObject({ data: { statStr: '+1' } });
   });
 
   it('rejects to the caller when the server refuses the write', async () => {
-    vi.mocked(updateDoc).mockRejectedValueOnce(new Error('denied'));
+    vi.mocked(runTransaction).mockRejectedValueOnce(new Error('denied'));
     await expect(editCharacter('g1', 'c1', (c) => patchCharacterData(c, { statStr: '+2' }), rejected, true)).rejects.toThrow('denied');
     expect(rejected).not.toHaveBeenCalled();
   });
