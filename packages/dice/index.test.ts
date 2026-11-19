@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { rollNotation } from '../diceNotation';
+import { rollNotation, withDie, withModifier } from './index';
 
 // Deterministic rng: yields the given faces for a die with `sides` sides, in order. (face-1)/sides + a
 // nudge lands floor(r*sides)+1 on the face.
@@ -99,5 +99,32 @@ describe('rollNotation', () => {
 
   it('rejects absurdly long numbers', () => {
     expect(rollNotation('99999999999*99999999999').ok).toBe(false);
+  });
+});
+
+describe('withDie', () => {
+  it('starts, bumps a matching trailing die, and appends a different one', () => {
+    expect(withDie('', 6)).toBe('d6');
+    expect(withDie('d6', 6)).toBe('2d6');
+    expect(withDie('2d6', 8)).toBe('2d6+d8');
+    expect(withDie('2d6+d8', 8)).toBe('2d6+2d8');
+    expect(withDie('4d6kh3', 6)).toBe('4d6kh3+d6');
+  });
+});
+
+describe('withModifier', () => {
+  it('adds, nudges and drops the trailing modifier', () => {
+    expect(withModifier('', 1)).toBe('');
+    expect(withModifier('2d6', 1)).toBe('2d6+1');
+    expect(withModifier('2d6+1', -1)).toBe('2d6');
+    expect(withModifier('2d6', -2)).toBe('2d6-2');
+    expect(withModifier('2d6-1', 3)).toBe('2d6+2');
+  });
+});
+
+describe('rollNotation limits', () => {
+  it('rejects overlong input and unsafe totals instead of throwing', () => {
+    expect(rollNotation('('.repeat(5000)).ok).toBe(false);
+    expect(rollNotation(Array(70).fill('999999').join('*')).ok).toBe(false);
   });
 });

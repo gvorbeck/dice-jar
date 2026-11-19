@@ -129,10 +129,10 @@ test('the live sheet rolls plain dice', async ({ page }) => {
   await createAgent(page);
   await page.getByLabel('Dice', { exact: true }).fill('2d6 + 1');
   await page.getByRole('button', { name: 'Roll', exact: true }).click();
-  await expect(page.locator('output').filter({ hasText: /^#1 2D6\+1 \(\d\+\d\+1\) → \d+$/ })).toBeVisible(); // typed loosely, shown as the bot shows it
+  await expect(page.locator('output').filter({ hasText: /^#1 2D6\+1 \[\d, \d\] \+ 1 → \d+$/ })).toBeVisible(); // typed loosely, shown normalized
   await page.getByLabel('Dice', { exact: true }).fill('nope');
   await page.getByRole('button', { name: 'Roll', exact: true }).click();
-  await expect(page.getByText(/Write dice like 2D6\+1\./)).toBeVisible();
+  await expect(page.locator('output').filter({ hasText: /^#2 Unexpected "n"\.$/ })).toBeVisible();
 });
 
 test('the Sanity box shows how far an agent is toward adapting', async ({ page }) => {
