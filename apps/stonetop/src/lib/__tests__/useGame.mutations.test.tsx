@@ -9,6 +9,8 @@ vi.mock('firebase/app', () => ({ initializeApp: () => ({}) }));
 vi.mock('firebase/firestore', () => firestoreMockModule());
 vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
 
+import { createElement, type ReactNode } from 'react';
+import { SaveStatusContext } from '@/ui/SaveStatus/SaveStatusContext';
 import { useGame } from '../useGame';
 import type { Character, LoggedRoll, NotesLock } from '@/model';
 
@@ -835,5 +837,30 @@ describe('useGame mutations', () => {
       expect(result.current.game?.notes).toEqual({ gm: '<p>ok</p>' });
       expect(result.current.game?.notesLocks).toEqual({ gm: { clientId: 'x', at: 1 } });
     });
+  });
+
+  it('takes back "Saved" and shows the error when the server refuses a character save that was already reported done', async () => {
+    firestoreStore.setGame(GAME_PATH, { name: 'Test', createdAt: 0, characters: [char('a')] });
+    const status = {
+      status: 'idle' as const,
+      lastSavedAt: null,
+      reportSaveStart: vi.fn(),
+      reportSaveSettled: vi.fn(),
+      reportSaveRefused: vi.fn(),
+    };
+    const wrapper = ({ children }: { children: ReactNode }) => createElement(SaveStatusContext.Provider, { value: status }, children);
+    const { result } = renderHook(() => useGame('g1'), { wrapper });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    const { updateDoc } = await import('firebase/firestore');
+    (updateDoc as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      Object.assign(new Error('denied'), { code: 'permission-denied' }),
+    );
+
+    await act(async () => {
+      await result.current.updateCharacterName('a', 'Renamed'); // queued: reported done
+    });
+    expect(status.reportSaveSettled).toHaveBeenCalledWith(true);
+    await waitFor(() => expect(status.reportSaveRefused).toHaveBeenCalled());
+    expect(addToastSpy).toHaveBeenCalledWith("You don't have access to this game.", 'error');
   });
 });

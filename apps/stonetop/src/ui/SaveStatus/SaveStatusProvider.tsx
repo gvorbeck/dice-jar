@@ -48,9 +48,15 @@ export const SaveStatusProvider = ({ children }: { children: ReactNode }) => {
     [lastSavedAt],
   );
 
+  const reportSaveRefused = useCallback(() => {
+    // Only when nothing else is in flight: a save still running will set the status when it settles.
+    if (activeRef.current === 0) setStatus('idle');
+    setLastSavedAt(null);
+  }, []);
+
   const value = useMemo<SaveStatusContextValue>(
-    () => ({ status, lastSavedAt, reportSaveStart, reportSaveSettled }),
-    [status, lastSavedAt, reportSaveStart, reportSaveSettled],
+    () => ({ status, lastSavedAt, reportSaveStart, reportSaveSettled, reportSaveRefused }),
+    [status, lastSavedAt, reportSaveStart, reportSaveSettled, reportSaveRefused],
   );
 
   return <SaveStatusContext.Provider value={value}>{children}</SaveStatusContext.Provider>;

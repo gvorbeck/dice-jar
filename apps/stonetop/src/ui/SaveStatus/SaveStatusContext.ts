@@ -15,6 +15,8 @@ export interface SaveStatusContextValue {
   // once reads as a single "Saving…" until the last one finishes.
   reportSaveStart: () => void;
   reportSaveSettled: (succeeded: boolean) => void;
+  // A write the server refused after its save had already been reported as done: the "Saved" it earned no longer holds.
+  reportSaveRefused: () => void;
 }
 
 // Context lives apart from the provider component so the data layer (useGame)

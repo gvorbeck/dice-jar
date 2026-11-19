@@ -3,7 +3,9 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     // DOM only because shared src/model code mentions localStorage and File; Functions never call those parts.
-    "lib": ["ES2022", "DOM"]
+    "lib": ["ES2022", "DOM"],
+    // The shared src code imports itself with the app's @/ alias.
+    "paths": { "@/*": ["../src/*"] }
   },
   "include": ["src"]
 }

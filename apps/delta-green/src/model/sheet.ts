@@ -1,7 +1,7 @@
-import { STATS } from '../rules/data/creation';
-import { activeBonds, derived, disorderOf, featureOf, motivationsOf, professionOf, skillsOf, veteranOf } from '../rules';
+import { STATS } from '@/rules/data/creation';
+import { activeBonds, derived, disorderOf, featureOf, motivationsOf, professionOf, skillsOf, veteranOf } from '@/rules';
 import type { Character } from './character';
-import { pad2 } from '../rules/outcome';
+import { pad2 } from '@/rules/outcome';
 
 export const MAX_COL = 30;
 

@@ -1,4 +1,4 @@
-import type { Character } from '../model/character';
+import type { Character } from '@/model/character';
 import { STATS, STAT_SETS, POINT_BUY_TOTAL, VETERANS, FEATURES, type Stat } from './data/creation';
 import { PROFESSIONS, type ProfessionDef } from './data/professions';
 import { modText } from './outcome';

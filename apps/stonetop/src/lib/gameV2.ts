@@ -1,4 +1,17 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, runTransaction, setDoc } from 'firebase/firestore';
+import {
+  FieldPath,
+  collection,
+  deleteDoc,
+  deleteField,
+  doc,
+  getDoc,
+  getDocFromCache,
+  getDocs,
+  runTransaction,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
+import { REMOVED, diffPaths } from '@dice-jar/diff';
 import { db } from '@/lib/firebase';
 import { GAMES_COLLECTION } from '@/lib/constants';
 import { assembleGame, restoredLevel, splitGame, type Stored } from '@/lib/gameShape';
@@ -47,17 +60,44 @@ export const readMovedGame = async (gameId: string): Promise<Raw> => {
   throw new Error('The game kept changing while it was being read. Try again in a moment.');
 };
 
-/** Changes one character on the freshly-read document, so a save only ever touches that character. */
-export const editCharacter = (gameId: string, characterId: string, transform: (c: Character) => Character): Promise<void> =>
-  runTransaction(db, async (tx) => {
-    const ref = characterRef(gameId, characterId);
-    const snap = await tx.get(ref);
-    // Fail loud: a missing document means the character was removed mid-session, and "Saved" would be a lie.
-    if (!snap.exists()) throw new Error('Character not found — it may have been removed.');
-    const [character] = parseCharacters({ characters: [{ ...snap.data(), id: characterId }] });
-    if (!character) throw new Error("This character's data couldn't be read.");
-    tx.update(ref, stripUndefined(transform(character)));
-  });
+// The fields of a character document this build knows. `order` and anything else on the document are not the character's to change.
+const CHARACTER_FIELDS = ['id', 'name', 'playbook', 'level', 'data'];
+
+/**
+ * Changes one character and writes only the fields that changed, so two devices editing different fields never overwrite each other
+ * (the same field goes to whoever writes last, so two devices changing one stat in the same instant keep only one change).
+ * It builds on this tab's local copy, which the page's listener keeps current and which already holds this tab's unconfirmed writes,
+ * so quick edits, and edits made offline, add up. It resolves once the write is queued: the server's answer can take any time
+ * offline, and holding the caller until then would hold every later edit back in memory, where closing the tab loses it.
+ * `onRejected` hears of a write the server later refuses.
+ * `confirmed` is for edits that cannot be merged from a stale copy (an id-merged list) or that a bonus depends on (an XP payment):
+ * it reads the server's copy when online and resolves only once the server accepts the write, rejecting if it refuses.
+ */
+export const editCharacter = async (
+  gameId: string,
+  characterId: string,
+  transform: (c: Character) => Character,
+  onRejected: (error: unknown) => void,
+  confirmed = false,
+): Promise<void> => {
+  const ref = characterRef(gameId, characterId);
+  const snap = confirmed ? await getDoc(ref) : await getDocFromCache(ref).catch(() => getDoc(ref)); // not cached: ask the server
+  // Fail loud: a missing document means the character was removed mid-session, and "Saved" would be a lie.
+  if (!snap.exists()) throw new Error('Character not found — it may have been removed.');
+  const raw = snap.data();
+  const [before] = parseCharacters({ characters: [{ ...raw, id: characterId }] });
+  if (!before) throw new Error("This character's data couldn't be read.");
+  const after = stripUndefined(transform(before));
+  // Compared with what is stored, not with the parsed copy, so what the reader repairs or drops (a missing level, a key it no longer knows) is written too.
+  const known = (from: Record<string, unknown>) =>
+    Object.fromEntries(CHARACTER_FIELDS.filter((field) => field in from).map((field) => [field, from[field]]));
+  const changes = diffPaths(known(raw), known({ ...after }));
+  if (!changes.length) return;
+  const writes = changes.flatMap(([path, value]) => [new FieldPath(...path), value === REMOVED ? deleteField() : value]);
+  const write = updateDoc(ref, ...(writes as [FieldPath, unknown, ...unknown[]]));
+  if (confirmed) await write;
+  else write.catch(onRejected);
+};
 
 /** Adds a character unless that id is already there, so a double-tap or a retry after a dropped connection cannot add it twice. */
 export const addCharacter = async (gameId: string, character: Character): Promise<void> => {

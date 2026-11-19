@@ -1,7 +1,7 @@
-import { PROFESSIONS } from '../rules/data/professions';
-import { BASE_RATINGS, BONUS_PICKS, makeKey } from '../rules/data/skills';
+import { PROFESSIONS } from '@/rules/data/professions';
+import { BASE_RATINGS, BONUS_PICKS, makeKey } from '@/rules/data/skills';
 import { CUSTOM_SKILLS, DETAIL_FIELDS, MAX_LINE, MAX_NAME, newCharacter, type Character } from './character';
-import { clamp, slotsOf } from '../rules';
+import { clamp, slotsOf } from '@/rules';
 
 // Importer for the JSON exported by greenagentcreator.github.io/charactercreator.
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z]/g, '');

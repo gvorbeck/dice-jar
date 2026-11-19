@@ -1,7 +1,7 @@
 // /dg command handling. Discord sends each command (and each autocomplete keystroke) here; the reply goes back in the HTTP response.
 import { randomInt } from 'node:crypto';
 import { FieldPath, FieldValue, getFirestore, Timestamp, type DocumentData, type DocumentReference } from 'firebase-admin/firestore';
-import { REMOVED, type Change } from '../../src/lib/diff';
+import { REMOVED, type Change } from '../../../../packages/diff/index';
 import { SAN_KINDS, type SanKind } from '../../src/model/live';
 import { agentLabel } from '../../src/model/names';
 import { canImprove, diceText, isSuccess, matches, parseDice, rollExpression, sameText } from '../../src/rules';

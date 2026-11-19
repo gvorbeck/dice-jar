@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { loadCharacter } from '../lib/savedAgent';
-import { newCharacter, parseCharacter } from '../model/character';
+import { loadCharacter } from '@/lib/savedAgent';
+import { newCharacter, parseCharacter } from '@/model/character';
 import {
   blocking,
   filterSkills,
@@ -20,7 +20,7 @@ import {
   slotsOf,
   validate,
 } from './index';
-import { asciiSheet } from '../model/sheet';
+import { asciiSheet } from '@/model/sheet';
 import { asLoss, bpNote, diceDetail, diceLabel, hpNote, hurtNote, outcomeClass, wpNote } from './outcome';
 import { PROFESSIONS } from './data/professions';
 import { PACKAGES } from './data/creation';
@@ -82,7 +82,7 @@ describe('skills', () => {
 
 describe('ascii sheet', () => {
   it('never exceeds 30 columns', async () => {
-    const { asciiSheet, MAX_COL } = await import('../model/sheet');
+    const { asciiSheet, MAX_COL } = await import('@/model/sheet');
     const c = newCharacter();
     c.professionId = 'police-officer';
     c.veteran = 'violence';
@@ -95,7 +95,7 @@ describe('ascii sheet', () => {
     expect(out).toContain('Violence:');
   });
   it('wraps prose that starts with a screen-wide indent instead of looping forever', async () => {
-    const { asciiSheet, MAX_COL } = await import('../model/sheet');
+    const { asciiSheet, MAX_COL } = await import('@/model/sheet');
     const c = newCharacter();
     c.details.personality = `${' '.repeat(40)}pasted from a document`;
     const out = asciiSheet(c);

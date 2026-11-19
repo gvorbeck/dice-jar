@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { REMOVED, diffPaths, mergeRemote, setDelta } from './diff';
+import { REMOVED, diffPaths, mergeRemote, setDelta } from './index';
 
 describe('diffPaths', () => {
   it('returns nothing for equal values', () => {
@@ -62,5 +62,22 @@ describe('mergeRemote', () => {
     expect(
       mergeRemote(b, { ...b, spent: { rest: true, sleep: false } }, { ...b, advance: { Law: 1 }, spent: { rest: false, sleep: true } }),
     ).toEqual({ advance: { Law: 1 }, spent: { rest: true, sleep: true } });
+  });
+  it('keeps the local change when the remote one replaced the whole branch it sits in', () => {
+    const b = { sheet: { hp: 3, wp: 4 } };
+    expect(mergeRemote(b, { sheet: { hp: 2, wp: 4 } }, { sheet: 'replaced' as never })).toEqual({ sheet: { hp: 2, wp: 4 } });
+  });
+  it('keeps the local change when it replaced a branch the remote one changed inside', () => {
+    const b = { sheet: { hp: 3, wp: 4 } };
+    expect(mergeRemote(b, { sheet: 'replaced' as never }, { sheet: { hp: 3, wp: 9 } })).toEqual({ sheet: 'replaced' });
+  });
+  it('takes the remote additions to a set the local value does not have', () => {
+    expect(mergeRemote({ checked: ['a'] }, { checked: undefined as never }, { checked: ['a', 'b'] }, ['checked'])).toEqual({
+      checked: ['b'],
+    });
+  });
+  it('does not touch a set nobody changed', () => {
+    const b = { checked: ['a'] };
+    expect(mergeRemote(b, { ...b }, { ...b }, ['checked'])).toEqual(b);
   });
 });

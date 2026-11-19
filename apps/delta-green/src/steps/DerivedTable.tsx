@@ -1,5 +1,5 @@
-import { derived } from '../rules';
-import type { Character } from '../model/character';
+import { derived } from '@/rules';
+import type { Character } from '@/model/character';
 import { stepNo } from '.';
 
 export function DerivedTable({ c }: { c: Character }) {

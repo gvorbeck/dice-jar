@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { PROFESSIONS, GROUP_LABEL, POSTINGS, type Group } from '../rules/data/professions';
-import { PACKAGES } from '../rules/data/creation';
+import { PROFESSIONS, GROUP_LABEL, POSTINGS, type Group } from '@/rules/data/professions';
+import { PACKAGES } from '@/rules/data/creation';
 import {
   BONUS_PICKS,
   BONUS_POINTS,
@@ -10,7 +10,7 @@ import {
   baseRating,
   familyOf,
   typeOf,
-} from '../rules/data/skills';
+} from '@/rules/data/skills';
 import {
   CUSTOM_ID,
   CUSTOM_MAX_RATING,
@@ -22,9 +22,9 @@ import {
   slotsOf,
   type Alt,
   type Slot,
-} from '../rules';
-import { MAX_NAME } from '../model/character';
-import { Btn, Choice, Num, Pick, Select, RadioGroup, Label, Rule, SkillPicker, SkillTable, Text, TypeInput, type StepProps } from '../ui';
+} from '@/rules';
+import { MAX_NAME } from '@/model/character';
+import { Btn, Choice, Num, Pick, Select, RadioGroup, Label, Rule, SkillPicker, SkillTable, Text, TypeInput, type StepProps } from '@/ui';
 
 const altLabel = (a: Alt) => `${a.family}${a.type ? `(${a.type})` : a.askType ? ' (type)' : ''} ${a.rating}%`;
 

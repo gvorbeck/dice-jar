@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { FieldPath, FieldValue } from 'firebase-admin/firestore';
-import { REMOVED } from '../../src/lib/diff';
+import { REMOVED } from '../../../../packages/diff/index';
 import { newCharacter } from '../../src/model/character';
 import { freshLive } from '../../src/model/live';
 import { agentOf } from './dg';

@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
-import { Legal } from '../ui/Legal';
-import { MenuBar } from '../ui/MenuBar';
-import { Win, useFocusMain } from '../ui/Win';
+import { Legal } from '@/ui/Legal';
+import { MenuBar } from '@/ui/MenuBar';
+import { Win, useFocusMain } from '@/ui/Win';
 
 export const useTitle = (title?: string) =>
   useEffect(() => {

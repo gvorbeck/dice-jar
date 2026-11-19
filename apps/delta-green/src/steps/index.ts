@@ -1,4 +1,4 @@
-import type { StepId } from '../rules';
+import type { StepId } from '@/rules';
 
 export const STEPS: { id: StepId | 'review'; title: string }[] = [
   { id: 'stats', title: 'Statistics & derived attributes' },
