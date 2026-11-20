@@ -112,7 +112,7 @@ h2.eyebrow::before {
   padding-inline: 0.06em; /* room for the offset plates */
   font: 800 clamp(2.5rem, 14vw, 9rem) / 0.95 var(--font-display);
   letter-spacing: -0.04em;
-  white-space: nowrap; /* never break at the hyphen */
+  white-space: nowrap; /* the two words stay on one line */
   /* Misregistered print: magenta and turquoise plates slipped off the white one, all worn by the same speckle. */
   text-shadow:
     -0.035em 0.025em 0 var(--dj-magenta),
