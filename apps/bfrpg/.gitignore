@@ -34,3 +34,6 @@ coverage/
 
 # Vitest UI cache
 .vitest/
+
+# Look-baseline screenshots (e2e/visual.spec.ts)
+visual/

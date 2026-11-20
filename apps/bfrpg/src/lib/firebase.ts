@@ -3,6 +3,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { FIREBASE_ENV_KEYS } from '@/constants';
+import { isMockMode } from './mockMode';
 
 // Validate required environment variables
 const requiredEnvVars = [
@@ -14,19 +15,22 @@ const requiredEnvVars = [
   FIREBASE_ENV_KEYS.APP_ID,
 ] as const;
 
+// Mock mode runs without credentials: the services never reach Firebase, so placeholders are enough to initialise the SDK
+const mock = isMockMode();
+
 requiredEnvVars.forEach((varName) => {
-  if (!import.meta.env[varName]) {
+  if (!mock && !import.meta.env[varName]) {
     throw new Error(`Missing required environment variable: ${varName}`);
   }
 });
 
 const firebaseConfig = {
-  apiKey: import.meta.env[FIREBASE_ENV_KEYS.API_KEY],
-  authDomain: import.meta.env[FIREBASE_ENV_KEYS.AUTH_DOMAIN],
-  projectId: import.meta.env[FIREBASE_ENV_KEYS.PROJECT_ID],
-  storageBucket: import.meta.env[FIREBASE_ENV_KEYS.STORAGE_BUCKET],
-  messagingSenderId: import.meta.env[FIREBASE_ENV_KEYS.MESSAGING_SENDER_ID],
-  appId: import.meta.env[FIREBASE_ENV_KEYS.APP_ID],
+  apiKey: import.meta.env[FIREBASE_ENV_KEYS.API_KEY] || 'mock',
+  authDomain: import.meta.env[FIREBASE_ENV_KEYS.AUTH_DOMAIN] || 'mock',
+  projectId: import.meta.env[FIREBASE_ENV_KEYS.PROJECT_ID] || 'mock',
+  storageBucket: import.meta.env[FIREBASE_ENV_KEYS.STORAGE_BUCKET] || 'mock',
+  messagingSenderId: import.meta.env[FIREBASE_ENV_KEYS.MESSAGING_SENDER_ID] || 'mock',
+  appId: import.meta.env[FIREBASE_ENV_KEYS.APP_ID] || 'mock',
   measurementId: import.meta.env[FIREBASE_ENV_KEYS.MEASUREMENT_ID],
 };
 
