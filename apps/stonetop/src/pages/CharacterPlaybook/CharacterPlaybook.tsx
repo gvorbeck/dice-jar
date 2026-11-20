@@ -2,7 +2,8 @@ import { useRef, useCallback, useMemo, useInsertionEffect, lazy, Suspense } from
 import { useHashTabs } from '@/lib/useHashTabs';
 import type { ComponentType, ReactNode } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useTitle } from '@/lib/useTitle';
+import { useTitle } from '@dice-jar/browser';
+import { SITE_TITLE } from '@/lib/siteTitle';
 import { useGame } from '@/lib/useGame';
 import { useNotesActions } from '@/lib/useNotesActions';
 import { SharedNotes, type NotesActions } from '@/playbook/SharedNotes/SharedNotes';
@@ -550,7 +551,7 @@ const CharacterPlaybookContent = ({
   const characterName = character?.name?.trim();
   useTitle(
     !playbookOption
-      ? undefined
+      ? SITE_TITLE
       : !character
         ? 'Character not found — Hearthfire'
         : `${characterName ? `${characterName} — ` : ''}${playbookOption.label} Playbook — Hearthfire`,

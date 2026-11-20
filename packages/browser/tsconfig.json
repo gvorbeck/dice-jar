@@ -7,6 +7,8 @@
     "DiceJarCredit.test.tsx",
     "focus.tsx",
     "focus.test.tsx",
+    "useTitle.ts",
+    "useTitle.test.ts",
     "ErrorBoundary.test.tsx",
     "index.test.tsx",
     "vitest.config.ts"

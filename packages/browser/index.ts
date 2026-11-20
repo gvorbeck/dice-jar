@@ -63,3 +63,4 @@ export function useCopy(): [CopyState, (text: string) => Promise<boolean>] {
 export { ErrorBoundary } from './ErrorBoundary';
 export { DiceJarCredit } from './DiceJarCredit';
 export { SkipLink, useFocusMain } from './focus';
+export { useTitle } from './useTitle';

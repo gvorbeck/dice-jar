@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useEffect, useRef, memo } from 'react';
 import { Button as AriaButton, GridList, GridListItem, useDragAndDrop } from 'react-aria-components';
 import { cn } from '@dice-jar/cn';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { useTitle } from '@/lib/useTitle';
+import { useTitle } from '@dice-jar/browser';
 import { useGame } from '@/lib/useGame';
 import { DEFAULT_GAME_NAME, getPlaybook, PLAYBOOKS } from '@/lib/constants';
 import { Button, Heading, Icon, Text } from '@/ui';
