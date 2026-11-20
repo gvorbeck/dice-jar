@@ -13,3 +13,11 @@ export const expectAccessible = async (page: Page) => {
 /** Every game app's footer credits the Dice Jar (the landing page itself does not). */
 export const expectDiceJarCredit = (page: Page) =>
   expect(page.getByRole('link', { name: 'Dice Jar', exact: true })).toHaveAttribute('href', 'https://dicejar.games');
+
+/** From a fresh load, the first Tab reaches "Skip to content", and Enter moves focus to <main>. */
+export const expectSkipLink = async (page: Page) => {
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('main')).toBeFocused();
+};

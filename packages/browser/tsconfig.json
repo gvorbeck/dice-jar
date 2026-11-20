@@ -5,6 +5,8 @@
     "ErrorBoundary.tsx",
     "DiceJarCredit.tsx",
     "DiceJarCredit.test.tsx",
+    "focus.tsx",
+    "focus.test.tsx",
     "ErrorBoundary.test.tsx",
     "index.test.tsx",
     "vitest.config.ts"

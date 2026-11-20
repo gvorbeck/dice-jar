@@ -1,3 +1,4 @@
+import { SkipLink, useFocusMain } from '@dice-jar/browser';
 import { PageFooter } from '@/ui/PageFooter/PageFooter';
 import { PageHeader } from '@/ui/PageHeader/PageHeader';
 import type { GameNav } from '@/ui/PageHeader/gameNav';
@@ -59,9 +60,11 @@ type Props = SimpleProps | FullProps;
 
 export const PageLayout = (props: Props) => {
   const { simple, children } = props;
+  useFocusMain();
 
   return (
     <>
+      <SkipLink className="page-layout-skip field-focus-visible" />
       {/*
        * PageHeader is always rendered — even in simple mode — because the
        * SiteBanner inside it must be visible on every page. The `simple`
@@ -100,7 +103,9 @@ export const PageLayout = (props: Props) => {
        * own their full layout. In full mode, <main> applies the shared
        * 1200px constraint and padding used by all inner pages.
        */}
-      <main className={simple ? 'page-layout-main-simple' : 'page-layout-main'}>{children}</main>
+      <main id="main" tabIndex={-1} className={simple ? 'page-layout-main-simple' : 'page-layout-main'}>
+        {children}
+      </main>
 
       <PageFooter />
 

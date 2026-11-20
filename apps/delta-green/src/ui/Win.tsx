@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type ReactNode, type Ref } from 'react';
+import { useId, useState, type ReactNode, type Ref } from 'react';
 import { cn } from '@dice-jar/cn';
 
 // Apart from ui/index.tsx so pages that need no form controls don't pull in react-aria-components.
@@ -37,28 +37,3 @@ export const Win = ({ title, right, children, headingRef, className, collapsible
     </section>
   );
 };
-
-/** First tab stop: jumps past the menu bar to the page's <main id="main">. */
-export const SkipLink = () => (
-  <a
-    className="skip"
-    href="#main"
-    onClick={(e) => {
-      e.preventDefault();
-      document.getElementById('main')?.focus();
-    }}
-  >
-    Skip to content
-  </a>
-);
-
-let firstView = true;
-/** After in-app navigation, focus the new view's <main> so keyboard and screen-reader users start there. The first page load keeps the browser's own focus. */
-export const useFocusMain = () =>
-  useEffect(() => {
-    if (firstView) {
-      firstView = false;
-      return;
-    }
-    document.getElementById('main')?.focus();
-  }, []);
