@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- dark default; useColorScheme sets it from --surface-page when the theme is applied -->
+    <meta name="theme-color" content="#141210" />
     <title>Hearthfire — Stonetop Party Tracker</title>
     <meta name="description" content="Track your Stonetop TTRPG campaign — manage characters, GM playbook, and game sessions." />
     <!--
@@ -27,6 +30,18 @@
     <meta name="twitter:title" content="Hearthfire — Stonetop Party Tracker" />
     <meta name="twitter:description" content="Track your Stonetop TTRPG campaign — manage characters, GM playbook, and game sessions." />
     <meta name="twitter:image" content="https://hearthfire.camp/og-image.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Hearthfire",
+        "url": "https://hearthfire.camp/",
+        "description": "Track your Stonetop TTRPG campaign — manage characters, GM playbook, and game sessions.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
     <!--
       preconnect opens the TCP + TLS connection to Firestore eagerly so the
       first realtime read isn't stalled on connection setup. dns-prefetch is
@@ -40,6 +55,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>Hearthfire: Stonetop party tracker</h1>
+      <p>
+        Track your Stonetop campaign in the browser: character playbooks, the steading, the GM playbook and a shared roll log, kept in sync
+        for the whole party. No account. This app needs JavaScript.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

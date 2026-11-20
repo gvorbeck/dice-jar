@@ -1,6 +1,6 @@
-# dice-jar
+# Dice Jar
 
-The landing page at [dicejar.games](https://dicejar.games/): what dice-jar is, and a card for each app. A static page with one URL, so it has no Firebase project, `firestore.rules`, `test:rules` or rules MCP server. It deploys to GitHub Pages ([deploy-dice-jar.yml](../../.github/workflows/deploy-dice-jar.yml)); Pages can't send custom headers, so it has no CSP header like the other apps.
+The landing page at [dicejar.games](https://dicejar.games/): what Dice Jar is, and a card for each app. A static page with one URL, so it has no Firebase project, `firestore.rules`, `test:rules` or rules MCP server. It deploys to GitHub Pages ([deploy-dice-jar.yml](../../.github/workflows/deploy-dice-jar.yml)); Pages can't send custom headers, so it has no CSP header like the other apps.
 
 ## Where things are
 
