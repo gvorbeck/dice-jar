@@ -1,0 +1,43 @@
+@layer components {
+  /* The copy and delete buttons on a card. Tinted outline, filling on hover; from 640px the padding is square (below it the size's own padding applies). */
+  .btn.card-action {
+    --tint: var(--amber-600);
+    --ring: var(--amber-500);
+    position: relative;
+    z-index: 30;
+    color: var(--amber-400);
+    background: transparent;
+    border-color: color-mix(in oklab, var(--tint) 40%, transparent);
+    border-radius: var(--radius-lg);
+    box-shadow: none;
+    pointer-events: auto;
+    touch-action: manipulation;
+    transition-duration: 200ms;
+  }
+  .btn.card-action-danger {
+    --tint: var(--red-600);
+    --ring: var(--red-500);
+    color: var(--red-400);
+  }
+  .btn.card-action[data-hovered] {
+    color: var(--white);
+    background: var(--tint);
+    border-color: var(--tint);
+    box-shadow:
+      0 10px 15px -3px color-mix(in oklab, var(--tint) 40%, transparent),
+      0 4px 6px -4px color-mix(in oklab, var(--tint) 40%, transparent);
+  }
+  .btn.card-action[data-pressed] {
+    transform: none;
+  }
+  .btn.card-action[data-focused] {
+    box-shadow:
+      0 0 0 2px var(--panel),
+      0 0 0 4px var(--ring);
+  }
+  @media (min-width: 640px) {
+    .btn.card-action {
+      padding: calc(var(--space) * 2.5);
+    }
+  }
+}

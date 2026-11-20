@@ -139,16 +139,15 @@ function createDeleteColumn(
 
       return (
         <Button
-          onClick={(e) => {
-            e.stopPropagation();
+          onClick={() => {
             onDeleteCombatant(c, index);
           }}
           variant="destructive"
           size="sm"
+          className="p-2 min-w-0"
           icon="trash"
           iconSize="sm"
           aria-label={`Remove ${c.name} from combat`}
-          className="p-2 min-w-0"
         />
       );
     },
@@ -222,9 +221,7 @@ export default function InitiativeTable({
       {hasUnrolledMonsters && onRollInitiativeForMonsters && (
         <div className="mb-3">
           <Button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+            onClick={() => {
               onRollInitiativeForMonsters();
             }}
             variant="secondary"

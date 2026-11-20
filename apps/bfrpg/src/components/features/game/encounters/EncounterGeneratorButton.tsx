@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/core/primitives';
 import { LoadingState } from '@/components/ui/core/feedback';
 import type { EncounterType } from '@/types';
+import '../GameButtons.css';
 
 interface EncounterGeneratorButtonProps {
   encounterType: EncounterType;
@@ -19,7 +20,7 @@ export default function EncounterGeneratorButton({ encounterType, isGenerating, 
           size="lg"
           onClick={onGenerate}
           disabled={isGenerating || !hasTable}
-          className="w-14 h-14 p-0"
+          className="generate-button"
           icon="dice"
           iconSize="md"
           iconClassName={isGenerating ? 'animate-spin' : ''}

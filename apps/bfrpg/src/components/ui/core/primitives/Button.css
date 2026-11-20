@@ -1,0 +1,155 @@
+/* In the components layer so a caller's Tailwind utility (p-2, w-8) still overrides it while both systems coexist. */
+@layer components {
+  /* A button's "depth" is the solid shadow under it; hover deepens it, press sinks the button into it. */
+  .btn {
+    --depth-color: var(--amber-700);
+    --depth: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--space) * 2);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 var(--depth) 0 0 var(--depth-color);
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .btn[data-hovered] {
+    --depth: 6px;
+  }
+  .btn[data-pressed] {
+    --depth: 2px;
+    transform: translateY(2px);
+  }
+  /* The old buttons showed this ring on any focus, mouse included. */
+  .btn[data-focused] {
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 4px var(--accent),
+      0 var(--depth) 0 0 var(--depth-color);
+  }
+  .btn:is([data-disabled], [data-pending]) {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-sm {
+    padding: calc(var(--space) * 3) calc(var(--space) * 4);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    min-height: 40px;
+  }
+  .btn-md {
+    padding: calc(var(--space) * 4) calc(var(--space) * 6);
+    font-size: var(--text-base);
+    line-height: var(--text-base-lh);
+    min-height: 48px;
+  }
+  .btn-lg {
+    padding: calc(var(--space) * 5) calc(var(--space) * 8);
+    font-size: var(--text-lg);
+    line-height: var(--text-lg-lh);
+    min-height: 56px;
+  }
+
+  .btn-primary {
+    background: var(--amber-500);
+    color: var(--white);
+    border-color: var(--amber-600);
+  }
+  .btn-primary[data-hovered] {
+    background: var(--amber-600);
+    border-color: var(--amber-700);
+  }
+  .btn-primary[data-pressed] {
+    background: var(--amber-700);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--amber-400);
+    border-color: var(--amber-400);
+  }
+  .btn-secondary[data-hovered] {
+    background: var(--amber-400);
+    color: var(--white);
+    border-color: var(--amber-500);
+  }
+  .btn-secondary[data-pressed] {
+    background: var(--amber-500);
+    color: var(--white);
+  }
+
+  .btn-ghost {
+    --depth-color: var(--zinc-700);
+    background: transparent;
+    color: var(--zinc-300);
+    border-color: var(--zinc-600);
+  }
+  .btn-ghost[data-hovered] {
+    background: var(--zinc-700);
+    color: var(--zinc-100);
+    border-color: var(--zinc-500);
+  }
+  .btn-ghost[data-pressed] {
+    background: var(--zinc-800);
+  }
+
+  .btn-destructive {
+    --depth-color: var(--red-700);
+    background: var(--red-500);
+    color: var(--white);
+    border-color: var(--red-600);
+  }
+  .btn-destructive[data-hovered] {
+    background: var(--red-400);
+    border-color: var(--red-500);
+  }
+  .btn-destructive[data-pressed] {
+    background: var(--red-600);
+  }
+
+  .btn-accent {
+    background: linear-gradient(to bottom right, var(--amber-500), var(--amber-600));
+    color: var(--white);
+    border-color: var(--amber-700);
+  }
+  .btn-accent[data-hovered] {
+    background: linear-gradient(to bottom right, var(--amber-600), var(--amber-700));
+  }
+
+  .btn-spinner {
+    display: inline-block;
+    width: calc(var(--space) * 5);
+    height: calc(var(--space) * 5);
+    flex-shrink: 0;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  .btn-label {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+  }
+  .btn-label[data-loading] {
+    opacity: 0;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/* Unlayered so it beats the global *:focus-visible outline; the ring below is the one focus indicator. */
+.btn:focus,
+.btn:focus-visible {
+  outline: none;
+}

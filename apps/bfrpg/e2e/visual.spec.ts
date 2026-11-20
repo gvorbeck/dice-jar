@@ -1,8 +1,11 @@
-import { test } from '@playwright/test';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
+import { expect, test, type Page, type TestInfo } from '@playwright/test';
 
-// Look baseline for the style conversion: `VISUAL=1 npx playwright test visual --project=chromium`.
-// Writes full-page PNGs to visual/<label>/ (git-ignored). Run it once before a change and once after, then compare the two folders.
-const label = process.env['VISUAL_LABEL'] ?? 'baseline';
+// Look baseline for the style conversion, chromium only.
+//   VISUAL=1 npx playwright test visual --project=chromium            writes full-page PNGs to e2e/visual.spec.ts-snapshots/ (git-ignored)
+//   VISUAL=compare npx playwright test visual --project=chromium      checks the app against them; diffs land in test-results/
+const compare = process.env['VISUAL'] === 'compare';
 const viewports = { desktop: { width: 1280, height: 900 }, phone: { width: 390, height: 844 } };
 
 test.describe('look baseline', () => {
@@ -12,34 +15,54 @@ test.describe('look baseline', () => {
     test.describe(vp, () => {
       test.use({ viewport: size, reducedMotion: 'reduce' });
 
-      const shot = async (page: import('@playwright/test').Page, name: string) => {
+      const shot = async (page: Page, name: string, info: TestInfo) => {
         await page.waitForLoadState('networkidle');
-        await page.screenshot({ path: `visual/${label}/${vp}-${name}.png`, fullPage: true, animations: 'disabled' });
+        const png = await page.screenshot({ fullPage: true, animations: 'disabled' });
+        if (compare) expect(png).toMatchSnapshot(`${vp}-${name}.png`, { maxDiffPixelRatio: 0 });
+        else {
+          const file = info.snapshotPath(`${vp}-${name}.png`);
+          mkdirSync(dirname(file), { recursive: true });
+          writeFileSync(file, png);
+        }
       };
 
-      test('pages', async ({ page }) => {
+      const hrefOf = async (page: Page, pattern: string, tab?: string) => {
         await page.goto('/');
-        await shot(page, 'home');
+        if (tab) await page.getByRole('tab', { name: tab }).click();
+        const href = await page.locator(`a[href^="/u/"][href*="${pattern}"]`).first().getAttribute('href');
+        if (!href) throw new Error(`no link containing ${pattern} on the home page; is the mock data loaded?`);
+        return href;
+      };
 
-        const character = await page.locator('a[href^="/u/"][href*="/c/"]').first().getAttribute('href');
+      test('home', async ({ page }, info) => {
+        await page.goto('/');
+        await shot(page, 'home', info);
+      });
+      test('home games', async ({ page }, info) => {
+        await page.goto('/');
         await page.getByRole('tab', { name: 'Games' }).click();
-        await shot(page, 'home-games');
-        const game = await page.locator('a[href^="/u/"][href*="/g/"]').first().getAttribute('href');
-
+        await expect(page.getByRole('heading', { name: 'Your Games' })).toBeVisible(); // the first baseline was shot before the list loaded
+        await shot(page, 'home-games', info);
+      });
+      test('new character', async ({ page }, info) => {
         await page.goto('/new-character');
-        await shot(page, 'new-character');
+        await shot(page, 'new-character', info);
+      });
+      test('new game', async ({ page }, info) => {
         await page.goto('/new-game');
-        await shot(page, 'new-game');
-        if (character) {
-          await page.goto(character);
-          await shot(page, 'character-sheet');
-        }
-        if (game) {
-          await page.goto(game);
-          await shot(page, 'game-sheet');
-        }
+        await shot(page, 'new-game', info);
+      });
+      test('character sheet', async ({ page }, info) => {
+        await page.goto(await hrefOf(page, '/c/'));
+        await shot(page, 'character-sheet', info);
+      });
+      test('game sheet', async ({ page }, info) => {
+        await page.goto(await hrefOf(page, '/g/', 'Games'));
+        await shot(page, 'game-sheet', info);
+      });
+      test('not found', async ({ page }, info) => {
         await page.goto('/no-such-page');
-        await shot(page, 'not-found');
+        await shot(page, 'not-found', info);
       });
     });
   }

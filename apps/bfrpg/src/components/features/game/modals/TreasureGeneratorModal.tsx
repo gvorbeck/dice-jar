@@ -8,6 +8,7 @@ import { useNotificationContext } from '@/hooks';
 import { generateTreasure, formatTreasureResult, logger, getCoinsToDisplay, hasCoins } from '@/utils';
 import { TREASURE_TYPES, LAIR_TREASURE_TYPES, INDIVIDUAL_TREASURE_TYPES, UNGUARDED_TREASURE_LEVELS } from '@/constants';
 import type { IndividualTreasureType, LairTreasureType, TreasureResult, TreasureType, UnguardedTreasureLevel } from '@/types';
+import '../GameButtons.css';
 
 interface TreasureGeneratorModalProps {
   isOpen: boolean;
@@ -216,7 +217,7 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
             size="lg"
             onClick={handleGenerate}
             disabled={isGenerating}
-            className="w-14 h-14 p-0"
+            className="generate-button"
             icon="dice"
             iconSize="md"
             iconClassName={isGenerating ? 'animate-spin' : ''}

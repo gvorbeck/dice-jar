@@ -5,6 +5,7 @@ import { TextInput, Button } from '@/components/ui/core/primitives';
 import { Icon } from '@/components/ui/core/display';
 import { Typography } from '@/components/ui/core/display';
 import { cn } from '@/utils';
+import '../GameButtons.css';
 
 interface GameHeroProps extends HTMLAttributes<HTMLDivElement> {
   game: Game;
@@ -212,7 +213,7 @@ const GameHero = forwardRef<HTMLDivElement, GameHeroProps>(
                       variant="secondary"
                       size="md"
                       onClick={onCombatTrackerOpen}
-                      className="bg-zinc-800/80 border-zinc-700 text-lime-100 hover:bg-zinc-700/80 w-10 h-10 sm:w-12 sm:h-12 p-0"
+                      className="game-hero-tool"
                       icon="sword"
                       iconSize={size === 'sm' ? 'sm' : 'md'}
                       aria-label="Open combat tracker"
@@ -225,7 +226,7 @@ const GameHero = forwardRef<HTMLDivElement, GameHeroProps>(
                     variant="secondary"
                     size="md"
                     onClick={onEncounterGeneratorOpen}
-                    className="bg-zinc-800/80 border-zinc-700 text-lime-100 hover:bg-zinc-700/80 w-10 h-10 sm:w-12 sm:h-12 p-0"
+                    className="game-hero-tool"
                     icon="map-pin"
                     iconSize={size === 'sm' ? 'sm' : 'md'}
                     aria-label="Generate random encounters"
@@ -237,7 +238,7 @@ const GameHero = forwardRef<HTMLDivElement, GameHeroProps>(
                     variant="secondary"
                     size="md"
                     onClick={onTreasureGenerate}
-                    className="bg-zinc-800/80 border-zinc-700 text-lime-100 hover:bg-zinc-700/80 w-10 h-10 sm:w-12 sm:h-12 p-0"
+                    className="game-hero-tool"
                     icon="coin"
                     iconSize={size === 'sm' ? 'sm' : 'md'}
                     aria-label="Generate treasure"

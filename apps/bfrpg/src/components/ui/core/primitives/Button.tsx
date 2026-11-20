@@ -1,10 +1,13 @@
-import { combineButtonStyles, createButtonStyles } from '@/utils';
+import { forwardRef, type ReactNode } from 'react';
+import { Button as AriaButton } from 'react-aria-components';
+import { cn } from '@dice-jar/cn';
 import type { BaseButtonProps } from '@/types';
-import { forwardRef } from 'react';
-import type { ReactNode } from 'react';
 import { Icon, type IconName } from '@/components/ui/core/display/Icon';
+import './Button.css';
 
-interface ButtonProps extends BaseButtonProps {
+export interface ButtonProps extends Omit<BaseButtonProps, 'onClick'> {
+  // Fired through RAC's onPress, which also stops the press reaching parents; the click event is not exposed
+  onClick?: () => void;
   children?: ReactNode;
   icon?: IconName;
   iconSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -26,41 +29,32 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       size = 'md',
       className = '',
       'aria-label': ariaLabel,
+      onClick,
+      title,
       ...props
     },
     ref,
   ) => {
-    const isDisabled = disabled || loading;
-
-    // Get button styles using shared utility
-    const buttonStyles = createButtonStyles(false); // false = not circular
-
-    // Combine all styles
-    const buttonClasses = combineButtonStyles(buttonStyles.base, buttonStyles.variants[variant], buttonStyles.sizes[size], className);
-
     return (
-      <button
+      <AriaButton
         ref={ref}
         type={type}
-        disabled={isDisabled}
+        isDisabled={disabled ?? false}
+        isPending={loading}
         aria-label={ariaLabel}
-        aria-disabled={isDisabled}
-        aria-busy={loading}
-        className={buttonClasses}
-        {...props}
+        onPress={onClick}
+        className={cn('btn', `btn-${variant}`, `btn-${size}`, className)}
+        // RAC filters title out of the DOM props, so render it back on
+        render={(domProps) => <button {...domProps} title={title} />}
+        {...(props as object)}
       >
-        {loading && (
-          <span
-            aria-hidden="true"
-            className="animate-spin inline-block w-5 h-5 border-2 border-current border-t-transparent rounded-full flex-shrink-0"
-          />
-        )}
-        <span className={`flex items-center gap-2 ${loading ? 'opacity-0' : ''}`}>
+        {loading && <span aria-hidden="true" className="btn-spinner" />}
+        <span className="btn-label" data-loading={loading || undefined}>
           {icon && <Icon name={icon} size={iconSize} className={iconClassName || ''} />}
           {children}
         </span>
         {loading && <span className="sr-only">{loadingText}</span>}
-      </button>
+      </AriaButton>
     );
   },
 );

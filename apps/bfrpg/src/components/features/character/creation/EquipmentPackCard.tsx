@@ -113,8 +113,7 @@ function EquipmentPackCard({
       {isSelected && onConfirm && (
         <div className="mt-4 pt-4 border-t border-lime-400/20">
           <Button
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
               onConfirm(pack);
             }}
             className="w-full flex items-center justify-center gap-2"

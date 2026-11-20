@@ -7,6 +7,8 @@ import { Details } from '@/components/ui/composite';
 import { Icon, Image, Typography } from '@/components/ui/core/display';
 import { getClassName, isCustomRace, getRaceById, cn } from '@/utils';
 
+import './Hero.css';
+
 type HeroSize = 'sm' | 'md' | 'lg';
 
 interface HeroProps extends HTMLAttributes<HTMLDivElement> {
@@ -162,18 +164,6 @@ const Hero = forwardRef<HTMLDivElement, HeroProps>(
       currentSize.avatar,
     );
 
-    const settingsButtonClasses = cn(
-      'absolute top-2 right-2 sm:top-4 sm:right-6 z-10',
-      'p-1.5 sm:p-2 bg-zinc-800/80 hover:bg-zinc-700/80 focus:bg-zinc-700/80',
-      'border border-zinc-600 rounded-lg transition-colors duration-200 group',
-      'focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-amber-500',
-    );
-
-    const avatarOverlayClasses = cn(
-      'absolute inset-0 bg-black/60 rounded-full opacity-0 group-hover:opacity-100',
-      'transition-opacity duration-200 flex items-center justify-center cursor-pointer',
-    );
-
     const layoutClasses = cn('flex flex-col sm:flex-row sm:items-start', currentSize.gap);
 
     const avatarFallbackClasses = cn('text-zinc-300 font-bold', currentSize.avatarText);
@@ -207,19 +197,18 @@ const Hero = forwardRef<HTMLDivElement, HeroProps>(
               variant="ghost"
               size="sm"
               onClick={() => setIsSettingsModalOpen(true)}
-              className={settingsButtonClasses}
+              className="hero-settings"
               aria-label="Open character settings"
               title="Settings"
               icon="settings"
               iconSize="md"
-              iconClassName="text-zinc-300 group-hover:text-zinc-100 group-focus:text-zinc-100"
             />
           )}
 
           {/* Mobile: Stack vertically, Desktop: Horizontal layout */}
           <div className={layoutClasses}>
             {/* Avatar with edit functionality */}
-            <div className="relative group flex-shrink-0 self-center sm:self-start">
+            <div className="avatar-edit relative flex-shrink-0 self-center sm:self-start">
               <div className={avatarContainerClasses} aria-hidden="true">
                 {character.avatar ? (
                   <Image
@@ -239,12 +228,11 @@ const Hero = forwardRef<HTMLDivElement, HeroProps>(
               {isEditable && (
                 <Button
                   variant="ghost"
-                  className={avatarOverlayClasses}
+                  className="avatar-overlay"
                   onClick={() => setIsAvatarModalOpen(true)}
                   aria-label="Change avatar"
                   icon="edit"
                   iconSize="lg"
-                  iconClassName="text-white"
                 />
               )}
             </div>

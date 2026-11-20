@@ -36,4 +36,4 @@ coverage/
 .vitest/
 
 # Look-baseline screenshots (e2e/visual.spec.ts)
-visual/
+e2e/visual.spec.ts-snapshots/

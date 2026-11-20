@@ -1,0 +1,44 @@
+@layer components {
+  /* A full-width row that rolls dice when pressed: label and status dot on the left, value on the right. */
+  .btn.rollable {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: calc(var(--space) * 4);
+    border-color: color-mix(in oklab, var(--zinc-600) 60%, transparent);
+  }
+  .btn.rollable[data-hovered] {
+    background: color-mix(in oklab, var(--zinc-700) 30%, transparent);
+    border-color: color-mix(in oklab, var(--amber-400) 20%, transparent);
+    box-shadow:
+      0 10px 15px -3px color-mix(in oklab, var(--amber-400) 5%, transparent),
+      0 4px 6px -4px color-mix(in oklab, var(--amber-400) 5%, transparent);
+  }
+  .rollable-label {
+    color: var(--amber-400);
+    text-align: left;
+    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .rollable-value {
+    color: var(--zinc-100);
+    text-align: right;
+    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .rollable[data-hovered] :is(.rollable-label, .rollable-value) {
+    color: var(--amber-300);
+  }
+  .rollable-lead {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 3);
+    min-width: 0;
+    flex: 1;
+  }
+}
+
+/* Temporary: the dot is still a Tailwind-styled StatusDot, whose background utility sits in this layer. Goes when StatusDot is converted. */
+@layer utilities {
+  .rollable[data-hovered] .rollable-dot {
+    background-color: var(--amber-400);
+  }
+}

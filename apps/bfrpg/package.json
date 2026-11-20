@@ -24,6 +24,7 @@
     "@tanstack/react-query-devtools": "^5.89.0",
     "firebase": "^13.2.0",
     "react": "^19.3.1",
+    "react-aria-components": "^1.22.1",
     "react-dom": "^19.3.1",
     "tailwindcss": "^4.1.12",
     "wouter": "^3.7.1",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@dice-jar/browser": "*",
+    "@dice-jar/cn": "*",
     "@playwright/test": "^1.65.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.2",

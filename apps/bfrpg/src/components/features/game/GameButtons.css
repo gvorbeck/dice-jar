@@ -1,0 +1,27 @@
+@layer components {
+  /* The tool buttons in a game's hero: a fixed 40px (48px from 640px) tile that the size's padding can still make wider. */
+  .btn.game-hero-tool {
+    width: calc(var(--space) * 10);
+    height: calc(var(--space) * 10);
+    border-color: var(--zinc-700);
+    background: color-mix(in oklab, var(--zinc-800) 80%, transparent);
+  }
+  .btn.game-hero-tool:not([data-hovered]) {
+    color: var(--lime-100);
+  }
+  .btn.game-hero-tool[data-hovered] {
+    background: color-mix(in oklab, var(--zinc-700) 80%, transparent);
+  }
+  @media (min-width: 640px) {
+    .btn.game-hero-tool {
+      width: calc(var(--space) * 12);
+      height: calc(var(--space) * 12);
+    }
+  }
+
+  /* The round-ish dice button that generates an encounter or treasure: 56px, grown by the large size's padding. */
+  .btn.generate-button {
+    width: calc(var(--space) * 14);
+    height: calc(var(--space) * 14);
+  }
+}

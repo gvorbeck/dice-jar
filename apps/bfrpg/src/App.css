@@ -1,9 +1,10 @@
 @import 'tailwindcss';
+@import './styles/tokens.css';
 
 /* Apply dark theme to body */
 body {
-  background-color: #18181b; /* zinc-900 */
-  color: #f4f4f5; /* zinc-100 */
+  background-color: var(--bg);
+  color: var(--fg);
 }
 
 /* Apply Wellfleet font to headings */
@@ -13,7 +14,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Wellfleet', serif;
+  font-family: var(--font-title);
 }
 
 /* Custom accessibility and focus styles */
@@ -33,7 +34,7 @@ h6 {
 
 /* Focus management with amber highlight */
 *:focus {
-  outline: 2px solid #fbbf24; /* amber-400 */
+  outline: var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -42,7 +43,7 @@ h6 {
 }
 
 *:focus-visible {
-  outline: 2px solid #fbbf24; /* amber-400 */
+  outline: var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -51,15 +52,15 @@ h6 {
   position: absolute !important;
   top: -40px !important;
   left: 6px !important;
-  background: #fbbf24 !important; /* amber-400 */
-  color: #18181b !important; /* zinc-900 */
+  background: var(--accent) !important;
+  color: var(--bg) !important;
   padding: 12px 16px !important;
   text-decoration: none !important;
   z-index: 9999 !important;
   border-radius: 4px !important;
   font-weight: 600 !important;
   font-size: 14px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--black) 30%, transparent) !important;
   transition: all 0.2s ease-in-out !important;
   white-space: nowrap !important;
   transform: translateY(-100%) !important;
@@ -70,18 +71,18 @@ h6 {
   top: 16px !important;
   transform: translateY(0) !important;
   opacity: 1 !important;
-  outline: 2px solid #fbbf24 !important; /* amber-400 */
+  outline: var(--focus-ring) !important;
   outline-offset: 2px !important;
 }
 
 /* Error states with theme colors */
 [aria-invalid='true'] {
-  border-color: #dc3545 !important;
-  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2) !important;
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 20%, transparent) !important;
 }
 
 [role='alert'] {
-  color: #dc3545;
+  color: var(--danger);
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
@@ -90,7 +91,7 @@ h6 {
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #52525b #27272a; /* thumb color, track color */
+  scrollbar-color: var(--zinc-600) var(--zinc-800); /* thumb, track */
 }
 
 /* Webkit browsers (Chrome, Safari, Edge) */
@@ -100,22 +101,22 @@ h6 {
 }
 
 ::-webkit-scrollbar-track {
-  background: #27272a; /* zinc-800 */
+  background: var(--zinc-800);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #52525b; /* zinc-600 */
+  background: var(--zinc-600);
   border-radius: 4px;
-  border: 1px solid #3f3f46; /* zinc-700 */
+  border: 1px solid var(--scrollbar-thumb-border);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #71717a; /* zinc-500 */
+  background: var(--zinc-500);
 }
 
 ::-webkit-scrollbar-corner {
-  background: #27272a; /* zinc-800 */
+  background: var(--zinc-800);
 }
 
 /* Notification progress bar animation */
@@ -146,13 +147,13 @@ h6 {
     display: none !important;
   }
 
-  /* Hide skip link */
-  .skip-link {
+  /* Hide breadcrumb navigation */
+  nav[aria-label='Breadcrumb'] {
     display: none !important;
   }
 
-  /* Hide breadcrumb navigation */
-  nav[aria-label='Breadcrumb'] {
+  /* Hide skip link */
+  .skip-link {
     display: none !important;
   }
 

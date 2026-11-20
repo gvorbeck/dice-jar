@@ -191,8 +191,7 @@ export const PlayerCard = memo(({ player, getResolvedData, onDelete }: PlayerCar
             className="p-2 text-zinc-400 hover:text-red-400 hover:bg-zinc-700/50 transition-colors duration-200"
             title={`Remove ${characterName} from game`}
             aria-label={`Remove ${characterName} from game`}
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
               onDelete(player);
             }}
             icon="trash"

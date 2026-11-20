@@ -1,0 +1,98 @@
+/* Design tokens. The palette is Tailwind's default (oklch), copied here so the look survives Tailwind's removal. Colors live only in this file. */
+:root {
+  --zinc-50: oklch(98.5% 0 0);
+  --zinc-100: oklch(96.7% 0.001 286.375);
+  --zinc-200: oklch(92% 0.004 286.32);
+  --zinc-300: oklch(87.1% 0.006 286.286);
+  --zinc-400: oklch(70.5% 0.015 286.067);
+  --zinc-500: oklch(55.2% 0.016 285.938);
+  --zinc-600: oklch(44.2% 0.017 285.786);
+  --zinc-700: oklch(37% 0.013 285.805);
+  --zinc-800: oklch(27.4% 0.006 286.033);
+  --zinc-900: oklch(21% 0.006 285.885);
+  --zinc-950: oklch(14.1% 0.005 285.823);
+  --amber-50: oklch(98.7% 0.022 95.277);
+  --amber-100: oklch(96.2% 0.059 95.617);
+  --amber-200: oklch(92.4% 0.12 95.746);
+  --amber-300: oklch(87.9% 0.169 91.605);
+  --amber-400: oklch(82.8% 0.189 84.429);
+  --amber-500: oklch(76.9% 0.188 70.08);
+  --amber-600: oklch(66.6% 0.179 58.318);
+  --amber-700: oklch(55.5% 0.163 48.998);
+  --amber-800: oklch(47.3% 0.137 46.201);
+  --amber-900: oklch(41.4% 0.112 45.904);
+  --amber-950: oklch(27.9% 0.077 45.635);
+  --lime-50: oklch(98.6% 0.031 120.757);
+  --lime-100: oklch(96.7% 0.067 122.328);
+  --lime-200: oklch(93.8% 0.127 124.321);
+  --lime-300: oklch(89.7% 0.196 126.665);
+  --lime-400: oklch(84.1% 0.238 128.85);
+  --lime-500: oklch(76.8% 0.233 130.85);
+  --lime-600: oklch(64.8% 0.2 131.684);
+  --lime-700: oklch(53.2% 0.157 131.589);
+  --lime-800: oklch(45.3% 0.124 130.933);
+  --lime-900: oklch(40.5% 0.101 131.063);
+  --lime-950: oklch(27.4% 0.072 132.109);
+  --red-50: oklch(97.1% 0.013 17.38);
+  --red-100: oklch(93.6% 0.032 17.717);
+  --red-200: oklch(88.5% 0.062 18.334);
+  --red-300: oklch(80.8% 0.114 19.571);
+  --red-400: oklch(70.4% 0.191 22.216);
+  --red-500: oklch(63.7% 0.237 25.331);
+  --red-600: oklch(57.7% 0.245 27.325);
+  --red-700: oklch(50.5% 0.213 27.518);
+  --red-800: oklch(44.4% 0.177 26.899);
+  --red-900: oklch(39.6% 0.141 25.723);
+  --red-950: oklch(25.8% 0.092 26.042);
+  --blue-50: oklch(97% 0.014 254.604);
+  --blue-100: oklch(93.2% 0.032 255.585);
+  --blue-200: oklch(88.2% 0.059 254.128);
+  --blue-300: oklch(80.9% 0.105 251.813);
+  --blue-400: oklch(70.7% 0.165 254.624);
+  --blue-500: oklch(62.3% 0.214 259.815);
+  --blue-600: oklch(54.6% 0.245 262.881);
+  --blue-700: oklch(48.8% 0.243 264.376);
+  --blue-800: oklch(42.4% 0.199 265.638);
+  --blue-900: oklch(37.9% 0.146 265.522);
+  --blue-950: oklch(28.2% 0.091 267.935);
+  --green-50: oklch(98.2% 0.018 155.826);
+  --green-100: oklch(96.2% 0.044 156.743);
+  --green-200: oklch(92.5% 0.084 155.995);
+  --green-300: oklch(87.1% 0.15 154.449);
+  --green-400: oklch(79.2% 0.209 151.711);
+  --green-500: oklch(72.3% 0.219 149.579);
+  --green-600: oklch(62.7% 0.194 149.214);
+  --green-700: oklch(52.7% 0.154 150.069);
+  --green-800: oklch(44.8% 0.119 151.328);
+  --green-900: oklch(39.3% 0.095 152.535);
+  --green-950: oklch(26.6% 0.065 152.934);
+  --white: #fff;
+  --black: #000;
+
+  /* Roles */
+  --bg: var(--zinc-900);
+  --panel: var(--zinc-800);
+  --fg: var(--zinc-100);
+  --dim: var(--zinc-400);
+  --line: var(--zinc-600);
+  --accent: var(--amber-400);
+  --accent-hover: var(--amber-300);
+  --ok: var(--lime-400);
+  --danger: #dc3545; /* the error red App.css has always used, not a palette red */
+
+  --text-sm: 0.875rem;
+  --text-sm-lh: calc(1.25 / 0.875);
+  --text-base: 1rem;
+  --text-base-lh: 1.5;
+  --text-lg: 1.125rem;
+  --text-lg-lh: calc(1.75 / 1.125);
+  --radius-lg: 0.5rem;
+  --shadow-sm:
+    0 1px 3px 0 color-mix(in srgb, var(--black) 10%, transparent), 0 1px 2px -1px color-mix(in srgb, var(--black) 10%, transparent);
+
+  --font-title: 'Wellfleet', serif;
+  --space: 0.25rem; /* one Tailwind step; spacing is calc(var(--space) * n) */
+  --page-w: 80rem; /* max-w-7xl */
+  --focus-ring: 2px solid var(--amber-400);
+  --scrollbar-thumb-border: var(--zinc-700);
+}

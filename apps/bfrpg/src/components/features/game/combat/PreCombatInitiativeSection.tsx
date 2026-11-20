@@ -30,10 +30,7 @@ export default function PreCombatInitiativeSection({
 
           {combatants.some((c) => !c.isPlayer) && (
             <Button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
+              onClick={() => {
                 const monsters = combatants.filter((c) => !c.isPlayer);
 
                 if (onUpdateMultipleInitiatives) {

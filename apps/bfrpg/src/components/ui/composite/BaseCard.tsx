@@ -4,6 +4,7 @@ import { Icon } from '@/components/ui/core/display';
 import { Card } from '@/components/ui/core/display';
 import type { ReactNode } from 'react';
 import { DESIGN_TOKENS } from '@/constants';
+import './BaseCard.css';
 
 interface BaseCardProps {
   id: string;
@@ -39,10 +40,8 @@ export function BaseCard({ id, name, user, href, onDelete, onCopy, isDeleting, c
             <Button
               variant="secondary"
               size="sm"
-              className="relative z-30 p-2 sm:p-2.5 text-amber-400 bg-transparent border border-amber-600/40 shadow-none hover:text-white hover:bg-amber-600 hover:border-amber-600 hover:shadow-lg hover:shadow-amber-600/40 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-800 transition-all duration-200 rounded-lg pointer-events-auto touch-manipulation"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+              className="card-action"
+              onClick={() => {
                 const fullUrl = `${window.location.origin}${href}`;
                 onCopy(fullUrl, name);
               }}
@@ -54,10 +53,8 @@ export function BaseCard({ id, name, user, href, onDelete, onCopy, isDeleting, c
             <Button
               variant="secondary"
               size="sm"
-              className="relative z-30 p-2 sm:p-2.5 text-red-400 bg-transparent border border-red-600/40 shadow-none hover:text-white hover:bg-red-600 hover:border-red-600 hover:shadow-lg hover:shadow-red-600/40 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-zinc-800 transition-all duration-200 rounded-lg pointer-events-auto touch-manipulation"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+              className="card-action card-action-danger"
+              onClick={() => {
                 onDelete(id, name);
               }}
               disabled={isDeleting}

@@ -172,8 +172,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 type="button"
                 variant="destructive"
                 size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={() => {
                   handleClear();
                 }}
                 disabled={disabled}

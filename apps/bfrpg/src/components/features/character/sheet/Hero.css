@@ -1,0 +1,49 @@
+@layer components {
+  /* The gear in the hero's corner. Square padding from 640px; below it the size's own padding applies. */
+  .btn.hero-settings {
+    position: absolute;
+    top: calc(var(--space) * 2);
+    right: calc(var(--space) * 2);
+    z-index: 10;
+    color: var(--zinc-300);
+    background: color-mix(in oklab, var(--zinc-800) 80%, transparent);
+    border-color: var(--zinc-600);
+    border-radius: var(--radius-lg);
+    transition-property: color, background-color, border-color;
+    transition-duration: 200ms;
+  }
+  .btn.hero-settings:is([data-hovered], [data-focused]) {
+    color: var(--zinc-100);
+    background: color-mix(in oklab, var(--zinc-700) 80%, transparent);
+  }
+  .btn.hero-settings[data-focused] {
+    box-shadow:
+      0 0 0 2px var(--amber-500),
+      0 0 0 4px var(--accent),
+      0 var(--depth) 0 0 var(--depth-color);
+  }
+  @media (min-width: 640px) {
+    .btn.hero-settings {
+      top: calc(var(--space) * 4);
+      right: calc(var(--space) * 6);
+      padding: calc(var(--space) * 2);
+    }
+  }
+
+  /* The edit overlay on the avatar: shows on hover, and on keyboard focus (it used to show only on hover). */
+  .btn.avatar-overlay {
+    position: absolute;
+    inset: 0;
+    justify-content: center;
+    color: var(--white);
+    background: color-mix(in oklab, var(--black) 60%, transparent);
+    border-radius: 9999px;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .avatar-edit:hover .btn.avatar-overlay,
+  .btn.avatar-overlay[data-focus-visible] {
+    opacity: 1;
+  }
+}
