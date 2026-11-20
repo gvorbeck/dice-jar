@@ -1,7 +1,8 @@
 import { useState, useCallback, useId } from 'react';
 import { cn } from '@dice-jar/cn';
 import { useNavigate } from 'react-router-dom';
-import { useTitle } from '@/lib/useTitle';
+import { useTitle } from '@dice-jar/browser';
+import { SITE_TITLE } from '@/lib/siteTitle';
 import { PageLayout } from '@/ui/PageLayout/PageLayout';
 import { createGame, createGameWithId } from '@/lib/game';
 import { useGameIdCheck } from '@/lib/useGameIdCheck';
@@ -101,7 +102,7 @@ export const Home = () => {
     joinStatus === 'checking' && 'home-id-hint-checking',
   );
 
-  useTitle();
+  useTitle(SITE_TITLE);
 
   return (
     <PageLayout simple>

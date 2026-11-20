@@ -1,13 +1,9 @@
-import { useEffect, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { DiceJarCredit, useFocusMain } from '@dice-jar/browser';
+import { useSiteTitle } from '@/lib/useSiteTitle';
 import { Legal } from '@/ui/Legal';
 import { MenuBar } from '@/ui/MenuBar';
 import { Win } from '@/ui/Win';
-
-export const useTitle = (title?: string) =>
-  useEffect(() => {
-    document.title = title ? `${title} // YOURCODENA.ME` : 'YOURCODENA.ME // Agent Intake';
-  }, [title]);
 
 interface PageProps {
   title?: string;
@@ -41,7 +37,7 @@ export const Footer = ({ children }: { children?: ReactNode }) => (
 
 /** Menu bar, <main> and status bar shared by every page except the live sheet. */
 export const Page = ({ title, heading, subtitle, actions, status, wide, children }: PageProps) => {
-  useTitle(title);
+  useSiteTitle(title);
   useFocusMain();
   return (
     <>

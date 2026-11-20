@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFocusMain } from '@dice-jar/browser';
+import { useSiteTitle } from '@/lib/useSiteTitle';
 import { STATS, STAT_NAMES, type Stat } from './rules/data/creation';
 import { activeBonds, featureOf, isSuccess, liveOutcome, motivationsOf, professionOf, rollD100, testOutcome, type Outcome } from './rules';
 import { lowHp, pad2, testText, wpNote } from './rules/outcome';
@@ -26,7 +27,7 @@ import { Btn, ConfirmDialog, Counter, Select, SkillTable, Win } from './ui';
 import { SanSection } from './SanSection';
 import { DiceRoller } from './DiceRoller';
 import { MenuBar } from './ui/MenuBar';
-import { Footer, useTitle } from './pages/Page';
+import { Footer } from './pages/Page';
 import { Alert, CopyButton, Hint, OutcomeText } from './ui/bits';
 import { gameUrl } from './lib/paths';
 import type { HeldSan } from './lib/games';
@@ -116,7 +117,7 @@ export function LiveSheet({ c, init, game }: { c: Character; init: Live; game?: 
     }
   }, [l]);
   const name = nameOf(c);
-  useTitle(`Live: ${name}`);
+  useSiteTitle(`Live: ${name}`);
   useFocusMain();
   const [leaving, setLeaving] = useState(false);
   const [rolls, setRolls] = useState<Roll[]>([]);
