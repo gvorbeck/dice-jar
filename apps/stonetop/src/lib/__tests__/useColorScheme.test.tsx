@@ -12,7 +12,7 @@ beforeEach(() => {
     () =>
       ({
         getPropertyValue: () => (document.documentElement.getAttribute('data-theme') === 'light' ? ' #fff ' : ' #000 '),
-      }) as CSSStyleDeclaration,
+      }) as unknown as CSSStyleDeclaration,
   );
   vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: false } as MediaQueryList);
 });
