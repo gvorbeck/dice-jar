@@ -1,0 +1,215 @@
+import type { NotificationSystem } from '@/types';
+import { logger } from '@/utils';
+
+/**
+ * Global error handler for TanStack Query and application errors
+ * Provides consistent error handling, user feedback, and retry mechanisms
+ */
+class GlobalErrorHandler {
+  private notifications: NotificationSystem;
+
+  constructor(notifications: NotificationSystem) {
+    this.notifications = notifications;
+  }
+
+  /**
+   * Handle query errors with user-friendly messages
+   */
+  handleQueryError = (error: Error, context?: { entityType?: string }) => {
+    logger.error('Query error:', error);
+
+    // Determine appropriate error message based on error type
+    let userMessage = 'Something went wrong. Please try again.';
+    let title = 'Error';
+
+    if (this.isNetworkError(error)) {
+      userMessage = 'Network connection problem. Please check your internet connection.';
+      title = 'Connection Error';
+    } else if (this.isAuthError(error)) {
+      userMessage = 'Authentication failed. Please sign in again.';
+      title = 'Authentication Error';
+    } else if (this.isPermissionError(error)) {
+      userMessage = "You don't have permission to perform this action.";
+      title = 'Permission Denied';
+    } else if (context?.entityType) {
+      userMessage = `Failed to load ${context.entityType}. Please try again.`;
+      title = `${context.entityType} Error`;
+    }
+
+    this.notifications.showError(userMessage, { title });
+  };
+
+  /**
+   * Handle mutation errors with context-aware messages
+   */
+  handleMutationError = (
+    error: Error,
+    context: {
+      operation: string;
+      entityType?: string;
+      entityName?: string;
+    },
+  ) => {
+    logger.error(`${context.operation} error:`, error);
+
+    let userMessage = `Failed to ${context.operation.toLowerCase()}. Please try again.`;
+    let title = `${context.operation} Failed`;
+
+    if (context.entityType && context.entityName) {
+      userMessage = `Failed to ${context.operation.toLowerCase()} ${context.entityType} "${context.entityName}".`;
+      title = `${context.operation} ${context.entityType} Failed`;
+    } else if (context.entityType) {
+      userMessage = `Failed to ${context.operation.toLowerCase()} ${context.entityType}.`;
+      title = `${context.operation} ${context.entityType} Failed`;
+    }
+
+    // Add specific handling for common errors
+    if (this.isNetworkError(error)) {
+      userMessage += ' Please check your internet connection.';
+    } else if (this.isValidationError(error)) {
+      userMessage = 'Please check your input and try again.';
+      title = 'Validation Error';
+    }
+
+    this.notifications.showError(userMessage, { title, duration: 0 }); // Errors don't auto-dismiss
+  };
+
+  /**
+   * Handle mutation success with appropriate feedback
+   */
+  handleMutationSuccess = (context: { operation: string; entityType?: string; entityName?: string }) => {
+    let message = `${context.operation} completed successfully.`;
+
+    if (context.entityType && context.entityName) {
+      const pastTense = this.getPastTenseOperation(context.operation);
+      message = `${context.entityType} "${context.entityName}" ${pastTense} successfully.`;
+    } else if (context.entityType) {
+      const pastTense = this.getPastTenseOperation(context.operation);
+      message = `${context.entityType} ${pastTense} successfully.`;
+    }
+
+    this.notifications.showSuccess(message, { duration: 4000 });
+  };
+
+  /**
+   * Handle offline state and retry mechanisms
+   */
+  handleOfflineError = () => {
+    this.notifications.showWarning("You're currently offline. Changes will be saved when you reconnect.", {
+      title: 'Offline Mode',
+      duration: 0, // Keep visible until online
+    });
+  };
+
+  /**
+   * Handle retry attempts
+   */
+  handleRetryAttempt = (attempt: number, maxRetries: number) => {
+    if (attempt === 1) {
+      this.notifications.showInfo(`Retrying... (${attempt}/${maxRetries})`, {
+        duration: 2000,
+      });
+    }
+  };
+
+  /**
+   * Clear all error notifications (useful for successful operations)
+   */
+  clearErrorNotifications = () => {
+    // This would require tracking error notification IDs
+    // For now, we rely on success messages to indicate resolution
+  };
+
+  /**
+   * Error type detection helpers
+   */
+  public isNetworkError(error: Error): boolean {
+    return (
+      error.message.includes('NetworkError') ||
+      error.message.includes('Failed to fetch') ||
+      error.message.includes('ERR_NETWORK') ||
+      error.name === 'NetworkError'
+    );
+  }
+
+  public isAuthError(error: Error): boolean {
+    const errorObj = error as unknown as Record<string, unknown>;
+    return (
+      error.message.includes('auth/') ||
+      error.message.includes('unauthorized') ||
+      error.message.includes('Authentication') ||
+      (errorObj['code']?.toString().startsWith('auth/') ?? false)
+    );
+  }
+
+  public isPermissionError(error: Error): boolean {
+    const errorObj = error as unknown as Record<string, unknown>;
+    return (
+      error.message.includes('permission') ||
+      error.message.includes('forbidden') ||
+      error.message.includes('access denied') ||
+      errorObj['status'] === 403
+    );
+  }
+
+  public isValidationError(error: Error): boolean {
+    const errorObj = error as unknown as Record<string, unknown>;
+    return (
+      error.message.includes('validation') ||
+      error.message.includes('invalid') ||
+      error.message.includes('required') ||
+      errorObj['status'] === 400
+    );
+  }
+
+  /**
+   * Convert operation verb to past tense for success messages
+   */
+  private getPastTenseOperation(operation: string): string {
+    const lowerOp = operation.toLowerCase();
+
+    // Handle irregular verbs and special cases
+    switch (lowerOp) {
+      case 'apply':
+        return 'applied';
+      case 'save':
+        return 'saved';
+      case 'delete':
+        return 'deleted';
+      case 'update':
+        return 'updated';
+      case 'create':
+        return 'created';
+      case 'remove':
+        return 'removed';
+      case 'add':
+        return 'added';
+      default:
+        // For regular verbs, handle consonant + 'y' ending
+        if (lowerOp.length >= 2 && lowerOp.endsWith('y')) {
+          const secondToLast = lowerOp[lowerOp.length - 2];
+          if (secondToLast && !'aeiou'.includes(secondToLast)) {
+            // Replace 'y' with 'ied'
+            return `${lowerOp.slice(0, -1)}ied`;
+          }
+        }
+
+        // Just add 'ed' for other regular verbs
+        return lowerOp.endsWith('e') ? `${lowerOp}d` : `${lowerOp}ed`;
+    }
+  }
+}
+
+/**
+ * Hook factory for creating mutation handlers with consistent error handling
+ */
+export function createMutationHandlers(notifications: NotificationSystem) {
+  const errorHandler = new GlobalErrorHandler(notifications);
+
+  return {
+    onError: errorHandler.handleMutationError,
+    onSuccess: errorHandler.handleMutationSuccess,
+    queryError: errorHandler.handleQueryError,
+    offlineError: errorHandler.handleOfflineError,
+  };
+}
