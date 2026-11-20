@@ -2,6 +2,7 @@
 // Checks that need "did it reach the server?" use a second browser context: it has its own offline cache, so it can only see saved data.
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
+import { expectSkipLink } from '@dice-jar/e2e-helpers';
 import { agentDoc, createAgent, freshPage, hp, savedHp, startAgent } from './helpers';
 import { newCharacter } from '../src/model/character';
 import { encodeSheet, freshLive } from '../src/model/live';
@@ -264,6 +265,17 @@ test('a standalone sheet keeps its changes in the link', async ({ page }) => {
   await expect.poll(() => page.url()).not.toBe(before); // the link is the save file
   await page.reload();
   await expect(hp(page)).toHaveText('9 / 10');
+});
+
+test('a standalone sheet has the menu bar, and its logo asks before leaving the sheet', async ({ page }) => {
+  const c = newCharacter();
+  await page.goto('/' + encodeSheet(c, freshLive(c)));
+  await expect(hp(page)).toHaveText('10 / 10'); // past the loading fallback
+  await expectSkipLink(page);
+  const sheet = page.url();
+  await page.getByRole('navigation', { name: 'Application' }).getByRole('link', { name: 'YOURCODENA.ME' }).click();
+  await expect(page.getByRole('alertdialog', { name: 'Leave this sheet?' })).toBeVisible();
+  expect(page.url()).toBe(sheet); // nothing lost until Leave is confirmed
 });
 
 test('a SAN loss waiting for a decision keeps its buttons out of the announced region', async ({ page }) => {

@@ -1,6 +1,6 @@
 // Every page, scanned with axe: the home page, each creation step, the review, the live sheet, the game page and a standalone sheet.
 import { expect, test } from '@playwright/test';
-import { expectAccessible, expectDiceJarCredit } from '@dice-jar/e2e-helpers';
+import { expectAccessible, expectDiceJarCredit, expectSkipLink } from '@dice-jar/e2e-helpers';
 import { createAgent, finishAgent, startAgent } from './helpers';
 import { newCharacter } from '../src/model/character';
 import { encodeSheet, freshLive } from '../src/model/live';
@@ -51,4 +51,10 @@ test('the home page, live sheet and game page have no accessibility violations i
   await expect(page).toHaveURL(new RegExp(`${gameUrl}$`));
   await expect(page.getByRole('region', { name: 'SANITY' })).toBeVisible();
   await expectAccessible(page);
+});
+
+test('the skip link moves focus past the menu bar to the page', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Generate game' })).toBeVisible();
+  await expectSkipLink(page);
 });

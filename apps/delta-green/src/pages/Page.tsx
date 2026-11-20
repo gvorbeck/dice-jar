@@ -1,8 +1,8 @@
 import { useEffect, type ReactNode } from 'react';
-import { DiceJarCredit } from '@dice-jar/browser';
+import { DiceJarCredit, useFocusMain } from '@dice-jar/browser';
 import { Legal } from '@/ui/Legal';
 import { MenuBar } from '@/ui/MenuBar';
-import { Win, useFocusMain } from '@/ui/Win';
+import { Win } from '@/ui/Win';
 
 export const useTitle = (title?: string) =>
   useEffect(() => {
