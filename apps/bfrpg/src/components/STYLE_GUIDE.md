@@ -1,6 +1,6 @@
 # Codex.Quest UI Style Guide
 
-**React 19 + TypeScript 5.9 + TailwindCSS 4.1 + Modern Development Patterns**
+**React 19 + TypeScript 5.9 + Plain CSS + Modern Development Patterns**
 
 ---
 
@@ -214,41 +214,18 @@ function CharacterManagement() {
 
 ## Design System Usage
 
-### TailwindCSS 4.1 Semantic Tokens
+### Styling
 
-```typescript
-// ✅ Use semantic color tokens from tailwind.config.js
-const colorClasses = {
-  // Text hierarchy
-  textPrimary: "text-text-primary",     // #f4f4f5 (zinc-100)
-  textSecondary: "text-text-secondary", // #a1a1aa (zinc-400)
-  textMuted: "text-text-muted",         // #71717a (zinc-500)
+Each component has a stylesheet beside it (`Card.tsx` and `Card.css`) written in `@layer components`, with semantic class names and the tokens from `src/styles/tokens.css` (`var(--zinc-700)`, `var(--space)`, `var(--radius-lg)`). Variants and sizes are `data-*` attributes (`data-variant`, `data-size`), and `cn` from `@dice-jar/cn` joins conditional classes. Layout several components share lives in `src/styles/patterns.css`. There are no utility classes.
 
-  // Background layers
-  bgPrimary: "bg-background-primary",     // #18181b (zinc-900)
-  bgSecondary: "bg-background-secondary", // #27272a (zinc-800)
-  bgTertiary: "bg-background-tertiary",   // #3f3f46 (zinc-700)
-
-  // Interactive elements
-  highlight: "text-highlight-400",        // #fbbf24 (amber-400)
-  accent: "text-accent-100",              // #f5f5f4 (stone-100)
-
-  // Borders
-  border: "border-border",                // #52525b (zinc-600)
-  borderLight: "border-border-light",     // #71717a (zinc-500)
-};
-
-// ✅ Card variants for consistent styling
+```tsx
+// Card variants for consistent styling
 <Card variant="info">       {/* Amber accent, for informational content */}
 <Card variant="success">    {/* Lime accent, for positive states */}
 <Card variant="standard">   {/* Default styling */}
 <Card variant="hero">       {/* Gradient backgrounds for headers */}
 <Card variant="nested">     {/* Reduced padding for nested content */}
 <Card variant="gradient">   {/* Interactive hover effects */}
-
-// ❌ Avoid hardcoded Tailwind classes
-<div className="text-zinc-100 bg-amber-500"> {/* Don't do this */}
-<div className="text-text-primary bg-highlight-400"> {/* Do this */}
 ```
 
 ### Component Size & Spacing System
@@ -522,17 +499,17 @@ export function CharacterCard({ character }: CharacterCardProps) {
       aria-labelledby={`${cardId}-name`}
       aria-describedby={descriptionId}
     >
-      <h3 id={`${cardId}-name`} className="text-text-primary">
+      <h3 id={`${cardId}-name`} className="character-name">
         {character.name}
       </h3>
 
-      <div id={descriptionId} className="text-text-secondary">
+      <div id={descriptionId} className="character-meta">
         Level {character.level} {character.race} {character.class.join("/")}
       </div>
 
       <button
         aria-label={`Edit ${character.name}`}
-        className="focus:ring-2 focus:ring-highlight-400"
+        className="edit-button"
       >
         <Icon name="edit" aria-hidden="true" />
       </button>
@@ -570,11 +547,11 @@ export function CharGenErrorBoundary({ children }: { children: ReactNode }) {
   return (
     <ErrorBoundary
       fallback={(error) => (
-        <Card variant="info" className="max-w-md mx-auto mt-8">
-          <Typography variant="h3" className="text-text-primary mb-4">
+        <Card variant="info" className="error-card">
+          <Typography variant="h3">
             Character Creation Error
           </Typography>
-          <Typography variant="body" className="text-text-secondary mb-4">
+          <Typography variant="body" color="secondary">
             There was a problem with the character creation wizard.
             Your progress has been saved.
           </Typography>
@@ -713,7 +690,7 @@ export default defineConfig({
 
 ---
 
-_This style guide reflects the current Codex.Quest architecture using React 19, TypeScript 5.9, TailwindCSS 4.1, TanStack Query, Zustand, and Firebase. Always prioritize maintainability, performance, and accessibility in your implementations._
+_This style guide reflects the current Codex.Quest architecture using React 19, TypeScript 5.9, plain CSS, TanStack Query, Zustand, and Firebase. Always prioritize maintainability, performance, and accessibility in your implementations._
 
 ### 2. Performance Optimization
 
@@ -753,28 +730,19 @@ const handleClick = useCallback((id: string) => {
 
 #### Color Patterns
 
-```typescript
-// ✅ Use semantic color tokens
-className = 'text-text-primary'; // Primary text (#f4f4f5)
-className = 'text-text-secondary'; // Secondary text (#a1a1aa)
-className = 'text-text-muted'; // Muted text (#71717a)
-className = 'bg-background-primary'; // Primary background (#18181b)
-className = 'bg-background-secondary'; // Secondary background (#27272a)
-className = 'bg-background-tertiary'; // Tertiary background (#3f3f46)
-className = 'border-border'; // Standard borders (#52525b)
-className = 'border-border-light'; // Light borders (#71717a)
-className = 'text-highlight-400'; // Accent colors (#fbbf24)
-
-// ✅ Use primary/accent color scales
-className = 'text-primary-100'; // Light text
-className = 'bg-primary-900'; // Dark backgrounds
-className = 'text-highlight-400'; // Interactive elements
-className = 'text-accent-100'; // Subtle accents
-
-// ❌ Avoid hardcoded colors
-className = 'text-zinc-100'; // Don't hardcode
-className = 'bg-amber-500'; // Use semantic tokens
+```css
+/* Use semantic tokens from src/styles/tokens.css, never hex values */
+.example {
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.example a {
+  color: var(--accent);
+}
 ```
+
+---
 
 ## Component Architecture
 

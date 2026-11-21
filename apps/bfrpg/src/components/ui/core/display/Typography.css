@@ -61,8 +61,6 @@
   .typography[data-variant='description'],
   .typography[data-variant='descriptionCompact'] {
     line-height: 1.625;
-    /* shortcut: Tailwind's text-lg on a caller reads --tw-leading for its line-height, as the old leading-relaxed set it; delete with Tailwind. */
-    --tw-leading: 1.625;
   }
   .typography[data-variant='body'] {
     font-size: var(--text-base);

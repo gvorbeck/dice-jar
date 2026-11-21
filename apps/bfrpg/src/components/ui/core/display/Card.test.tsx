@@ -12,13 +12,13 @@ describe('Card', () => {
 
   it('marks hover cards and passes variant, size and className through', () => {
     render(
-      <Card variant="success" size="compact" hover className="mb-6">
+      <Card variant="success" size="compact" hover className="custom-class">
         body
       </Card>,
     );
     const card = screen.getByText('body');
     expect(card).toHaveAttribute('data-hover');
     expect(card).toHaveAttribute('data-variant', 'success');
-    expect(card).toHaveClass('card', 'mb-6');
+    expect(card).toHaveClass('card', 'custom-class');
   });
 });

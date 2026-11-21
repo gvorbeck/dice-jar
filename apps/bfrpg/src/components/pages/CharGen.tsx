@@ -18,6 +18,7 @@ import { useCascadeValidation, createCharacterValidationPipeline } from '@/valid
 import { allRaces, allClasses } from '@/data';
 import { logger, createEmptyCharacter, getRaceById } from '@/utils';
 import { COMBINATION_CLASS_IDS } from '@/constants';
+import './CharGen.css';
 
 function CharGen() {
   const { user } = useAuth();
@@ -221,8 +222,8 @@ function CharGen() {
   return (
     <PageWrapper>
       <article>
-        <header className="mb-6">
-          <Breadcrumb items={breadcrumbItems} className="mb-4" />
+        <header className="new-char-head">
+          <Breadcrumb items={breadcrumbItems} />
           <Typography variant="h2" as="h2">
             Character Creation
           </Typography>
@@ -241,7 +242,7 @@ function CharGen() {
 
         {/* Show save error if it occurs */}
         {saveError && (
-          <div className="mt-4">
+          <div className="new-char-error">
             <Callout variant="error" title="Save Failed">
               {saveError.message || 'Failed to save character. Please try again.'}
             </Callout>

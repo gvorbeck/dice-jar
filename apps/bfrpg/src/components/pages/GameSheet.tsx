@@ -17,8 +17,9 @@ import { useDiceRoller } from '@/hooks/dice/useDiceRoller';
 import { useNotificationContext } from '@/hooks';
 import { useAuth } from '@/hooks';
 import { logger, getErrorMessage } from '@/utils';
-import { GAME_SHEET_STYLES, ERROR_MESSAGES, LOADING_MESSAGES } from '@/constants';
+import { ERROR_MESSAGES, LOADING_MESSAGES } from '@/constants';
 import type { Game, GamePlayer, GameCombatant } from '@/types';
+import './GameSheet.css';
 
 export default function GameSheet() {
   const { user } = useAuth();
@@ -179,7 +180,7 @@ export default function GameSheet() {
 
   if (error) {
     return (
-      <div className={GAME_SHEET_STYLES.layout.statusMessage} role="alert">
+      <div role="alert">
         <Typography variant="body" color="secondary">
           Error: {getErrorMessage(error, 'Failed to load game')}
         </Typography>
@@ -189,7 +190,7 @@ export default function GameSheet() {
 
   if (!game) {
     return (
-      <div className={GAME_SHEET_STYLES.layout.statusMessage}>
+      <div>
         <Typography variant="body" color="muted">
           {ERROR_MESSAGES.gameNotFound}
         </Typography>
@@ -203,20 +204,19 @@ export default function GameSheet() {
 
   return (
     <>
-      <PageWrapper>
-        <header className="mb-8">
-          <Breadcrumb items={breadcrumbItems} className="mb-4" />
+      <PageWrapper className="game-sheet">
+        <header>
+          <Breadcrumb items={breadcrumbItems} />
         </header>
 
         {/* Skip link for accessibility */}
-        <a href="#main-content" className={GAME_SHEET_STYLES.accessibility.skipLink}>
+        <a href="#main-content" className="game-skip">
           Skip to main content
         </a>
 
         {/* Hero section with game info */}
         <GameHero
           game={game}
-          className={GAME_SHEET_STYLES.spacing.section}
           editable={!!isGameMaster}
           onGameChange={handleGameChange}
           onTreasureGenerate={handleTreasureGenerate}
@@ -225,12 +225,12 @@ export default function GameSheet() {
         />
 
         {/* Game Sheet Content */}
-        <main id="main-content" className={GAME_SHEET_STYLES.spacing.content}>
+        <main id="main-content" className="game-body">
           <PlayersSection players={game.players || []} showDivider={false} {...(isGameMaster && { onDeletePlayer: handleDeletePlayer })} />
 
           {/* Add Character section - only show for game master */}
           {isGameMaster && (
-            <div className={GAME_SHEET_STYLES.spacing.section}>
+            <div className="game-add">
               <AddChar onAddPlayer={handleAddPlayer} disabled={isSaving} existingPlayers={game.players || []} />
             </div>
           )}

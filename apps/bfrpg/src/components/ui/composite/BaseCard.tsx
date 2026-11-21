@@ -18,8 +18,7 @@ interface BaseCardProps {
 
 export function BaseCard({ id, name, user, href, onDelete, onCopy, isDeleting, children }: BaseCardProps) {
   return (
-    // shortcut: group only feeds group-hover in CharacterCard and GameCard; delete it when both are converted.
-    <Card variant="gradient" size="default" className="base-card group">
+    <Card variant="gradient" size="default" className="base-card">
       {/* Clickable overlay for entire card */}
       <Link href={href} className="base-card-link" aria-label={`View ${name}`} />
 

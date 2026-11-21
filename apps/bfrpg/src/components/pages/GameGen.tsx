@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks';
 import { useGameNavigation } from '@/hooks';
 import { logger } from '@/utils';
 import { saveGame } from '@/services';
+import './GameGen.css';
 
 interface DraftGame {
   name: string;
@@ -67,7 +68,7 @@ function GameGen() {
 
   return (
     <PageWrapper>
-      <div className="space-y-6">
+      <div className="new-game">
         {/* Breadcrumb */}
         <Breadcrumb
           items={[
@@ -77,16 +78,16 @@ function GameGen() {
         />
 
         {/* Header */}
-        <header className="text-center space-y-4">
+        <header className="new-game-head">
           <Typography variant="h1">Create New Game</Typography>
-          <Typography variant="body" color="secondary" className="text-lg">
+          <Typography variant="body" color="secondary">
             Set up a new Basic Fantasy RPG game session for your players.
           </Typography>
         </header>
 
         {/* Game Creation Form */}
-        <Card variant="standard" className="max-w-2xl mx-auto">
-          <div className="space-y-6">
+        <Card variant="standard" className="new-game-form">
+          <div>
             <Typography variant="h3">Game Details</Typography>
 
             {/* Game Name */}
@@ -108,7 +109,7 @@ function GameGen() {
         </Card>
 
         {/* Action Buttons */}
-        <div className="flex justify-center gap-4 max-w-2xl mx-auto">
+        <div className="new-game-actions">
           <Button variant="ghost" size="md" onClick={handleCancel} disabled={isSaving}>
             Cancel
           </Button>

@@ -1,4 +1,3 @@
-/* In the components layer so a caller's Tailwind utility (p-2, w-8) still overrides it while both systems coexist. */
 @layer components {
   /* A button's "depth" is the solid shadow under it; hover deepens it, press sinks the button into it. */
   .btn {

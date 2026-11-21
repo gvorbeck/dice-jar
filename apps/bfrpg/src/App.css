@@ -1,5 +1,6 @@
-@import 'tailwindcss';
+@layer base, components;
 @import './styles/tokens.css';
+@import './styles/reset.css';
 @import './styles/patterns.css';
 
 /* Apply dark theme to body */
@@ -170,4 +171,10 @@ h6 {
   50% {
     opacity: 0.5;
   }
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }

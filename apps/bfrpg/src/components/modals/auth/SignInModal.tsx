@@ -8,6 +8,7 @@ import { useLoadingState, useAuthMutations } from '@/hooks';
 import { signInWithEmail, signUpWithEmail } from '@/services';
 import { logger } from '@/utils';
 import GoogleSignInSection from './GoogleSignInSection';
+import './SignInModal.css';
 
 // Type guard for Firebase errors
 function isFirebaseError(error: unknown): error is { code?: string } {
@@ -281,7 +282,7 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
               dividerText="Or continue with email"
             />
 
-            <form onSubmit={handleSignIn} className="space-y-4">
+            <form onSubmit={handleSignIn} className="auth-form">
               <FormField label="Email address" required>
                 <TextInput
                   type="email"
@@ -302,7 +303,7 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
                 />
               </FormField>
 
-              <div className="text-right">
+              <div className="auth-forgot">
                 <Button type="button" onClick={() => setActiveTab('reset')} variant="ghost" size="sm" disabled={isLoading}>
                   Forgot Password?
                 </Button>
@@ -310,7 +311,7 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
 
               <ErrorDisplay error={error} />
 
-              <Button type="submit" disabled={isLoading || !signInForm.isValid} className="w-full">
+              <Button type="submit" disabled={isLoading || !signInForm.isValid}>
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
@@ -324,7 +325,7 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
               dividerText="Or create account with email"
             />
 
-            <form onSubmit={handleSignUp} className="space-y-4">
+            <form onSubmit={handleSignUp} className="auth-form">
               <FormField label="Email address" required>
                 <TextInput
                   type="email"
@@ -357,7 +358,7 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
 
               <ErrorDisplay error={error} />
 
-              <Button type="submit" disabled={isLoading || !signUpForm.isValid} className="w-full">
+              <Button type="submit" disabled={isLoading || !signUpForm.isValid}>
                 {isLoading ? 'Creating Account...' : 'Sign Up'}
               </Button>
             </form>
@@ -365,20 +366,18 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
 
           <TabPanel value="reset">
             {resetSuccess ? (
-              <div className="space-y-4 text-center">
-                <div className="text-green-400">
-                  <p className="font-medium">Password reset email sent!</p>
-                  <p className="text-sm text-zinc-400 mt-2">Check your email for instructions to reset your password.</p>
+              <div className="auth-sent">
+                <div>
+                  <p>Password reset email sent!</p>
+                  <p>Check your email for instructions to reset your password.</p>
                 </div>
-                <Button onClick={() => setActiveTab('signin')} variant="ghost" className="w-full">
+                <Button onClick={() => setActiveTab('signin')} variant="ghost">
                   Back to Sign In
                 </Button>
               </div>
             ) : (
-              <form onSubmit={handlePasswordReset} className="space-y-4">
-                <div className="text-center text-sm text-zinc-400 mb-4">
-                  Enter your email address and we'll send you a link to reset your password.
-                </div>
+              <form onSubmit={handlePasswordReset} className="auth-form">
+                <div className="auth-intro">Enter your email address and we'll send you a link to reset your password.</div>
 
                 <FormField label="Email address" required>
                   <TextInput
@@ -392,11 +391,11 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
 
                 <ErrorDisplay error={error} />
 
-                <Button type="submit" disabled={sendPasswordReset.isPending || !resetForm.isValid} className="w-full">
+                <Button type="submit" disabled={sendPasswordReset.isPending || !resetForm.isValid}>
                   {sendPasswordReset.isPending ? 'Sending...' : 'Send Reset Email'}
                 </Button>
 
-                <Button type="button" onClick={() => setActiveTab('signin')} variant="ghost" className="w-full">
+                <Button type="button" onClick={() => setActiveTab('signin')} variant="ghost">
                   Back to Sign In
                 </Button>
               </form>

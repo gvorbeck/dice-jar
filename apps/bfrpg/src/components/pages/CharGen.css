@@ -1,0 +1,11 @@
+@layer components {
+  .new-char-head {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .new-char-head .crumbs {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .new-char-error {
+    margin-top: calc(var(--space) * 4);
+  }
+}

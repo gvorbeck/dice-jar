@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui';
+import './GoogleSignInSection.css';
 
 interface GoogleSignInSectionProps {
   onClick: () => void;
@@ -9,16 +10,10 @@ interface GoogleSignInSectionProps {
 
 export default function GoogleSignInSection({ onClick, disabled, isPending, dividerText }: GoogleSignInSectionProps) {
   return (
-    <div className="space-y-6">
+    <div className="auth-google">
       {/* Google Sign In Button */}
-      <Button
-        type="button"
-        onClick={onClick}
-        disabled={disabled}
-        variant="secondary"
-        className="w-full flex items-center justify-center gap-3 bg-zinc-900 hover:bg-zinc-700 text-zinc-100 border border-zinc-700 shadow-sm"
-      >
-        <svg className="w-5 h-5" viewBox="0 0 24 24">
+      <Button type="button" onClick={onClick} disabled={disabled} variant="secondary">
+        <svg viewBox="0 0 24 24">
           <path
             fill="#4285F4"
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -40,12 +35,12 @@ export default function GoogleSignInSection({ onClick, disabled, isPending, divi
       </Button>
 
       {/* Divider */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-zinc-700" />
+      <div className="auth-divider">
+        <div className="auth-divider-line">
+          <div />
         </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-3 py-1 bg-zinc-900 text-zinc-400 rounded">{dividerText}</span>
+        <div className="auth-divider-label">
+          <span>{dividerText}</span>
         </div>
       </div>
     </div>

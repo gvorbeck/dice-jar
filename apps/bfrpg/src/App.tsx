@@ -51,7 +51,7 @@ function AppContent() {
   };
 
   return (
-    <div className="app dark bg-primary text-primary min-h-screen flex flex-col">
+    <div className="app">
       <Header {...headerProps} />
       <Routes />
       <Footer />

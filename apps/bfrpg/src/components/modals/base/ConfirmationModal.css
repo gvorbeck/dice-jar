@@ -32,3 +32,9 @@
     flex: 1 1 0%;
   }
 }
+
+@layer components {
+  .confirm-input .text-input {
+    font-family: var(--font-mono);
+  }
+}

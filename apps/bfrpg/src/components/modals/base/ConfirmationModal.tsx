@@ -140,7 +140,6 @@ function ConfirmationModal({
               placeholder={`Type "${confirmText}" to confirm`}
               disabled={isProcessing}
               error={inputText.length > 0 && !isConfirmValid}
-              className="font-mono"
               aria-label={`Type ${confirmText} to confirm ${actionLabel.toLowerCase()}`}
               aria-describedby="confirm-description validation-message"
               showClearButton={false}

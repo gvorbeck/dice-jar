@@ -10,6 +10,7 @@ import { CharactersList } from '@/components/features/character/management';
 import { GamesList } from '@/components/features/game/management';
 import { useAuth } from '@/hooks';
 import { useEnhancedCharacters } from '@/hooks/queries/useEnhancedQueries';
+import './Home.css';
 
 function Home() {
   const { user, loading: authLoading } = useAuth();
@@ -21,17 +22,17 @@ function Home() {
 
   return (
     <PageWrapper>
-      <section className="space-y-6 sm:space-y-8">
+      <section className="home">
         {/* Show loading state while checking authentication */}
         {authLoading && (
-          <Card variant="standard" size="compact" className="sm:p-6">
+          <Card variant="standard" size="compact" className="home-card">
             <LoadingState variant="inline" message="Loading your adventure..." />
           </Card>
         )}
 
         {/* Show character list for authenticated users */}
         {!authLoading && user && (
-          <Card variant="standard" size="compact" className="sm:p-6">
+          <Card variant="standard" size="compact" className="home-card">
             <Tabs defaultValue="characters">
               <TabList aria-label="Main navigation">
                 <Tab value="characters">Characters</Tab>
@@ -55,19 +56,17 @@ function Home() {
             <HeroSection
               title="Welcome to Codex.Quest"
               subtitle="Forge your legendary hero with our comprehensive character generator for Basic Fantasy RPG. Roll ability scores, choose from diverse races and classes, and equip your adventurer for epic quests ahead."
-              logo={<Image variant="logo" src="/images/logo.webp" alt="Codex.Quest Logo" className="mb-8 max-w-64 mx-auto" />}
+              logo={<Image variant="logo" src="/images/logo.webp" alt="Codex.Quest Logo" className="home-logo" />}
             />
 
             <Card variant="hero">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-highlight-400/50 to-transparent" />
-
-              <div className="pt-4">
-                <TextHeader variant="h3" size="lg" className="text-center mb-8 text-text-primary">
+              <div className="home-forge-body">
+                <TextHeader variant="h3" size="lg">
                   Forge Your Legend
                 </TextHeader>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
+                <div className="home-features">
+                  <div>
                     <FeatureCard
                       icon="dice"
                       title="Interactive Dice Rolling"
@@ -80,7 +79,7 @@ function Home() {
                     />
                   </div>
 
-                  <div className="space-y-4">
+                  <div>
                     <FeatureCard
                       icon="sword"
                       title="Complete Equipment System"

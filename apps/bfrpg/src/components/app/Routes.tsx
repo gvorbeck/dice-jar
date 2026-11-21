@@ -11,6 +11,7 @@ import {
   LoadingState,
 } from '@/components/ui/core/feedback';
 import { DOM_IDS } from '@/constants';
+import './Routes.css';
 
 const Home = lazy(() => import('../pages/Home'));
 const CharGen = lazy(() => import('../pages/CharGen'));
@@ -20,7 +21,7 @@ const GameSheet = lazy(() => import('../pages/GameSheet'));
 
 export function Routes() {
   return (
-    <main role="main" id={DOM_IDS.MAIN_CONTENT} className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
+    <main role="main" id={DOM_IDS.MAIN_CONTENT} className="site-main">
       <Suspense fallback={<LoadingState variant="page" message="Loading page..." />}>
         <Switch>
           <Route path="/">
@@ -50,16 +51,14 @@ export function Routes() {
           </Route>
 
           <Route>
-            <section className="text-center py-16">
+            <section className="not-found">
               <TextHeader variant="h2" size="lg">
                 Page Not Found
               </TextHeader>
-              <Typography variant="body" color="secondary" className="mb-6">
+              <Typography variant="body" color="secondary">
                 Sorry, the page you're looking for doesn't exist.
               </Typography>
-              <Link href="/" className="text-highlight hover:text-highlight-hover transition-colors">
-                Return to homepage
-              </Link>
+              <Link href="/">Return to homepage</Link>
             </section>
           </Route>
         </Switch>

@@ -23,7 +23,7 @@ export function GlobalAlert({ alert, onClose, className = '' }: GlobalAlertProps
       aria-atomic="true"
     >
       <div className="alert-body">
-        <Typography variant="bodySmall" color="primary" className="flex-1">
+        <Typography variant="bodySmall" color="primary">
           {alert.message}
         </Typography>
         {alert.dismissible && onClose && (

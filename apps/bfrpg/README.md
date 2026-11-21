@@ -8,7 +8,6 @@
 [![React](https://img.shields.io/badge/React-19.1-61dafb?style=flat&logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.1-646cff?style=flat&logo=vite)](https://vitejs.dev/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1-06b6d4?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
 [![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5.x-ff6b6b?style=flat&logo=react-query)](https://tanstack.com/query)
 [![Zustand](https://img.shields.io/badge/Zustand-5.x-000000?style=flat&logo=zustand)](https://zustand-demo.pmnd.rs/)
 [![Firebase](https://img.shields.io/badge/Firebase-12.2-ffca28?style=flat&logo=firebase)](https://firebase.google.com/)
@@ -40,7 +39,7 @@ Codex.Quest is a comprehensive web-based character creation and management syste
 - **React 19** with functional components and hooks
 - **TypeScript 5.9** for type-safe development
 - **Vite 7.1** for fast development and optimized builds
-- **TailwindCSS 4.1** with modern design tokens
+- **Plain CSS** with design tokens (`src/styles/tokens.css`), one stylesheet beside each component, and `@dice-jar/cn` for conditional classes
 - **Wouter 3.7** for lightweight client-side routing
 - **TanStack Query 5.x** for server state management and caching
 - **Zustand 5.x** for client-side state management with persistence

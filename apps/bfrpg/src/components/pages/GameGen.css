@@ -1,0 +1,28 @@
+@layer components {
+  .new-game > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .new-game-head {
+    text-align: center;
+  }
+  .new-game-head > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .new-game-head .typography[data-variant='body'] {
+    font-size: var(--text-lg);
+    line-height: 1.625;
+  }
+  .new-game .card.new-game-form,
+  .new-game-actions {
+    max-width: 42rem;
+    margin-inline: auto;
+  }
+  .new-game-form > div > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .new-game-actions {
+    display: flex;
+    justify-content: center;
+    gap: calc(var(--space) * 4);
+  }
+}

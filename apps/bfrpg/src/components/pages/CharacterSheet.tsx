@@ -25,8 +25,8 @@ import { useEnhancedCharacterSheet } from '@/hooks/queries/useEnhancedQueries';
 import { useCharacterMutations } from '@/hooks/mutations/useEnhancedMutations';
 import { useDiceRoller } from '@/hooks/dice/useDiceRoller';
 import type { Character, Equipment as EquipmentItem } from '@/types';
-import { cn } from '@dice-jar/cn';
 import { canCastSpells, hasCantrips, hasSpells, calculateModifier, getClassById, logger } from '@/utils';
+import './CharacterSheet.css';
 
 export default function CharacterSheet() {
   const [, params] = useRoute('/u/:userId/c/:characterId');
@@ -178,11 +178,7 @@ export default function CharacterSheet() {
     );
   }
 
-  const spellsEquipmentClassNames = cn(
-    `grid grid-cols-1 gap-6 ${
-      hasSpells(character) || hasCantrips(character) || canCastSpells(character) ? 'lg:grid-cols-2' : 'lg:grid-cols-1'
-    }`,
-  );
+  const hasSpellsSection = hasSpells(character) || hasCantrips(character) || canCastSpells(character);
 
   // Development-only character logging
   if (import.meta.env.DEV) {
@@ -191,35 +187,35 @@ export default function CharacterSheet() {
 
   return (
     <>
-      <PageWrapper>
-        <header className="mb-8">
-          <div className="flex items-center justify-between mb-4 relative">
+      <PageWrapper className="sheet-page">
+        <header className="sheet-head">
+          <div>
             <Breadcrumb items={breadcrumbItems} />
             {isSaving && <LoadingState message="Saving..." variant="overlay" />}
           </div>
         </header>
 
         {/* Hero section with character avatar and basic info */}
-        <Hero character={character} className="mb-8" editable={!!isOwner} onCharacterChange={handleCharacterChange} />
+        <Hero character={character} editable={!!isOwner} onCharacterChange={handleCharacterChange} />
 
         {/* Character Sheet Content */}
-        <div className="space-y-6">
+        <div className="sheet-body">
           {/* Main Character Stats Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+          <div className="sheet-stats">
             {/* Ability Scores */}
-            <section className="lg:col-span-1" aria-labelledby="ability-scores-heading">
+            <section aria-labelledby="ability-scores-heading">
               <AbilityScores character={character} editable={!!isOwner} onAbilityChange={handleAbilityChange} />
             </section>
 
             {/* Experience and Combat Stats */}
-            <section className="lg:col-span-3" aria-labelledby="character-stats-heading">
+            <section aria-labelledby="character-stats-heading">
               <Typography variant="h2" as="h2" id="character-stats-heading" className="sr-only">
                 Character Statistics
               </Typography>
 
               {/* Masonry-style layout for cards */}
-              <div className="columns-1 md:columns-2 gap-6 space-y-6 md:space-y-0">
-                <div className="break-inside-avoid mb-6">
+              <div className="sheet-masonry">
+                <div className="sheet-cell">
                   <ExperiencePoints
                     character={character}
                     classes={allClasses}
@@ -228,7 +224,7 @@ export default function CharacterSheet() {
                     onCharacterChange={handleCharacterChange}
                   />
                 </div>
-                <div className="break-inside-avoid mb-6">
+                <div className="sheet-cell">
                   <HitPoints
                     character={character}
                     editable={!!isOwner}
@@ -236,21 +232,21 @@ export default function CharacterSheet() {
                     onHPNotesChange={handleHPNotesChange}
                   />
                 </div>
-                <div className="break-inside-avoid mb-6">
+                <div className="sheet-cell">
                   <SavingThrows character={character} />
                 </div>
                 {hasSkills && (
-                  <div className="break-inside-avoid mb-6">
+                  <div className="sheet-cell">
                     <ThiefSkills character={character} />
                   </div>
                 )}
-                <div className="break-inside-avoid mb-6">
+                <div className="sheet-cell">
                   <AttackBonuses character={character} />
                 </div>{' '}
-                <div className="break-inside-avoid mb-6">
+                <div className="sheet-cell">
                   <CharacterDefense character={character} />
                 </div>
-                <div className="break-inside-avoid mb-6">
+                <div className="sheet-cell">
                   <SpecialsRestrictions character={character} isOwner={isOwner} onCharacterChange={handleCharacterChange} />
                 </div>
               </div>
@@ -261,11 +257,11 @@ export default function CharacterSheet() {
           <HorizontalRule />
 
           {/* Additional Components */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="break-inside-avoid">
+          <div className="sheet-pair" data-always>
+            <div>
               <CoinPurse character={character} editable={!!isOwner} onCurrencyChange={handleCurrencyChange} />
             </div>
-            <div className="break-inside-avoid">
+            <div>
               <Weight character={character} />
             </div>
           </div>
@@ -276,16 +272,16 @@ export default function CharacterSheet() {
           )}
 
           {/* Spells & Equipment Section - side-by-side on larger screens when both present */}
-          <div className={spellsEquipmentClassNames}>
+          <div className="sheet-pair" data-split={hasSpellsSection || undefined}>
             {/* Spells & Cantrips Section - only show if character has spells/cantrips or is a custom class that uses magic */}
-            {(hasSpells(character) || hasCantrips(character) || canCastSpells(character)) && (
-              <div className="break-inside-avoid">
+            {hasSpellsSection && (
+              <div>
                 <Spells character={character} onCharacterChange={handleCharacterChange} isOwner={isOwner} />
               </div>
             )}
 
             {/* Equipment Section */}
-            <div className="break-inside-avoid">
+            <div>
               <Equipment character={character} editable={!!isOwner} onEquipmentChange={handleEquipmentChange} />
             </div>
           </div>

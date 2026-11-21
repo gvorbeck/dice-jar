@@ -15,7 +15,7 @@ import './Icon.css';
  *
  * Usage:
  * ```tsx
- * <Icon name="settings" size="md" className="text-blue-500" />
+ * <Icon name="settings" size="md" className="icon-blue" />
  * <Icon name="close" size="sm" aria-label="Close modal" />
  * ```
  */
