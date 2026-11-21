@@ -203,7 +203,6 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
                 },
               ]}
               variant="equipment"
-              columns={{ base: 1, sm: 2 }}
             />
           </Card>
         )}

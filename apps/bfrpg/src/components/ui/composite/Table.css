@@ -1,0 +1,91 @@
+@layer components {
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius-xl);
+  }
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--zinc-800);
+  }
+  .table[data-size='sm'] {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .table[data-size='md'] {
+    font-size: var(--text-base);
+    line-height: var(--text-base-lh);
+  }
+  .table caption {
+    caption-side: top;
+    margin-bottom: calc(var(--space) * 4);
+    text-align: left;
+    font-weight: 600;
+    color: var(--amber-400);
+  }
+  .table th {
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    border-bottom: 2px solid color-mix(in oklab, var(--amber-500) 20%, transparent);
+    background-image: linear-gradient(to right in oklab, color-mix(in oklab, var(--zinc-700) 50%, transparent), transparent);
+    color: var(--amber-400);
+    text-align: left;
+  }
+  .table th[data-sortable] {
+    cursor: pointer;
+    user-select: none;
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .table th[data-sortable]:hover {
+    background-color: color-mix(in oklab, var(--zinc-600) 50%, transparent);
+  }
+  .table th > div {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+  }
+  .table th[aria-sort='ascending'] > div::after {
+    content: '▲';
+    font-size: var(--text-xs);
+  }
+  .table th[aria-sort='descending'] > div::after {
+    content: '▼';
+    font-size: var(--text-xs);
+  }
+  .table td {
+    border-bottom: 1px solid color-mix(in oklab, var(--zinc-700) 60%, transparent);
+    color: var(--zinc-100);
+  }
+  .table[data-size='sm'] th,
+  .table[data-size='sm'] td {
+    padding: calc(var(--space) * 2) calc(var(--space) * 3);
+  }
+  .table[data-size='md'] th,
+  .table[data-size='md'] td {
+    padding: calc(var(--space) * 3) calc(var(--space) * 4);
+  }
+  .table [data-align='center'] {
+    text-align: center;
+  }
+  .table [data-align='right'] {
+    text-align: right;
+  }
+  .table tr[data-stripe] {
+    background: color-mix(in oklab, var(--zinc-800) 30%, transparent);
+  }
+  .table[data-hoverable] tbody tr:hover {
+    background: color-mix(in oklab, var(--zinc-700) 30%, transparent);
+  }
+  .table tr[data-clickable] {
+    cursor: pointer;
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .table-empty {
+    padding: calc(var(--space) * 8);
+    text-align: center;
+    border-radius: var(--radius-xl);
+    background: var(--zinc-800);
+    color: var(--zinc-400);
+  }
+}

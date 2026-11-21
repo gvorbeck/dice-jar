@@ -110,22 +110,19 @@ function createWeightThresholds(lightCapacity: number, heavyCapacity: number): S
     {
       min: 100.1,
       max: Infinity,
-      textColor: 'text-red-400',
-      barColor: 'bg-red-500',
+      tone: 'red',
       label: 'Overloaded',
     },
     {
       min: lightPercentage,
       max: 100.1,
-      textColor: 'text-yellow-400',
-      barColor: 'bg-yellow-500',
+      tone: 'yellow',
       label: 'Heavily Loaded',
     },
     {
       min: 0,
       max: lightPercentage,
-      textColor: 'text-lime-400',
-      barColor: 'bg-lime-500',
+      tone: 'lime',
       label: 'Lightly Loaded',
     },
   ];

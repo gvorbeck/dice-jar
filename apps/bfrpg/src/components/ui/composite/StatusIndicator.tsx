@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
+import { cn } from '@dice-jar/cn';
+import './StatusIndicator.css';
 
 interface StatusThreshold {
   /** Minimum percentage for this status (0-100) */
   min: number;
   /** Maximum percentage for this status (0-100) */
   max: number;
-  /** Color class for text */
-  textColor: string;
-  /** Color class for progress bar */
-  barColor: string;
+  /** Colour of the label and bar */
+  tone: 'cyan' | 'lime' | 'yellow' | 'orange' | 'red' | 'gray';
   /** Status label */
   label: string;
 }
@@ -33,50 +33,43 @@ const DEFAULT_HEALTH_THRESHOLDS: StatusThreshold[] = [
   {
     min: 101,
     max: Infinity,
-    textColor: 'text-cyan-400',
-    barColor: 'bg-cyan-500',
+    tone: 'cyan',
     label: 'Temporary HP',
   },
   {
     min: 75,
     max: 101,
-    textColor: 'text-lime-400',
-    barColor: 'bg-lime-500',
+    tone: 'lime',
     label: 'Healthy',
   },
   {
     min: 50,
     max: 75,
-    textColor: 'text-yellow-400',
-    barColor: 'bg-yellow-500',
+    tone: 'yellow',
     label: 'Lightly Wounded',
   },
   {
     min: 25,
     max: 50,
-    textColor: 'text-orange-400',
-    barColor: 'bg-orange-500',
+    tone: 'orange',
     label: 'Moderately Wounded',
   },
   {
     min: 1,
     max: 25,
-    textColor: 'text-red-400',
-    barColor: 'bg-red-500',
+    tone: 'red',
     label: 'Heavily Wounded',
   },
   {
     min: 0.1,
     max: 1,
-    textColor: 'text-red-400',
-    barColor: 'bg-red-500',
+    tone: 'red',
     label: 'Critically Wounded',
   },
   {
     min: 0,
     max: 0.1,
-    textColor: 'text-gray-400',
-    barColor: 'bg-gray-500',
+    tone: 'gray',
     label: 'Unconscious/Dead',
   },
 ];
@@ -87,7 +80,7 @@ function StatusIndicator({
   thresholds = DEFAULT_HEALTH_THRESHOLDS,
   showBar = true,
   showLabel = true,
-  className = '',
+  className,
 }: StatusIndicatorProps) {
   const { percentage, status } = useMemo((): {
     percentage: number;
@@ -123,25 +116,11 @@ function StatusIndicator({
   }, [current, max, thresholds]);
 
   return (
-    <div className={`space-y-2 ${className}`}>
-      {/* Progress Bar */}
-      {showBar && (
-        <div className="w-full bg-zinc-700 rounded-full h-2 overflow-hidden">
-          <div
-            className={`
-              h-full transition-all duration-300 rounded-full
-              ${status.barColor}
-            `}
-            // shortcut: inline width for a computed percentage, use <progress> when the UI conversion reaches StatusIndicator
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
-      )}
-
-      {/* Status Label */}
+    <div className={cn('status-indicator', className)} data-tone={status.tone}>
+      {showBar && <progress className="status-bar" value={percentage} max={100} aria-label={status.label} />}
       {showLabel && (
-        <div className="text-center">
-          <span className={`text-xs font-medium ${status.textColor}`}>{status.label}</span>
+        <div className="status-label">
+          <span>{status.label}</span>
         </div>
       )}
     </div>

@@ -6,7 +6,6 @@
     line-height: var(--text-sm-lh);
   }
   .crumb {
-    display: flex;
     align-items: center;
   }
   .crumb-body {

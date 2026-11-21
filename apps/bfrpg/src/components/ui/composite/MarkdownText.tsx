@@ -1,6 +1,8 @@
 import { memo } from 'react';
 import type { JSX } from 'react';
 import { Typography } from '@/components/ui/core/display';
+import { cn } from '@dice-jar/cn';
+import './MarkdownText.css';
 
 interface MarkdownTextProps {
   content: string;
@@ -21,7 +23,7 @@ interface MarkdownTextProps {
  * @param className - Optional CSS classes to apply to the container
  * @param variant - Typography variant to use for paragraphs
  */
-export const MarkdownText = memo(({ content, className = '', variant = 'body' }: MarkdownTextProps) => {
+export const MarkdownText = memo(({ content, className, variant = 'body' }: MarkdownTextProps) => {
   // Split into blocks (paragraphs, tables, etc.)
   const blocks = content.split(/\n\s*\n/);
 
@@ -41,11 +43,7 @@ export const MarkdownText = memo(({ content, className = '', variant = 'body' }:
       }
 
       // Add bold element
-      parts.push(
-        <strong key={`bold-${match.index}`} className="font-semibold text-zinc-200">
-          {match[1]}
-        </strong>,
-      );
+      parts.push(<strong key={`bold-${match.index}`}>{match[1]}</strong>);
 
       currentIndex = match.index + match[0].length;
     }
@@ -118,24 +116,20 @@ export const MarkdownText = memo(({ content, className = '', variant = 'body' }:
 
   // Render a table component
   const renderTable = (tableData: { headers: string[]; rows: string[][] }, index: number) => (
-    <div key={`table-${index}`} className="overflow-x-auto my-4">
-      <table className="min-w-full border-collapse border border-zinc-600 bg-zinc-800 text-sm">
+    <div key={`table-${index}`} className="md-table-wrap">
+      <table className="md-table">
         <thead>
-          <tr className="bg-zinc-700">
+          <tr>
             {tableData.headers.map((header, headerIndex) => (
-              <th key={headerIndex} className="border border-zinc-600 px-3 py-2 text-left font-semibold text-zinc-200">
-                {processInlineMarkdown(header)}
-              </th>
+              <th key={headerIndex}>{processInlineMarkdown(header)}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {tableData.rows.map((row, rowIndex) => (
-            <tr key={rowIndex} className="hover:bg-zinc-750">
+            <tr key={rowIndex}>
               {row.map((cell, cellIndex) => (
-                <td key={cellIndex} className="border border-zinc-600 px-3 py-2 text-zinc-300">
-                  {processInlineMarkdown(cell)}
-                </td>
+                <td key={cellIndex}>{processInlineMarkdown(cell)}</td>
               ))}
             </tr>
           ))}
@@ -145,7 +139,7 @@ export const MarkdownText = memo(({ content, className = '', variant = 'body' }:
   );
 
   return (
-    <div className={`space-y-3 ${className}`}>
+    <div className={cn('md-text', className)}>
       {blocks.map((block, index) => {
         if (!block.trim()) return null;
 
@@ -157,7 +151,7 @@ export const MarkdownText = memo(({ content, className = '', variant = 'body' }:
 
         // Regular paragraph
         return (
-          <Typography key={index} variant={variant} className="text-zinc-300 leading-relaxed">
+          <Typography key={index} variant={variant}>
             {processInlineMarkdown(block)}
           </Typography>
         );

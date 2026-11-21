@@ -1,0 +1,97 @@
+@layer components {
+  .item-grid > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .item-grid-head {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: calc(var(--space) * 2);
+  }
+  .item-grid-head .typography[data-variant='h4'] {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+  }
+  .item-grid-head .icon {
+    color: var(--amber-400);
+  }
+  .item-grid-cells {
+    display: grid;
+    gap: calc(var(--space) * 4);
+  }
+  .item-grid-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .item-grid-state[data-kind='error'] {
+    padding-block: calc(var(--space) * 12);
+  }
+  .item-grid-state[data-kind='empty'] {
+    padding-block: calc(var(--space) * 16);
+  }
+  .item-grid-state[data-kind='error'] > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .item-grid-state[data-kind='empty'] > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .item-grid-state[data-kind='error'] .icon,
+  .item-grid-state[data-kind='error'] .typography {
+    color: var(--red-400);
+  }
+  .item-grid-state[data-kind='error'] .typography {
+    text-align: center;
+  }
+  .item-grid-state[data-kind='error'] .btn {
+    margin-top: calc(var(--space) * 2);
+  }
+  .item-grid-badge {
+    padding: calc(var(--space) * 6);
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--amber-950) 20%, transparent);
+    border: 2px solid color-mix(in oklab, var(--amber-600) 30%, transparent);
+  }
+  .item-grid-badge .icon {
+    color: var(--amber-400);
+  }
+  .item-grid-copy {
+    text-align: center;
+  }
+  .item-grid-copy > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .item-grid-state .btn[data-variant='primary'] {
+    margin-top: calc(var(--space) * 4);
+  }
+  .item-grid-state .btn[data-variant='primary'] .icon {
+    margin-right: calc(var(--space) * 2);
+  }
+  @media (min-width: 40rem) {
+    .item-grid > :not(:last-child) {
+      margin-bottom: calc(var(--space) * 6);
+    }
+    .item-grid-head {
+      flex-direction: row;
+      align-items: center;
+      gap: calc(var(--space) * 4);
+    }
+    .item-grid-head .typography[data-variant='helper'] {
+      text-align: right;
+    }
+    .item-grid-loading {
+      justify-content: flex-end;
+    }
+    .item-grid-cells {
+      gap: calc(var(--space) * 6);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .item-grid-cells {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}

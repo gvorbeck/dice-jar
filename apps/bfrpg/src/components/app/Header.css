@@ -1,5 +1,6 @@
 @layer components {
   .site-header {
+    backdrop-filter: blur(8px); /* also lifts the header, and so its shadow, above the alert below it */
     box-shadow:
       0 20px 25px -5px color-mix(in srgb, var(--black) 10%, transparent),
       0 8px 10px -6px color-mix(in srgb, var(--black) 10%, transparent);

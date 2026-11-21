@@ -5,8 +5,8 @@ import { memo, useEffect, useCallback } from 'react';
 import { Typography, Card } from '@/components/ui/core/display';
 import { Button, Icon } from '@/components/ui';
 import { TextHeader } from './TextHeader';
-import { cn } from '@/utils';
 import List, { StepListItem } from './List';
+import './Stepper.css';
 
 interface StepItem {
   title: string;
@@ -106,12 +106,7 @@ function Stepper({
   }
 
   return (
-    <div
-      className="flex flex-col lg:flex-row gap-8"
-      role="region"
-      aria-labelledby="stepper-heading"
-      aria-describedby="stepper-instructions"
-    >
+    <div className="stepper" role="region" aria-labelledby="stepper-heading" aria-describedby="stepper-instructions">
       {/* Hidden instructions for keyboard navigation */}
       <div id="stepper-instructions" className="sr-only">
         Use arrow keys to navigate between steps when focused within this area. Tab to navigate between interactive elements.
@@ -122,8 +117,8 @@ function Stepper({
       </div>
 
       {/* Step Navigation - Hidden on mobile, visible on large screens */}
-      <aside className="hidden lg:block lg:w-80 lg:flex-shrink-0">
-        <nav role="navigation" aria-label="Step navigation" className="sticky top-8">
+      <aside className="stepper-aside">
+        <nav role="navigation" aria-label="Step navigation" className="stepper-nav">
           <Typography variant="sectionHeading">Steps</Typography>
           <List variant="steps" spacing="loose" aria-label="Progress steps">
             {stepItems.map((item, index) => {
@@ -131,65 +126,27 @@ function Stepper({
               const isCompleted = index < safeCurrentStep;
               const isAccessible = index <= safeCurrentStep;
 
-              // Step button styles with 3D effects
-              const stepBaseStyles = [
-                'w-full flex items-center gap-4 p-4 rounded-lg border-2 transition-all duration-150',
-                'text-left font-medium',
-                'focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900',
-              ];
-
-              const stepVariantStyles = isActive
-                ? [
-                    'bg-amber-400 text-zinc-900 border-amber-500',
-                    'shadow-[0_4px_0_0_#b45309]', // amber-700 shadow
-                  ]
-                : isCompleted
-                  ? [
-                      'bg-lime-500 text-zinc-900 border-lime-600',
-                      'shadow-[0_3px_0_0_#65a30d]', // lime-700 shadow
-                      'hover:bg-lime-400 hover:shadow-[0_4px_0_0_#65a30d]',
-                      'cursor-pointer',
-                    ]
-                  : [
-                      'bg-zinc-700 text-zinc-300 border-zinc-600',
-                      'shadow-[0_3px_0_0_#3f3f46]', // zinc-700 shadow
-                      isAccessible ? 'hover:bg-zinc-600 hover:shadow-[0_4px_0_0_#3f3f46] cursor-pointer' : 'opacity-50 cursor-not-allowed',
-                    ];
-
-              const stepClasses = cn(...stepBaseStyles, ...stepVariantStyles);
-
-              // Step number styles with 3D effects
-              const numberBaseStyles = [
-                'flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-150',
-                'font-bold text-sm flex-shrink-0',
-              ];
-
-              const numberVariantStyles = isActive
-                ? ['bg-zinc-900 text-amber-400 border-zinc-900']
-                : isCompleted
-                  ? ['bg-zinc-900 text-lime-500 border-zinc-900']
-                  : ['bg-zinc-600 text-zinc-300 border-zinc-600'];
-
-              const numberClasses = cn(...numberBaseStyles, ...numberVariantStyles);
+              const state = isActive ? 'active' : isCompleted ? 'completed' : 'upcoming';
 
               return (
                 <StepListItem key={index}>
                   <button
                     onClick={() => handleStepClick(index)}
                     disabled={!isAccessible}
-                    className={stepClasses}
+                    className="stepper-step"
+                    data-state={state}
                     aria-current={isActive ? 'step' : undefined}
                     aria-label={`Step ${index + 1}: ${item.title}${isCompleted ? ' (completed)' : ''}`}
                   >
-                    <div className={numberClasses}>
+                    <div className="stepper-number">
                       {isCompleted ? <Icon name="check" size="md" aria-hidden={true} /> : <span aria-hidden="true">{index + 1}</span>}
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="stepper-step-text">
                       <TextHeader variant="h6" size="sm" underlined={false}>
                         {item.title}
                       </TextHeader>
-                      {isActive && <div className="text-sm opacity-75 mt-1">Current step</div>}
-                      {isCompleted && <div className="text-sm opacity-75 mt-1">Completed</div>}
+                      {isActive && <div className="stepper-step-note">Current step</div>}
+                      {isCompleted && <div className="stepper-step-note">Completed</div>}
                     </div>
                   </button>
                 </StepListItem>
@@ -200,39 +157,35 @@ function Stepper({
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0">
+      <main className="stepper-main">
         {/* Mobile Step Indicator */}
-        <div className="lg:hidden mb-6">
+        <div className="stepper-mobile">
           <Card variant="standard">
-            <div className="flex items-center justify-between mb-3">
-              <Typography variant="sectionHeading" color="zinc" as="h3" className="mb-0">
+            <div className="stepper-mobile-head">
+              <Typography variant="sectionHeading" color="zinc" as="h3">
                 Step {safeCurrentStep + 1} of {stepItems.length}
               </Typography>
-              <div className="text-sm text-zinc-400">{Math.round(((safeCurrentStep + 1) / stepItems.length) * 100)}%</div>
+              <div className="stepper-percent">{Math.round(((safeCurrentStep + 1) / stepItems.length) * 100)}%</div>
             </div>
-            <div className="w-full bg-zinc-700 rounded-full h-2 shadow-inner">
-              <div
-                className="bg-amber-400 h-2 rounded-full transition-all duration-300 shadow-[0_1px_0_0_#b45309]"
-                // shortcut: inline width for a computed percentage, use <progress> when the UI conversion reaches Stepper
-                style={{
-                  width: `${((safeCurrentStep + 1) / stepItems.length) * 100}%`,
-                }}
-              />
-            </div>
+            <progress
+              className="stepper-progress"
+              value={safeCurrentStep + 1}
+              max={stepItems.length}
+              aria-label={`Step ${safeCurrentStep + 1} of ${stepItems.length}`}
+            />
           </Card>
         </div>
 
         {/* Step Controls */}
-        <nav role="navigation" aria-label="Step controls" className="flex flex-col sm:flex-row gap-4 mb-8">
+        <nav role="navigation" aria-label="Step controls" className="stepper-controls">
           <Button
             onClick={() => handleStepChange('previous')}
             disabled={prevDisabled || safeCurrentStep === 0}
             variant="ghost"
             size="lg"
-            className="w-full sm:w-auto whitespace-nowrap"
+            className="stepper-prev"
             icon="chevron-left"
             iconSize="md"
-            iconClassName="mr-2 flex-shrink-0"
             aria-label={`Go to previous step: ${safeCurrentStep > 0 ? stepItems[safeCurrentStep - 1]?.title || 'Previous step' : ''}`}
           >
             Previous
@@ -243,11 +196,10 @@ function Stepper({
             disabled={nextDisabled || (safeCurrentStep === stepItems.length - 1 && !onNext)}
             variant="primary"
             size="lg"
-            className="w-full sm:w-auto sm:ml-auto whitespace-nowrap"
+            className="stepper-next"
             {...(safeCurrentStep < stepItems.length - 1 && {
               icon: 'chevron-right',
               iconSize: 'md',
-              iconClassName: 'ml-2 flex-shrink-0',
             })}
             aria-label={`Go to next step: ${
               safeCurrentStep < stepItems.length - 1 ? stepItems[safeCurrentStep + 1]?.title || 'Next step' : 'Complete'
@@ -259,23 +211,17 @@ function Stepper({
 
         {/* Validation Message */}
         {validationMessage && (
-          <div className="mb-6">
-            <div
-              role="alert"
-              aria-live="polite"
-              className="bg-red-950/20 border-2 border-red-600 text-red-100 p-4 rounded-lg shadow-[0_3px_0_0_#b91c1c]"
-            >
-              <div className="flex items-start gap-3">
-                <Icon name="exclamation-triangle" size="md" className="flex-shrink-0 mt-0.5" aria-hidden={true} />
-                <div>{validationMessage}</div>
-              </div>
+          <div className="stepper-error">
+            <div role="alert" aria-live="polite" className="stepper-error-box">
+              <Icon name="exclamation-triangle" size="md" aria-hidden={true} />
+              <div>{validationMessage}</div>
             </div>
           </div>
         )}
 
         {/* Step Content */}
-        <section aria-labelledby="step-content-heading" role="tabpanel" aria-live="polite" className="mb-8">
-          <Typography variant="h2" as="h2" id="step-content-heading" weight="bold" color="zinc" className="mb-4">
+        <section aria-labelledby="step-content-heading" role="tabpanel" aria-live="polite" className="stepper-content">
+          <Typography variant="h2" as="h2" id="step-content-heading" weight="bold" color="zinc">
             {currentStepItem?.title || 'Step'}
           </Typography>
           <div>{currentStepItem?.content}</div>

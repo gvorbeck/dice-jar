@@ -182,7 +182,6 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
                 modifier: score.modifier,
               }))}
               variant="ability"
-              columns={{ base: 2, sm: 3, md: 6 }}
             />
           </div>
 

@@ -187,7 +187,6 @@ function AbilityScoreStep({ character, onCharacterChange }: AbilityScoreStepProp
                 modifier: ability.modifier,
               }))}
               variant="summary"
-              columns={{ base: 2, sm: 3, md: 6 }}
             />
           </Card>
         </section>

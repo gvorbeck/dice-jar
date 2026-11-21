@@ -4,6 +4,7 @@ import { Icon } from '@/components/ui/core/display';
 import type { IconName } from '@/components/ui/core/display';
 import { SkeletonCard, LoadingState } from '@/components/ui/core/feedback';
 import type { ReactNode } from 'react';
+import './ItemGrid.css';
 
 interface ItemGridProps<T> {
   items: T[];
@@ -31,20 +32,20 @@ export function ItemGrid<T extends { id: string }>({ items, loading, error, empt
   // Show loading skeleton when loading AND no items yet
   if (loading && items.length === 0) {
     return (
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
-          <Typography variant="h4" className="flex items-center gap-2">
-            <Icon name={header.icon} size="md" className="text-amber-400" />
+      <div className="item-grid">
+        <div className="item-grid-head">
+          <Typography variant="h4">
+            <Icon name={header.icon} size="md" />
             {header.title}
           </Typography>
           <LoadingState
             variant="inline"
             message={`Loading ${header.title.toLowerCase().replace('your ', '')}...`}
-            className="sm:justify-end"
+            className="item-grid-loading"
           />
         </div>
 
-        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="item-grid-cells">
           {/* Show 6 skeleton cards while loading */}
           {Array.from({ length: 6 }).map((_, index) => (
             <SkeletonCard key={index} size="lg" label={`Loading ${header.title.toLowerCase().replace('your ', '')}...`} />
@@ -56,12 +57,12 @@ export function ItemGrid<T extends { id: string }>({ items, loading, error, empt
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 space-y-4">
-        <Icon name="exclamation-circle" size="xl" className="text-red-400" />
-        <Typography variant="body" className="text-red-400 text-center">
+      <div className="item-grid-state" data-kind="error">
+        <Icon name="exclamation-circle" size="xl" />
+        <Typography variant="body">
           Error loading {header.title.toLowerCase()}: {String(error)}
         </Typography>
-        <Button variant="secondary" size="sm" onClick={onRetry || (() => window.location.reload())} className="mt-2">
+        <Button variant="secondary" size="sm" onClick={onRetry || (() => window.location.reload())}>
           Try Again
         </Button>
       </div>
@@ -70,11 +71,11 @@ export function ItemGrid<T extends { id: string }>({ items, loading, error, empt
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 space-y-6">
-        <div className="p-6 rounded-full bg-amber-950/20 border-2 border-amber-600/30">
-          <Icon name={emptyState.icon} size="xl" className="text-amber-400" />
+      <div className="item-grid-state" data-kind="empty">
+        <div className="item-grid-badge">
+          <Icon name={emptyState.icon} size="xl" />
         </div>
-        <div className="text-center space-y-3">
+        <div className="item-grid-copy">
           <Typography variant="h4" color="primary">
             {emptyState.title}
           </Typography>
@@ -84,7 +85,7 @@ export function ItemGrid<T extends { id: string }>({ items, loading, error, empt
         </div>
         {emptyState.action && (
           <Link href={emptyState.action.href}>
-            <Button variant="primary" size="lg" className="mt-4" icon="plus" iconSize="sm" iconClassName="mr-2">
+            <Button variant="primary" size="lg" icon="plus" iconSize="sm">
               {emptyState.action.label}
             </Button>
           </Link>
@@ -94,13 +95,13 @@ export function ItemGrid<T extends { id: string }>({ items, loading, error, empt
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
-        <Typography variant="h4" className="flex items-center gap-2">
-          <Icon name={header.icon} size="md" className="text-amber-400" />
+    <div className="item-grid">
+      <div className="item-grid-head">
+        <Typography variant="h4">
+          <Icon name={header.icon} size="md" />
           {header.title}
         </Typography>
-        <Typography variant="helper" color="secondary" className="sm:text-right">
+        <Typography variant="helper" color="secondary">
           {(() => {
             const title = header.title.toLowerCase();
             if (title.startsWith('your ')) {
@@ -113,7 +114,7 @@ export function ItemGrid<T extends { id: string }>({ items, loading, error, empt
         </Typography>
       </div>
 
-      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="item-grid-cells">
         {items.map((item) => (
           <div key={item.id}>{renderItem(item)}</div>
         ))}
