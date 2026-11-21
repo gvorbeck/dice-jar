@@ -113,8 +113,8 @@ export default function SpecialsRestrictions({
   return (
     <SectionWrapper title="Restrictions & Special Abilities" size={size} className={className}>
       {/* Tabs inside the component */}
-      <Tabs defaultValue={availableTabs[0]!} variant="underline">
-        <div className="px-6 pt-4 border-b border-zinc-700/50">
+      <Tabs defaultValue={availableTabs[0]!}>
+        <div className="px-6 pt-4">
           <TabList aria-label="Restrictions & Special Abilities">
             {race && <Tab value="race">{race.name}</Tab>}
             {classes.length > 0 && <Tab value="class">{classes.length === 1 ? classes[0]?.name : 'Classes'}</Tab>}

@@ -132,6 +132,7 @@ function StatusIndicator({
               h-full transition-all duration-300 rounded-full
               ${status.barColor}
             `}
+            // shortcut: inline width for a computed percentage, use <progress> when the UI conversion reaches StatusIndicator
             style={{ width: `${percentage}%` }}
           />
         </div>

@@ -17,8 +17,10 @@ test.describe('look baseline', () => {
 
       const shot = async (page: Page, name: string, info: TestInfo) => {
         await page.waitForLoadState('networkidle');
+        await page.waitForFunction(() => [...document.images].every((i) => i.complete)); // avatars load lazily
         await page.mouse.move(0, 0); // a hovered button changes its shadow
-        const png = await page.screenshot({ fullPage: true, animations: 'disabled' });
+        // a modal sits in the viewport; a full-page capture would resize it
+        const png = await page.screenshot({ fullPage: !name.startsWith('modal-'), animations: 'disabled' });
         if (compare) expect(png).toMatchSnapshot(`${vp}-${name}.png`, { maxDiffPixelRatio: 0 });
         else {
           const file = info.snapshotPath(`${vp}-${name}.png`);
@@ -79,7 +81,7 @@ test.describe('look baseline', () => {
         await page.getByRole('button', { name: 'Roll All Abilities' }).click();
         await expect(page.getByRole('heading', { name: 'Ability Scores', exact: true })).toBeVisible();
         await shot(page, 'creation-1-abilities', info);
-        const next = page.getByRole('button', { name: 'Next', exact: true });
+        const next = page.getByRole('button', { name: /^Go to next step/ });
         await next.click();
         await page.getByLabel('Race*').selectOption('human');
         await shot(page, 'creation-2-race', info);

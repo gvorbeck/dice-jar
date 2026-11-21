@@ -57,10 +57,13 @@ export const GMBinder = memo(({ className, game, onAddToCombat }: GMBinderProps)
     setSelectedTab(value);
   }, []);
 
+  // A conditional tab can disappear while selected; reset to the first tab so one is always selected, and it stays reset if the tab returns.
+  if ((selectedTab === 'skills' && !hasSkillClasses) || (selectedTab === 'turnUndead' && !hasTurnUndead)) setSelectedTab('spells');
+
   return (
     <SectionWrapper title="GM Binder" {...(className && { className })} collapsible={true} collapsibleKey="gm-binder">
       <div className="p-4">
-        <Tabs value={selectedTab} onValueChange={handleTabChange} variant="underline" size="md">
+        <Tabs value={selectedTab} onValueChange={handleTabChange}>
           <TabList aria-label="GM resources">
             <Tab value="spells">Spells</Tab>
             <Tab value="bestiary">Bestiary</Tab>

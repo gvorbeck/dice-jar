@@ -207,16 +207,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       </div>
 
       {error && (
-        <div
-          id={errorId}
-          role="alert"
-          aria-live="assertive"
-          style={{
-            color: '#dc3545',
-            fontSize: '0.875rem',
-            marginTop: '0.25rem',
-          }}
-        >
+        <div id={errorId} role="alert" aria-live="assertive" className="text-sm mt-1 text-red-400">
           {error}
         </div>
       )}

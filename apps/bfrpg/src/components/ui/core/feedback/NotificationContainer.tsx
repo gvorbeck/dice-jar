@@ -43,6 +43,7 @@ const NotificationContainer: React.FC<NotificationContainerProps> = ({ notificat
         <div
           key={notification.id}
           className="pointer-events-auto"
+          // shortcut: inline style for a computed delay, move to a CSS variable when the UI conversion reaches notifications
           style={{
             // Stagger animation delay for multiple notifications
             animationDelay: `${index * NOTIFICATION_CONSTANTS.STAGGER_DELAY}ms`,

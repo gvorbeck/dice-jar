@@ -265,7 +265,7 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Authentication" size="sm">
-      <Tabs value={activeTab} onValueChange={handleTabChange} variant="underline">
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabList aria-label="Authentication options">
           <Tab value="signin">Sign In</Tab>
           <Tab value="signup">Sign Up</Tab>

@@ -215,7 +215,7 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
           Equipment Selection
         </Typography>
 
-        <Tabs defaultValue="equipment-packs" variant="underline" size="md">
+        <Tabs defaultValue="equipment-packs">
           <TabList aria-label="Equipment selection methods">
             <Tab value="equipment-packs">Equipment Packs</Tab>
             <Tab value="individual-items">Individual Items</Tab>

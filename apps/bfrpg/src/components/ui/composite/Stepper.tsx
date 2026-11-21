@@ -213,6 +213,7 @@ function Stepper({
             <div className="w-full bg-zinc-700 rounded-full h-2 shadow-inner">
               <div
                 className="bg-amber-400 h-2 rounded-full transition-all duration-300 shadow-[0_1px_0_0_#b45309]"
+                // shortcut: inline width for a computed percentage, use <progress> when the UI conversion reaches Stepper
                 style={{
                   width: `${((safeCurrentStep + 1) / stepItems.length) * 100}%`,
                 }}

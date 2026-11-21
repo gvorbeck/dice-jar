@@ -223,6 +223,7 @@ const Notification = forwardRef<HTMLDivElement, NotificationProps>(
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/5 dark:bg-white/5 overflow-hidden rounded-b-xl">
             <div
               className={progressClasses}
+              // shortcut: inline style for a per-notification duration, same upgrade as NotificationContainer
               style={{
                 animation: `shrink ${duration}ms linear forwards`,
               }}

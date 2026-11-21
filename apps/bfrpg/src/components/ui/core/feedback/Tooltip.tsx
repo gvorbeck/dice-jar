@@ -8,8 +8,6 @@ import type { TooltipPosition, PositioningOptions } from '@/types';
 // Constants
 const POSITIONING_DELAY = 0;
 const THROTTLE_DELAY = 16; // 60fps
-const TOOLTIP_Z_INDEX = 9999;
-
 /**
  * Throttle function to limit the rate of function execution
  * @param func - Function to throttle
@@ -198,7 +196,7 @@ const Tooltip: React.FC<TooltipProps> = ({
 
   // Hoist class computation outside of JSX
   const tooltipClasses = cn(
-    'fixed px-3 py-2 text-sm pointer-events-none transform -translate-x-1/2',
+    'fixed z-[9999] px-3 py-2 text-sm pointer-events-none transform -translate-x-1/2',
     DESIGN_TOKENS.colors.text.primary,
     DESIGN_TOKENS.colors.bg.input, // bg-zinc-700
     DESIGN_TOKENS.colors.border.primary, // border-zinc-600
@@ -209,9 +207,15 @@ const Tooltip: React.FC<TooltipProps> = ({
     className,
   );
 
-  const arrowUpClasses = cn('absolute bottom-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent', 'border-b-zinc-600');
+  const arrowUpClasses = cn(
+    'absolute -translate-x-1/2 bottom-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent',
+    'border-b-zinc-600',
+  );
 
-  const arrowDownClasses = cn('absolute top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent', 'border-t-zinc-600');
+  const arrowDownClasses = cn(
+    'absolute -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent',
+    'border-t-zinc-600',
+  );
 
   const tooltipPortal = isVisible
     ? createPortal(
@@ -220,35 +224,18 @@ const Tooltip: React.FC<TooltipProps> = ({
           id={tooltipId}
           role="tooltip"
           className={tooltipClasses}
-          style={{
-            top: position.top,
-            left: position.left,
-            zIndex: TOOLTIP_Z_INDEX,
-          }}
+          // shortcut: inline style for a computed pixel position, move to a CSS variable set by a ref if the UI rule is enforced by lint
+          style={{ top: position.top, left: position.left }}
           aria-hidden={!isVisible}
         >
           {content}
           {/* Arrow */}
           {isBelow ? (
             // Arrow pointing up (tooltip is below trigger)
-            <div
-              className={arrowUpClasses}
-              style={{
-                left: `calc(50% + ${arrowOffset}px)`,
-                transform: 'translateX(-50%)',
-              }}
-              aria-hidden="true"
-            />
+            <div className={arrowUpClasses} style={{ left: `calc(50% + ${arrowOffset}px)` }} aria-hidden="true" />
           ) : (
             // Arrow pointing down (tooltip is above trigger)
-            <div
-              className={arrowDownClasses}
-              style={{
-                left: `calc(50% + ${arrowOffset}px)`,
-                transform: 'translateX(-50%)',
-              }}
-              aria-hidden="true"
-            />
+            <div className={arrowDownClasses} style={{ left: `calc(50% + ${arrowOffset}px)` }} aria-hidden="true" />
           )}
         </div>,
         document.body,

@@ -32,7 +32,7 @@ function Home() {
         {/* Show character list for authenticated users */}
         {!authLoading && user && (
           <Card variant="standard" size="compact" className="sm:p-6">
-            <Tabs defaultValue="characters" variant="underline" size="md">
+            <Tabs defaultValue="characters">
               <TabList aria-label="Main navigation">
                 <Tab value="characters">Characters</Tab>
                 <Tab value="games">Games</Tab>
