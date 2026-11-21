@@ -1,0 +1,45 @@
+@layer components {
+  .spells-body {
+    padding: calc(var(--space) * 6);
+  }
+  .spells-body > div > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .spell-section .section-header {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .spell-heading {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+  }
+  .spell-count {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    font-weight: 400;
+    color: var(--zinc-400);
+  }
+  .spell-usage.typography {
+    display: block;
+    margin-bottom: calc(var(--space) * 4);
+    color: var(--zinc-500);
+  }
+  .spell-section[data-add] > .accordion,
+  .spell-section[data-add] > .card {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .spell-empty .typography {
+    text-align: center;
+    color: var(--zinc-400);
+  }
+  .spells-none {
+    color: var(--zinc-400);
+  }
+  .spells-none > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .spells-none .typography[data-variant='body'] {
+    font-size: var(--text-lg);
+    line-height: 1.625;
+  }
+}

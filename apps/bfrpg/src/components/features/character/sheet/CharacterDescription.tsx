@@ -2,6 +2,7 @@ import { TextArea } from '@/components/ui/core/primitives';
 import { SectionWrapper } from '@/components/ui/core/layout';
 import { useDebouncedUpdate } from '@/hooks';
 import type { Character } from '@/types';
+import './CharacterDescription.css';
 
 interface CharacterDescriptionProps {
   character: Character;
@@ -30,7 +31,7 @@ export default function CharacterDescription({
 
   return (
     <SectionWrapper title="Character Description" size={size} className={className}>
-      <div className="space-y-2 p-2">
+      <div className="desc-body">
         {editable ? (
           <TextArea
             value={debouncedDescription.value}
@@ -42,23 +43,17 @@ export default function CharacterDescription({
             rows={size === 'lg' ? 12 : size === 'md' ? 8 : 6}
             showClearButton={true}
             aria-label="Character description and notes"
-            className="!bg-zinc-800/50 !border-zinc-600/50 leading-relaxed"
+            className="desc-input"
             resize="vertical"
           />
         ) : (
-          character.desc && (
-            <div className="bg-zinc-800/50 border border-zinc-600/50 rounded px-3 py-2 text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap max-h-96 overflow-y-auto">
-              {character.desc}
-            </div>
-          )
+          character.desc && <div className="desc-text">{character.desc}</div>
         )}
 
         {editable && (
-          <div className="flex items-center justify-between text-xs text-zinc-500">
+          <div className="desc-foot">
             <span>{debouncedDescription.value.length} / 5000 characters</span>
-            <span className="text-zinc-600">
-              {debouncedDescription.isSaving ? 'Saving...' : 'Saves automatically after you stop typing (500ms)'}
-            </span>
+            <span>{debouncedDescription.isSaving ? 'Saving...' : 'Saves automatically after you stop typing (500ms)'}</span>
           </div>
         )}
       </div>

@@ -5,6 +5,7 @@ import { StepWrapper } from '@/components/ui/core/layout';
 import { InfoCardHeader, RequirementCard } from '@/components/ui/composite';
 import { logger, calculateHitDie, getRacialModificationInfo } from '@/utils';
 import type { BaseStepProps } from '@/types';
+import './HitPointsStep.css';
 
 type HitPointsStepProps = BaseStepProps;
 
@@ -94,21 +95,20 @@ const HitPointsStep: React.FC<HitPointsStepProps> = ({ character, onCharacterCha
   return (
     <StepWrapper title="Roll Hit Points" description="Determine your character's starting hit points based on their class.">
       {/* Hit Points Information */}
-      <section className="mb-8">
+      <section className="step-block">
         <Card variant="info">
-          <InfoCardHeader icon={<Icon name="info" size="md" aria-hidden={true} />} title="Hit Die Information" className="mb-4" />
-          <Typography variant="description">
-            Roll your starting hit points using your {racialModificationInfo ? 'modified' : "class's"} hit die:{' '}
-            <strong className="text-amber-100">{hitDie}</strong>
-            {constitutionText && <span className="text-amber-200">{constitutionText}</span>}
+          <InfoCardHeader icon={<Icon name="info" size="md" aria-hidden={true} />} title="Hit Die Information" spacing="normal" />
+          <Typography variant="description" className="hit-die">
+            Roll your starting hit points using your {racialModificationInfo ? 'modified' : "class's"} hit die: <strong>{hitDie}</strong>
+            {constitutionText && <span className="hit-die-bonus">{constitutionText}</span>}
           </Typography>
 
           {racialModificationInfo && (
-            <div className="mt-3 p-3 bg-orange-900/20 border border-orange-700/40 rounded-lg">
-              <div className="flex items-start gap-2">
-                <Icon name="info" size="md" className="flex-shrink-0 text-orange-400 mt-0.5" aria-hidden={true} />
+            <div className="hit-note">
+              <div className="hit-note-row">
+                <Icon name="info" size="md" aria-hidden={true} />
                 <div>
-                  <Typography variant="helper" weight="medium" color="amber" className="mb-1">
+                  <Typography variant="helper" weight="medium" color="amber">
                     Racial Restriction Applied
                   </Typography>
                   <Typography variant="helper" color="primary">
@@ -126,12 +126,12 @@ const HitPointsStep: React.FC<HitPointsStepProps> = ({ character, onCharacterCha
       </section>
 
       {/* Hit Points Rolling */}
-      <section className="mb-8">
+      <section className="step-block">
         <Typography variant="sectionHeading">Roll Hit Points</Typography>
 
         <Card variant="standard">
-          <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-end">
-            <div className="flex-grow">
+          <div className="hit-roll">
+            <div>
               <SimpleRoller
                 formula={`${hitDie}${constitutionBonus >= 0 ? '+' : ''}${constitutionBonus}`}
                 label="Hit Points"
@@ -153,24 +153,24 @@ const HitPointsStep: React.FC<HitPointsStepProps> = ({ character, onCharacterCha
 
       {/* Hit Points Summary */}
       {character.hp.max > 0 && (
-        <section className="mb-8">
+        <section className="step-block">
           <Typography variant="sectionHeading">Hit Points Summary</Typography>
 
           <Card variant="success">
-            <div className="flex items-center gap-3 mb-4">
-              <Icon name="check-circle" size="lg" className="flex-shrink-0 text-lime-400" aria-hidden={true} />
+            <div className="hit-current">
+              <Icon name="check-circle" size="lg" aria-hidden={true} />
               <Typography variant="infoHeading" color="zinc">
                 Current Hit Points
               </Typography>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="hit-summary">
               <Card variant="success">
                 <Typography variant="subHeading" color="lime">
                   <Icon name="heart" size="sm" />
                   Hit Points
                 </Typography>
-                <Typography variant="body" weight="bold" color="lime" className="text-lg m-0">
+                <Typography variant="body" weight="bold" color="lime">
                   {character.hp.current} / {character.hp.max} HP
                 </Typography>
               </Card>

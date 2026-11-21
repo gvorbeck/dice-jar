@@ -13,6 +13,7 @@ import { useCharacterMutations } from '@/hooks/mutations/useEnhancedMutations';
 import { formatCurrency } from '@/utils/currency';
 import { getCharacterSpellSystemType } from '@/utils/character';
 import EquipmentPackSelector from './EquipmentPackSelector';
+import './EquipmentStep.css';
 
 type EquipmentStepProps = BaseStepProps;
 
@@ -93,11 +94,11 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
       statusMessage={getStatusMessage()}
     >
       {/* Starting Gold Section */}
-      <section className="mb-8">
+      <section className="step-block">
         <Typography variant="sectionHeading">Starting Gold</Typography>
 
-        <Card variant="info" className="mb-6">
-          <InfoCardHeader icon={<Icon name="coin" size="md" aria-hidden={true} />} title="Gold Information" className="mb-4" />
+        <Card variant="info" className="step-card">
+          <InfoCardHeader icon={<Icon name="coin" size="md" aria-hidden={true} />} title="Gold Information" spacing="normal" />
           <Typography variant="description" color="primary">
             Roll 3d6 × 10 for your character's starting gold pieces. Use this gold to purchase equipment and supplies.
           </Typography>
@@ -114,15 +115,15 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
           />
 
           {startingGold !== undefined && (
-            <div className="mt-4 flex flex-col sm:flex-row gap-3 sm:gap-8">
-              <div className="flex items-center gap-2">
-                <Icon name="coin" size="sm" className="text-lime-400" aria-hidden={true} />
-                <span className="font-medium text-zinc-100">Current: {formatCurrency(character.currency)}</span>
+            <div className="gold-status">
+              <div>
+                <Icon name="coin" size="sm" aria-hidden={true} />
+                <span>Current: {formatCurrency(character.currency)}</span>
               </div>
               {startingGold !== character.currency.gold && (
-                <div className="flex items-center gap-2">
-                  <Icon name="clock" size="sm" className="text-zinc-400" />
-                  <span className="font-medium text-zinc-400">Started: {startingGold} gp</span>
+                <div>
+                  <Icon name="clock" size="sm" />
+                  <span>Started: {startingGold} gp</span>
                 </div>
               )}
             </div>
@@ -131,41 +132,41 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
       </section>
 
       {/* Current Equipment Section */}
-      <section className="mb-8">
+      <section className="step-block">
         <Typography variant="sectionHeading">Current Equipment</Typography>
 
         {cleanedEquipment.length === 0 ? (
           <Card variant="standard">
-            <div className="flex items-center gap-3">
-              <Icon name="clipboard" size="md" className="text-zinc-400" />
-              <Typography variant="body" color="muted" className="italic">
+            <div className="kit-none">
+              <Icon name="clipboard" size="md" />
+              <Typography variant="body" color="muted">
                 No equipment selected yet. Browse available equipment below.
               </Typography>
             </div>
           </Card>
         ) : (
-          <Card variant="success" className="p-0">
-            <div className="flex items-center gap-3 mb-4">
-              <Icon name="clipboard" size="md" className="text-lime-400" />
-              <Typography variant="h5" color="zinc" weight="semibold" className="m-0">
+          <Card variant="success" className="kit-inventory">
+            <div className="kit-title">
+              <Icon name="clipboard" size="md" />
+              <Typography variant="h5" color="zinc" weight="semibold">
                 Equipment Inventory
               </Typography>
             </div>
 
-            <div className="space-y-3 mb-6">
+            <div className="kit-items">
               {cleanedEquipment.map((item) => {
                 const itemKey = `${item.name}-${item.category || 'no-cat'}-${
                   item.subCategory || 'no-sub'
                 }-${item.costValue || 0}-${item.weight || 0}`;
                 return (
                   <Card key={itemKey} variant="success">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium text-lime-100">{item.name}</span>
+                    <div className="kit-item">
+                      <div>
+                        <div className="kit-name">
+                          <span>{item.name}</span>
                           {item.amount > 1 && <Badge variant="status">× {item.amount}</Badge>}
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-sm text-lime-200">
+                        <div className="kit-figures">
                           {item.weight > 0 && <span>{Math.round(item.weight * item.amount * 10) / 10} lbs</span>}
                           {item.costValue > 0 && (
                             <span>
@@ -174,12 +175,7 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
                           )}
                         </div>
                       </div>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleEquipmentRemove(item.name)}
-                        className="self-start sm:self-center"
-                      >
+                      <Button variant="destructive" size="sm" onClick={() => handleEquipmentRemove(item.name)}>
                         Remove
                       </Button>
                     </div>
@@ -209,10 +205,8 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
       </section>
 
       {/* Equipment Selection Tabs */}
-      <section className="mb-8">
-        <Typography variant="sectionHeading" className="mb-6">
-          Equipment Selection
-        </Typography>
+      <section className="step-block">
+        <Typography variant="sectionHeading">Equipment Selection</Typography>
 
         <Tabs defaultValue="equipment-packs">
           <TabList aria-label="Equipment selection methods">
@@ -223,7 +217,7 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
           <TabPanels>
             <TabPanel value="equipment-packs">
               {/* Equipment Pack Error */}
-              <ErrorDisplay error={packError?.message} className="mb-6" />
+              <ErrorDisplay error={packError?.message} className="kit-error" />
 
               {/* Equipment Pack Selector */}
               {showPackSelector && (
@@ -232,38 +226,29 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
 
               {/* Selected Pack Summary */}
               {selectedPack && !showPackSelector && (
-                <div className="mb-8">
-                  <Card variant="success" className="mb-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Icon name="check" size="sm" className="text-lime-400" />
-                          <Typography variant="h6" className="m-0">
-                            {selectedPack.name}
-                          </Typography>
+                <div className="kit-pack">
+                  <Card variant="success">
+                    <div className="kit-pack-row">
+                      <div>
+                        <div className="kit-pack-title">
+                          <Icon name="check" size="sm" />
+                          <Typography variant="h6">{selectedPack.name}</Typography>
                         </div>
-                        <Typography variant="bodySmall" color="secondary" className="mb-3">
+                        <Typography variant="bodySmall" color="secondary">
                           {selectedPack.description}
                         </Typography>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1">
-                            <Icon name="coin" size="sm" className="text-amber-400" />
-                            <span className="text-sm font-medium">{selectedPack.cost} gp spent</span>
+                        <div className="kit-pack-costs">
+                          <div>
+                            <Icon name="coin" size="sm" />
+                            <span>{selectedPack.cost} gp spent</span>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Icon name="weight" size="sm" className="text-zinc-400" />
-                            <span className="text-sm text-zinc-400">{selectedPack.weight} lb added</span>
+                          <div>
+                            <Icon name="weight" size="sm" />
+                            <span>{selectedPack.weight} lb added</span>
                           </div>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleRemovePack}
-                        className="flex items-center gap-1"
-                        icon="plus"
-                        iconSize="sm"
-                      >
+                      <Button variant="ghost" size="sm" onClick={handleRemovePack} icon="plus" iconSize="sm">
                         Add Another Pack
                       </Button>
                     </div>

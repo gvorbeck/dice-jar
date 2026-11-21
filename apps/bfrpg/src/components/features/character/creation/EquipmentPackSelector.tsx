@@ -8,6 +8,7 @@ import type { Character } from '@/types';
 import type { EquipmentPack } from '@/types';
 import { useEquipmentPacks } from '@/hooks/equipment/useEquipmentPacks';
 import EquipmentPackCard from './EquipmentPackCard';
+import './EquipmentPackSelector.css';
 
 interface EquipmentPackSelectorProps {
   character: Character;
@@ -29,16 +30,16 @@ function EquipmentPackSelector({ character, onPackSelected, isLoading = false }:
   };
 
   return (
-    <SectionWrapper title="Equipment Packs" className="mb-8">
-      <div className="p-6">
-        <Card variant="info" className="mb-6">
-          <InfoCardHeader icon={<Icon name="briefcase" size="md" aria-hidden={true} />} title="Quick Equipment Setup" className="mb-4" />
+    <SectionWrapper title="Equipment Packs" className="step-block">
+      <div className="packs-body">
+        <Card variant="info">
+          <InfoCardHeader icon={<Icon name="briefcase" size="md" aria-hidden={true} />} title="Quick Equipment Setup" spacing="normal" />
           <Typography variant="description" color="primary">
             Choose a pre-configured equipment pack to quickly gear up your character, or skip to select individual items.
           </Typography>
         </Card>
 
-        <div className="space-y-4 mb-6">
+        <div className="packs-list">
           {recommendedPacks.map((pack) => (
             <EquipmentPackCard
               key={pack.id}
@@ -56,7 +57,7 @@ function EquipmentPackSelector({ character, onPackSelected, isLoading = false }:
 
         {/* No affordable packs message */}
         {recommendedPacks.length > 0 && !hasAffordablePacks && (
-          <Callout variant="warning" title="Equipment packs require more gold" className="mb-6">
+          <Callout variant="warning" title="Equipment packs require more gold">
             <Typography variant="bodySmall" color="secondary">
               You need at least {cheapestPackCost} gp for the cheapest recommended pack. Roll for more starting gold or select individual
               equipment below.
@@ -66,7 +67,7 @@ function EquipmentPackSelector({ character, onPackSelected, isLoading = false }:
 
         {/* No recommended packs message */}
         {recommendedPacks.length === 0 && (
-          <Callout variant="info" title="No equipment packs available" className="mb-6">
+          <Callout variant="info" title="No equipment packs available">
             <Typography variant="bodySmall" color="secondary">
               No equipment packs are recommended for your character's class combination. Use the "Individual Items" tab to select equipment.
             </Typography>

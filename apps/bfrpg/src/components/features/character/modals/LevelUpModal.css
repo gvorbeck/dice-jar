@@ -1,0 +1,14 @@
+@layer components {
+  .levelup-error {
+    padding: calc(var(--space) * 4);
+    border: 1px solid var(--red-700);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--red-900) 20%, transparent);
+  }
+  .levelup-error .typography[data-variant='body'] {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .levelup-error .typography[data-variant='helper'] {
+    margin-bottom: calc(var(--space) * 3);
+  }
+}

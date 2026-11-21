@@ -5,6 +5,7 @@ import { Modal } from '@/components/modals';
 import { Icon } from '@/components/ui';
 import type { Cantrip } from '@/types';
 import type { SpellTypeInfo } from '@/types';
+import './CantripModal.css';
 
 interface CantripModalProps {
   isOpen: boolean;
@@ -68,8 +69,8 @@ export default function CantripModal({
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={modalTitle} size="md">
-      <div className="space-y-4" role="dialog" aria-labelledby="cantrip-modal-title">
-        <Typography variant="body" className="text-zinc-300" id={descriptionId}>
+      <div className="cantrip-pick" role="dialog" aria-labelledby="cantrip-modal-title">
+        <Typography variant="body" id={descriptionId}>
           {instructionText}
         </Typography>
 
@@ -85,9 +86,9 @@ export default function CantripModal({
 
         {selectedCantrip && (
           <Card variant="info" role="region" aria-labelledby="selected-cantrip-preview">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <Icon name="lightning" size="lg" className="text-blue-400" aria-hidden={true} />
+            <div className="cantrip-preview">
+              <div className="cantrip-preview-head">
+                <Icon name="lightning" size="lg" aria-hidden={true} />
                 <Typography variant="infoHeading" id="selected-cantrip-preview">
                   {selectedCantrip.name}
                 </Typography>
@@ -109,7 +110,7 @@ export default function CantripModal({
           </Card>
         )}
 
-        <div className="flex gap-3 pt-4" role="group" aria-label="Modal actions">
+        <div className="modal-buttons" role="group" aria-label="Modal actions">
           <Button variant="ghost" onClick={handleClose}>
             Cancel
           </Button>

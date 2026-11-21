@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './styles/tokens.css';
+@import './styles/patterns.css';
 
 /* Apply dark theme to body */
 body {
@@ -162,5 +163,11 @@ h6 {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
   }
 }

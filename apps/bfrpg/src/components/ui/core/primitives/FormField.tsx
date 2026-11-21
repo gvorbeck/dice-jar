@@ -16,20 +16,10 @@ interface FormFieldProps {
   hint?: string;
   required?: boolean;
   className?: string;
-  labelClassName?: string;
   validation?: ValidationResult;
 }
 
-export default function FormField({
-  label,
-  children,
-  error,
-  hint,
-  required = false,
-  className = '',
-  labelClassName = '',
-  validation,
-}: FormFieldProps) {
+export default function FormField({ label, children, error, hint, required = false, className = '', validation }: FormFieldProps) {
   const fieldId = useId();
 
   // Use validation error if provided, otherwise use explicit error prop
@@ -40,7 +30,7 @@ export default function FormField({
 
   return (
     <div className={cn('form-field', className)}>
-      <label htmlFor={fieldId} className={cn('form-field-label', labelClassName)}>
+      <label htmlFor={fieldId} className="form-field-label">
         {label}
         {required && (
           <span className="form-field-required" aria-label="required">

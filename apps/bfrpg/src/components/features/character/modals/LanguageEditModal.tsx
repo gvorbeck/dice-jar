@@ -4,6 +4,7 @@ import { LanguageSelector } from '@/components/features/character/creation';
 import { Button } from '@/components/ui';
 import { HorizontalRule } from '@/components/ui/composite';
 import type { Character } from '@/types';
+import './LanguageEditModal.css';
 
 interface LanguageEditModalProps {
   isOpen: boolean;
@@ -53,12 +54,10 @@ export default function LanguageEditModal({ isOpen, onClose, character, onCharac
       <>
         <LanguageSelector character={localCharacter} onCharacterChange={handleLocalCharacterChange} />
 
-        <div className="mt-6">
-          <HorizontalRule />
-        </div>
+        <HorizontalRule className="language-rule" />
 
         {/* Modal Action Buttons */}
-        <div className="flex gap-3 pt-6" role="group" aria-label="Modal actions">
+        <div className="modal-buttons" data-roomy role="group" aria-label="Modal actions">
           <Button variant="ghost" onClick={handleCancel} disabled={isSaving}>
             Cancel
           </Button>

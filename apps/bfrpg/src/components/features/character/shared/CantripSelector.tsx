@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, memo, forwardRef } from 'react';
+import { cn } from '@dice-jar/cn';
 import { useModal } from '@/hooks';
 import { Card, Typography } from '@/components/ui/core/display';
 import { Button } from '@/components/ui/core/primitives';
@@ -9,6 +10,7 @@ import type { Character, Cantrip } from '@/types';
 import { getAvailableCantrips, getSpellTypeInfo, getCantripOptions, canCastSpells } from '@/utils';
 import CantripCard from '@/components/domain/spells/CantripCard';
 import { CantripModal } from '@/components/modals/LazyModals';
+import './CantripSelector.css';
 
 // Discriminated union for better type safety
 type CantripSelectorProps =
@@ -30,7 +32,7 @@ type CantripSelectorProps =
 
 // Main component
 const CantripSelector = forwardRef<HTMLElement, CantripSelectorProps>((props, ref) => {
-  const { character, onCantripChange, className = '' } = props;
+  const { character, onCantripChange, className } = props;
 
   // All hooks must be called before any conditional returns
   const { isOpen: showModal, open: openModal, close: closeModal } = useModal();
@@ -87,11 +89,6 @@ const CantripSelector = forwardRef<HTMLElement, CantripSelectorProps>((props, re
     return '';
   };
 
-  const getSectionClassName = () => {
-    const base = props.mode === 'creation' ? 'mb-8' : 'space-y-4';
-    return `${base} ${className}`;
-  };
-
   const title = getTitle();
   const description = getDescription();
 
@@ -103,7 +100,7 @@ const CantripSelector = forwardRef<HTMLElement, CantripSelectorProps>((props, re
         : `No ${spellTypeInfo.type} known yet.`;
 
     return (
-      <section className={getSectionClassName()} ref={ref}>
+      <section className={cn('cantrips', className)} data-mode={props.mode} ref={ref}>
         {props.mode === 'creation' && (
           <>
             <TextHeader variant="h4" size="md">
@@ -111,23 +108,20 @@ const CantripSelector = forwardRef<HTMLElement, CantripSelectorProps>((props, re
             </TextHeader>
 
             {description && (
-              <div className="mb-6">
-                <MarkdownText content={description} variant="caption" className="text-sm text-zinc-400" />
+              <div className="cantrips-about">
+                <MarkdownText content={description} variant="caption" />
               </div>
             )}
           </>
         )}
 
-        <div className="space-y-4">
+        <div className="cantrips-body">
           <SectionHeader
             title={
               <>
                 {props.mode === 'creation' ? `Your Starting ${spellTypeInfo.capitalized}` : title}
                 {knownCantrips.length > 0 && (
-                  <span
-                    className="text-sm font-normal text-zinc-400 ml-2"
-                    aria-label={`${knownCantrips.length} ${spellTypeInfo.type} known`}
-                  >
+                  <span className="cantrip-count" aria-label={`${knownCantrips.length} ${spellTypeInfo.type} known`}>
                     ({knownCantrips.length})
                   </span>
                 )}
@@ -149,10 +143,8 @@ const CantripSelector = forwardRef<HTMLElement, CantripSelectorProps>((props, re
             }
           />
 
-          <Card variant="standard" size="compact">
-            <Typography variant="body" className="text-zinc-400 text-center">
-              {emptyMessage}
-            </Typography>
+          <Card variant="standard" size="compact" className="cantrips-empty">
+            <Typography variant="body">{emptyMessage}</Typography>
           </Card>
 
           <CantripModal
@@ -173,7 +165,7 @@ const CantripSelector = forwardRef<HTMLElement, CantripSelectorProps>((props, re
 
   // Render with cantrips
   return (
-    <section className={getSectionClassName()} ref={ref}>
+    <section className={cn('cantrips', className)} data-mode={props.mode} ref={ref}>
       {props.mode === 'creation' && (
         <>
           <TextHeader variant="h4" size="md">
@@ -181,20 +173,20 @@ const CantripSelector = forwardRef<HTMLElement, CantripSelectorProps>((props, re
           </TextHeader>
 
           {description && (
-            <div className="mb-6">
-              <MarkdownText content={description} variant="caption" className="text-sm text-zinc-400" />
+            <div className="cantrips-about">
+              <MarkdownText content={description} variant="caption" />
             </div>
           )}
         </>
       )}
 
-      <div className="space-y-4">
+      <div className="cantrips-body">
         <SectionHeader
           title={
             <>
               {props.mode === 'creation' ? `Your Starting ${spellTypeInfo.capitalized}` : title}
               {knownCantrips.length > 0 && (
-                <span className="text-sm font-normal text-zinc-400 ml-2" aria-label={`${knownCantrips.length} ${spellTypeInfo.type} known`}>
+                <span className="cantrip-count" aria-label={`${knownCantrips.length} ${spellTypeInfo.type} known`}>
                   ({knownCantrips.length})
                 </span>
               )}
@@ -216,7 +208,7 @@ const CantripSelector = forwardRef<HTMLElement, CantripSelectorProps>((props, re
           }
         />
 
-        <div className="space-y-3" role="list" aria-label={`Known ${spellTypeInfo.type}`}>
+        <div className="cantrips-list" role="list" aria-label={`Known ${spellTypeInfo.type}`}>
           {knownCantrips.map((cantrip, cantripIndex) => (
             <div key={`known-${cantrip.name}-${cantripIndex}`} role="listitem">
               <CantripCard cantrip={cantrip} spellTypeInfo={spellTypeInfo} onRemove={handleRemoveCantrip} showRemove={true} />

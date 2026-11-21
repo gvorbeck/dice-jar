@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui';
+import './LevelUp.css';
 
 interface ActionButtonsProps {
   canLevelUp: boolean;
@@ -10,7 +11,7 @@ interface ActionButtonsProps {
 
 export default function ActionButtons({ canLevelUp, hasRequiredXP, isProcessing, onClose, onLevelUp }: ActionButtonsProps) {
   return (
-    <div className="flex justify-end gap-3 pt-4 border-t border-zinc-700">
+    <div className="levelup-actions">
       <Button variant="secondary" onClick={onClose} disabled={isProcessing}>
         Cancel
       </Button>
@@ -20,7 +21,7 @@ export default function ActionButtons({ canLevelUp, hasRequiredXP, isProcessing,
         disabled={!canLevelUp || isProcessing}
         loading={isProcessing}
         loadingText="Leveling up..."
-        className="min-w-[120px]"
+        className="levelup-confirm"
       >
         {hasRequiredXP ? 'Level Up!' : 'Not Ready'}
       </Button>

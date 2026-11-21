@@ -5,6 +5,7 @@ import { InfoCardHeader, MarkdownText } from '@/components/ui/composite';
 import { TextInput, Checkbox } from '@/components/ui/core/primitives';
 import type { Character, Spell } from '@/types';
 import { logger } from '@/utils';
+import './SpellChecklistSelector.css';
 
 interface SpellChecklistSelectorProps {
   character: Character;
@@ -80,11 +81,11 @@ export function SpellChecklistSelector({
 
   if (isLoading) {
     return (
-      <section className="mb-8">
+      <section className="step-block">
         <Typography variant="sectionHeading">{title}</Typography>
         <Card variant="standard">
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-pulse">
+          <div className="spell-checks-loading">
+            <div>
               <Typography variant="body" color="muted">
                 Loading spells...
               </Typography>
@@ -100,47 +101,41 @@ export function SpellChecklistSelector({
   }
 
   return (
-    <section className="mb-8">
+    <section className="step-block">
       <Typography variant="sectionHeading">{title}</Typography>
 
       <Card variant="standard">
-        <InfoCardHeader
-          icon={<Icon name="star" />}
-          title={headerTitle || title}
-          iconSize="lg"
-          badge={{ text: 'Custom' }}
-          className="mb-6"
-        />
+        <InfoCardHeader icon={<Icon name="star" />} title={headerTitle || title} iconSize="lg" badge={{ text: 'Custom' }} spacing="roomy" />
 
-        <div className="mb-6">
+        <div className="spell-checks-about">
           <MarkdownText content={description} variant="description" />
         </div>
 
         {/* Search Filter */}
-        <div className="mb-6">
+        <div className="spell-checks-search">
           <TextInput value={searchTerm} onChange={setSearchTerm} placeholder="Search spells..." aria-label="Search spells" />
         </div>
 
         {/* Selected Count */}
-        <div className="mb-4">
-          <Typography variant="body" className="text-zinc-300">
+        <div className="spell-checks-count">
+          <Typography variant="body">
             Selected: {selectedSpellNames.size} spell
             {selectedSpellNames.size !== 1 ? 's' : ''}
           </Typography>
         </div>
 
         {/* Spell Lists by Level */}
-        <div className="space-y-6">
+        <div className="spell-checks-levels">
           {Object.entries(spellsByLevel)
             .sort(([a], [b]) => parseInt(a) - parseInt(b))
             .map(([level, spells]) => (
               <div key={level}>
-                <Typography variant="subHeading" className="mb-3 flex items-center gap-2">
+                <Typography variant="subHeading">
                   <Icon name="lightning" size="sm" />
                   Level {level} Spells ({spells.length})
                 </Typography>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="spell-checks-grid">
                   {spells.map((spell, spellIndex) => (
                     <Checkbox
                       key={`${spell.name}-${spell.level}-${spellIndex}`}
@@ -148,7 +143,6 @@ export function SpellChecklistSelector({
                       checked={selectedSpellNames.has(spell.name)}
                       onCheckedChange={(checked) => handleSpellToggle(spell, checked)}
                       size="sm"
-                      className="p-3 bg-zinc-800/50 border border-zinc-700/50 rounded-lg hover:bg-zinc-700/50 transition-colors"
                     />
                   ))}
                 </div>
@@ -157,7 +151,7 @@ export function SpellChecklistSelector({
         </div>
 
         {searchTerm && Object.keys(spellsByLevel).length === 0 && (
-          <div className="text-center py-8">
+          <div className="spell-checks-none">
             <Typography variant="body" color="muted">
               No spells found matching "{searchTerm}"
             </Typography>

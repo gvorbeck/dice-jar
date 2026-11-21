@@ -2,9 +2,10 @@ import { Select } from '@/components/ui/core/primitives';
 import { Card, Typography, Badge } from '@/components/ui/core/display';
 import { Icon } from '@/components/ui';
 import type { Character } from '@/types';
-import { LAYOUT_STYLES, COMBINATION_CLASSES } from '@/constants';
+import { COMBINATION_CLASSES } from '@/constants';
 import { memo } from 'react';
 import { getClassById } from '@/utils';
+import './CombinationClassSelector.css';
 
 interface CombinationClassSelectorProps {
   character: Character;
@@ -28,12 +29,12 @@ function CombinationClassSelectorComponent({ character, onCombinationChange, rac
   const selectedClassData = character.class ? getClassById(character.class) : null;
 
   return (
-    <section aria-labelledby="combination-classes-heading" className="mb-8">
+    <section aria-labelledby="combination-classes-heading" className="step-block">
       <Typography variant="sectionHeading" id="combination-classes-heading">
         Combination Classes
       </Typography>
 
-      <Card variant="standard" className="mb-6">
+      <Card variant="standard" className="step-card">
         <Select
           label="Select Combination Class"
           value={character.class || ''}
@@ -48,28 +49,28 @@ function CombinationClassSelectorComponent({ character, onCombinationChange, rac
       {selectedCombination && selectedClassData && (
         <Card variant="info" id="combination-class-details">
           <div aria-labelledby="combination-class-info-heading">
-            <Typography variant="infoHeading" className={`${LAYOUT_STYLES.iconText} mb-6`} id="combination-class-info-heading">
-              <Icon name="star" size="md" className="flex-shrink-0 text-amber-400" aria-hidden={true} />
+            <Typography variant="infoHeading" className="info-title" id="combination-class-info-heading">
+              <Icon name="star" size="md" aria-hidden={true} />
               {selectedCombination.name}
               <Badge variant="combination">Combination</Badge>
             </Typography>
 
-            <div className="mb-6">
+            <div className="detail-intro">
               <Typography variant="description">{selectedCombination.description}</Typography>
             </div>
 
-            <div className="mb-6">
+            <div className="detail-intro">
               <Typography variant="description">{selectedClassData.description}</Typography>
             </div>
 
-            <Card variant="nested" className="mb-4">
+            <Card variant="nested" className="combo-nested">
               <Typography variant="subHeading">
                 <Icon name="briefcase" size="sm" />
                 Base Classes Combined
               </Typography>
-              <div className={LAYOUT_STYLES.tagContainer}>
+              <div className="tag-list">
                 {selectedCombination.baseClasses.map((className, index) => (
-                  <Badge key={index} variant="status" className="capitalize">
+                  <Badge key={index} variant="status" className="combo-badge">
                     {className}
                   </Badge>
                 ))}
@@ -82,12 +83,10 @@ function CombinationClassSelectorComponent({ character, onCombinationChange, rac
                   <Icon name="star" size="sm" />
                   Special Abilities
                 </Typography>
-                <ul className="space-y-2">
+                <ul className="combo-abilities">
                   {selectedClassData.specialAbilities.map((ability, index) => (
                     <li key={index}>
-                      <Typography variant="body" className="font-semibold">
-                        {ability.name}
-                      </Typography>
+                      <Typography variant="body">{ability.name}</Typography>
                       <Typography variant="description" color="secondary">
                         {ability.description}
                       </Typography>

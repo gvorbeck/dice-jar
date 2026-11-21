@@ -4,7 +4,6 @@ import { SectionWrapper } from '@/components/ui/core/layout';
 import RollableButton from '@/components/domain/dice/RollableButton';
 import { formatModifier, getRaceById } from '@/utils';
 import { getBaseAttackBonus } from '@/utils/combatCalculations';
-import { SIZE_STYLES } from '@/constants';
 import { useDiceRoll } from '@/hooks/dice/useDiceRoll';
 import type { Character, SpecialAbility } from '@/types';
 
@@ -15,7 +14,6 @@ interface AttackBonusesProps {
 }
 
 export default function AttackBonuses({ character, className = '', size = 'md' }: AttackBonusesProps) {
-  const currentSize = SIZE_STYLES[size];
   const { rollAttack } = useDiceRoll();
 
   const attackBonuses = useMemo(() => {
@@ -91,7 +89,7 @@ export default function AttackBonuses({ character, className = '', size = 'md' }
   };
 
   const titleWithTooltip = (
-    <div className="flex items-center gap-2">
+    <div className="icon-heading">
       Attack Bonuses
       <InfoTooltip content={getTooltipContent()} />
     </div>
@@ -99,8 +97,8 @@ export default function AttackBonuses({ character, className = '', size = 'md' }
 
   return (
     <SectionWrapper title={titleWithTooltip} size={size} className={className}>
-      <div className={currentSize.container}>
-        <div className="space-y-3">
+      <div className="sheet-pad" data-size={size}>
+        <div className="roll-list">
           {[
             { label: 'Base', value: attackBonuses.base, type: 'Base' },
             { label: 'Melee', value: attackBonuses.melee, type: 'Melee' },

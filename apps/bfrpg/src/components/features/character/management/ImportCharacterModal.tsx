@@ -8,6 +8,7 @@ import { processCharacterData } from '@/services/characterMigration';
 import { isValidCharacterStructure, validateImportedCharacter } from '@/validation/character';
 import type { Character } from '@/types';
 import { logger } from '@/utils';
+import './ImportCharacterModal.css';
 
 interface ImportCharacterModalProps {
   isOpen: boolean;
@@ -127,7 +128,7 @@ export default function ImportCharacterModal({ isOpen, onClose, userId }: Import
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Import Character" size="lg">
-      <div className="space-y-6">
+      <div className="modal-stack">
         {/* File Upload */}
         <FileUpload
           label="Select Character File"
@@ -139,11 +140,7 @@ export default function ImportCharacterModal({ isOpen, onClose, userId }: Import
         />
 
         {/* Error Display */}
-        {error && (
-          <Callout variant="error" className="mt-4">
-            {error}
-          </Callout>
-        )}
+        {error && <Callout variant="error">{error}</Callout>}
 
         {/* Example JSON Structure */}
         <Accordion
@@ -157,17 +154,16 @@ export default function ImportCharacterModal({ isOpen, onClose, userId }: Import
           sortBy="id"
           labelProperty="name"
           renderItem={(item) => (
-            <pre className="bg-zinc-950 p-4 rounded-lg overflow-x-auto text-xs">
-              <code className="text-zinc-300">{String(item.content)}</code>
+            <pre className="import-example">
+              <code>{String(item.content)}</code>
             </pre>
           )}
           showCounts={false}
           showSearch={false}
-          className="mt-4"
         />
 
         {/* Action Buttons */}
-        <div className="flex gap-3 justify-end mt-6">
+        <div className="modal-actions">
           <Button variant="secondary" size="md" onClick={handleClose} disabled={importing}>
             Cancel
           </Button>

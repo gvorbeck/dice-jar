@@ -1,0 +1,44 @@
+@layer components {
+  .export-label {
+    display: block;
+    margin-bottom: calc(var(--space) * 3);
+    font-weight: 500;
+    color: var(--zinc-100);
+  }
+  .export-list {
+    max-height: 24rem;
+    overflow-y: auto;
+  }
+  .export-list > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .export-pick {
+    width: 100%;
+    padding: calc(var(--space) * 4);
+    border: 2px solid var(--zinc-700);
+    border-radius: var(--radius-lg);
+    background: var(--zinc-800);
+    text-align: left;
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .export-pick:hover {
+    border-color: var(--zinc-600);
+  }
+  .export-pick[aria-pressed='true'] {
+    border-color: var(--amber-400);
+    background: color-mix(in oklab, var(--amber-400) 10%, transparent);
+  }
+  .export-pick:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .export-pick-name {
+    font-weight: 600;
+    color: var(--zinc-100);
+  }
+  .export-pick-meta {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--zinc-400);
+  }
+}

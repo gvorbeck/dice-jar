@@ -1,9 +1,9 @@
 import { SectionWrapper } from '@/components/ui/core/layout';
 import { StatusIndicator } from '@/components/ui/composite';
-import { SIZE_STYLES } from '@/constants';
 import { calculateTotalCoinCount, calculateCoinWeight } from '@/utils/currency';
 import type { Character } from '@/types';
 import type { StatusThreshold } from '@/components/ui/composite/StatusIndicator';
+import './Weight.css';
 
 interface WeightProps {
   character: Character;
@@ -129,7 +129,6 @@ function createWeightThresholds(lightCapacity: number, heavyCapacity: number): S
 }
 
 export default function Weight({ character, className = '', size = 'md' }: WeightProps) {
-  const currentSize = SIZE_STYLES[size];
   const totalWeight = calculateTotalWeight(character);
   const pcCapacity = getCarryingCapacity(character.race, character.abilities.strength.value);
   const beastCapacity = calculateBeastCapacity(character);
@@ -156,21 +155,21 @@ export default function Weight({ character, className = '', size = 'md' }: Weigh
 
   return (
     <SectionWrapper title="Weight" size={size} className={className}>
-      <div className={currentSize.container}>
-        <div className="space-y-4">
+      <div className="sheet-pad" data-size={size}>
+        <div className="weight">
           {/* Current Weight vs Capacity */}
-          <div className="text-center">
+          <div className="weight-now">
             <div
-              className="flex items-baseline justify-center gap-2 mb-3"
+              className="weight-line"
               role="group"
               aria-label={`Current weight: ${totalWeight.toFixed(1)} pounds out of ${totalCapacity.heavy} pound maximum capacity`}
             >
-              <span className="text-2xl font-mono font-bold text-zinc-100">{totalWeight.toFixed(1)}</span>
-              <span className="text-lg text-zinc-400 font-mono" aria-hidden="true">
+              <span className="weight-carried">{totalWeight.toFixed(1)}</span>
+              <span className="weight-sep" aria-hidden="true">
                 /
               </span>
-              <span className="text-lg font-mono text-zinc-300">{totalCapacity.heavy}</span>
-              <span className="text-sm text-zinc-500">lbs</span>
+              <span className="weight-max">{totalCapacity.heavy}</span>
+              <span className="weight-unit">lbs</span>
             </div>
 
             {/* Load Status with StatusIndicator */}
@@ -180,77 +179,76 @@ export default function Weight({ character, className = '', size = 'md' }: Weigh
               thresholds={weightThresholds}
               showBar={true}
               showLabel={true}
-              className="mt-2"
             />
           </div>
 
           {/* Weight Breakdown */}
-          <div className="space-y-2 text-xs">
-            <div className="flex justify-between text-zinc-400">
+          <div className="weight-rows">
+            <div className="weight-row">
               <span>Equipment:</span>
-              <span className="font-mono">{equipmentWeight.toFixed(1)} lbs</span>
+              <span>{equipmentWeight.toFixed(1)} lbs</span>
             </div>
 
             {character.settings?.useCoinWeight !== false && (
-              <div className="flex justify-between text-zinc-400">
+              <div className="weight-row">
                 <span>Coins:</span>
-                <span className="font-mono">{coinWeight.toFixed(1)} lbs</span>
+                <span>{coinWeight.toFixed(1)} lbs</span>
               </div>
             )}
 
-            <hr className="border-zinc-600" />
+            <hr />
 
-            <div className="flex justify-between text-zinc-300 font-semibold">
+            <div className="weight-row" data-strong>
               <span>Total:</span>
-              <span className="font-mono">{totalWeight.toFixed(1)} lbs</span>
+              <span>{totalWeight.toFixed(1)} lbs</span>
             </div>
           </div>
 
           {/* Capacity Indicators */}
-          <div className="space-y-1 text-xs">
+          <div className="weight-rows" data-tight>
             {hasBeasts ? (
               <>
                 {/* PC Capacity */}
-                <div className="flex justify-between text-zinc-400">
+                <div className="weight-row">
                   <span>PC Light Load:</span>
-                  <span className="font-mono">{pcCapacity.light} lbs</span>
+                  <span>{pcCapacity.light} lbs</span>
                 </div>
-                <div className="flex justify-between text-zinc-400">
+                <div className="weight-row">
                   <span>PC Heavy Load:</span>
-                  <span className="font-mono">{pcCapacity.heavy} lbs</span>
+                  <span>{pcCapacity.heavy} lbs</span>
                 </div>
 
                 {/* Beast Capacity */}
-                <div className="flex justify-between text-zinc-400">
+                <div className="weight-row">
                   <span>Animal Light Load:</span>
-                  <span className="font-mono">{beastCapacity.lightCapacity} lbs</span>
+                  <span>{beastCapacity.lightCapacity} lbs</span>
                 </div>
-                <div className="flex justify-between text-zinc-400">
+                <div className="weight-row">
                   <span>Animal Heavy Load:</span>
-                  <span className="font-mono">{beastCapacity.heavyCapacity} lbs</span>
+                  <span>{beastCapacity.heavyCapacity} lbs</span>
                 </div>
 
-                <hr className="border-zinc-600" />
+                <hr />
 
                 {/* Total Capacity */}
-                <div className="flex justify-between text-zinc-300 font-semibold">
+                <div className="weight-row" data-strong>
                   <span>Total Light Load:</span>
-                  <span className="font-mono">{totalCapacity.light} lbs</span>
+                  <span>{totalCapacity.light} lbs</span>
                 </div>
-                <div className="flex justify-between text-zinc-300 font-semibold">
+                <div className="weight-row" data-strong>
                   <span>Total Heavy Load:</span>
-                  <span className="font-mono">{totalCapacity.heavy} lbs</span>
+                  <span>{totalCapacity.heavy} lbs</span>
                 </div>
               </>
             ) : (
               <>
-                <div className="flex justify-between text-zinc-400">
+                <div className="weight-row">
                   <span>Light Load Max:</span>
-                  <span className="font-mono">{pcCapacity.light} lbs</span>
+                  <span>{pcCapacity.light} lbs</span>
                 </div>
-                <div className="flex justify-between text-zinc-400">
+                <div className="weight-row">
                   <span>Heavy Load Max:</span>
-                  <span className="font-mono">{pcCapacity.heavy} lbs</span>
+                  <span>{pcCapacity.heavy} lbs</span>
                 </div>
               </>
             )}

@@ -9,6 +9,7 @@ import { allClasses } from '@/data';
 import { loadAllSpells } from '@/services/dataLoader';
 import type { Character, Spell } from '@/types';
 import { getSpellSlots, getSpellLevel } from '@/utils';
+import './MUAddSpellModal.css';
 
 interface MUAddSpellModalProps {
   isOpen: boolean;
@@ -146,15 +147,10 @@ export default function MUAddSpellModal({ isOpen, onClose, character, onSpellAdd
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Learn New Spells" size="lg">
-      <div className="space-y-6">
+      <div className="modal-stack">
         {/* Explanation Text */}
-        <Callout
-          variant="info"
-          title="Learning Spells"
-          icon={<Icon name="book" size="md" className="text-amber-400" />}
-          className="bg-amber-950/30 border-amber-800/50"
-        >
-          <Typography variant="caption" className="text-amber-300/80">
+        <Callout variant="info" title="Learning Spells" icon={<Icon name="book" size="md" />} className="learn-note">
+          <Typography variant="caption">
             Arcane spellcasters may learn spells by being taught by another arcane spellcaster, or by studying another spellcaster's
             spellbook. If being taught, a spell can be learned in a single day. Researching from a spellbook takes one day per spell level.
             In either case, the spell must be transcribed into the character's own spellbook, at a cost of 500 gp per spell level.
@@ -163,18 +159,11 @@ export default function MUAddSpellModal({ isOpen, onClose, character, onSpellAdd
 
         {/* Spell Selection */}
         {isLoadingSpells ? (
-          <LoadingState variant="inline" message="Loading available spells..." className="py-8" />
+          <LoadingState variant="inline" message="Loading available spells..." className="learn-loading" />
         ) : loadError ? (
-          <div className="text-center py-8">
-            <Callout
-              variant="error"
-              title="Failed to Load Spells"
-              icon={<Icon name="exclamation-circle" size="md" className="text-red-400" />}
-              className="mb-4"
-            >
-              <Typography variant="body" className="text-red-300 mb-3">
-                {loadError}
-              </Typography>
+          <div className="learn-state">
+            <Callout variant="error" title="Failed to Load Spells" icon={<Icon name="exclamation-circle" size="md" />}>
+              <Typography variant="body">{loadError}</Typography>
               <Button
                 variant="secondary"
                 size="sm"
@@ -188,17 +177,15 @@ export default function MUAddSpellModal({ isOpen, onClose, character, onSpellAdd
             </Callout>
           </div>
         ) : availableLevels.length > 0 ? (
-          <div className="space-y-4">
-            <Typography variant="sectionHeading" className="text-zinc-100">
-              Available Spell Levels
-            </Typography>
+          <div className="learn-levels">
+            <Typography variant="sectionHeading">Available Spell Levels</Typography>
 
             {availableLevels.map((level) => {
               const spellsForLevel = filteredSpellsByLevel[level] || [];
               if (spellsForLevel.length === 0) return null;
 
               return (
-                <div key={level} className="space-y-2">
+                <div key={level} className="learn-level">
                   <Select
                     label={`Level ${level} Spells`}
                     value={selectedSpells[level] || ''}
@@ -214,7 +201,7 @@ export default function MUAddSpellModal({ isOpen, onClose, character, onSpellAdd
                   />
 
                   {selectedSpells[level] && (
-                    <div className="mt-2">
+                    <div className="learn-preview">
                       {(() => {
                         const selectedSpell = spellsForLevel.find((s) => s.name === selectedSpells[level]);
                         if (!selectedSpell) return null;
@@ -226,9 +213,7 @@ export default function MUAddSpellModal({ isOpen, onClose, character, onSpellAdd
                           uniqueKey: `preview-${selectedSpell.name.toLowerCase().replace(/\s+/g, '-')}-${level}`,
                         };
 
-                        return (
-                          <SpellDetails spell={spellWithLevel} showAccessibilityLabels={false} className="bg-zinc-800/30 rounded-lg p-3" />
-                        );
+                        return <SpellDetails spell={spellWithLevel} showAccessibilityLabels={false} className="learn-preview-card" />;
                       })()}
                     </div>
                   )}
@@ -237,18 +222,16 @@ export default function MUAddSpellModal({ isOpen, onClose, character, onSpellAdd
             })}
           </div>
         ) : (
-          <div className="text-center py-8">
-            <Typography variant="body" className="text-zinc-400 mb-2">
-              No new spells available
-            </Typography>
-            <Typography variant="caption" className="text-zinc-500">
+          <div className="learn-state learn-none">
+            <Typography variant="body">No new spells available</Typography>
+            <Typography variant="caption">
               You either know all available spells for your current spell levels, or you don't have any spell slots yet.
             </Typography>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-zinc-700">
+        <div className="learn-actions">
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>

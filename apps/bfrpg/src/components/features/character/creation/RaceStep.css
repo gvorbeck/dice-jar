@@ -1,0 +1,33 @@
+@layer components {
+  .race-custom-name {
+    margin-top: calc(var(--space) * 4);
+  }
+  .race-none.typography {
+    margin-top: calc(var(--space) * 2);
+  }
+  .race-reqs > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .race-req {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .race-req span:first-child {
+    font-weight: 500;
+    color: var(--amber-100);
+  }
+  .race-req span:last-child {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--amber-200);
+  }
+  .race-abilities > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .race-ability-name {
+    margin-bottom: var(--space);
+    font-weight: 500;
+    color: var(--amber-100);
+  }
+}

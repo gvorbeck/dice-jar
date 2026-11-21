@@ -1,0 +1,20 @@
+@layer components {
+  .specials-tabs {
+    padding: calc(var(--space) * 4) calc(var(--space) * 6) 0;
+  }
+  .specials-scroll {
+    height: 24rem;
+    overflow-y: auto;
+  }
+  .specials-panel {
+    padding: calc(var(--space) * 6);
+  }
+  .specials-panel > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .specials-edit {
+    display: flex;
+    justify-content: center;
+    margin-top: calc(var(--space) * 6);
+  }
+}

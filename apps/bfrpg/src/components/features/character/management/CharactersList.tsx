@@ -9,6 +9,7 @@ import { useCharacterMutations } from '@/hooks/mutations/useEnhancedMutations';
 import { useState, useMemo } from 'react';
 import { Select, Button } from '@/components/ui';
 import type { CharacterListItem } from '@/services';
+import './CharactersList.css';
 
 type SortOption = 'name' | 'level' | 'class' | 'race';
 
@@ -82,9 +83,9 @@ export function CharactersList() {
 
   return (
     <>
-      <div className="mb-4 flex flex-col sm:flex-row gap-3 sm:items-end sm:justify-between">
+      <div className="chars-bar">
         {characters.length > 1 && (
-          <div className="max-w-48">
+          <div className="chars-sort">
             <Select
               label="Sort by"
               options={sortOptions}
@@ -94,7 +95,7 @@ export function CharactersList() {
             />
           </div>
         )}
-        <div className="flex gap-2 sm:ml-auto">
+        <div className="chars-tools">
           <Button variant="secondary" size="sm" icon="upload" onClick={() => setImportModalOpen(true)}>
             Import
           </Button>

@@ -1,0 +1,28 @@
+@layer components {
+  .cantrips[data-mode='creation'] {
+    margin-bottom: calc(var(--space) * 8);
+  }
+  .cantrips[data-mode='edit'] > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .cantrips-about {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .cantrips-body > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .cantrip-count {
+    margin-left: calc(var(--space) * 2);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    font-weight: 400;
+    color: var(--zinc-400);
+  }
+  .cantrips-empty .typography {
+    text-align: center;
+    color: var(--zinc-400);
+  }
+  .cantrips-list > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+}

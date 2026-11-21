@@ -2,6 +2,7 @@ import type { ScrollCreationProject } from '@/types';
 import { Badge, Card, Typography } from '@/components/ui/core/display';
 import { Button, NumberInput, FormField } from '@/components/ui/core/primitives';
 import { SectionHeader } from '@/components/ui/composite';
+import './../ScrollCreation.css';
 
 interface ActiveScrollsProps {
   projects: ScrollCreationProject[];
@@ -35,21 +36,21 @@ export const ActiveScrolls = ({ projects, isOwner, onUpdateProject, onCompletePr
   if (projects.length === 0) return null;
 
   return (
-    <div className="mb-6">
-      <SectionHeader title="Active Scrolls" size="md" className="mb-3" />
-      <div className="space-y-3">
+    <div className="scrolls-block">
+      <SectionHeader title="Active Scrolls" size="md" />
+      <div className="scrolls-list">
         {projects.map((project) => (
           <Card key={project.id} size="compact">
-            <div className="flex justify-between items-start mb-2">
+            <div className="scroll-head">
               <div>
                 <Typography variant="h5">{project.spellName}</Typography>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="scroll-tags">
                   <Badge>Level {project.spellLevel}</Badge>
                   <Badge variant={getStatusBadgeVariant(project.status)}>{project.status}</Badge>
                 </div>
               </div>
               {isOwner && (
-                <div className="flex gap-1">
+                <div className="scroll-tools">
                   {project.daysCompleted >= project.daysRequired && (
                     <Button
                       size="sm"
@@ -72,7 +73,7 @@ export const ActiveScrolls = ({ projects, isOwner, onUpdateProject, onCompletePr
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="scroll-facts">
               <div>
                 <strong>Progress:</strong> {formatProgress(project)}
               </div>
@@ -82,14 +83,14 @@ export const ActiveScrolls = ({ projects, isOwner, onUpdateProject, onCompletePr
             </div>
 
             {project.notes && (
-              <div className="mt-2 text-sm">
+              <div className="scroll-notes">
                 <strong>Notes:</strong> {project.notes}
               </div>
             )}
 
             {isOwner && (
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <FormField label="Days completed" labelClassName="text-xs">
+              <div className="scroll-fields">
+                <FormField label="Days completed">
                   <NumberInput
                     value={project.daysCompleted}
                     onChange={(value) =>
@@ -101,7 +102,7 @@ export const ActiveScrolls = ({ projects, isOwner, onUpdateProject, onCompletePr
                     maxValue={project.daysRequired}
                   />
                 </FormField>
-                <FormField label="Cost paid (gp)" labelClassName="text-xs">
+                <FormField label="Cost paid (gp)">
                   <NumberInput
                     value={project.costPaid}
                     onChange={(value) =>

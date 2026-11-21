@@ -128,7 +128,7 @@ function EquipmentSelector({ character, onEquipmentAdd }: EquipmentSelectorProps
       <Typography variant="sectionHeading">Available Equipment</Typography>
 
       <Card variant="info" className="mb-6">
-        <InfoCardHeader icon="info" title="Shopping Guide" className="mb-3" />
+        <InfoCardHeader icon="info" title="Shopping Guide" />
         <Typography variant="description" color="primary">
           Browse and select equipment for your character. Items are organized by category.
           <span className="hidden sm:inline"> You can only purchase items you can afford with your current gold.</span>

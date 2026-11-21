@@ -7,6 +7,7 @@ import { Button, NumberInput } from '@/components/ui/core/primitives';
 import { getPrimaryClassInfo } from '@/utils';
 import type { Character, Class } from '@/types';
 import type { HPGainResult } from '@/types';
+import './LevelUp.css';
 
 interface HPGainPreviewProps {
   character: Character;
@@ -47,28 +48,28 @@ export default function HPGainPreview({
   };
 
   return (
-    <Card variant="success" size="default">
-      <TextHeader variant="h4" size="md" className="text-lime-400">
-        <div className="flex items-center gap-2">
+    <Card variant="success" size="default" className="levelup-ready">
+      <TextHeader variant="h4" size="md">
+        <div className="icon-heading">
           <Icon name="star" size="sm" />
           Ready to Level Up!
         </div>
       </TextHeader>
-      <div className="space-y-4">
+      <div className="levelup-body">
         <Typography variant="body" color="primary">
           Your character is ready to advance to level {nextLevel}!
         </Typography>
 
         {/* HP Gain Preview */}
         <Card variant="nested" size="compact">
-          <Typography variant="subHeading" color="amber" className="mb-2">
+          <Typography variant="subHeading" color="amber">
             Hit Points Gain
           </Typography>
-          <div className="space-y-2">
+          <div className="levelup-gain">
             {hpGainResult.isFixed ? (
               // Fixed HP gain (levels 10+)
               <>
-                <div className="flex justify-between items-center">
+                <div className="levelup-row">
                   <Typography variant="bodySmall" color="secondary">
                     Fixed HP Gain:
                   </Typography>
@@ -83,7 +84,7 @@ export default function HPGainPreview({
             ) : (
               // Rolled HP gain (levels 1-9)
               <>
-                <div className="flex justify-between items-center">
+                <div className="levelup-row">
                   <Typography variant="bodySmall" color="secondary">
                     Roll ({hitDie}):
                   </Typography>
@@ -91,7 +92,7 @@ export default function HPGainPreview({
                     {hpGainResult.roll}
                   </Typography>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="levelup-row">
                   <Typography variant="bodySmall" color="secondary">
                     Constitution Bonus:
                   </Typography>
@@ -102,7 +103,7 @@ export default function HPGainPreview({
                 </div>
               </>
             )}
-            <div className="flex justify-between items-center border-t border-amber-700/30 pt-2">
+            <div className="levelup-row levelup-total">
               <Typography variant="bodySmall" color="amber" weight="semibold">
                 Total HP Gain:
               </Typography>
@@ -116,15 +117,15 @@ export default function HPGainPreview({
 
             {/* Re-roll and Manual Entry Options (only for non-fixed HP) */}
             {!hpGainResult.isFixed && (onReroll || onSetCustomHP) && (
-              <div className="pt-3 border-t border-amber-700/30 space-y-2">
+              <div className="levelup-options">
                 {showManualInput ? (
-                  <div className="flex items-center gap-2">
+                  <div className="levelup-choices">
                     <NumberInput
                       value={manualHP}
                       onChange={(value) => setManualHP(value ?? 1)}
                       minValue={1}
                       maxValue={hpGainResult.max ?? 20}
-                      className="w-20"
+                      className="levelup-manual"
                       aria-label="Manual HP gain"
                     />
                     <Button variant="primary" size="sm" onClick={handleManualSubmit}>
@@ -135,9 +136,9 @@ export default function HPGainPreview({
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2">
+                  <div className="levelup-choices">
                     {onReroll && (
-                      <Button variant="secondary" size="sm" onClick={handleReroll} className="flex items-center gap-1">
+                      <Button variant="secondary" size="sm" onClick={handleReroll} className="levelup-reroll">
                         <Icon name="dice" size="xs" />
                         Re-roll
                       </Button>

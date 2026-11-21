@@ -7,6 +7,7 @@ import type { Character, AbilityScore, BaseStepProps } from '@/types';
 import { memo, useState } from 'react';
 import { useValidation } from '@/validation';
 import type { AbilityName } from '@/validation';
+import './AbilityScoreStep.css';
 
 // Helper function to describe what ability-score modifiers mean in gameplay terms
 const getModifierDescription = (modifier: number): string => {
@@ -160,10 +161,10 @@ function AbilityScoreStep({ character, onCharacterChange }: AbilityScoreStepProp
       statusMessage={getStatusMessage()}
     >
       {/* Action Buttons */}
-      <fieldset className="mb-8">
+      <fieldset className="step-block">
         <legend className="sr-only">Ability score generation controls</legend>
 
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="roll-controls">
           <Button onClick={rollAllAbilities} variant="primary" size="lg">
             Roll All Abilities
           </Button>
@@ -177,9 +178,9 @@ function AbilityScoreStep({ character, onCharacterChange }: AbilityScoreStepProp
 
       {/* Ability Scores Summary */}
       {hasRolledScores && (
-        <section className="mb-8">
+        <section className="step-block">
           <Card variant="info" size="compact">
-            <InfoCardHeader icon={<Icon name="info" size="md" aria-hidden={true} />} title="Ability Scores Summary" className="mb-3" />
+            <InfoCardHeader icon={<Icon name="info" size="md" aria-hidden={true} />} title="Ability Scores Summary" />
             <StatGrid
               stats={Object.entries(character.abilities).map(([name, ability]) => ({
                 label: name,
@@ -193,30 +194,25 @@ function AbilityScoreStep({ character, onCharacterChange }: AbilityScoreStepProp
       )}
 
       {/* Ability Scores Grid */}
-      <section aria-labelledby="ability-scores-heading" className="mb-8">
+      <section aria-labelledby="ability-scores-heading" className="step-block">
         <Typography variant="sectionHeading" id="ability-scores-heading">
           Ability Scores
         </Typography>
 
         {/* Swap hint message */}
         {hasRolledScores && (
-          <Typography variant="body" color="zinc" className="mb-4">
+          <Typography variant="body" color="zinc" className="swap-hint">
             {selectedAbility
               ? `Click another ability to swap with ${selectedAbility}, or click ${selectedAbility} again to cancel.`
               : 'Click any ability name to select it, then click another to swap their scores.'}
           </Typography>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="ability-tiles">
           {(Object.entries(character.abilities) as [keyof Character['abilities'], AbilityScore][]).map(([abilityName, ability]) => {
             const isSelected = selectedAbility === abilityName;
             return (
-              <Card
-                key={abilityName}
-                variant="standard"
-                hover={true}
-                className={isSelected ? 'ring-2 ring-amber-500 border-amber-500' : undefined}
-              >
+              <Card key={abilityName} variant="standard" hover={true} data-selected={isSelected || undefined}>
                 {/* Ability Name - clickable for swapping */}
                 <button
                   type="button"
@@ -230,21 +226,17 @@ function AbilityScoreStep({ character, onCharacterChange }: AbilityScoreStepProp
                         : `Select ${abilityName} to swap with another ability`
                       : abilityName
                   }
-                  className={`flex items-center justify-between mb-3 w-full text-left rounded p-1 -m-1 transition-colors ${
-                    hasRolledScores
-                      ? 'cursor-pointer hover:bg-zinc-700/50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-800'
-                      : 'cursor-default'
-                  }`}
+                  className="ability-pick"
                 >
-                  <span className="text-base font-semibold text-zinc-100 capitalize">{abilityName}</span>
+                  <span className="ability-pick-name">{abilityName}</span>
                   {ability.value > 0 && (
                     <div
-                      className="text-sm text-zinc-300 bg-zinc-700 px-2 py-1 rounded border border-zinc-600"
+                      className="ability-pick-mod"
                       aria-label={`${abilityName} modifier: ${
                         ability.modifier >= 0 ? 'plus ' : 'minus '
                       }${Math.abs(ability.modifier)}. ${getModifierDescription(ability.modifier)}`}
                     >
-                      <span className="font-medium">
+                      <span>
                         Modifier: {ability.modifier >= 0 ? '+' : ''}
                         {ability.modifier}
                       </span>
@@ -268,7 +260,7 @@ function AbilityScoreStep({ character, onCharacterChange }: AbilityScoreStepProp
 
                 {/* Validation Error Display */}
                 {!validationResults[abilityName as keyof typeof validationResults].isValid && (
-                  <div className="mt-2 text-sm text-red-400" role="alert">
+                  <div className="ability-error" role="alert">
                     {validationResults[abilityName as keyof typeof validationResults].errors[0]}
                   </div>
                 )}
@@ -281,7 +273,7 @@ function AbilityScoreStep({ character, onCharacterChange }: AbilityScoreStepProp
       {/* Flip Scores Information */}
       {hasRolledScores && (
         <Card variant="info">
-          <InfoCardHeader icon={<Icon name="info" size="md" aria-hidden={true} />} title="Flip Scores Information" className="mb-3" />
+          <InfoCardHeader icon={<Icon name="info" size="md" aria-hidden={true} />} title="Flip Scores Information" />
           <Typography variant="descriptionCompact" color="amber">
             You can flip all ability scores by subtracting them from 21. This turns low scores into high scores and vice versa. For example,
             a 15 becomes a 6, and a 3 becomes an 18. All scores must be flipped together.

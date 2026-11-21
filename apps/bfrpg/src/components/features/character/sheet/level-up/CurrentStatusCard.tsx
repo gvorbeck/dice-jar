@@ -3,6 +3,7 @@ import Typography from '@/components/ui/core/display/Typography';
 import { TextHeader } from '@/components/ui/composite/TextHeader';
 import { getPrimaryClassInfo } from '@/utils';
 import type { Character, Class } from '@/types';
+import './LevelUp.css';
 
 interface CurrentStatusCardProps {
   character: Character;
@@ -23,8 +24,8 @@ export default function CurrentStatusCard({ character, currentLevel, requiredXP,
       <TextHeader variant="h4" size="md">
         Current Status
       </TextHeader>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="flex justify-between">
+      <div className="levelup-status">
+        <div>
           <Typography variant="bodySmall" color="secondary">
             Current Level:
           </Typography>
@@ -32,7 +33,7 @@ export default function CurrentStatusCard({ character, currentLevel, requiredXP,
             {currentLevel}
           </Typography>
         </div>
-        <div className="flex justify-between">
+        <div>
           <Typography variant="bodySmall" color="secondary">
             Current XP:
           </Typography>
@@ -40,7 +41,7 @@ export default function CurrentStatusCard({ character, currentLevel, requiredXP,
             {character.xp.toLocaleString()}
           </Typography>
         </div>
-        <div className="flex justify-between">
+        <div>
           <Typography variant="bodySmall" color="secondary">
             Class:
           </Typography>
@@ -48,7 +49,7 @@ export default function CurrentStatusCard({ character, currentLevel, requiredXP,
             {className}
           </Typography>
         </div>
-        <div className="flex justify-between">
+        <div>
           <Typography variant="bodySmall" color="secondary">
             Next Level XP:
           </Typography>
@@ -56,7 +57,7 @@ export default function CurrentStatusCard({ character, currentLevel, requiredXP,
             {isCustomClass ? 'N/A (Custom)' : requiredXP ? requiredXP.toLocaleString() : 'Max Level'}
           </Typography>
         </div>
-        <div className="flex justify-between">
+        <div>
           <Typography variant="bodySmall" color="secondary">
             Current HP:
           </Typography>
@@ -64,7 +65,7 @@ export default function CurrentStatusCard({ character, currentLevel, requiredXP,
             {character.hp.current}/{character.hp.max}
           </Typography>
         </div>
-        <div className="flex justify-between">
+        <div>
           <Typography variant="bodySmall" color="secondary">
             Hit Die:
           </Typography>

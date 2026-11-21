@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/core/primitives';
 import { useScrollCreation } from './hooks/useScrollCreation';
 import { useScrollActions } from './hooks/useScrollActions';
 import { SpellcrafterBonuses, ActiveScrolls, CompletedScrolls, ScrollCreationModal, EmptyState } from './components';
+import './ScrollCreation.css';
 
 interface ScrollCreationProps {
   character: Character;
@@ -51,13 +52,12 @@ export default function ScrollCreation({
     <>
       <SectionWrapper
         title={
-          <div className="flex justify-between items-center w-full gap-4">
+          <div className="scrolls-title">
             <span>Scroll Creation</span>
             {isOwner && (
               <Button
                 size="sm"
                 onClick={openCreateModal}
-                className="text-xs"
                 disabled={!canCreateScrolls}
                 title={!canCreateScrolls ? 'Must be a Spellcrafter to create scrolls' : 'Start new scroll'}
                 icon="plus"
@@ -70,7 +70,7 @@ export default function ScrollCreation({
         className={className}
         size={size}
       >
-        <div className="p-4">
+        <div className="scrolls-body">
           {/* Spellcrafter Bonuses Info */}
           {scrollCreationBonuses && <SpellcrafterBonuses bonuses={scrollCreationBonuses} />}
 

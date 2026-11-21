@@ -18,6 +18,7 @@ import { useSpellData } from './spells/hooks/useSpellData';
 import { useClericSpells } from './spells/hooks/useClericSpells';
 import { useSpellPreparation } from './spells/hooks/useSpellPreparation';
 import { hasTurnUndeadAbility } from '@/utils';
+import './Spells.css';
 
 interface SpellsProps {
   character?: Character;
@@ -68,13 +69,17 @@ const SpellSection = ({
   showSearch = false,
   renderItem,
 }: SpellSectionProps) => (
-  <section aria-labelledby={`${title.toLowerCase().replace(/\s+/g, '-')}-heading`}>
+  <section
+    className="spell-section"
+    data-add={editButtonText?.includes('Add') || undefined}
+    aria-labelledby={`${title.toLowerCase().replace(/\s+/g, '-')}-heading`}
+  >
     <SectionHeader
       title={
-        <span className="flex items-center gap-2" id={`${title.toLowerCase().replace(/\s+/g, '-')}-heading`}>
+        <span className="spell-heading" id={`${title.toLowerCase().replace(/\s+/g, '-')}-heading`}>
           {title}
           {items.length > 0 && (
-            <span className="text-sm font-normal text-zinc-400" aria-label={`${items.length} ${title.toLowerCase()}`}>
+            <span className="spell-count" aria-label={`${items.length} ${title.toLowerCase()}`}>
               ({items.length})
             </span>
           )}
@@ -88,30 +93,19 @@ const SpellSection = ({
           </Button>
         ) : undefined
       }
-      className="mb-4"
     />
 
     {usageDescription && (
-      <Typography variant="caption" className="text-zinc-500 block mb-4">
+      <Typography variant="caption" className="spell-usage">
         {usageDescription}
       </Typography>
     )}
 
     {items.length > 0 ? (
-      <Accordion
-        items={items}
-        sortBy="name"
-        labelProperty="name"
-        showSearch={showSearch}
-        renderItem={renderItem}
-        showCounts={false}
-        {...(editButtonText?.includes('Add') && { className: 'mb-6' })}
-      />
+      <Accordion items={items} sortBy="name" labelProperty="name" showSearch={showSearch} renderItem={renderItem} showCounts={false} />
     ) : (
-      <Card variant="standard" size="compact" className={editButtonText?.includes('Add') ? 'mb-6' : undefined}>
-        <Typography variant="body" className="text-zinc-400 text-center">
-          {emptyStateMessage}
-        </Typography>
+      <Card variant="standard" size="compact" className="spell-empty">
+        <Typography variant="body">{emptyStateMessage}</Typography>
       </Card>
     )}
   </section>
@@ -172,7 +166,7 @@ export default function Spells({
   return (
     <SectionWrapper
       title={
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between w-full">
+        <div className="section-title">
           <span>Spells & Cantrips</span>
           {canEdit && (
             <Button onClick={customSpellModal.open} variant="primary" size="sm" aria-label="Create custom spell">
@@ -184,9 +178,9 @@ export default function Spells({
       size={size}
       className={className}
     >
-      <div className="p-6">
+      <div className="spells-body">
         {hasAnySpells ? (
-          <div className="space-y-6">
+          <div>
             {/* Spell Slots */}
             <SpellSlotDisplay spellSlots={spellSlots} />
 
@@ -242,10 +236,8 @@ export default function Spells({
             {hasTurnUndead && <TurnUndeadSection />}
           </div>
         ) : (
-          <div className="status-message text-zinc-400 space-y-2" role="status" aria-live="polite">
-            <Typography variant="body" className="text-lg">
-              No spells known
-            </Typography>
+          <div className="spells-none" role="status" aria-live="polite">
+            <Typography variant="body">No spells known</Typography>
             <Typography variant="helper">This character doesn't know any spells yet.</Typography>
           </div>
         )}
@@ -271,7 +263,7 @@ export default function Spells({
             title="Known Cantrips"
           />
 
-          <div className="flex justify-end pt-4 mt-6 border-t border-zinc-700">
+          <div className="modal-footer">
             <Button variant="primary" onClick={cantripModal.close}>
               Done
             </Button>

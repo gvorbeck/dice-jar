@@ -1,0 +1,113 @@
+@layer components {
+  .char-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .char-head > div {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+  .char-name.typography {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    color: var(--zinc-100);
+    transition: color 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .base-card:hover .char-name.typography {
+    color: var(--amber-300);
+  }
+  .char-level.typography {
+    margin-top: var(--space);
+    font-weight: 500;
+    color: var(--amber-400);
+  }
+  .char-kind > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .char-kind-head {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+  }
+  .char-kind-head .status-dot {
+    flex-shrink: 0;
+  }
+  .char-kind-label.typography {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--zinc-400);
+  }
+  .char-tags > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 1.5);
+  }
+  .char-tags .badge {
+    width: fit-content;
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .char-tags .badge.char-race {
+    background-image: linear-gradient(to right in oklab, var(--amber-500), var(--amber-600));
+    font-weight: 600;
+    box-shadow:
+      0 10px 15px -3px color-mix(in srgb, var(--black) 10%, transparent),
+      0 4px 6px -4px color-mix(in srgb, var(--black) 10%, transparent);
+  }
+  .char-tags .badge.char-class {
+    border: 1px solid var(--zinc-600);
+    background: var(--zinc-700);
+    color: var(--zinc-200);
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .char-tags .badge.char-class:hover {
+    background: var(--zinc-600);
+  }
+  .char-classes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space);
+  }
+  .char-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(var(--space) * 2);
+    padding-top: var(--space);
+  }
+  .char-stats .stat-card {
+    min-width: 0;
+  }
+  @media (min-width: 40rem) {
+    .char-kind > :not(:last-child) {
+      margin-bottom: calc(var(--space) * 3);
+    }
+    .char-kind-head {
+      gap: calc(var(--space) * 3);
+    }
+    .char-tags > :not(:last-child) {
+      margin-bottom: 0;
+    }
+    .char-tags {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: calc(var(--space) * 2);
+    }
+    .char-tags .badge {
+      font-size: var(--text-sm);
+      line-height: var(--text-sm-lh);
+    }
+    .char-classes {
+      gap: calc(var(--space) * 2);
+    }
+    .char-stats {
+      gap: calc(var(--space) * 3);
+      padding-top: calc(var(--space) * 2);
+    }
+  }
+}

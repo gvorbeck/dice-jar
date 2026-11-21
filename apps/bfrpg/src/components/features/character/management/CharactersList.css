@@ -1,0 +1,25 @@
+@layer components {
+  .chars-bar {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space) * 3);
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .chars-sort {
+    max-width: 12rem;
+  }
+  .chars-tools {
+    display: flex;
+    gap: calc(var(--space) * 2);
+  }
+  @media (min-width: 40rem) {
+    .chars-bar {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .chars-tools {
+      margin-left: auto;
+    }
+  }
+}

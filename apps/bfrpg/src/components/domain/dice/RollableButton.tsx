@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { SIZE_STYLES } from '@/constants';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
 import { StatusDot } from '@/components/ui/composite';
 import './RollableButton.css';
 import Button, { type ButtonProps } from '@/components/ui/core/primitives/Button';

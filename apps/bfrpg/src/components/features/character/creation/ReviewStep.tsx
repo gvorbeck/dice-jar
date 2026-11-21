@@ -9,6 +9,7 @@ import { AvatarSelector } from '@/components/features/character/management';
 import { useValidation } from '@/validation';
 import { sanitizeCharacterName, getClassById, isCustomClass, isCustomRace, getRaceById, characterNameSchema } from '@/utils';
 import type { BaseStepProps } from '@/types';
+import './ReviewStep.css';
 
 type ReviewStepProps = BaseStepProps;
 
@@ -70,10 +71,10 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
       statusMessage={getStatusMessage()}
     >
       {/* Character Name Section */}
-      <section className="mb-8">
+      <section className="step-block">
         <Typography variant="sectionHeading">Character Name</Typography>
 
-        <Card variant="standard" className="p-0">
+        <Card variant="standard" className="review-card">
           <TextInput
             value={character.name}
             onChange={handleNameChange}
@@ -87,7 +88,7 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
             aria-invalid={!nameValidation.isValid}
           />
           {nameValidation.errors.length > 0 && (
-            <div id="name-error" role="alert" aria-live="assertive" className="text-red-400 text-sm mt-2">
+            <div id="name-error" role="alert" aria-live="assertive" className="review-name-error">
               {nameValidation.errors[0]}
             </div>
           )}
@@ -95,35 +96,29 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
       </section>
 
       {/* Character Summary */}
-      <section className="mb-8">
+      <section className="step-block">
         <Typography variant="sectionHeading">Character Summary</Typography>
 
-        <Card variant="success" className="p-0">
+        <Card variant="success" className="review-card">
           {/* Header with Avatar and Basic Info */}
-          <div className="flex flex-col sm:flex-row gap-6 mb-6">
+          <div className="review-head">
             {/* Avatar */}
             {character.avatar && (
-              <div className="flex-shrink-0 self-center sm:self-start">
-                <Image
-                  variant="avatar"
-                  size="lg"
-                  src={character.avatar}
-                  alt={`${character.name || 'Character'} avatar`}
-                  className="border-3 border-lime-400 shadow-lg"
-                />
+              <div className="review-avatar">
+                <Image variant="avatar" size="lg" src={character.avatar} alt={`${character.name || 'Character'} avatar`} />
               </div>
             )}
 
             {/* Character Overview */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-4">
-                <Icon name="user" size="lg" className="text-lime-400" />
+            <div className="review-overview">
+              <div className="review-name">
+                <Icon name="user" size="lg" />
                 <Typography variant="infoHeading" color="zinc">
                   {character.name || 'Unnamed Character'}
                 </Typography>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="review-facts">
                 <Card variant="success" size="compact">
                   <Typography variant="subHeadingLime" color="lime">
                     <Icon name="eye" size="sm" />
@@ -149,7 +144,7 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
                     <Icon name="heart" size="sm" />
                     Hit Points
                   </Typography>
-                  <Typography variant="body" weight="bold" color="lime" className="text-lg">
+                  <Typography variant="body" weight="bold" color="lime" className="review-hp">
                     {character.hp?.current || 0} / {character.hp?.max || 0} HP
                   </Typography>
                 </Card>
@@ -170,7 +165,7 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
           </div>
 
           {/* Ability Scores */}
-          <div className="mb-6">
+          <div className="review-block">
             <Typography variant="subHeading" color="lime">
               <Icon name="lightning" size="sm" />
               Ability Scores
@@ -187,22 +182,22 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
 
           {/* Equipment Summary */}
           {character.equipment.length > 0 && (
-            <div className="mb-6">
+            <div className="review-block">
               <Typography variant="subHeading" color="lime">
                 <Icon name="clipboard" size="sm" />
                 Equipment ({character.equipment.reduce((total, item) => total + item.amount, 0)} items)
               </Typography>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div className="review-totals">
                 <Card variant="success" size="compact">
-                  <div className="text-sm text-lime-300 mb-1">Total Weight</div>
-                  <div className="text-lime-50 font-medium">
+                  <div className="review-label">Total Weight</div>
+                  <div className="review-value">
                     {character.equipment.reduce((total, item) => total + item.weight * item.amount, 0).toFixed(1)} lbs
                   </div>
                 </Card>
                 <Card variant="success" size="compact">
-                  <div className="text-sm text-lime-300 mb-1">Equipment Value</div>
-                  <div className="text-lime-50 font-medium">
+                  <div className="review-label">Equipment Value</div>
+                  <div className="review-value">
                     {character.equipment
                       .reduce((total, item) => {
                         let itemValueInGold = item.costValue * item.amount;
@@ -216,12 +211,12 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
                 </Card>
               </div>
 
-              <div className="max-h-32 overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="review-gear">
+                <div>
                   {character.equipment.map((item, index) => (
-                    <div key={index} className="text-sm text-lime-200 flex justify-between">
+                    <div key={index} className="review-gear-item">
                       <span>{item.name}</span>
-                      {item.amount > 1 && <span className="text-lime-300">× {item.amount}</span>}
+                      {item.amount > 1 && <span>× {item.amount}</span>}
                     </div>
                   ))}
                 </div>
@@ -238,25 +233,25 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
               </Typography>
 
               <Card variant="success" size="compact">
-                <div className="space-y-2">
+                <div className="review-spells">
                   {(() => {
                     // Check if class has Read Magic ability (magic-user types and combination classes)
                     const classData = getClassById(character.class);
                     const hasReadMagic = classData?.specialAbilities?.some((ability) => ability.name === 'Read Magic');
                     return (
                       hasReadMagic && (
-                        <div className="flex items-center gap-2">
-                          <span className="bg-amber-600 text-zinc-900 text-xs font-medium px-2 py-1 rounded">Auto</span>
-                          <span className="text-lime-200 font-medium">Read Magic</span>
-                          <span className="text-lime-300 text-sm">(automatically known)</span>
+                        <div className="review-spell">
+                          <span className="review-auto">Auto</span>
+                          <span className="review-spell-name">Read Magic</span>
+                          <span className="review-spell-note">(automatically known)</span>
                         </div>
                       )
                     );
                   })()}
                   {character.spells.map((spell, index) => (
-                    <div key={index} className="flex items-center gap-2">
+                    <div key={index} className="review-spell">
                       <Badge variant="status">L1</Badge>
-                      <span className="text-lime-200 font-medium">{spell.name}</span>
+                      <span className="review-spell-name">{spell.name}</span>
                     </div>
                   ))}
                 </div>
@@ -269,14 +264,14 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
       <HorizontalRule />
 
       {/* Languages */}
-      <section className="mb-8">
+      <section className="step-block">
         <LanguageSelector character={character} onCharacterChange={onCharacterChange} />
       </section>
 
       <HorizontalRule />
 
       {/* Avatar */}
-      <section className="mb-8">
+      <section className="step-block">
         <AvatarSelector character={character} onCharacterChange={onCharacterChange} />
       </section>
     </StepWrapper>

@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { SectionWrapper } from '@/components/ui/core/layout';
-import { SIZE_STYLES } from '@/constants';
 import RollableButton from '@/components/domain/dice/RollableButton';
 import { useDiceRoll } from '@/hooks/dice/useDiceRoll';
 import { InfoTooltip } from '@/components/ui/core/feedback';
 import { TextHeader } from '@/components/ui/composite/TextHeader';
 import type { Character } from '@/types';
+import './SavingThrows.css';
 
 // Constants
 const MIN_SAVING_THROW = 1;
@@ -221,7 +221,6 @@ interface SavingThrowsProps {
 }
 
 export default function SavingThrows({ character, className = '', size = 'md' }: SavingThrowsProps) {
-  const currentSize = SIZE_STYLES[size];
   const { rollSavingThrow } = useDiceRoll();
 
   const savingThrows = useMemo(() => {
@@ -340,11 +339,11 @@ export default function SavingThrows({ character, className = '', size = 'md' }:
   ];
 
   const tooltipContent = (
-    <div className="whitespace-normal max-w-xs">
-      <TextHeader variant="h6" size="sm" underlined={false} className="mb-1">
+    <div className="rules-tip">
+      <TextHeader variant="h6" size="sm" underlined={false}>
         {SAVING_THROW_HELP.title}
       </TextHeader>
-      <div className="space-y-1 text-xs">
+      <div className="rules-tip-list">
         {SAVING_THROW_HELP.rules.map((rule, index) => (
           <div key={index}>{rule}</div>
         ))}
@@ -355,7 +354,7 @@ export default function SavingThrows({ character, className = '', size = 'md' }:
   return (
     <SectionWrapper
       title={
-        <div className="flex items-center gap-2">
+        <div className="icon-heading">
           <span>Saving Throws</span>
           <InfoTooltip content={tooltipContent} ariaLabel="Saving throw rules" />
         </div>
@@ -363,8 +362,8 @@ export default function SavingThrows({ character, className = '', size = 'md' }:
       size={size}
       className={className}
     >
-      <div className={currentSize.container}>
-        <div className="space-y-3">
+      <div className="sheet-pad" data-size={size}>
+        <div className="roll-list">
           {savingThrowItems.map((item, index) => (
             <RollableButton
               key={index}

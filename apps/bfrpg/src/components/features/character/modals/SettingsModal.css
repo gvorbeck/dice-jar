@@ -1,0 +1,24 @@
+@layer components {
+  .settings-list > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .setting {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: calc(var(--space) * 4);
+    border: 1px solid var(--zinc-600);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--zinc-800) 50%, transparent);
+  }
+  .setting > div:first-child {
+    flex: 1 1 0%;
+    padding-right: calc(var(--space) * 4);
+  }
+  .setting .typography[data-variant='caption'] {
+    margin-top: var(--space);
+  }
+  .setting > div:last-child {
+    flex-shrink: 0;
+  }
+}

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Details } from '@/components/ui/composite';
 import { SectionWrapper } from '@/components/ui/core/layout';
-import { SIZE_STYLES, LEVEL_UP_CONSTANTS } from '@/constants';
+import { LEVEL_UP_CONSTANTS } from '@/constants';
 import { calculateArmorClass, calculateMovementRate, calculateHitDie, getClassById } from '@/utils';
 import type { Character, TwoHPClass } from '@/types';
 
@@ -12,7 +12,6 @@ interface CharacterDefenseProps {
 }
 
 export default function CharacterDefense({ character, className = '', size = 'md' }: CharacterDefenseProps) {
-  const currentSize = SIZE_STYLES[size];
   // Calculate Armor Class
   const armorClass = useMemo(() => {
     return calculateArmorClass(character);
@@ -75,7 +74,7 @@ export default function CharacterDefense({ character, className = '', size = 'md
 
   return (
     <SectionWrapper title="Defense & Movement" size={size} className={className}>
-      <div className={currentSize.container}>
+      <div className="sheet-pad" data-size={size}>
         <Details items={detailsItems} layout="vertical" size={size} />
       </div>
     </SectionWrapper>

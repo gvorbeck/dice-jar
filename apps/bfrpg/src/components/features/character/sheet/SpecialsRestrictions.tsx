@@ -8,6 +8,7 @@ import { Button } from '@/components/ui';
 import { LanguageEditModal } from '@/components/modals';
 import type { Character } from '@/types';
 import { getRaceById, getClassById } from '@/utils';
+import './SpecialsRestrictions.css';
 
 interface SpecialsRestrictionsProps {
   character: Character;
@@ -114,7 +115,7 @@ export default function SpecialsRestrictions({
     <SectionWrapper title="Restrictions & Special Abilities" size={size} className={className}>
       {/* Tabs inside the component */}
       <Tabs defaultValue={availableTabs[0]!}>
-        <div className="px-6 pt-4">
+        <div className="specials-tabs">
           <TabList aria-label="Restrictions & Special Abilities">
             {race && <Tab value="race">{race.name}</Tab>}
             {classes.length > 0 && <Tab value="class">{classes.length === 1 ? classes[0]?.name : 'Classes'}</Tab>}
@@ -123,14 +124,14 @@ export default function SpecialsRestrictions({
         </div>
 
         {/* Fixed height scrollable content area to prevent masonry reflow */}
-        <div className="h-96 overflow-y-auto">
+        <div className="specials-scroll">
           <TabPanels>
             {race && (
               <TabPanel value="race">
-                <div className="p-6 space-y-4">
+                <div className="specials-panel">
                   {raceItems.length > 0 ? (
                     raceItems.map((item, index) => (
-                      <Card key={index} variant="standard" hover className="group/card">
+                      <Card key={index} variant="standard" hover>
                         <SkillDescriptionItem title={String(item.label)} description={item.children} variant="decorated" />
                       </Card>
                     ))
@@ -145,10 +146,10 @@ export default function SpecialsRestrictions({
 
             {classes.length > 0 && (
               <TabPanel value="class">
-                <div className="p-6 space-y-4">
+                <div className="specials-panel">
                   {classItems.length > 0 ? (
                     classItems.map((item, index) => (
-                      <Card key={index} variant="standard" hover className="group/card">
+                      <Card key={index} variant="standard" hover>
                         <SkillDescriptionItem title={String(item.label)} description={item.children} variant="decorated" />
                       </Card>
                     ))
@@ -162,10 +163,10 @@ export default function SpecialsRestrictions({
             )}
 
             <TabPanel value="languages">
-              <div className="p-6 space-y-4">
+              <div className="specials-panel">
                 {languageItems.length > 0 ? (
                   languageItems.map((item, index) => (
-                    <Card key={index} variant="standard" hover className="group/card">
+                    <Card key={index} variant="standard" hover>
                       <SkillDescriptionItem title={String(item.label)} description={item.children} variant="decorated" color="lime" />
                     </Card>
                   ))
@@ -177,15 +178,8 @@ export default function SpecialsRestrictions({
 
                 {/* Edit Languages Button */}
                 {isOwner && onCharacterChange && (
-                  <div className="flex justify-center mt-6">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setIsLanguageModalOpen(true)}
-                      className="flex items-center gap-2"
-                      icon="edit"
-                      iconSize="xs"
-                    >
+                  <div className="specials-edit">
+                    <Button variant="secondary" size="sm" onClick={() => setIsLanguageModalOpen(true)} icon="edit" iconSize="xs">
                       Edit Languages
                     </Button>
                   </div>

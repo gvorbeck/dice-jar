@@ -8,6 +8,7 @@ import { allRaces } from '@/data';
 import { isCustomRace, getRaceById, getClassById } from '@/utils';
 import type { BaseStepProps } from '@/types';
 import { memo, useMemo, useState } from 'react';
+import './RaceStep.css';
 
 interface RaceStepProps extends BaseStepProps {
   includeSupplemental: boolean;
@@ -116,12 +117,12 @@ function RaceStep({ character, onCharacterChange, includeSupplemental, onInclude
   return (
     <StepWrapper title="Choose Your Race" description="Select the race that defines your character's heritage and abilities.">
       {/* Race Selection Controls */}
-      <section className="mb-8">
+      <section className="step-block">
         <Card variant="standard">
           <fieldset>
             <legend className="sr-only">Race selection options</legend>
 
-            <div className="space-y-6">
+            <div className="option-stack">
               <OptionToggle
                 title="Content Options"
                 description="Include additional races from supplemental materials"
@@ -143,7 +144,7 @@ function RaceStep({ character, onCharacterChange, includeSupplemental, onInclude
 
                 {/* Custom Race Name Input */}
                 {isInCustomMode && (
-                  <div className="mt-4">
+                  <div className="race-custom-name">
                     <FormField label="Custom Race Name" required>
                       <TextInput
                         value={isCurrentRaceCustom ? character.race : customRaceName}
@@ -156,7 +157,7 @@ function RaceStep({ character, onCharacterChange, includeSupplemental, onInclude
                 )}
 
                 {raceOptions.length === 1 && ( // Only custom option available
-                  <Typography variant="helper" color="amber" className="mt-2">
+                  <Typography variant="helper" color="amber" className="race-none">
                     No standard races available with current ability scores. Try rolling different abilities, including supplemental
                     content, or use a custom race.
                   </Typography>
@@ -169,7 +170,7 @@ function RaceStep({ character, onCharacterChange, includeSupplemental, onInclude
 
       {/* Selected Race Details */}
       {(selectedRace || isInCustomMode) && (
-        <section aria-labelledby="race-details-heading" className="mb-8">
+        <section aria-labelledby="race-details-heading" className="step-block">
           <Typography variant="sectionHeading" id="race-details-heading">
             Race Details
           </Typography>
@@ -183,11 +184,11 @@ function RaceStep({ character, onCharacterChange, includeSupplemental, onInclude
                   title={isCurrentRaceCustom ? character.race : customRaceName || 'Custom Race'}
                   iconSize="lg"
                   badge={{ text: 'Custom' }}
-                  className="mb-6"
+                  spacing="roomy"
                 />
 
                 {/* Custom Race Description */}
-                <div className="mb-6">
+                <div className="detail-intro">
                   <Typography variant="description" color="primary">
                     This is a custom race created by you. Custom races have no class restrictions and can pursue any available class
                     combination.
@@ -195,7 +196,7 @@ function RaceStep({ character, onCharacterChange, includeSupplemental, onInclude
                 </div>
 
                 {/* Custom Race Information */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="detail-grid">
                   {/* No Ability Requirements */}
                   <DetailSection icon={<Icon name="badge-check" />} title="Ability Requirements">
                     <Typography variant="helper" color="primary">
@@ -236,18 +237,18 @@ function RaceStep({ character, onCharacterChange, includeSupplemental, onInclude
                     {...(selectedRace.supplementalContent && {
                       badge: { text: 'Supplemental' },
                     })}
-                    className="mb-6"
+                    spacing="roomy"
                   />
 
                   {/* Race Description */}
-                  <div className="mb-6">
+                  <div className="detail-intro">
                     <Typography variant="description" color="primary">
                       {selectedRace.description}
                     </Typography>
                   </div>
 
                   {/* Race Information Grid */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="detail-grid">
                     {/* Physical Description */}
                     <DetailSection icon={<Icon name="user" />} title="Physical Description">
                       <Typography variant="description" color="primary">
@@ -258,13 +259,11 @@ function RaceStep({ character, onCharacterChange, includeSupplemental, onInclude
                     {/* Ability Requirements */}
                     {selectedRace.abilityRequirements.length > 0 && (
                       <DetailSection icon={<Icon name="badge-check" />} title="Ability Requirements">
-                        <div className="space-y-2">
+                        <div className="race-reqs">
                           {selectedRace.abilityRequirements.map((req, index) => (
-                            <div key={index} className="flex justify-between items-center">
-                              <span className="text-amber-100 font-medium">
-                                {req.ability.charAt(0).toUpperCase() + req.ability.slice(1)}
-                              </span>
-                              <span className="text-amber-200 text-sm">
+                            <div key={index} className="race-req">
+                              <span>{req.ability.charAt(0).toUpperCase() + req.ability.slice(1)}</span>
+                              <span>
                                 {req.min && `min ${req.min}`}
                                 {req.min && req.max && ' • '}
                                 {req.max && `max ${req.max}`}
@@ -278,10 +277,10 @@ function RaceStep({ character, onCharacterChange, includeSupplemental, onInclude
                     {/* Special Abilities */}
                     {selectedRace.specialAbilities.length > 0 && (
                       <DetailSection icon={<Icon name="star" />} title="Special Abilities">
-                        <div className="space-y-3">
+                        <div className="race-abilities">
                           {selectedRace.specialAbilities.map((ability, index) => (
                             <div key={index}>
-                              <div className="font-medium text-amber-100 mb-1">{ability.name}</div>
+                              <div className="race-ability-name">{ability.name}</div>
                               <Typography variant="helper" color="amber">
                                 {ability.description}
                               </Typography>
@@ -293,7 +292,7 @@ function RaceStep({ character, onCharacterChange, includeSupplemental, onInclude
 
                     {/* Allowed Classes */}
                     <DetailSection icon={<Icon name="briefcase" />} title="Allowed Classes">
-                      <div className="flex flex-wrap gap-2">
+                      <div className="tag-list">
                         {selectedRace.allowedClasses.map((classId, index) => (
                           <Badge key={index} variant="status">
                             {getClassName(classId)}

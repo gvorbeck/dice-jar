@@ -1,0 +1,19 @@
+@layer components {
+  .cantrip-pick > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .cantrip-pick > .typography {
+    color: var(--zinc-300);
+  }
+  .cantrip-preview > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .cantrip-preview-head {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 3);
+  }
+  .cantrip-preview-head .icon {
+    color: var(--blue-400);
+  }
+}

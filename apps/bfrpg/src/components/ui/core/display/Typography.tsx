@@ -1,6 +1,6 @@
 import { forwardRef, createElement } from 'react';
 import type { ReactNode, HTMLAttributes, ElementType } from 'react';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
 import './Typography.css';
 
 type TypographyVariant =

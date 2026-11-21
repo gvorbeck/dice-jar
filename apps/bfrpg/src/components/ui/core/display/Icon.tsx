@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
-import { logger, cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
+import { logger } from '@/utils';
 import './Icon.css';
 
 /**

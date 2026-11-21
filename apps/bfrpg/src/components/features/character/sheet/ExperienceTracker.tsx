@@ -5,6 +5,7 @@ import { LevelUpModal } from '@/components/modals/LazyModals';
 import { logger } from '@/utils';
 import { canLevelUp, hasCustomClasses, getXPToNextLevel } from '@/utils';
 import type { Character, Class } from '@/types';
+import './ExperienceTracker.css';
 
 interface ExperienceTrackerProps {
   /** The character whose XP to track */
@@ -128,7 +129,7 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
           Experience Points Tracker
         </div>
 
-        <div className="flex">
+        <div className="xp-row">
           <div role="presentation" onContextMenu={handleContextMenu}>
             <TextInput
               id={inputId}
@@ -141,7 +142,7 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
               aria-label="Experience Points"
               aria-describedby={buttonId}
               showClearButton={false}
-              className="rounded-r-none border-r-0 shadow-[0_3px_0_0_#3f3f46] focus:shadow-[0_4px_0_0_#b45309] flex-1 min-h-[48px] py-4"
+              className="xp-input"
             />
           </div>
           <Button
@@ -150,7 +151,7 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
             disabled={!isLevelUpEnabled}
             aria-label="Level up character"
             aria-describedby={inputId}
-            className="rounded-l-none"
+            className="xp-levelup"
           >
             Level Up
           </Button>
@@ -158,7 +159,7 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
 
         {/* Helper text for XP to next level (only for standard classes) */}
         {xpToNextLevel !== null && (
-          <div className="mt-2 px-2 text-sm text-zinc-400">
+          <div className="xp-note">
             {xpToNextLevel > 0
               ? `${xpToNextLevel.toLocaleString()} XP needed to reach level ${character.level + 1}`
               : `Ready to level up to ${character.level + 1}!`}

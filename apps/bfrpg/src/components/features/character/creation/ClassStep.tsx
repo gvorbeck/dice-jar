@@ -268,12 +268,12 @@ function ClassStepComponent({
   return (
     <StepWrapper title="Choose Your Class" description="Select the class that defines your character's abilities and role.">
       {/* Class Selection Controls */}
-      <section className="mb-8">
+      <section className="step-block">
         <Card variant="standard">
           <fieldset>
             <legend className="sr-only">Class selection options</legend>
 
-            <div className="space-y-6">
+            <div className="option-stack">
               <OptionToggle
                 title="Content Options"
                 description="Include additional classes from supplemental materials"
@@ -282,7 +282,7 @@ function ClassStepComponent({
                 onCheckedChange={onIncludeSupplementalClassChange}
               />
 
-              <div className="border-t border-zinc-600 pt-6">
+              <div className="option-divided">
                 <OptionToggle
                   title="Use Cantrips/Orisons"
                   description="Include 0-level spells (cantrips for Magic-Users, orisons for Clerics) in your character"
@@ -293,7 +293,7 @@ function ClassStepComponent({
               </div>
 
               {canUseCombinationClasses && (
-                <div className="border-t border-zinc-600 pt-6">
+                <div className="option-divided">
                   <OptionToggle
                     title="Combination Classes"
                     description={`As ${

@@ -5,7 +5,8 @@ import { AvatarChangeModal, SettingsModal } from '@/components/modals';
 import { TextInput, Button } from '@/components/ui/core/primitives';
 import { Details } from '@/components/ui/composite';
 import { Icon, Image, Typography } from '@/components/ui/core/display';
-import { getClassName, isCustomRace, getRaceById, cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
+import { getClassName, isCustomRace, getRaceById } from '@/utils';
 
 import './Hero.css';
 
@@ -44,45 +45,18 @@ const getAvatarFallback = (name: string): string => {
     .slice(0, 2);
 };
 
-const getSizeStyles = (size: HeroSize) => {
-  const styles = {
-    sm: {
-      container: 'p-3 sm:p-4',
-      gap: 'gap-3 sm:gap-4',
-      avatar: 'w-12 h-12 sm:w-16 sm:h-16',
-      name: 'text-xl sm:text-2xl',
-      avatarText: 'text-base sm:text-lg',
-    },
-    md: {
-      container: 'p-4 sm:p-6',
-      gap: 'gap-4 sm:gap-6',
-      avatar: 'w-16 h-16 sm:w-24 sm:h-24',
-      name: 'text-2xl sm:text-3xl',
-      avatarText: 'text-xl sm:text-2xl',
-    },
-    lg: {
-      container: 'p-6 sm:p-8',
-      gap: 'gap-6 sm:gap-8',
-      avatar: 'w-20 h-20 sm:w-32 sm:h-32',
-      name: 'text-3xl sm:text-4xl',
-      avatarText: 'text-2xl sm:text-4xl',
-    },
-  };
-  return styles[size];
-};
-
 const getCharacterDetails = (character: Character) => [
   {
     label: 'Race',
-    children: <span className="text-zinc-100 font-medium">{getRaceDisplayName(character)}</span>,
+    children: <span>{getRaceDisplayName(character)}</span>,
   },
   {
     label: 'Class',
-    children: <span className="text-zinc-100 font-medium">{getClassDisplayNames(character)}</span>,
+    children: <span>{getClassDisplayNames(character)}</span>,
   },
   {
     label: 'Level',
-    children: <span className="text-zinc-100 font-medium">{character.level}</span>,
+    children: <span>{character.level}</span>,
   },
 ];
 
@@ -94,7 +68,6 @@ const Hero = forwardRef<HTMLDivElement, HeroProps>(
     const [nameValue, setNameValue] = useState(character.name);
     const [prevCharacterName, setPrevCharacterName] = useState(character.name);
     const nameInputRef = useRef<HTMLInputElement>(null);
-    const currentSize = getSizeStyles(size);
 
     const isEditable = editable && onCharacterChange;
 
@@ -147,27 +120,6 @@ const Hero = forwardRef<HTMLDivElement, HeroProps>(
       }
     };
 
-    const containerClasses = cn(
-      'bg-gradient-to-br from-amber-400 to-amber-500',
-      'border-2 border-amber-600 rounded-xl',
-      'shadow-[0_6px_0_0_#b45309]',
-      'transition-all duration-150',
-      'text-zinc-900 relative',
-      currentSize.container,
-      className,
-    );
-
-    const avatarContainerClasses = cn(
-      'bg-zinc-800 border-2 border-zinc-700 rounded-full',
-      'shadow-[0_4px_0_0_#3f3f46]',
-      'flex items-center justify-center overflow-hidden flex-shrink-0',
-      currentSize.avatar,
-    );
-
-    const layoutClasses = cn('flex flex-col sm:flex-row sm:items-start', currentSize.gap);
-
-    const avatarFallbackClasses = cn('text-zinc-300 font-bold', currentSize.avatarText);
-
     // Determine TextInput size based on Hero size
     let textInputSize: HeroSize = 'md';
     if (size === 'sm') {
@@ -176,22 +128,9 @@ const Hero = forwardRef<HTMLDivElement, HeroProps>(
       textInputSize = 'lg';
     }
 
-    const nameTypographyClasses = cn(
-      'break-words',
-      currentSize.name,
-      isEditable &&
-        'cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 focus:ring-offset-amber-400 rounded-sm',
-    );
-
-    const editIconClasses = cn(
-      'absolute -right-6 sm:right-12 top-1/2 -translate-y-1/2',
-      'opacity-0 group-hover:opacity-100 transition-opacity duration-200',
-      'flex items-center justify-center',
-    );
-
     return (
       <>
-        <header ref={ref} className={containerClasses} aria-labelledby="hero-character-name" {...props}>
+        <header ref={ref} className={cn('hero-card', className)} data-size={size} aria-labelledby="hero-character-name" {...props}>
           {isEditable && (
             <Button
               variant="ghost"
@@ -206,20 +145,14 @@ const Hero = forwardRef<HTMLDivElement, HeroProps>(
           )}
 
           {/* Mobile: Stack vertically, Desktop: Horizontal layout */}
-          <div className={layoutClasses}>
+          <div className="hero-layout">
             {/* Avatar with edit functionality */}
-            <div className="avatar-edit relative flex-shrink-0 self-center sm:self-start">
-              <div className={avatarContainerClasses} aria-hidden="true">
+            <div className="avatar-edit">
+              <div className="hero-avatar" aria-hidden="true">
                 {character.avatar ? (
-                  <Image
-                    variant="standard"
-                    src={character.avatar}
-                    alt=""
-                    className="w-full h-full rounded-full object-cover"
-                    fallback={getAvatarFallback(character.name)}
-                  />
+                  <Image variant="standard" src={character.avatar} alt="" fallback={getAvatarFallback(character.name)} />
                 ) : (
-                  <div className={avatarFallbackClasses} aria-hidden="true">
+                  <div className="hero-initials" aria-hidden="true">
                     {getAvatarFallback(character.name)}
                   </div>
                 )}
@@ -238,9 +171,9 @@ const Hero = forwardRef<HTMLDivElement, HeroProps>(
             </div>
 
             {/* Character Info */}
-            <div className="flex-1 min-w-0 text-center">
+            <div className="hero-info">
               {isEditingName ? (
-                <div className="space-y-2">
+                <div className="hero-rename">
                   <TextInput
                     ref={nameInputRef}
                     value={nameValue}
@@ -249,57 +182,41 @@ const Hero = forwardRef<HTMLDivElement, HeroProps>(
                     onKeyDown={handleNameKeyDown}
                     maxLength={50}
                     size={textInputSize}
-                    className="font-bold"
                     aria-label="Edit character name"
                   />
-                  <div className="text-xs text-zinc-700 flex gap-2">
+                  <div className="hero-rename-hint">
                     <span>Press Enter to save, Escape to cancel</span>
                   </div>
                 </div>
               ) : (
-                <div className="group relative flex items-center justify-center gap-2 max-w-full sm:max-w-[calc(100%-40px)]">
+                <div className="hero-name-row">
                   {isEditable ? (
-                    <button onClick={handleNameClick} className={nameTypographyClasses} aria-label="Click to edit character name">
+                    <button onClick={handleNameClick} className="hero-name" data-editable aria-label="Click to edit character name">
                       <Typography as="h1" variant="h1" color="primary" weight="bold" id="hero-character-name">
                         {character.name}
                       </Typography>
                     </button>
                   ) : (
-                    <Typography
-                      as="h1"
-                      variant="h1"
-                      color="primary"
-                      weight="bold"
-                      id="hero-character-name"
-                      className={nameTypographyClasses}
-                    >
+                    <Typography as="h1" variant="h1" color="primary" weight="bold" id="hero-character-name" className="hero-name">
                       {character.name}
                     </Typography>
                   )}
 
                   {isEditable && (
-                    <div className={editIconClasses}>
-                      <Icon name="edit" size="md" className="text-zinc-700" aria-hidden={true} />
+                    <div className="hero-edit-icon">
+                      <Icon name="edit" size="md" aria-hidden={true} />
                     </div>
                   )}
                 </div>
               )}
 
               {/* Character Details */}
-              <div className="mt-3 sm:mt-4">
-                <div className="sm:hidden">
-                  <Details
-                    layout="vertical"
-                    className="bg-zinc-800/50 border-zinc-700/ p-2 rounded-lg text-sm"
-                    items={getCharacterDetails(character)}
-                  />
+              <div className="hero-details">
+                <div className="hero-details-narrow">
+                  <Details layout="vertical" items={getCharacterDetails(character)} />
                 </div>
-                <div className="hidden sm:block">
-                  <Details
-                    layout="horizontal"
-                    className="bg-zinc-800/50 border-zinc-700/ p-2 rounded-lg text-base"
-                    items={getCharacterDetails(character)}
-                  />
+                <div className="hero-details-wide">
+                  <Details layout="horizontal" items={getCharacterDetails(character)} />
                 </div>
               </div>
             </div>

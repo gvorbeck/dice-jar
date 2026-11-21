@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import type { ReactNode, HTMLAttributes } from 'react';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
 import './Badge.css';
 
 type BadgeVariant = 'status' | 'supplemental' | 'combination' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';

@@ -2,9 +2,9 @@ import { useCallback, useState } from 'react';
 import { FileUpload } from '@/components/ui/core/primitives';
 import { Button, Icon, Image } from '@/components/ui';
 import { Card, Typography } from '@/components/ui/core/display';
-import { LAYOUT_STYLES } from '@/constants';
 import type { Character } from '@/types';
 import { FILE_UPLOAD } from '@/constants';
+import './AvatarSelector.css';
 
 interface AvatarSelectorProps {
   character: Character;
@@ -104,13 +104,13 @@ function AvatarSelector({ character, onCharacterChange }: AvatarSelectorProps) {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="avatar-picker">
       <header>
-        <Typography variant="sectionHeading" className={LAYOUT_STYLES.iconText}>
-          <Icon name="user" size="md" className="text-amber-400" />
+        <Typography variant="sectionHeading" className="icon-heading">
+          <Icon name="user" size="md" />
           Avatar
         </Typography>
-        <Card variant="info" size="compact" className="mb-6">
+        <Card variant="info" size="compact">
           <Typography variant="helper" color="amber">
             Choose a stock avatar or upload your own image to represent your character.
           </Typography>
@@ -119,21 +119,15 @@ function AvatarSelector({ character, onCharacterChange }: AvatarSelectorProps) {
 
       {/* Current Avatar Preview */}
       {character.avatar && (
-        <Card variant="success">
-          <Typography variant="baseSectionHeading" className={`${LAYOUT_STYLES.iconText} text-lime-100`}>
-            <Icon name="check-circle" size="sm" className="text-lime-400" />
+        <Card variant="success" className="avatar-current">
+          <Typography variant="baseSectionHeading" className="icon-heading">
+            <Icon name="check-circle" size="sm" />
             Current Avatar
           </Typography>
-          <div className="flex items-center gap-4">
-            <Image
-              variant="avatar"
-              size="lg"
-              src={character.avatar}
-              alt={`${character.name || 'Character'} avatar`}
-              className="border-3 border-lime-400 shadow-lg"
-            />
-            <div className="flex-1">
-              <div className="text-lime-100 font-medium mb-3">
+          <div className="avatar-current-row">
+            <Image variant="avatar" size="lg" src={character.avatar} alt={`${character.name || 'Character'} avatar`} />
+            <div>
+              <div className="avatar-current-name">
                 {isCustomAvatar ? 'Custom Upload' : getAvatarDisplayName(character.avatar.split('/').pop() || '')}
               </div>
               <Button variant="destructive" size="sm" onClick={handleClearAvatar}>
@@ -146,11 +140,11 @@ function AvatarSelector({ character, onCharacterChange }: AvatarSelectorProps) {
 
       {/* Stock Avatars */}
       <Card variant="standard">
-        <Typography variant="baseSectionHeading" className={LAYOUT_STYLES.iconText}>
-          <Icon name="photo" size="sm" className="text-zinc-400" />
+        <Typography variant="baseSectionHeading" className="icon-heading">
+          <Icon name="photo" size="sm" />
           Stock Avatars
         </Typography>
-        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
+        <div className="avatar-grid">
           {STOCK_AVATARS.map((avatar) => {
             const avatarPath = `/avatars/${avatar}`;
             const isSelected = selectedStockAvatar === avatarPath;
@@ -161,29 +155,22 @@ function AvatarSelector({ character, onCharacterChange }: AvatarSelectorProps) {
                 variant="ghost"
                 onClick={() => handleStockAvatarSelect(avatar)}
                 aria-label={`Select ${getAvatarDisplayName(avatar)} avatar`}
-                className={`
-                  relative w-16 h-16 rounded-lg border-2 transition-all duration-200 p-0
-                  ${
-                    isSelected
-                      ? 'border-lime-400 bg-lime-400/10 shadow-[0_2px_0_0_#65a30d]'
-                      : 'border-zinc-600 hover:border-lime-400 hover:bg-zinc-700'
-                  }
-                `}
+                className="avatar-pick"
+                data-selected={isSelected || undefined}
               >
                 <Image
                   variant="standard"
                   src={avatarPath}
                   alt={getAvatarDisplayName(avatar)}
-                  className="w-full h-full rounded-md"
                   fallback={
-                    <div className="w-full h-full rounded-md bg-zinc-700 flex items-center justify-center">
-                      <span className="text-xs text-zinc-400">N/A</span>
+                    <div className="avatar-missing">
+                      <span>N/A</span>
                     </div>
                   }
                 />
                 {isSelected && (
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-lime-400 rounded-full flex items-center justify-center">
-                    <Icon name="check" size="xs" className="text-zinc-900" />
+                  <div className="avatar-check">
+                    <Icon name="check" size="xs" />
                   </div>
                 )}
               </Button>
@@ -194,8 +181,8 @@ function AvatarSelector({ character, onCharacterChange }: AvatarSelectorProps) {
 
       {/* Custom Upload */}
       <Card variant="standard">
-        <Typography variant="baseSectionHeading" className={LAYOUT_STYLES.iconText}>
-          <Icon name="upload" size="sm" className="text-zinc-400" />
+        <Typography variant="baseSectionHeading" className="icon-heading">
+          <Icon name="upload" size="sm" />
           Upload Custom Avatar
         </Typography>
         <FileUpload
@@ -207,7 +194,7 @@ function AvatarSelector({ character, onCharacterChange }: AvatarSelectorProps) {
           error={uploadError}
           aria-describedby="avatar-upload-info"
         />
-        <Card variant="info" size="compact" className="mt-4">
+        <Card variant="info" size="compact" className="avatar-tip">
           <Typography variant="helper" color="amber">
             For best results, use a square image (1:1 aspect ratio) that's at least 128x128 pixels.
           </Typography>

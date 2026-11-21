@@ -1,4 +1,229 @@
 @layer components {
+  .hero-card {
+    position: relative;
+    border: 2px solid var(--amber-600);
+    border-radius: var(--radius-xl);
+    background-image: linear-gradient(to bottom right in oklab, var(--amber-400), var(--amber-500));
+    box-shadow: 0 6px 0 0 var(--amber-700);
+    color: var(--zinc-900);
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hero-card[data-size='sm'] {
+    padding: calc(var(--space) * 3);
+  }
+  .hero-card[data-size='md'] {
+    padding: calc(var(--space) * 4);
+  }
+  .hero-card[data-size='lg'] {
+    padding: calc(var(--space) * 6);
+  }
+  .hero-layout {
+    display: flex;
+    flex-direction: column;
+  }
+  .hero-card[data-size='sm'] .hero-layout {
+    gap: calc(var(--space) * 3);
+  }
+  .hero-card[data-size='md'] .hero-layout {
+    gap: calc(var(--space) * 4);
+  }
+  .hero-card[data-size='lg'] .hero-layout {
+    gap: calc(var(--space) * 6);
+  }
+  .avatar-edit {
+    position: relative;
+    flex-shrink: 0;
+    align-self: center;
+  }
+  .hero-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 2px solid var(--zinc-700);
+    border-radius: 9999px;
+    background: var(--zinc-800);
+    box-shadow: 0 4px 0 0 var(--zinc-700);
+  }
+  .hero-card[data-size='sm'] .hero-avatar {
+    width: 3rem;
+    height: 3rem;
+  }
+  .hero-card[data-size='md'] .hero-avatar {
+    width: 4rem;
+    height: 4rem;
+  }
+  .hero-card[data-size='lg'] .hero-avatar {
+    width: 5rem;
+    height: 5rem;
+  }
+  .hero-avatar .img {
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    object-fit: cover;
+  }
+  .hero-initials {
+    font-weight: 700;
+    color: var(--zinc-300);
+  }
+  .hero-card[data-size='sm'] .hero-initials {
+    font-size: var(--text-base);
+    line-height: var(--text-base-lh);
+  }
+  .hero-card[data-size='md'] .hero-initials {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl-lh);
+  }
+  .hero-card[data-size='lg'] .hero-initials {
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl-lh);
+  }
+  .hero-info {
+    flex: 1 1 0%;
+    min-width: 0;
+    text-align: center;
+  }
+  .hero-rename > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .hero-rename .text-input {
+    font-weight: 700;
+  }
+  .hero-rename-hint {
+    display: flex;
+    gap: calc(var(--space) * 2);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-700);
+  }
+  .hero-name-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--space) * 2);
+    max-width: 100%;
+  }
+  .hero-name {
+    overflow-wrap: break-word;
+  }
+  .hero-name[data-editable] {
+    cursor: pointer;
+    border-radius: var(--radius);
+  }
+  .hero-name[data-editable]:focus {
+    box-shadow:
+      0 0 0 2px var(--amber-400),
+      0 0 0 4px var(--amber-600);
+  }
+  .hero-edit-icon {
+    position: absolute;
+    top: 50%;
+    right: calc(var(--space) * -6);
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hero-edit-icon .icon {
+    color: var(--zinc-700);
+  }
+  .hero-name-row:hover .hero-edit-icon {
+    opacity: 1;
+  }
+  .hero-details {
+    margin-top: calc(var(--space) * 3);
+  }
+  .hero-details .details {
+    padding: calc(var(--space) * 2);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--zinc-800) 50%, transparent);
+  }
+  .hero-details .details-content span {
+    font-weight: 500;
+    color: var(--zinc-100);
+  }
+  .hero-details-wide {
+    display: none;
+  }
+  @media (min-width: 40rem) {
+    .hero-card[data-size='sm'] {
+      padding: calc(var(--space) * 4);
+    }
+    .hero-card[data-size='md'] {
+      padding: calc(var(--space) * 6);
+    }
+    .hero-card[data-size='lg'] {
+      padding: calc(var(--space) * 8);
+    }
+    .hero-layout {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    .hero-card[data-size='sm'] .hero-layout {
+      gap: calc(var(--space) * 4);
+    }
+    .hero-card[data-size='md'] .hero-layout {
+      gap: calc(var(--space) * 6);
+    }
+    .hero-card[data-size='lg'] .hero-layout {
+      gap: calc(var(--space) * 8);
+    }
+    .avatar-edit {
+      align-self: flex-start;
+    }
+    .hero-card[data-size='sm'] .hero-avatar {
+      width: 4rem;
+      height: 4rem;
+    }
+    .hero-card[data-size='md'] .hero-avatar {
+      width: 6rem;
+      height: 6rem;
+    }
+    .hero-card[data-size='lg'] .hero-avatar {
+      width: 8rem;
+      height: 8rem;
+    }
+    .hero-card[data-size='sm'] .hero-initials {
+      font-size: var(--text-lg);
+      line-height: var(--text-lg-lh);
+    }
+    .hero-card[data-size='md'] .hero-initials {
+      font-size: var(--text-2xl);
+      line-height: var(--text-2xl-lh);
+    }
+    .hero-card[data-size='lg'] .hero-initials {
+      font-size: var(--text-4xl);
+      line-height: var(--text-4xl-lh);
+    }
+    .hero-name-row {
+      max-width: calc(100% - 40px);
+    }
+    .hero-edit-icon {
+      right: calc(var(--space) * 12);
+    }
+    .hero-details {
+      margin-top: calc(var(--space) * 4);
+    }
+    .hero-details-narrow {
+      display: none;
+    }
+    .hero-details-wide {
+      display: block;
+    }
+    .hero-card[data-size='sm'] .hero-name.typography:not([data-editable]) {
+      font-size: var(--text-2xl);
+      line-height: var(--text-2xl-lh);
+    }
+    .hero-card[data-size='md'] .hero-name.typography:not([data-editable]) {
+      font-size: var(--text-3xl);
+      line-height: var(--text-3xl-lh);
+    }
+  }
   /* The gear in the hero's corner. Square padding from 640px; below it the size's own padding applies. */
   .btn.hero-settings {
     position: absolute;

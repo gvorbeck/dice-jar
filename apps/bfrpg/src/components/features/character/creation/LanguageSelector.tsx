@@ -3,9 +3,9 @@ import { TextInput } from '@/components/ui/core/primitives';
 import { Button, Icon } from '@/components/ui';
 import { Card, Typography, Badge } from '@/components/ui/core/display';
 import { allRaces } from '@/data';
-import { LAYOUT_STYLES } from '@/constants';
-import { cn, findById } from '@/utils';
+import { findById } from '@/utils';
 import type { Character } from '@/types';
+import './LanguageSelector.css';
 
 interface LanguageSelectorProps {
   character: Character;
@@ -21,15 +21,9 @@ interface LanguageInputProps {
   labelPrefix: string;
 }
 
-// Hoist styling constants
-const REMOVE_BUTTON_CLASSES = cn('text-red-400 hover:text-red-300 hover:bg-red-900/20');
-
-const SECTION_HEADING_WITH_MARGIN_CLASSES = cn(LAYOUT_STYLES.iconText, 'mb-4');
-const INFO_SECTION_CLASSES = cn(LAYOUT_STYLES.iconText, 'mb-2');
-
 const LanguageInput = ({ language, index, onChange, onBlur, onRemove, labelPrefix }: LanguageInputProps) => (
-  <div className="flex items-center gap-3">
-    <div className="flex-1">
+  <div className="lang-row">
+    <div>
       <TextInput
         value={language}
         onChange={(value) => onChange(index, value)}
@@ -44,7 +38,7 @@ const LanguageInput = ({ language, index, onChange, onBlur, onRemove, labelPrefi
       size="sm"
       onClick={() => onRemove(index)}
       aria-label={`Remove language ${index + 1}`}
-      className={REMOVE_BUTTON_CLASSES}
+      className="lang-remove"
       icon="close"
     />
   </div>
@@ -143,13 +137,13 @@ function LanguageSelector({ character, onCharacterChange }: LanguageSelectorProp
   );
 
   return (
-    <div className="space-y-6">
+    <div className="lang">
       <header>
-        <Typography variant="sectionHeading" className="flex items-center gap-2">
-          <Icon name="language" size="md" className="text-amber-400" />
+        <Typography variant="sectionHeading" className="icon-heading">
+          <Icon name="language" size="md" />
           Languages
         </Typography>
-        <Card variant="info" size="compact" className="mb-6">
+        <Card variant="info" size="compact">
           <Typography variant="descriptionCompact">
             All characters know their native language(s). Characters with Intelligence 13+ may learn additional languages equal to their
             Intelligence bonus (+1, +2, or +3).
@@ -159,15 +153,15 @@ function LanguageSelector({ character, onCharacterChange }: LanguageSelectorProp
 
       {/* Automatic Languages */}
       <Card variant="standard">
-        <Typography variant="baseSectionHeading" className={LAYOUT_STYLES.iconText}>
-          <Icon name="check-circle" size="sm" className="text-zinc-400" />
+        <Typography variant="baseSectionHeading" className="icon-heading">
+          <Icon name="check-circle" size="sm" />
           Automatic Languages
         </Typography>
-        <div className="flex flex-wrap gap-2">
+        <div className="tag-list">
           {automaticLanguages.map((language, index) => (
-            <Badge key={`auto-${index}`} variant="secondary" size="md" className="gap-2">
+            <Badge key={`auto-${index}`} variant="secondary" size="md" className="lang-tag">
               {language}
-              <span className="text-zinc-400 text-sm">(automatic)</span>
+              <span>(automatic)</span>
             </Badge>
           ))}
         </div>
@@ -176,23 +170,23 @@ function LanguageSelector({ character, onCharacterChange }: LanguageSelectorProp
       {/* Bonus Languages */}
       {maxBonusLanguages > 0 && (
         <Card variant="standard">
-          <Typography variant="baseSectionHeading" className={SECTION_HEADING_WITH_MARGIN_CLASSES} color="zinc">
-            <Icon name="plus" size="sm" className="text-zinc-400" aria-hidden={true} />
+          <Typography variant="baseSectionHeading" className="icon-heading" color="zinc">
+            <Icon name="plus" size="sm" aria-hidden={true} />
             Bonus Languages
             {maxBonusLanguages > 0 && (
-              <Typography variant="helper" className="ml-2">
+              <Typography variant="helper" className="lang-used">
                 ({bonusLanguages.length}/{maxBonusLanguages} used)
               </Typography>
             )}
           </Typography>
 
           {bonusLanguages.length === 0 && maxBonusLanguages > 0 && (
-            <Typography variant="body" color="secondary" className="mb-4">
+            <Typography variant="body" color="secondary" className="lang-note">
               Your Intelligence bonus allows you to learn {maxBonusLanguages} additional language{maxBonusLanguages > 1 ? 's' : ''}.
             </Typography>
           )}
 
-          <div className="space-y-3">
+          <div className="lang-inputs">
             {bonusLanguages.map((language, index) => (
               <LanguageInput
                 key={`bonus-${index}`}
@@ -206,14 +200,14 @@ function LanguageSelector({ character, onCharacterChange }: LanguageSelectorProp
             ))}
           </div>
 
-          <div className="mt-4">
-            <Button variant="secondary" size="sm" onClick={handleAddLanguage} className="w-full sm:w-auto" icon="plus">
+          <div className="lang-add">
+            <Button variant="secondary" size="sm" onClick={handleAddLanguage} icon="plus">
               Add Language
               {remainingSlots > 0 ? ` (${remainingSlots} remaining)` : ''}
             </Button>
             {remainingSlots <= 0 && maxBonusLanguages > 0 && (
-              <Typography variant="helper" color="amber" className="mt-2">
-                <Icon name="exclamation-triangle" size="xs" className="inline mr-1" />
+              <Typography variant="helper" color="amber">
+                <Icon name="exclamation-triangle" size="xs" />
                 Adding beyond Intelligence limit - GM discretion required
               </Typography>
             )}
@@ -223,20 +217,20 @@ function LanguageSelector({ character, onCharacterChange }: LanguageSelectorProp
 
       {maxBonusLanguages === 0 && (
         <Card variant="standard">
-          <Typography variant="baseSectionHeading" className={SECTION_HEADING_WITH_MARGIN_CLASSES} color="zinc">
-            <Icon name="plus" size="sm" className="text-zinc-400" aria-hidden={true} />
+          <Typography variant="baseSectionHeading" className="icon-heading" color="zinc">
+            <Icon name="plus" size="sm" aria-hidden={true} />
             Additional Languages
-            <Typography variant="helper" className="ml-2">
+            <Typography variant="helper" className="lang-used">
               ({bonusLanguages.length}/0 used)
             </Typography>
           </Typography>
 
-          <Typography variant="body" color="secondary" className="mb-4">
+          <Typography variant="body" color="secondary" className="lang-note">
             Your Intelligence score ({character.abilities.intelligence.value}) doesn't normally allow bonus languages, but your GM may
             permit additional languages.
           </Typography>
 
-          <div className="space-y-3">
+          <div className="lang-inputs">
             {bonusLanguages.map((language, index) => (
               <LanguageInput
                 key={`bonus-${index}`}
@@ -250,12 +244,12 @@ function LanguageSelector({ character, onCharacterChange }: LanguageSelectorProp
             ))}
           </div>
 
-          <div className="mt-4 flex gap-4 items-center">
-            <Button variant="secondary" size="sm" onClick={handleAddLanguage} className="w-full sm:w-auto" icon="plus">
+          <div className="lang-add" data-inline>
+            <Button variant="secondary" size="sm" onClick={handleAddLanguage} icon="plus">
               Add Language
             </Button>
-            <Typography variant="helper" color="amber" className="mt-2">
-              <Icon name="exclamation-triangle" size="xs" className="inline mr-1" />
+            <Typography variant="helper" color="amber">
+              <Icon name="exclamation-triangle" size="xs" />
               Beyond Intelligence limit - GM discretion required
             </Typography>
           </div>
@@ -265,8 +259,8 @@ function LanguageSelector({ character, onCharacterChange }: LanguageSelectorProp
       {/* Common bonus languages suggestion */}
       {maxBonusLanguages > 0 && (
         <Card variant="info">
-          <Typography variant="baseSectionHeading" className={INFO_SECTION_CLASSES} color="amber">
-            <Icon name="info" size="sm" className="text-amber-400" />
+          <Typography variant="baseSectionHeading" className="icon-heading info-tip-heading" color="amber">
+            <Icon name="info" size="sm" />
             Common Languages to Consider
           </Typography>
           <Typography variant="helper" color="amber">

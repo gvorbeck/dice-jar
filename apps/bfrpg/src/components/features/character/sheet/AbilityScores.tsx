@@ -5,9 +5,10 @@ import { Icon } from '@/components/ui/core/display';
 import { NumberInput } from '@/components/ui/core/primitives';
 import { InfoTooltip, SkeletonStatBlock } from '@/components/ui/core/feedback';
 import { Typography } from '@/components/ui/core/display';
-import { DESIGN_TOKENS, SIZE_STYLES } from '@/constants';
 import { formatModifier, getAbilityScoreCategory } from '@/utils';
 import { useDiceRoll } from '@/hooks';
+import '@/components/ui/composite/StatCard.css';
+import './AbilityScores.css';
 
 interface AbilityScoresProps {
   character?: Character;
@@ -23,7 +24,7 @@ interface AbilityScoreCardProps {
   fullName: string;
   value: number;
   modifier: number;
-  valueColor?: string;
+  rank: 'highest' | 'lowest' | 'middle';
   size?: 'sm' | 'md' | 'lg';
   editable?: boolean;
   onChange?: (value: number) => void;
@@ -31,11 +32,7 @@ interface AbilityScoreCardProps {
 }
 
 const AbilityScoreCard = forwardRef<HTMLDivElement, AbilityScoreCardProps>(
-  (
-    { label, fullName, value, modifier, valueColor = DESIGN_TOKENS.colors.text.primary, size = 'md', editable = false, onChange, onRoll },
-    ref,
-  ) => {
-    const currentSize = SIZE_STYLES[size];
+  ({ label, fullName, value, modifier, rank, size = 'md', editable = false, onChange, onRoll }, ref) => {
     const [isEditing, setIsEditing] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -84,22 +81,9 @@ const AbilityScoreCard = forwardRef<HTMLDivElement, AbilityScoreCardProps>(
     return (
       <div
         ref={ref}
-        className={`
-          ${DESIGN_TOKENS.colors.bg.ability}
-          ${DESIGN_TOKENS.effects.roundedSm}
-          border-2 ${DESIGN_TOKENS.colors.border.ability}
-          ${DESIGN_TOKENS.effects.abilityShadow}
-          ${currentSize.abilityContainer}
-          ${DESIGN_TOKENS.effects.transition}
-          hover:${DESIGN_TOKENS.colors.bg.abilityHover}
-          hover:border-amber-400/40
-          hover:scale-105
-          group/stat-card
-          text-center
-          relative
-          overflow-hidden
-          cursor-pointer
-        `}
+        className="stat-card ability-card"
+        data-size={size}
+        data-rank={rank}
         title={`${fullName} - Click to roll d20${modifier >= 0 ? '+' : ''}${modifier}${editable ? ' • Double-click to edit' : ''}`}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
@@ -108,27 +92,16 @@ const AbilityScoreCard = forwardRef<HTMLDivElement, AbilityScoreCardProps>(
         aria-label={`${fullName} (${value}, modifier ${formatModifier(modifier)}) - Click to roll ability check`}
         onKeyDown={handleKeyDown}
       >
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent"></div>
-        </div>
-
         {/* Content */}
-        <div className="relative z-10">
+        <div className="stat-card-body">
           {/* Label */}
-          <Typography
-            variant="bodySmall"
-            color="amber"
-            weight="medium"
-            as="h3"
-            className="group-hover/stat-card:text-amber-300 transition-colors duration-200"
-          >
+          <Typography variant="bodySmall" color="amber" weight="medium" as="h3" className="stat-card-label">
             {label}
           </Typography>
 
           {/* Primary Value - with editing support */}
           {isEditing && onChange ? (
-            <div className="mb-1">
+            <div className="ability-input">
               <NumberInput
                 ref={inputRef}
                 value={value}
@@ -138,58 +111,19 @@ const AbilityScoreCard = forwardRef<HTMLDivElement, AbilityScoreCardProps>(
                 minValue={3}
                 maxValue={25}
                 size={size}
-                className="text-center bg-zinc-700 border-amber-400 text-zinc-100"
                 aria-label={`${fullName} value`}
               />
             </div>
           ) : (
-            <div
-              className={`
-                ${valueColor}
-                ${currentSize.abilityScore}
-                leading-none
-                mb-1
-                transition-colors duration-200
-                relative
-              `}
-            >
+            <div className="stat-card-value">
               {value}
-              {editable && (
-                <Icon
-                  name="edit"
-                  size="xs"
-                  className={`
-                    text-zinc-400 
-                    opacity-0 group-hover/stat-card:opacity-100 
-                    transition-opacity duration-200
-                    absolute -top-1 right-2
-                  `}
-                  aria-hidden={true}
-                />
-              )}
+              {editable && <Icon name="edit" size="xs" className="ability-edit" aria-hidden={true} />}
             </div>
           )}
 
           {/* Secondary Value (modifier) */}
-          <div
-            className={`
-              ${DESIGN_TOKENS.colors.text.modifier}
-              ${currentSize.abilityModifier}
-              font-mono
-              bg-zinc-900/50
-              px-2 py-1
-              ${DESIGN_TOKENS.effects.roundedSm}
-              border border-lime-500/20
-              inline-block
-              min-w-[3rem]
-            `}
-          >
-            {formatModifier(modifier)}
-          </div>
+          <div className="ability-mod">{formatModifier(modifier)}</div>
         </div>
-
-        {/* Hover indicator */}
-        <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-amber-400/0 via-amber-400/60 to-amber-400/0 transform translate-y-full group-hover/stat-card:translate-y-0 transition-transform duration-200"></div>
       </div>
     );
   },
@@ -199,7 +133,6 @@ AbilityScoreCard.displayName = 'AbilityScoreCard';
 
 const AbilityScores = forwardRef<HTMLDivElement, AbilityScoresProps>(
   ({ character, className = '', size = 'md', editable = false, loading = false, onAbilityChange }, ref) => {
-    const currentSize = SIZE_STYLES[size];
     const { rollAbility } = useDiceRoll();
 
     // Show skeleton while loading
@@ -229,7 +162,7 @@ const AbilityScores = forwardRef<HTMLDivElement, AbilityScoresProps>(
     };
 
     const titleWithTooltip = (
-      <div className="flex items-center gap-2">
+      <div className="icon-heading">
         Ability Scores
         <InfoTooltip content="Single click to roll d20 + modifier • Double click to edit value" />
       </div>
@@ -238,13 +171,12 @@ const AbilityScores = forwardRef<HTMLDivElement, AbilityScoresProps>(
     return (
       <SectionWrapper ref={ref} title={titleWithTooltip} size={size} className={className}>
         {/* Ability Scores Grid */}
-        <div className={currentSize.container}>
-          <div className={`grid ${currentSize.grid}`}>
+        <div className="sheet-pad" data-size={size}>
+          <div className="ability-grid">
             {abilities.map(({ key, label, fullName }) => {
               const ability = character.abilities[key];
               const scoreCategory = getAbilityScoreCategory(ability.value, allScores);
-              const scoreColor =
-                scoreCategory === 'highest' ? 'text-lime-400' : scoreCategory === 'lowest' ? 'text-red-400' : 'text-zinc-400';
+              const rank = scoreCategory === 'highest' || scoreCategory === 'lowest' ? scoreCategory : 'middle';
 
               return (
                 <AbilityScoreCard
@@ -253,7 +185,7 @@ const AbilityScores = forwardRef<HTMLDivElement, AbilityScoresProps>(
                   fullName={fullName}
                   value={ability.value}
                   modifier={ability.modifier}
-                  valueColor={scoreColor}
+                  rank={rank}
                   size={size}
                   editable={editable}
                   {...(editable && { onChange: handleAbilityChange(key) })}

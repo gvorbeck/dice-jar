@@ -2,12 +2,14 @@ import { Card, Typography } from '@/components/ui/core/display';
 import { Button } from '@/components/ui/core/primitives';
 import { SectionHeader } from '@/components/ui';
 import { useDiceRoll } from '@/hooks/dice/useDiceRoll';
+import { cn } from '@dice-jar/cn';
+import './TurnUndeadSection.css';
 
 interface TurnUndeadSectionProps {
   className?: string;
 }
 
-export default function TurnUndeadSection({ className = '' }: TurnUndeadSectionProps) {
+export default function TurnUndeadSection({ className }: TurnUndeadSectionProps) {
   const { rollAbility } = useDiceRoll();
 
   const handleTurnUndeadRoll = () => {
@@ -15,10 +17,10 @@ export default function TurnUndeadSection({ className = '' }: TurnUndeadSectionP
   };
 
   return (
-    <section aria-labelledby="turn-undead-heading" className={className}>
+    <section aria-labelledby="turn-undead-heading" className={cn('turn-undead', className)}>
       <SectionHeader
         title={
-          <span className="flex items-center gap-2" id="turn-undead-heading">
+          <span className="icon-heading" id="turn-undead-heading">
             Turn Undead
           </span>
         }
@@ -28,15 +30,14 @@ export default function TurnUndeadSection({ className = '' }: TurnUndeadSectionP
             Roll d20
           </Button>
         }
-        className="mb-4"
       />
 
-      <Typography variant="caption" className="text-zinc-500 block mb-4">
+      <Typography variant="caption" className="turn-undead-note">
         Faith-based ability • Can retry if successful, but cannot retry for one full turn if failed
       </Typography>
 
       <Card variant="standard" size="compact">
-        <Typography variant="body" className="text-zinc-300">
+        <Typography variant="body">
           Clerics can Turn the undead, that is, drive away undead monsters by means of faith alone. The Cleric brandishes their holy symbol
           and calls upon the power of their divine patron. The player rolls 1d20 and tells the GM the result.
         </Typography>

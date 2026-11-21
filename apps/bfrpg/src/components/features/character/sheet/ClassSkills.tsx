@@ -4,13 +4,14 @@ import { SectionWrapper } from '@/components/ui/core/layout';
 import { Card, Typography } from '@/components/ui/core/display';
 import { SkillDescriptionItem, List, ListItem } from '@/components/ui/composite';
 import { TextHeader } from '@/components/ui/composite/TextHeader';
-import { SIZE_STYLES, ALL_SKILLS, SKILL_DESCRIPTIONS, CLASSES_WITH_SKILLS, SKILL_CONSTANTS } from '@/constants';
+import { ALL_SKILLS, SKILL_DESCRIPTIONS, CLASSES_WITH_SKILLS, SKILL_CONSTANTS } from '@/constants';
 import RollableButton from '@/components/domain/dice/RollableButton';
 import Button from '@/components/ui/core/primitives/Button';
 import { useDiceRoll } from '@/hooks/dice/useDiceRoll';
 import { allClasses } from '@/data';
 import { logger } from '@/utils';
 import type { Character, SkillKey, SkillClassKey } from '@/types';
+import './ClassSkills.css';
 
 interface ClassSkillsProps {
   character: Character;
@@ -26,7 +27,6 @@ export default function ClassSkills({
   id = SKILL_CONSTANTS.COMPONENT_ID_PREFIX,
 }: ClassSkillsProps) {
   const { isOpen: showDetails, toggle: toggleDetails } = useModal();
-  const currentSize = SIZE_STYLES[size];
   const { rollPercentile } = useDiceRoll();
 
   // Check if character has a class with skills using optimized lookup
@@ -90,20 +90,20 @@ export default function ClassSkills({
   const detailsContentId = `${id}-details`;
 
   const detailsContent = (
-    <Card id={detailsContentId} className="mt-4" variant="nested" size="compact">
-      <Typography variant="h4" weight="semibold" className="mb-3">
+    <Card id={detailsContentId} className="skill-details" variant="nested" size="compact">
+      <Typography variant="h4" weight="semibold">
         {abilityType} Descriptions:
       </Typography>
-      <div className="space-y-2 text-xs">
+      <div className="skill-descriptions">
         {Object.entries(SKILL_DESCRIPTIONS)
           .filter(([key]) => key in classSkills) // Only show skills this class actually has
           .map(([key, description]) => (
             <SkillDescriptionItem key={key} title={ALL_SKILLS[key as SkillKey]} description={description} variant="simple" />
           ))}
       </div>
-      <div className="mt-3 pt-3 border-t border-zinc-700">
-        <div className="text-xs text-zinc-400">
-          <TextHeader variant="h6" size="sm" underlined={false} className="mb-1 text-xs">
+      <div className="skill-howto">
+        <div>
+          <TextHeader variant="h6" size="sm" underlined={false}>
             How Skills Work:
           </TextHeader>
           <List variant="disc" spacing="tight" size="sm">
@@ -118,8 +118,8 @@ export default function ClassSkills({
 
   return (
     <SectionWrapper title={characterClassInfo.displayName} size={size} className={className}>
-      <div className={currentSize.container}>
-        <div className="space-y-3">
+      <div className="sheet-pad" data-size={size}>
+        <div className="roll-list">
           {Object.entries(ALL_SKILLS).map(([skillKey, skillLabel]) => {
             const skillValue = classSkills[skillKey];
             if (!skillValue) return null;
@@ -146,15 +146,8 @@ export default function ClassSkills({
           })}
         </div>
 
-        <div className="mt-4 pt-4 border-t border-zinc-700">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={toggleDetails}
-            className="w-full text-xs"
-            aria-expanded={showDetails}
-            aria-controls={detailsContentId}
-          >
+        <div className="skill-toggle">
+          <Button variant="secondary" size="sm" onClick={toggleDetails} aria-expanded={showDetails} aria-controls={detailsContentId}>
             {showDetails ? 'Hide' : 'Show'} {abilityType} Details
           </Button>
         </div>

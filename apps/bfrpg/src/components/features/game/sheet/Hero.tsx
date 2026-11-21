@@ -4,7 +4,7 @@ import type { Game } from '@/types';
 import { TextInput, Button } from '@/components/ui/core/primitives';
 import { Icon } from '@/components/ui/core/display';
 import { Typography } from '@/components/ui/core/display';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
 import '../GameButtons.css';
 
 interface GameHeroProps extends HTMLAttributes<HTMLDivElement> {

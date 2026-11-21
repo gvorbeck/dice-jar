@@ -3,9 +3,9 @@ import { Card, Typography, Badge } from '@/components/ui/core/display';
 import { Icon } from '@/components/ui';
 import { MarkdownText } from '@/components/ui/composite';
 import { LoadingState } from '@/components/ui/core/feedback';
-import { LAYOUT_STYLES } from '@/constants';
 import type { Character, Spell } from '@/types';
 import { memo } from 'react';
+import './SpellSelector.css';
 
 interface SpellSelectorProps {
   character: Character;
@@ -35,13 +35,13 @@ function SpellSelectorComponent({
 
   const renderSpellDetails = (spell: Spell) => (
     <div aria-labelledby={`${detailsId}-info-heading`}>
-      <Typography variant="infoHeading" className={`${LAYOUT_STYLES.iconText} mb-6`} id={`${detailsId}-info-heading`}>
-        <Icon name="star" size="md" className="flex-shrink-0 text-amber-400" aria-hidden={true} />
+      <Typography variant="infoHeading" className="info-title" id={`${detailsId}-info-heading`}>
+        <Icon name="star" size="md" aria-hidden={true} />
         {spell.name}
         <Badge variant="status">Level 1</Badge>
       </Typography>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <div className="spell-facts">
         <Card variant="nested">
           <Typography variant="subHeading">
             <Icon name="map-pin" size="sm" aria-hidden={true} />
@@ -81,15 +81,15 @@ function SpellSelectorComponent({
   );
 
   return (
-    <section aria-labelledby={`${detailsId}-heading`} className="mb-8">
-      <Typography variant="sectionHeading" as="h4" id={`${detailsId}-heading`} color="zinc" className="mb-3">
+    <section aria-labelledby={`${detailsId}-heading`} className="step-block">
+      <Typography variant="sectionHeading" as="h4" id={`${detailsId}-heading`} color="zinc" className="spell-pick-title">
         {title}
       </Typography>
-      <MarkdownText content={description} variant="caption" className="text-sm text-zinc-400 mb-6" />
+      <MarkdownText content={description} variant="caption" className="spell-pick-about" />
 
-      <Card variant="standard" className="mb-6">
+      <Card variant="standard" className="step-card">
         {isLoading ? (
-          <LoadingState variant="inline" message="Loading spells..." className="py-4" />
+          <LoadingState variant="inline" message="Loading spells..." className="spell-pick-loading" />
         ) : (
           <>
             <Select

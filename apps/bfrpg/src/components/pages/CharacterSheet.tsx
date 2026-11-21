@@ -25,7 +25,8 @@ import { useEnhancedCharacterSheet } from '@/hooks/queries/useEnhancedQueries';
 import { useCharacterMutations } from '@/hooks/mutations/useEnhancedMutations';
 import { useDiceRoller } from '@/hooks/dice/useDiceRoller';
 import type { Character, Equipment as EquipmentItem } from '@/types';
-import { canCastSpells, hasCantrips, hasSpells, calculateModifier, getClassById, logger, cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
+import { canCastSpells, hasCantrips, hasSpells, calculateModifier, getClassById, logger } from '@/utils';
 
 export default function CharacterSheet() {
   const [, params] = useRoute('/u/:userId/c/:characterId');

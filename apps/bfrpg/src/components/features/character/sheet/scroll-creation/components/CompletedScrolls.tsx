@@ -2,6 +2,7 @@ import type { ScrollCreationProject } from '@/types';
 import { Badge, Card, Typography } from '@/components/ui/core/display';
 import { Button } from '@/components/ui/core/primitives';
 import { SectionHeader } from '@/components/ui/composite';
+import './../ScrollCreation.css';
 
 interface CompletedScrollsProps {
   projects: ScrollCreationProject[];
@@ -13,28 +14,28 @@ export const CompletedScrolls = ({ projects, isOwner, onDeleteProject }: Complet
   if (projects.length === 0) return null;
 
   return (
-    <div>
-      <SectionHeader title="Completed Scrolls" size="md" className="mb-3" />
-      <div className="space-y-2">
+    <div className="scrolls-done">
+      <SectionHeader title="Completed Scrolls" size="md" />
+      <div className="scrolls-list">
         {projects.map((project) => (
-          <Card key={project.id} className="p-3">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
+          <Card key={project.id} className="scroll-done">
+            <div className="scroll-done-row">
+              <div>
                 <Typography variant="body">{project.spellName}</Typography>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="scroll-tags">
                   <Badge size="sm">Level {project.spellLevel}</Badge>
                   <Badge variant="primary" size="sm">
                     Completed
                   </Badge>
                 </div>
                 {project.notes && (
-                  <div className="mt-2 text-sm text-zinc-300">
+                  <div className="scroll-notes">
                     <strong>Notes:</strong> {project.notes}
                   </div>
                 )}
               </div>
-              <div className="flex items-start gap-3">
-                <div className="text-right text-sm text-zinc-400">
+              <div className="scroll-cost">
+                <div>
                   <div>{project.costTotal} gp</div>
                   <div>
                     {project.daysRequired} {project.daysRequired === 1 ? 'day' : 'days'}

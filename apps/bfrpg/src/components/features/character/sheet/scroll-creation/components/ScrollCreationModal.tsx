@@ -1,6 +1,7 @@
 import { useFormValidation } from '@/hooks';
 import { Button, NumberInput, TextArea, TextInput, FormField } from '@/components/ui/core/primitives';
 import { Modal } from '@/components/modals';
+import './../ScrollCreation.css';
 
 interface ScrollCreationModalProps {
   isOpen: boolean;
@@ -42,7 +43,7 @@ export const ScrollCreationModal = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Create New Scroll" size="md">
-      <div className="space-y-4">
+      <div className="form-stack">
         <FormField label="Spell Name">
           <TextInput
             value={newProject.spellName}
@@ -60,7 +61,7 @@ export const ScrollCreationModal = ({
           />
         </FormField>
 
-        <div className="grid grid-cols-3 gap-4 p-3 bg-zinc-800 rounded-md">
+        <div className="scroll-estimate">
           <div>
             <strong>Estimated Cost:</strong>
             <br />
@@ -87,8 +88,8 @@ export const ScrollCreationModal = ({
           />
         </FormField>
 
-        <div className="flex gap-3 pt-4">
-          <Button onClick={handleCreateProject} disabled={!isProjectValid} className="flex-1">
+        <div className="scroll-form-actions">
+          <Button onClick={handleCreateProject} disabled={!isProjectValid}>
             Start Scroll
           </Button>
           <Button variant="secondary" onClick={onClose}>

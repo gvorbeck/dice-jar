@@ -8,7 +8,7 @@ import { generateCharacterSheetText, sanitizeFilename, formatDate } from '@/util
 import { downloadFile } from '@/utils/fileDownload';
 import type { CharacterListItem } from '@/services';
 import { logger } from '@/utils';
-import { cn } from '@/utils';
+import './ExportCharacterModal.css';
 
 interface ExportCharacterModalProps {
   isOpen: boolean;
@@ -83,29 +83,23 @@ export default function ExportCharacterModal({ isOpen, onClose, characters, user
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Export Character" size="md">
-      <div className="space-y-6">
+      <div className="modal-stack">
         {/* Character Selection */}
         <div>
-          <span id="export-character-label" className="block font-medium text-zinc-100 mb-3">
+          <span id="export-character-label" className="export-label">
             Select Character
           </span>
-          <div role="group" aria-labelledby="export-character-label" className="space-y-2 max-h-96 overflow-y-auto">
+          <div role="group" aria-labelledby="export-character-label" className="export-list">
             {characters.map((char) => (
               <button
                 key={char.id}
                 onClick={() => setSelectedCharacterId(char.id)}
                 disabled={exporting}
-                className={cn(
-                  'w-full p-4 rounded-lg border-2 text-left transition-all',
-                  selectedCharacterId === char.id
-                    ? 'border-amber-400 bg-amber-400/10'
-                    : 'border-zinc-700 bg-zinc-800 hover:border-zinc-600',
-                  exporting && 'opacity-60 cursor-not-allowed',
-                )}
+                className="export-pick"
                 aria-pressed={selectedCharacterId === char.id}
               >
-                <div className="font-semibold text-zinc-100">{char.name}</div>
-                <div className="text-sm text-zinc-400">
+                <div className="export-pick-name">{char.name}</div>
+                <div className="export-pick-meta">
                   Level {char.level} {char.class} • {char.race}
                 </div>
               </button>
@@ -124,14 +118,10 @@ export default function ExportCharacterModal({ isOpen, onClose, characters, user
         />
 
         {/* Error Display */}
-        {error && (
-          <Callout variant="error" className="mt-4">
-            {error}
-          </Callout>
-        )}
+        {error && <Callout variant="error">{error}</Callout>}
 
         {/* Action Buttons */}
-        <div className="flex gap-3 justify-end mt-6">
+        <div className="modal-actions">
           <Button variant="secondary" size="md" onClick={handleClose} disabled={exporting}>
             Cancel
           </Button>

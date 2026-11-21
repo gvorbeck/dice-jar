@@ -11,6 +11,7 @@ import HPGainPreview from '../../character/sheet/level-up/HPGainPreview';
 import LevelUpRequirements from '../../character/sheet/level-up/LevelUpRequirements';
 import ActionButtons from '../../character/sheet/level-up/ActionButtons';
 import type { Character, Class } from '@/types';
+import './LevelUpModal.css';
 
 interface LevelUpModalProps {
   isOpen: boolean;
@@ -120,7 +121,7 @@ export default function LevelUpModal({ isOpen, onClose, character, classes, onLe
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={`Level Up ${character.name}`} size="lg">
-      <div className="space-y-6">
+      <div className="modal-stack">
         {/* Current Status */}
         <CurrentStatusCard character={character} currentLevel={currentLevel} requiredXP={requiredXP} availableClasses={classes} />
 
@@ -140,11 +141,11 @@ export default function LevelUpModal({ isOpen, onClose, character, classes, onLe
 
         {/* Error Display */}
         {hasError && (
-          <div className="p-4 bg-red-900/20 border border-red-700 rounded-lg">
-            <Typography variant="body" color="secondary" className="mb-2">
+          <div className="levelup-error">
+            <Typography variant="body" color="secondary">
               An error occurred:
             </Typography>
-            <Typography variant="helper" color="secondary" className="mb-3">
+            <Typography variant="helper" color="secondary">
               {hpError}
             </Typography>
             <Button onClick={clearErrors} variant="destructive" size="sm">

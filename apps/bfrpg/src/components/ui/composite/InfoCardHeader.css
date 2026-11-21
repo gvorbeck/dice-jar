@@ -4,6 +4,15 @@
     align-items: center;
     gap: calc(var(--space) * 3);
   }
+  .info-card-header {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .info-card-header[data-spacing='normal'] {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .info-card-header[data-spacing='roomy'] {
+    margin-bottom: calc(var(--space) * 6);
+  }
   .info-card-icon {
     flex-shrink: 0;
     color: var(--amber-400);

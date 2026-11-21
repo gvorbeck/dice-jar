@@ -1,0 +1,67 @@
+@layer components {
+  .weight > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .weight-now {
+    text-align: center;
+  }
+  .weight-now .status-indicator {
+    margin-top: calc(var(--space) * 2);
+  }
+  .weight-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: calc(var(--space) * 2);
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .weight-carried {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl-lh);
+    font-weight: 700;
+    color: var(--zinc-100);
+  }
+  .weight-sep,
+  .weight-max {
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    line-height: var(--text-lg-lh);
+  }
+  .weight-sep {
+    color: var(--zinc-400);
+  }
+  .weight-max {
+    color: var(--zinc-300);
+  }
+  .weight-unit {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--zinc-500);
+  }
+  .weight-rows {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .weight-rows > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .weight-rows[data-tight] > :not(:last-child) {
+    margin-bottom: var(--space);
+  }
+  .weight-rows hr {
+    border-color: var(--zinc-600);
+  }
+  .weight-row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--zinc-400);
+  }
+  .weight-row[data-strong] {
+    font-weight: 600;
+    color: var(--zinc-300);
+  }
+  .weight-row span:last-child {
+    font-family: var(--font-mono);
+  }
+}

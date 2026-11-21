@@ -6,6 +6,7 @@ import { Accordion } from '@/components/ui/core/layout';
 import { SkeletonList } from '@/components/ui/core/feedback';
 import { SectionHeader } from '@/components/ui/composite';
 import SpellDetails from '@/components/domain/spells/SpellDetails';
+import './PreparedSpellsSection.css';
 
 interface PreparedSpellsSectionProps {
   character: Character;
@@ -36,7 +37,7 @@ export default function PreparedSpellsSection({
   }
 
   return (
-    <section aria-labelledby="prepared-spells-heading">
+    <section className="prepared" aria-labelledby="prepared-spells-heading">
       <SectionHeader
         title="Daily Spell Preparation"
         extra={
@@ -46,17 +47,16 @@ export default function PreparedSpellsSection({
             </Badge>
           )
         }
-        className="mb-4"
       />
 
-      <Typography variant="caption" className="text-zinc-500 block mt-2 mb-4">
+      <Typography variant="caption" className="prepared-note">
         You can prepare any spell of a level for which you have slots. Choose wisely - these are your spells for the day.
       </Typography>
 
       {loadingSpells ? (
         <SkeletonList items={3} showAvatar={false} label="Loading available spells..." />
       ) : (
-        <div className="space-y-6">
+        <div className="prepared-levels">
           {Object.entries(spellSlots)
             .sort(([a], [b]) => parseInt(a) - parseInt(b))
             .map(([levelStr, slotCount]) => {
@@ -64,8 +64,8 @@ export default function PreparedSpellsSection({
               const availableForLevel = availableSpells[level] || [];
 
               return (
-                <div key={level} className="space-y-3">
-                  <Typography variant="subHeading" className="text-purple-300 flex items-center gap-2">
+                <div key={level} className="prep-level-block">
+                  <Typography variant="subHeading" className="prep-level">
                     <Badge variant="primary" size="sm">
                       {level}
                     </Badge>
@@ -73,7 +73,7 @@ export default function PreparedSpellsSection({
                     {slotCount !== 1 ? 's' : ''})
                   </Typography>
 
-                  <div className="grid gap-3">
+                  <div className="prep-slots">
                     {Array.from({ length: slotCount }, (_, index) => {
                       const preparedSpell = getPreparedSpellForSlot(level, index);
                       const selectOptions: SelectOption[] = [
@@ -85,9 +85,9 @@ export default function PreparedSpellsSection({
                       ];
 
                       return (
-                        <div key={`${level}-${index}`} className="space-y-2">
-                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 items-end">
-                            <div className="lg:col-span-2">
+                        <div key={`${level}-${index}`} className="prep-slot">
+                          <div className="prep-slot-row">
+                            <div>
                               {canEdit ? (
                                 <Select
                                   label={`Slot ${index + 1}`}
@@ -105,10 +105,8 @@ export default function PreparedSpellsSection({
                                 />
                               ) : (
                                 <FormField label={`Slot ${index + 1}`}>
-                                  <div className="px-4 py-3 bg-zinc-800 border-2 border-zinc-600 rounded-lg">
-                                    <Typography variant="body" className="text-zinc-100">
-                                      {preparedSpell?.name || 'No spell prepared'}
-                                    </Typography>
+                                  <div className="prep-readonly">
+                                    <Typography variant="body">{preparedSpell?.name || 'No spell prepared'}</Typography>
                                   </div>
                                 </FormField>
                               )}
@@ -121,7 +119,7 @@ export default function PreparedSpellsSection({
                                 onClick={() => onClearPreparation(level, index)}
                                 icon="close"
                                 iconSize="sm"
-                                className="self-end"
+                                className="prep-clear"
                               >
                                 Clear
                               </Button>
@@ -141,7 +139,6 @@ export default function PreparedSpellsSection({
                               renderItem={(spell) => <SpellDetails spell={spell} />}
                               showSearch={false}
                               showCounts={false}
-                              className="mt-2"
                             />
                           )}
                         </div>

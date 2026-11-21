@@ -10,9 +10,9 @@ import EquipmentSelector from '@/components/domain/equipment/EquipmentSelector';
 import { CustomEquipmentModal } from '@/components/modals/LazyModals';
 import { Icon } from '@/components/ui/core/display/Icon';
 import { SkeletonList } from '@/components/ui/core/feedback';
-import { SIZE_STYLES } from '@/constants';
 import { cleanEquipmentArray } from '@/utils';
 import type { Character, Equipment as EquipmentItem } from '@/types';
+import './Equipment.css';
 
 interface EquipmentProps {
   character?: Character;
@@ -30,21 +30,21 @@ interface WeaponPropertiesProps {
 
 function WeaponProperties({ editForm, updateEditForm }: WeaponPropertiesProps) {
   return (
-    <div className="border-t border-zinc-600 pt-4">
-      <Typography variant="body" weight="medium" className="mb-3">
+    <div className="form-section">
+      <Typography variant="body" weight="medium">
         Weapon Properties
       </Typography>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="form-grid">
         {editForm.damage && (
           <FormField label="Damage">
-            <TextInput value={editForm.damage} onChange={(value) => updateEditForm('damage', value)} className="w-full" />
+            <TextInput value={editForm.damage} onChange={(value) => updateEditForm('damage', value)} />
           </FormField>
         )}
 
         {editForm.twoHandedDamage && (
           <FormField label="Two-Handed Damage">
-            <TextInput value={editForm.twoHandedDamage} onChange={(value) => updateEditForm('twoHandedDamage', value)} className="w-full" />
+            <TextInput value={editForm.twoHandedDamage} onChange={(value) => updateEditForm('twoHandedDamage', value)} />
           </FormField>
         )}
       </div>
@@ -59,21 +59,21 @@ interface ArmorPropertiesProps {
 
 function ArmorProperties({ editForm, updateEditForm }: ArmorPropertiesProps) {
   return (
-    <div className="border-t border-zinc-600 pt-4">
-      <Typography variant="body" weight="medium" className="mb-3">
+    <div className="form-section">
+      <Typography variant="body" weight="medium">
         Armor Properties
       </Typography>
 
-      <div className="grid grid-cols-1 gap-3">
+      <div className="form-grid" data-cols="1">
         {editForm.AC && (
           <FormField label="Armor Class">
-            <TextInput value={editForm.AC.toString()} onChange={(value) => updateEditForm('AC', value)} className="w-full" />
+            <TextInput value={editForm.AC.toString()} onChange={(value) => updateEditForm('AC', value)} />
           </FormField>
         )}
 
         {editForm.missileAC && (
           <FormField label="Missile AC">
-            <TextInput value={editForm.missileAC} onChange={(value) => updateEditForm('missileAC', value)} className="w-full" />
+            <TextInput value={editForm.missileAC} onChange={(value) => updateEditForm('missileAC', value)} />
           </FormField>
         )}
       </div>
@@ -96,7 +96,6 @@ export default function Equipment({
     index: number;
   } | null>(null);
   const [editForm, setEditForm] = useState<EquipmentItem | null>(null);
-  const currentSize = SIZE_STYLES[size];
 
   // Performance optimization: Only show search for larger equipment inventories
   const SEARCH_THRESHOLD = 8; // Show search bar when equipment count exceeds this
@@ -175,11 +174,11 @@ export default function Equipment({
   const renderEquipmentItem = useCallback(
     (item: EquipmentItem & { originalIndex: number }) => {
       return (
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+        <div className="equip-item">
           {/* Item Info */}
-          <div className="flex-1">
-            <div className="flex items-start gap-3 mb-2">
-              <Typography variant="body" color="primary" weight="medium" className="flex-1 flex items-center gap-2">
+          <div className="equip-info">
+            <div className="equip-name-row">
+              <Typography variant="body" color="primary" weight="medium" className="equip-name">
                 {item.name}
                 {item.wearing && (
                   <Badge variant="success" size="sm" aria-label="Currently equipped">
@@ -196,32 +195,32 @@ export default function Equipment({
 
             {/* Item Description */}
             {item.description && (
-              <div className="mb-3">
-                <Typography variant="bodySmall" color="muted" className="italic leading-relaxed">
+              <div className="equip-desc">
+                <Typography variant="bodySmall" color="muted">
                   {item.description}
                 </Typography>
               </div>
             )}
 
             {/* Item Statistics */}
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-4 text-sm text-zinc-400">
-              <span className="flex items-center gap-1">
+            <div className="equip-stats">
+              <span>
                 <Icon name="coin" size="xs" aria-hidden={true} />
                 {formatCost(item.costValue, item.costCurrency, item.amount)}
               </span>
-              <span className="flex items-center gap-1">
+              <span>
                 <Icon name="weight" size="xs" aria-hidden={true} />
                 {formatWeight(item.weight, item.amount)}
               </span>
               {item.damage && (
-                <span className="flex items-center gap-1">
+                <span>
                   <Icon name="damage" size="xs" aria-hidden={true} />
                   {item.damage}
                   {item.twoHandedDamage && ` / ${item.twoHandedDamage}`}
                 </span>
               )}
               {item.AC && (
-                <span className="flex items-center gap-1">
+                <span>
                   <Icon name="shield" size="xs" aria-hidden={true} />
                   AC {item.AC}
                 </span>
@@ -231,7 +230,7 @@ export default function Equipment({
 
           {/* Equipment Controls */}
           {editable && (
-            <div className="flex flex-col gap-3 sm:min-w-[140px]">
+            <div className="equip-controls">
               {/* Wearing Switch for armor and shields */}
               {isWearableItem(item) && (
                 <Switch
@@ -282,10 +281,10 @@ export default function Equipment({
   return (
     <SectionWrapper
       title={
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between w-full">
+        <div className="section-title">
           <span>Equipment</span>
           {editable && (
-            <div className="flex flex-col sm:flex-row gap-2 sm:ml-auto">
+            <div className="section-tools">
               <Button
                 onClick={toggleSelector}
                 variant="secondary"
@@ -305,18 +304,18 @@ export default function Equipment({
       size={size}
       className={className}
     >
-      <div className={currentSize.container}>
+      <div className="sheet-pad" data-size={size}>
         {/* Equipment Selector */}
         {showSelector && (
-          <div id="equipment-selector" className="mb-6">
+          <div id="equipment-selector" className="equip-shop">
             <EquipmentSelector character={character} onEquipmentAdd={handleEquipmentAdd} />
           </div>
         )}
 
         {/* Equipment List */}
         {cleanEquipmentArray(character.equipment).length === 0 ? (
-          <Card variant="standard" className="text-center py-8">
-            <Typography variant="body" color="secondary" className="mb-4">
+          <Card variant="standard" className="equip-empty">
+            <Typography variant="body" color="secondary">
               No equipment found
             </Typography>
             {editable && (
@@ -342,32 +341,25 @@ export default function Equipment({
         {/* Edit Equipment Modal */}
         {editingItem && editForm && (
           <Modal isOpen={true} onClose={handleEditCancel} title={`Edit ${editingItem.item.name}`} size="md">
-            <div className="space-y-4">
+            <div className="form-stack">
               {/* Name */}
               <FormField label="Name">
-                <TextInput value={editForm.name} onChange={(value) => updateEditForm('name', value)} className="w-full" />
+                <TextInput value={editForm.name} onChange={(value) => updateEditForm('name', value)} />
               </FormField>
 
               {/* Amount */}
               <FormField label="Amount">
-                <NumberInput
-                  value={editForm.amount}
-                  onChange={(value) => updateEditForm('amount', value || 1)}
-                  minValue={1}
-                  step={1}
-                  className="w-full"
-                />
+                <NumberInput value={editForm.amount} onChange={(value) => updateEditForm('amount', value || 1)} minValue={1} step={1} />
               </FormField>
 
               {/* Cost */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="form-grid">
                 <FormField label="Cost Value">
                   <NumberInput
                     value={editForm.costValue}
                     onChange={(value) => updateEditForm('costValue', value || 0)}
                     minValue={0}
                     step={0.01}
-                    className="w-full"
                   />
                 </FormField>
                 <Select
@@ -379,24 +371,17 @@ export default function Equipment({
                     { value: 'sp', label: 'sp' },
                     { value: 'cp', label: 'cp' },
                   ]}
-                  className="w-full"
                 />
               </div>
 
               {/* Weight */}
               <FormField label="Weight (lbs)">
-                <NumberInput
-                  value={editForm.weight}
-                  onChange={(value) => updateEditForm('weight', value || 0)}
-                  minValue={0}
-                  step={0.1}
-                  className="w-full"
-                />
+                <NumberInput value={editForm.weight} onChange={(value) => updateEditForm('weight', value || 0)} minValue={0} step={0.1} />
               </FormField>
 
               {/* Category */}
               <FormField label="Category">
-                <TextInput value={editForm.category || ''} onChange={(value) => updateEditForm('category', value)} className="w-full" />
+                <TextInput value={editForm.category || ''} onChange={(value) => updateEditForm('category', value)} />
               </FormField>
 
               {/* Description */}
@@ -406,7 +391,6 @@ export default function Equipment({
                   onChange={(value) => updateEditForm('description', value)}
                   placeholder="Optional description for this equipment..."
                   rows={3}
-                  className="w-full"
                 />
               </FormField>
 
@@ -417,7 +401,7 @@ export default function Equipment({
               {(editForm.AC || editForm.missileAC) && <ArmorProperties editForm={editForm} updateEditForm={updateEditForm} />}
 
               {/* Modal actions */}
-              <div className="flex justify-end gap-3 pt-6 border-t border-zinc-600">
+              <div className="form-actions">
                 <Button onClick={handleEditCancel} variant="secondary" size="md">
                   Cancel
                 </Button>

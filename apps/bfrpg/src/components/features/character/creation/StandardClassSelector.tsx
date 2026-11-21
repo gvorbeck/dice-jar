@@ -6,6 +6,7 @@ import { Icon } from '@/components/ui';
 import type { Character, Class } from '@/types';
 import { getClassFromAvailable, hasCustomClasses } from '@/utils';
 import { memo } from 'react';
+import './StandardClassSelector.css';
 
 interface StandardClassSelectorProps {
   character: Character;
@@ -73,13 +74,13 @@ function StandardClassSelectorComponent({
   const selectedClass = !isCustomClass && currentClassId ? getClassFromAvailable(currentClassId, availableClasses) : null;
 
   return (
-    <section aria-labelledby="standard-classes-heading" className="mb-8">
+    <section aria-labelledby="standard-classes-heading" className="step-block">
       <Typography variant="sectionHeading" id="standard-classes-heading">
         {isCustomClass ? 'Custom Class' : 'Standard Classes'}
       </Typography>
 
-      <Card variant="standard" className="mb-6">
-        <div className="space-y-4">
+      <Card variant="standard" className="step-card">
+        <div className="form-stack">
           <Select
             label="Select Class"
             value={selectValue}
@@ -92,7 +93,7 @@ function StandardClassSelectorComponent({
 
           {/* Custom Class Configuration */}
           {showCustomClassUI && (
-            <div className="space-y-4 border-t border-zinc-600 pt-4">
+            <div className="form-stack form-section">
               <FormField label="Custom Class Name" required>
                 <TextInput
                   value={character.class || ''}
@@ -104,7 +105,7 @@ function StandardClassSelectorComponent({
 
               {/* Hit Die Selection */}
               <div>
-                <Typography variant="body" weight="medium" className="mb-2">
+                <Typography variant="body" weight="medium" className="class-hit-die">
                   Hit Die
                 </Typography>
                 <Select
@@ -145,16 +146,16 @@ function StandardClassSelectorComponent({
                 title={character.class || 'Custom Class'}
                 iconSize="lg"
                 badge={{ text: 'Custom' }}
-                className="mb-6"
+                spacing="roomy"
               />
 
-              <div className="mb-6">
+              <div className="detail-intro">
                 <Typography variant="description">
                   This is a custom class created by you. Define your own abilities, spellcasting rules, and character progression.
                 </Typography>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="detail-grid">
                 <DetailSection icon={<Icon name="check-circle" size="md" aria-hidden={true} />} title="Hit Die">
                   <Typography variant="description">{character.hp.die}</Typography>
                 </DetailSection>
@@ -172,19 +173,19 @@ function StandardClassSelectorComponent({
                 {...(selectedClass.supplementalContent && {
                   badge: { text: 'Supplemental' },
                 })}
-                className="mb-6"
+                spacing="roomy"
               />
 
-              <div className="mb-6">
+              <div className="detail-intro">
                 <Typography variant="description">{selectedClass.description}</Typography>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="detail-grid">
                 <DetailSection icon={<Icon name="check-circle" size="md" aria-hidden={true} />} title="Hit Die">
                   <Typography variant="description">{selectedClass.hitDie}</Typography>
                 </DetailSection>
                 <DetailSection icon={<Icon name="lightning" />} title="Primary Attribute">
-                  <Typography variant="description" className="capitalize">
+                  <Typography variant="description" className="class-attribute">
                     {selectedClass.primaryAttribute}
                   </Typography>
                 </DetailSection>
