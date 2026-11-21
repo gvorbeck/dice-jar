@@ -1,12 +1,12 @@
 import { memo, useMemo } from 'react';
 import type { GamePlayer } from '@/types';
-import { GAME_SHEET_STYLES } from '@/constants';
 import { Typography, Card, Badge, Image } from '@/components/ui/core/display';
 import { Button } from '@/components/ui/core/primitives';
 import { getClassById, getRaceById, getImportantAbilities } from '@/utils';
 import { ABILITY_BADGE_VARIANTS } from '@/constants';
 import { truncateText } from '@/utils';
 import type { SpecialAbility } from '@/types';
+import './PlayerCard.css';
 
 interface PlayerCardProps {
   player: GamePlayer;
@@ -95,30 +95,23 @@ export const PlayerCard = memo(({ player, getResolvedData, onDelete }: PlayerCar
   }, [specialAbilities]);
 
   return (
-    <Card variant="standard" size="compact" className="relative h-full flex flex-col">
-      <div className="flex-1">
-        <div className="flex items-start gap-3 mb-3">
-          <Image
-            variant="avatar"
-            size="sm"
-            src={avatar || ''}
-            alt=""
-            className="border-2 border-zinc-600 flex-shrink-0"
-            fallback={getInitials(characterName)}
-          />
+    <Card variant="standard" size="compact" className="player">
+      <div className="player-body">
+        <div className="player-head">
+          <Image variant="avatar" size="sm" src={avatar || ''} alt="" fallback={getInitials(characterName)} />
 
-          <div className="flex-1 min-w-0">
-            <Typography variant="bodySmall" weight="medium" as="h3" className={`${GAME_SHEET_STYLES.colors.text.primary} truncate mb-1`}>
+          <div className="player-who">
+            <Typography variant="bodySmall" weight="medium" as="h3" className="player-name">
               {characterName}
             </Typography>
 
             {/* Character Level and Race/Class info */}
             {(characterLevel || characterRace || resolved?.class) && (
-              <div className="text-xs text-zinc-400 mb-2">
+              <div className="player-meta">
                 {characterLevel && `Level ${characterLevel} `}
-                {characterRace && <span className="capitalize">{characterRace}</span>}
+                {characterRace && <span>{characterRace}</span>}
                 {resolved?.class && (
-                  <span className="capitalize">
+                  <span>
                     {characterRace ? ' ' : ''}
                     {resolved.class}
                   </span>
@@ -130,7 +123,7 @@ export const PlayerCard = memo(({ player, getResolvedData, onDelete }: PlayerCar
 
         {/* Special Abilities Badges */}
         {importantAbilities.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="player-abilities">
             {importantAbilities.map((ability, index) => {
               let variant: 'status' | 'supplemental' | 'primary' | 'secondary' | 'warning' | 'danger' | 'success' = 'secondary';
               let displayText = ability.name;
@@ -173,11 +166,11 @@ export const PlayerCard = memo(({ player, getResolvedData, onDelete }: PlayerCar
       </div>
 
       {/* Action Buttons - Always at bottom */}
-      <div className="flex justify-end gap-2 pt-3 mt-3 border-t border-zinc-700/50">
+      <div className="player-actions">
         <Button
           variant="ghost"
           size="sm"
-          className="p-2 text-zinc-400 hover:text-amber-400 hover:bg-zinc-700/50 transition-colors duration-200"
+          className="player-act"
           title={`View ${characterName}'s character sheet`}
           aria-label={`View ${characterName}'s character sheet`}
           onClick={() => window.open(characterSheetUrl, '_blank')}
@@ -188,7 +181,8 @@ export const PlayerCard = memo(({ player, getResolvedData, onDelete }: PlayerCar
           <Button
             variant="ghost"
             size="sm"
-            className="p-2 text-zinc-400 hover:text-red-400 hover:bg-zinc-700/50 transition-colors duration-200"
+            className="player-act"
+            data-danger
             title={`Remove ${characterName} from game`}
             aria-label={`Remove ${characterName} from game`}
             onClick={() => {

@@ -129,7 +129,7 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
           Experience Points Tracker
         </div>
 
-        <div className="xp-row">
+        <div className="joined-row">
           <div role="presentation" onContextMenu={handleContextMenu}>
             <TextInput
               id={inputId}
@@ -142,7 +142,7 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
               aria-label="Experience Points"
               aria-describedby={buttonId}
               showClearButton={false}
-              className="xp-input"
+              className="joined-input xp-input"
             />
           </div>
           <Button
@@ -151,7 +151,7 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
             disabled={!isLevelUpEnabled}
             aria-label="Level up character"
             aria-describedby={inputId}
-            className="xp-levelup"
+            className="joined-button"
           >
             Level Up
           </Button>

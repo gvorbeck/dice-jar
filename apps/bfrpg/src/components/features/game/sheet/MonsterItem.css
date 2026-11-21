@@ -1,0 +1,54 @@
+@layer components {
+  .monster > :not(:last-child),
+  .monster-variants > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .monster-single > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .monster .card .text-header {
+    margin-bottom: calc(var(--space) * 3);
+    color: var(--zinc-300);
+  }
+  .monster .card .monster-variant-name {
+    color: var(--zinc-200);
+  }
+  .monster .card.monster-extra {
+    padding: calc(var(--space) * 3);
+  }
+  .monster .card.monster-extra .text-header {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .monster-add {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .monster-variants .monster-add {
+    margin-top: calc(var(--space) * 3);
+  }
+  .monster-add .icon {
+    margin-right: var(--space);
+  }
+  .monster-more {
+    margin-top: calc(var(--space) * 3);
+    padding-top: calc(var(--space) * 3);
+    border-top: 1px solid var(--zinc-700);
+  }
+  .monster-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--space) * 4);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .monster-more .monster-facts {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .monster-facts span:first-child {
+    color: var(--zinc-400);
+  }
+  .monster-facts span:last-child {
+    color: var(--zinc-300);
+  }
+}

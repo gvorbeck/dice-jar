@@ -1,0 +1,39 @@
+@layer components {
+  .spell-details > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .spell-details-facts {
+    display: grid;
+    gap: calc(var(--space) * 3);
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .spell-details .card.spell-detail {
+    padding: calc(var(--space) * 3);
+  }
+  .spell-details .spell-detail .text-header {
+    margin-bottom: var(--space);
+    color: var(--zinc-300);
+  }
+  .spell-details .spell-detail .typography[data-variant='caption'] {
+    color: var(--zinc-400);
+  }
+  .spell-details .spell-detail > div {
+    display: flex;
+    align-items: center;
+  }
+  .spell-details .spell-detail .badge {
+    font-size: var(--text-xs);
+  }
+  .spell-details .spell-detail[data-about] > .typography[data-variant='subHeading'] {
+    margin-bottom: calc(var(--space) * 2);
+    color: var(--zinc-300);
+  }
+  .spell-details .spell-detail .typography[data-variant='description'] {
+    color: var(--zinc-400);
+  }
+  @media (min-width: 40rem) {
+    .spell-details-facts[data-wide] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}

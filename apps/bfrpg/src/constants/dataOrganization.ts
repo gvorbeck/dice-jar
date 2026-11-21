@@ -131,8 +131,7 @@ export const GM_BINDER_MESSAGES = {
 } as const;
 
 // Coin configuration for treasure display - derived from unified currency configuration
-export const COIN_CONFIGS: CoinConfig[] = CURRENCY_UI_CONFIG.map(({ key, abbrev, textColor }) => ({
+export const COIN_CONFIGS: CoinConfig[] = CURRENCY_UI_CONFIG.map(({ key, abbrev }) => ({
   key,
   label: abbrev,
-  color: textColor,
 }));

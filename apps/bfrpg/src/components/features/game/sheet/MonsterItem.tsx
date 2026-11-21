@@ -5,6 +5,7 @@ import { MarkdownText, TextHeader } from '@/components/ui/composite';
 import { MonsterStatsDisplay } from './MonsterStatsDisplay';
 import type { Monster } from '@/types';
 import type { GameCombatant } from '@/types';
+import './MonsterItem.css';
 
 interface MonsterItemProps {
   monster: Monster;
@@ -30,14 +31,14 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
   );
 
   return (
-    <div className="space-y-4" role="article" aria-labelledby={`${uniqueKey}-name`}>
+    <div className="monster" role="article" aria-labelledby={`${uniqueKey}-name`}>
       {/* Hidden monster name for screen readers */}
       <Typography variant="h4" as="h4" id={`${uniqueKey}-name`} className="sr-only">
         {monster.name} - Monster Reference
       </Typography>
 
       {hasVariants ? (
-        <div className="space-y-4">
+        <div className="monster-variants">
           {/* Show main monster name */}
           <TextHeader variant="h4" size="md" underlined={true}>
             {monster.name}
@@ -46,7 +47,7 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
           {monster.variants?.map(([variantName, stats], index) => (
             <Card key={variantName || `variant-${index}`} variant="nested" size="compact">
               {variantName && (
-                <TextHeader variant="h5" size="sm" underlined={false} className="text-zinc-200 mb-3">
+                <TextHeader variant="h5" size="sm" underlined={false} className="monster-variant-name">
                   {variantName}
                 </TextHeader>
               )}
@@ -54,14 +55,13 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
 
               {/* Add to Combat button */}
               {onAddToCombat && (
-                <div className="mt-3 flex justify-end">
+                <div className="monster-add">
                   <Button
                     onClick={() => handleAddToCombat(index)}
                     variant="secondary"
                     size="sm"
                     icon="plus"
                     iconSize="sm"
-                    iconClassName="mr-1"
                     aria-label={`Add ${variantName ? `${monster.name} (${variantName})` : monster.name} to Combat Tracker`}
                   >
                     Add to Combat
@@ -70,16 +70,16 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
               )}
 
               {/* Additional info */}
-              <div className="mt-3 pt-3 border-t border-zinc-700">
-                <div className="flex flex-wrap gap-4 text-xs">
+              <div className="monster-more">
+                <div className="monster-facts">
                   <div>
-                    <span className="text-zinc-400">Appears:</span> <span className="text-zinc-300">{stats.numAppear || '—'}</span>
+                    <span>Appears:</span> <span>{stats.numAppear || '—'}</span>
                   </div>
                   <div>
-                    <span className="text-zinc-400">Save As:</span> <span className="text-zinc-300">{stats.saveAs || '—'}</span>
+                    <span>Save As:</span> <span>{stats.saveAs || '—'}</span>
                   </div>
                   <div>
-                    <span className="text-zinc-400">Treasure:</span> <span className="text-zinc-300">{stats.treasure || '—'}</span>
+                    <span>Treasure:</span> <span>{stats.treasure || '—'}</span>
                   </div>
                 </div>
               </div>
@@ -89,7 +89,7 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
           {/* Monster description for variants */}
           {monster.description && (
             <Card variant="nested" size="compact">
-              <TextHeader variant="h5" size="sm" underlined={false} className="text-zinc-300 mb-3">
+              <TextHeader variant="h5" size="sm" underlined={false}>
                 Description
               </TextHeader>
               <MarkdownText content={monster.description} />
@@ -97,7 +97,7 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
           )}
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="monster-single">
           {/* Show main monster name */}
           <TextHeader variant="h4" size="md" underlined={true}>
             {monster.name}
@@ -107,14 +107,13 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
 
           {/* Add to Combat button */}
           {onAddToCombat && (
-            <div className="flex justify-end">
+            <div className="monster-add">
               <Button
                 onClick={() => handleAddToCombat(0)}
                 variant="secondary"
                 size="sm"
                 icon="plus"
                 iconSize="sm"
-                iconClassName="mr-1"
                 aria-label={`Add ${monster.name} to Combat Tracker`}
               >
                 Add to Combat
@@ -124,24 +123,24 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
 
           {/* Additional info for non-variant monsters */}
           {(monster.numAppear || monster.saveAs || monster.treasure) && (
-            <Card variant="nested" className="p-3">
-              <TextHeader variant="h5" size="sm" underlined={false} className="text-zinc-300 mb-2">
+            <Card variant="nested" className="monster-extra">
+              <TextHeader variant="h5" size="sm" underlined={false}>
                 Additional Details
               </TextHeader>
-              <div className="flex flex-wrap gap-4 text-sm">
+              <div className="monster-facts">
                 {monster.numAppear && (
                   <div>
-                    <span className="text-zinc-400">Appears:</span> <span className="text-zinc-300">{monster.numAppear}</span>
+                    <span>Appears:</span> <span>{monster.numAppear}</span>
                   </div>
                 )}
                 {monster.saveAs && (
                   <div>
-                    <span className="text-zinc-400">Save As:</span> <span className="text-zinc-300">{monster.saveAs}</span>
+                    <span>Save As:</span> <span>{monster.saveAs}</span>
                   </div>
                 )}
                 {monster.treasure && (
                   <div>
-                    <span className="text-zinc-400">Treasure:</span> <span className="text-zinc-300">{monster.treasure}</span>
+                    <span>Treasure:</span> <span>{monster.treasure}</span>
                   </div>
                 )}
               </div>
@@ -151,7 +150,7 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
           {/* Monster description for non-variants */}
           {monster.description && (
             <Card variant="nested" size="compact">
-              <TextHeader variant="h5" size="sm" underlined={false} className="text-zinc-300 mb-3">
+              <TextHeader variant="h5" size="sm" underlined={false}>
                 Description
               </TextHeader>
               <MarkdownText content={monster.description} />

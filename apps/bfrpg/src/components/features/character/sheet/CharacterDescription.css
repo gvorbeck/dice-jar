@@ -5,12 +5,6 @@
   .desc-body > :not(:last-child) {
     margin-bottom: calc(var(--space) * 2);
   }
-  .desc-input.text-area,
-  .desc-input.text-area[data-focused] {
-    line-height: 1.625;
-    background: color-mix(in oklab, var(--zinc-800) 50%, transparent);
-    border-color: color-mix(in oklab, var(--zinc-600) 50%, transparent);
-  }
   .desc-text {
     max-height: 24rem;
     overflow-y: auto;
@@ -22,16 +16,5 @@
     line-height: 1.625;
     color: var(--zinc-300);
     white-space: pre-wrap;
-  }
-  .desc-foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: var(--text-xs);
-    line-height: var(--text-xs-lh);
-    color: var(--zinc-500);
-  }
-  .desc-foot span:last-child {
-    color: var(--zinc-600);
   }
 }

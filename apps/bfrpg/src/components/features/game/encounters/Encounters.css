@@ -1,0 +1,72 @@
+@layer components {
+  .encounter-result.card {
+    text-align: center;
+  }
+  .encounter-result > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .encounter-verdict {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--space) * 2);
+  }
+  .encounter-result > .encounter-verdict[data-hit] {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .encounter-verdict .icon {
+    color: var(--lime-400);
+  }
+  .encounter-verdict[data-hit] .icon {
+    color: var(--amber-400);
+  }
+  .encounter-found {
+    padding: calc(var(--space) * 4);
+    border: 1px solid color-mix(in oklab, var(--amber-400) 30%, transparent);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--amber-400) 10%, transparent);
+  }
+  .encounter-found .typography[data-variant='h5'] {
+    color: var(--amber-300);
+  }
+  .encounter-found .typography[data-variant='bodySmall'] {
+    margin-top: calc(var(--space) * 2);
+  }
+  .encounter-found .btn {
+    width: 100%;
+    margin-top: calc(var(--space) * 3);
+    background: var(--red-600);
+  }
+  .encounter-found .btn[data-hovered] {
+    background: var(--red-700);
+  }
+  .encounter-picks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--space) * 2);
+  }
+  .encounter-picks[data-grid] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .encounter-picks[data-grid] .btn {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .encounter-picks .btn[data-capitalize] {
+    text-transform: capitalize;
+  }
+  .encounter-generate > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .encounter-generate > div {
+    display: flex;
+    justify-content: center;
+  }
+  .encounter-notes.card > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .encounter-notes .typography[data-variant='bodySmall'][data-inline] {
+    display: inline;
+  }
+}

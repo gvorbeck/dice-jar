@@ -2,6 +2,7 @@ import React, { useState, useId, useEffect } from 'react';
 import { Button } from '@/components/ui';
 import { NumberInput } from '@/components/ui/core/primitives';
 import { roller, logger } from '@/utils';
+import './SimpleRoller.css';
 
 interface SimpleRollerProps {
   /** The dice formula to roll (e.g., "3d6", "1d20+5") */
@@ -82,7 +83,7 @@ const SimpleRoller: React.FC<SimpleRollerProps> = ({ formula, label, initialValu
       {/* Global dice announcer - only create once per page */}
       {!document.getElementById('dice-announcer') && <div id="dice-announcer" aria-live="polite" aria-atomic="true" className="sr-only" />}
 
-      <div className="flex">
+      <div className="joined-row">
         <NumberInput
           id={inputId}
           value={value || 0}
@@ -93,7 +94,7 @@ const SimpleRoller: React.FC<SimpleRollerProps> = ({ formula, label, initialValu
             minValue !== undefined && maxValue !== undefined ? ` (range ${minValue}-${maxValue})` : ''
           }`}
           aria-describedby={`${buttonId} ${resultId}`}
-          className="rounded-r-none border-r-0 shadow-[0_3px_0_0_#3f3f46] focus:shadow-[0_4px_0_0_#b45309] flex-1"
+          className="joined-input roller-input"
         />
         <Button
           id={buttonId}
@@ -102,7 +103,7 @@ const SimpleRoller: React.FC<SimpleRollerProps> = ({ formula, label, initialValu
             minValue !== undefined && maxValue !== undefined ? `. Expected range: ${minValue} to ${maxValue}` : ''
           }`}
           aria-describedby={inputId}
-          className="rounded-l-none"
+          className="joined-button"
         >
           {buttonText}
         </Button>

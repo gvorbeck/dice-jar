@@ -135,6 +135,85 @@
     flex-wrap: wrap;
     gap: calc(var(--space) * 2);
   }
+  /* The notes box on a sheet and the line of counts under it. */
+  .note-input.text-area,
+  .note-input.text-area[data-focused] {
+    line-height: 1.625;
+    background: color-mix(in oklab, var(--zinc-800) 50%, transparent);
+    border-color: color-mix(in oklab, var(--zinc-600) 50%, transparent);
+  }
+  .note-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-500);
+  }
+  .note-foot span:last-child {
+    color: var(--zinc-600);
+  }
+  .empty-card.card {
+    padding: calc(var(--space) * 8);
+    text-align: center;
+  }
+  .empty-card .typography {
+    color: var(--zinc-400);
+  }
+  /* An input and its button fused into one bar. */
+  .joined-row {
+    display: flex;
+  }
+  .joined-input.text-input {
+    border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 3px 0 0 var(--zinc-700);
+  }
+  .joined-input.text-input[data-focused] {
+    box-shadow: 0 4px 0 0 var(--amber-700);
+  }
+  .joined-button.btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  /* The forms that create a custom spell or item. */
+  .custom-form > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .custom-block > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .custom-block > .typography {
+    color: var(--zinc-200);
+  }
+  .custom-block.form-section > .typography:first-child {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .custom-grid {
+    display: grid;
+    gap: calc(var(--space) * 4);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .custom-grid[data-cols='3'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: calc(var(--space) * 2);
+  }
+  .custom-grid .custom-sub {
+    display: block;
+    margin-bottom: var(--space);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-400);
+  }
+  .custom-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(var(--space) * 3);
+    margin-top: calc(var(--space) * 6);
+    padding-top: calc(var(--space) * 6);
+    border-top: 1px solid var(--zinc-600);
+  }
   .modal-stack > :not(:last-child) {
     margin-bottom: calc(var(--space) * 6);
   }

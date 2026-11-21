@@ -9,6 +9,7 @@ import EncounterInstructions from '../encounters/EncounterInstructions';
 import { useEncounterData } from '../encounters/hooks/useEncounterData';
 import { useEncounterGeneration } from '../encounters/hooks/useEncounterGeneration';
 import type { GameCombatant } from '@/types';
+import './GameModals.css';
 
 interface EncounterGeneratorModalProps {
   isOpen: boolean;
@@ -59,7 +60,7 @@ export default function EncounterGeneratorModal({ isOpen, onClose, onAddToCombat
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Random Encounter Generator" size="md">
-      <div className="space-y-6 p-2">
+      <div className="game-modal">
         {/* Encounter Type Selection */}
         <EncounterTypeSelector selectedType={encounterType} onTypeChange={handleTypeChangeWithReset} />
 

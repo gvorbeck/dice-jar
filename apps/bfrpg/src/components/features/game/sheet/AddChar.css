@@ -1,0 +1,24 @@
+@layer components {
+  .add-char {
+    padding: calc(var(--space) * 4);
+  }
+  .add-char > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .add-char-row {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 3);
+  }
+  .add-char-row > div {
+    flex: 1 1 0%;
+  }
+  .add-char-row .btn {
+    flex-shrink: 0;
+  }
+  .add-char-error {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--red-400);
+  }
+}

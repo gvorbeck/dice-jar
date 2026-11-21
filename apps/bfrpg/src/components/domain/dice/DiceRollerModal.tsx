@@ -5,6 +5,7 @@ import { Icon } from '@/components/ui/core/display';
 import { TextHeader } from '@/components/ui/composite/TextHeader';
 import { roller, getErrorMessage } from '@/utils';
 import { useNotificationContext } from '@/hooks';
+import './DiceRollerModal.css';
 
 interface DiceRollerModalProps {
   isOpen: boolean;
@@ -29,12 +30,12 @@ export default function DiceRollerModal({ isOpen, onClose }: DiceRollerModalProp
 
       // Create a detailed result message
       const resultMessage = (
-        <div className="text-left">
-          <TextHeader variant="h5" size="md" underlined={false} className="flex items-center gap-2 mb-2">
+        <div className="dice-result">
+          <TextHeader variant="h5" size="md" underlined={false}>
             <Icon name="dice" size="sm" />
             Roll Result: {result.total}
           </TextHeader>
-          <div className="text-sm text-zinc-300 space-y-1">
+          <div className="dice-result-lines">
             <div>
               <strong>Formula:</strong> {result.formula}
             </div>
@@ -82,7 +83,7 @@ export default function DiceRollerModal({ isOpen, onClose }: DiceRollerModalProp
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Dice Roller" size="md">
-      <div className="space-y-6">
+      <div className="modal-stack">
         <FormField label="Dice Notation" hint="Examples: 1d20, 3d6+2, 4d6L (drop lowest), 2d20K (keep highest)">
           <TextInput
             value={diceNotation}
@@ -94,7 +95,7 @@ export default function DiceRollerModal({ isOpen, onClose }: DiceRollerModalProp
           />
         </FormField>
 
-        <div className="flex justify-end gap-3">
+        <div className="dice-roll-actions modal-actions">
           <Button variant="secondary" onClick={handleClose} disabled={isRolling}>
             Cancel
           </Button>
@@ -104,7 +105,6 @@ export default function DiceRollerModal({ isOpen, onClose }: DiceRollerModalProp
             loading={isRolling}
             loadingText="Rolling..."
             disabled={!diceNotation.trim()}
-            className="min-w-[100px]"
             icon="dice"
           >
             Roll

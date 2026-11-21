@@ -11,7 +11,6 @@ export interface ButtonProps extends Omit<BaseButtonProps, 'onClick'> {
   children?: ReactNode;
   icon?: IconName;
   iconSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  iconClassName?: string;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -20,7 +19,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       children,
       icon,
       iconSize = 'sm',
-      iconClassName,
       loading = false,
       loadingText = 'Loading...',
       disabled,
@@ -50,7 +48,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {loading && <span aria-hidden="true" className="btn-spinner" />}
         <span className="btn-label" data-loading={loading || undefined}>
-          {icon && <Icon name={icon} size={iconSize} className={iconClassName || ''} />}
+          {icon && <Icon name={icon} size={iconSize} />}
           {children}
         </span>
         {loading && <span className="sr-only">{loadingText}</span>}

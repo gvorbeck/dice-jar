@@ -4,6 +4,8 @@ import { StatusDot, StatCard } from '@/components/ui/composite';
 import type { Game } from '@/types';
 import { useNotificationContext } from '@/hooks';
 import { truncateText } from '@/utils';
+import '@/components/features/character/management/CharacterCard.css';
+import './GameCard.css';
 
 interface GameCardProps {
   game: Game;
@@ -40,12 +42,9 @@ export function GameCard({ game, user, onDelete, isDeleting }: GameCardProps) {
       isDeleting={isDeleting || false}
     >
       {/* Game Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex-1 min-w-0">
-          <Typography
-            variant="h4"
-            className="text-zinc-100 group-hover:text-amber-300 transition-colors duration-300 truncate font-bold tracking-wide"
-          >
+      <div className="char-head">
+        <div>
+          <Typography variant="h4" className="char-name">
             {game.name}
           </Typography>
         </div>
@@ -54,34 +53,22 @@ export function GameCard({ game, user, onDelete, isDeleting }: GameCardProps) {
       {/* Game Notes */}
       {game.notes && (
         <section aria-labelledby={`game-${game.id}-notes-label`}>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
+          <div className="game-notes">
+            <div className="game-notes-head">
               <StatusDot status="active" ariaLabel="Game notes section" />
-              <Typography
-                id={`game-${game.id}-notes-label`}
-                variant="helper"
-                className="text-zinc-400 uppercase tracking-wider font-medium text-xs"
-              >
+              <Typography id={`game-${game.id}-notes-label`} variant="helper" className="char-kind-label">
                 Notes
               </Typography>
             </div>
-            <Typography variant="body" className="text-zinc-300 text-sm">
-              {truncateText(game.notes)}
-            </Typography>
+            <Typography variant="body">{truncateText(game.notes)}</Typography>
           </div>
         </section>
       )}
 
       {/* Game Stats */}
       {game.players && game.players.length > 0 && (
-        <section aria-labelledby={`game-${game.id}-stats-label`} className="pt-2">
-          <StatCard
-            label="Players"
-            value={game.players.length}
-            size="sm"
-            className="bg-zinc-800/50 border-zinc-700/50"
-            fullName="Number of players in this game"
-          />
+        <section aria-labelledby={`game-${game.id}-stats-label`} className="game-stats">
+          <StatCard label="Players" value={game.players.length} size="sm" fullName="Number of players in this game" />
         </section>
       )}
     </BaseCard>

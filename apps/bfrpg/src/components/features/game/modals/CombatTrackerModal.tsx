@@ -11,6 +11,7 @@ import InitiativeTable from '../combat/InitiativeTable';
 import PreCombatInitiativeSection from '../combat/PreCombatInitiativeSection';
 import CombatantsList from '../combat/CombatantsList';
 import type { Game } from '@/types';
+import './GameModals.css';
 
 interface CombatTrackerModalProps {
   isOpen: boolean;
@@ -81,7 +82,7 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
   if (!game) {
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Combat Tracker" size="lg">
-        <div className="text-center py-8">
+        <div className="game-modal-empty">
           <Typography variant="body" color="muted">
             No game data available for combat tracking.
           </Typography>
@@ -92,7 +93,7 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Combat Tracker - ${game.name}`} size="lg">
-      <div className="space-y-6 p-2">
+      <div className="game-modal">
         {/* Combat Controls */}
         <CombatControls
           isCombatActive={isCombatActive}
@@ -111,11 +112,11 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
 
         {/* No Combatants */}
         {!loading && currentCombatants.length === 0 && (
-          <div className="text-center py-8" role="status">
+          <div className="game-modal-empty" role="status">
             <Typography variant="body" color="secondary">
               No combatants available for combat.
             </Typography>
-            <Typography variant="bodySmall" color="muted" className="mt-2">
+            <Typography variant="bodySmall" color="muted">
               Add monsters from the Bestiary or players from below to begin combat.
             </Typography>
           </div>
@@ -124,7 +125,7 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
         {/* Initiative Order with Table */}
         {!loading && combatants.length > 0 && (
           <SectionWrapper title="Initiative Order">
-            <div className="p-2">
+            <div className="game-modal-pad">
               <InitiativeTable
                 combatants={sortCombatantsByInitiative(combatants)}
                 currentTurn={currentTurn}

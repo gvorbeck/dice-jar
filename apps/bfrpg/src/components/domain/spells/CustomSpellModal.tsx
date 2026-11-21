@@ -3,6 +3,7 @@ import { Modal } from '@/components/modals';
 import { Button, Select, TextInput, TextArea, FormField } from '@/components/ui/core/primitives';
 import { Typography } from '@/components/ui/core/display';
 import type { Spell } from '@/types';
+import './CustomSpellModal.css';
 
 interface CustomSpellModalProps {
   isOpen: boolean;
@@ -112,10 +113,10 @@ export default function CustomSpellModal({ isOpen, onClose, onSpellAdd }: Custom
 
   return (
     <Modal isOpen={isOpen} onClose={handleCancel} title="Create Custom Spell" size="lg">
-      <div className="space-y-6">
+      <div className="custom-form">
         {/* Basic Information */}
-        <div className="space-y-4">
-          <Typography variant="body" weight="medium" className="text-zinc-200">
+        <div className="custom-block">
+          <Typography variant="body" weight="medium">
             Basic Information
           </Typography>
 
@@ -162,8 +163,8 @@ export default function CustomSpellModal({ isOpen, onClose, onSpellAdd }: Custom
         </div>
 
         {/* Spell Properties */}
-        <div className="space-y-4 border-t border-zinc-600 pt-4">
-          <Typography variant="body" weight="medium" className="text-zinc-200">
+        <div className="custom-block form-section">
+          <Typography variant="body" weight="medium">
             Spell Properties
           </Typography>
 
@@ -182,19 +183,15 @@ export default function CustomSpellModal({ isOpen, onClose, onSpellAdd }: Custom
             required
             {...(attemptedSubmit && formData.availableForClasses.length === 0 && { error: 'Select at least one class' })}
           >
-            <div className="space-y-2">
+            <div className="spell-classes">
               {SPELL_CLASSES.map((spellClass) => (
-                <label
-                  key={spellClass.value}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-zinc-700 hover:border-zinc-600 cursor-pointer transition-colors"
-                >
+                <label key={spellClass.value} className="spell-class">
                   <input
                     type="checkbox"
                     checked={formData.availableForClasses.includes(spellClass.value as SpellClass)}
                     onChange={() => handleClassToggle(spellClass.value as SpellClass)}
-                    className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
                   />
-                  <span className="text-sm text-zinc-200">{spellClass.label}</span>
+                  <span>{spellClass.label}</span>
                 </label>
               ))}
             </div>
@@ -203,7 +200,7 @@ export default function CustomSpellModal({ isOpen, onClose, onSpellAdd }: Custom
       </div>
 
       {/* Modal Actions */}
-      <div className="flex justify-end gap-3 pt-6 border-t border-zinc-600 mt-6">
+      <div className="custom-actions">
         <Button onClick={handleCancel} variant="secondary" size="md">
           Cancel
         </Button>

@@ -1,5 +1,4 @@
 import { forwardRef } from 'react';
-import { SIZE_STYLES } from '@/constants';
 import { cn } from '@dice-jar/cn';
 import { StatusDot } from '@/components/ui/composite';
 import './RollableButton.css';
@@ -13,17 +12,13 @@ interface RollableButtonProps extends Omit<ButtonProps, 'children'> {
 }
 
 const RollableButton = forwardRef<HTMLButtonElement, RollableButtonProps>(
-  ({ label, value, tooltip, size = 'md', variant = 'ghost', className = '', ...props }, ref) => {
-    const currentSize = SIZE_STYLES[size];
-
-    const labelClasses = cn('rollable-label', currentSize.labelText, 'transition-colors');
-    const valueClasses = cn('rollable-value', currentSize.contentText, 'transition-colors');
-
+  ({ label, value, tooltip, size = 'md', variant = 'ghost', className, ...props }, ref) => {
     return (
       <Button
         ref={ref}
         variant={variant}
         className={cn('rollable', className)}
+        data-size={size}
         title={tooltip}
         aria-label={tooltip}
         role="button"
@@ -31,9 +26,9 @@ const RollableButton = forwardRef<HTMLButtonElement, RollableButtonProps>(
       >
         <div className="rollable-lead">
           <StatusDot size="xs" status="inactive" className="rollable-dot" ariaLabel="Rollable button indicator" />
-          <span className={labelClasses}>{label}</span>
+          <span className="rollable-label">{label}</span>
         </div>
-        <div className={valueClasses}>{value}</div>
+        <div className="rollable-value">{value}</div>
       </Button>
     );
   },

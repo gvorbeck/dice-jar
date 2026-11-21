@@ -158,10 +158,10 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
 
   return (
     <Modal isOpen={isOpen} onClose={handleCancel} title="Create Custom Equipment" size="lg">
-      <div className="space-y-6">
+      <div className="custom-form">
         {/* Basic Information */}
-        <div className="space-y-4">
-          <Typography variant="body" weight="medium" className="text-zinc-200">
+        <div className="custom-block">
+          <Typography variant="body" weight="medium">
             Basic Information
           </Typography>
 
@@ -205,8 +205,8 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
         </div>
 
         {/* Basic Properties */}
-        <div className="space-y-4 border-t border-zinc-600 pt-4">
-          <Typography variant="body" weight="medium" className="text-zinc-200">
+        <div className="custom-block form-section">
+          <Typography variant="body" weight="medium">
             Basic Properties
           </Typography>
 
@@ -221,7 +221,7 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
           </FormField>
 
           {/* Cost */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="custom-grid">
             <FormField label="Cost Value">
               <NumberInput
                 value={formData.costValue || 0}
@@ -253,8 +253,8 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
 
         {/* Weapon-specific fields */}
         {isWeapon && (
-          <div className="space-y-4 border-t border-zinc-600 pt-4">
-            <Typography variant="body" weight="medium" className="text-zinc-200">
+          <div className="custom-block form-section">
+            <Typography variant="body" weight="medium">
               Weapon Properties
             </Typography>
 
@@ -297,9 +297,9 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
             {/* Range (for missile weapons) */}
             {(formData.type === 'missile' || formData.type === 'both') && (
               <FormField label="Range (Short/Medium/Long in feet)">
-                <div className="grid grid-cols-3 gap-2">
+                <div className="custom-grid" data-cols="3">
                   <div>
-                    <span className="block text-xs text-zinc-400 mb-1">Short</span>
+                    <span className="custom-sub">Short</span>
                     <NumberInput
                       aria-label="Short range"
                       value={formData.range?.[0] || 0}
@@ -313,7 +313,7 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
                     />
                   </div>
                   <div>
-                    <span className="block text-xs text-zinc-400 mb-1">Medium</span>
+                    <span className="custom-sub">Medium</span>
                     <NumberInput
                       aria-label="Medium range"
                       value={formData.range?.[1] || 0}
@@ -327,7 +327,7 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
                     />
                   </div>
                   <div>
-                    <span className="block text-xs text-zinc-400 mb-1">Long</span>
+                    <span className="custom-sub">Long</span>
                     <NumberInput
                       aria-label="Long range"
                       value={formData.range?.[2] || 0}
@@ -359,8 +359,8 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
 
         {/* Armor-specific fields */}
         {isArmor && (
-          <div className="space-y-4 border-t border-zinc-600 pt-4">
-            <Typography variant="body" weight="medium" className="text-zinc-200">
+          <div className="custom-block form-section">
+            <Typography variant="body" weight="medium">
               Armor Properties
             </Typography>
 
@@ -390,8 +390,8 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
 
         {/* Animal/Mount specific fields */}
         {isAnimal && (
-          <div className="space-y-4 border-t border-zinc-600 pt-4">
-            <Typography variant="body" weight="medium" className="text-zinc-200">
+          <div className="custom-block form-section">
+            <Typography variant="body" weight="medium">
               Animal/Mount Properties
             </Typography>
 
@@ -406,7 +406,7 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
             </FormField>
 
             {/* Load Capacities */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="custom-grid">
               <FormField label="Low Capacity (lbs)">
                 <NumberInput
                   value={formData.lowCapacity || 0}
@@ -429,8 +429,8 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
 
         {/* Special fields for equipment with gold value */}
         {formData.category === 'trade-good' && (
-          <div className="space-y-4 border-t border-zinc-600 pt-4">
-            <Typography variant="body" weight="medium" className="text-zinc-200">
+          <div className="custom-block form-section">
+            <Typography variant="body" weight="medium">
               Trade Good Properties
             </Typography>
 
@@ -447,7 +447,7 @@ export default function CustomEquipmentModal({ isOpen, onClose, onEquipmentAdd }
       </div>
 
       {/* Modal Actions */}
-      <div className="flex justify-end gap-3 pt-6 border-t border-zinc-600 mt-6">
+      <div className="custom-actions">
         <Button onClick={handleCancel} variant="secondary" size="md">
           Cancel
         </Button>

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/core/primitives';
 import { LoadingState } from '@/components/ui/core/feedback';
 import type { EncounterType } from '@/types';
 import '../GameButtons.css';
+import './Encounters.css';
 
 interface EncounterGeneratorButtonProps {
   encounterType: EncounterType;
@@ -12,9 +13,9 @@ interface EncounterGeneratorButtonProps {
 
 export default function EncounterGeneratorButton({ encounterType, isGenerating, hasTable, onGenerate }: EncounterGeneratorButtonProps) {
   return (
-    <div className="space-y-4">
+    <div className="encounter-generate">
       {/* Generate Button */}
-      <div className="flex justify-center">
+      <div>
         <Button
           variant="primary"
           size="lg"
@@ -23,7 +24,7 @@ export default function EncounterGeneratorButton({ encounterType, isGenerating, 
           className="generate-button"
           icon="dice"
           iconSize="md"
-          iconClassName={isGenerating ? 'animate-spin' : ''}
+          data-busy={isGenerating || undefined}
           aria-label={`Generate random ${encounterType} encounter${hasTable ? '' : ' (no encounters available)'}`}
           title={`Generate random ${encounterType} encounter`}
           role="button"
@@ -32,7 +33,7 @@ export default function EncounterGeneratorButton({ encounterType, isGenerating, 
 
       {/* Loading State */}
       {isGenerating && (
-        <div className="flex justify-center" role="status" aria-live="polite">
+        <div role="status" aria-live="polite">
           <LoadingState variant="inline" message="Rolling for encounter..." />
         </div>
       )}

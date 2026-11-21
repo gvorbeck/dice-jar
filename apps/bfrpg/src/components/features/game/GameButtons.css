@@ -24,4 +24,7 @@
     width: calc(var(--space) * 14);
     height: calc(var(--space) * 14);
   }
+  .btn.generate-button[data-busy] .icon {
+    animation: spin 1s linear infinite;
+  }
 }

@@ -1,0 +1,22 @@
+@layer components {
+  .game-ready {
+    padding-block: calc(var(--space) * 12);
+    text-align: center;
+  }
+  .game-ready-icon {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .game-ready-icon .icon {
+    margin-inline: auto;
+    width: 3.75rem;
+    height: 3.75rem;
+  }
+  .game-ready .typography[data-variant='h2'] {
+    margin-bottom: calc(var(--space) * 2);
+    color: var(--zinc-100);
+  }
+  .game-ready .typography[data-variant='body'] {
+    max-width: 28rem;
+    margin-inline: auto;
+  }
+}

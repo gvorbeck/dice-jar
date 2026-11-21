@@ -5,32 +5,6 @@
 
 import { isMockMode } from '@/lib/mockMode';
 
-// Text colors still read by EncounterResults
-export const DESIGN_TOKENS = {
-  colors: {
-    text: {
-      accent: 'text-amber-400',
-      modifier: 'text-lime-400',
-    },
-  },
-} as const;
-
-// Size-based text styles read by RollableButton
-export const SIZE_STYLES = {
-  sm: {
-    labelText: 'text-xs font-semibold tracking-wide uppercase',
-    contentText: 'text-sm font-medium',
-  },
-  md: {
-    labelText: 'text-sm font-semibold tracking-wide uppercase',
-    contentText: 'text-base font-medium',
-  },
-  lg: {
-    labelText: 'text-base font-semibold tracking-wide uppercase',
-    contentText: 'text-lg font-medium',
-  },
-} as const;
-
 // DOM Element Configuration
 export const DOM_IDS = {
   MAIN_CONTENT: 'main-content',
@@ -57,31 +31,26 @@ export const CURRENCY_UI_CONFIG = [
     key: 'platinum' as const,
     label: 'Platinum',
     abbrev: 'pp',
-    textColor: 'text-purple-600',
   },
   {
     key: 'gold' as const,
     label: 'Gold',
     abbrev: 'gp',
-    textColor: 'text-yellow-600',
   },
   {
     key: 'electrum' as const,
     label: 'Electrum',
     abbrev: 'ep',
-    textColor: 'text-blue-600',
   },
   {
     key: 'silver' as const,
     label: 'Silver',
     abbrev: 'sp',
-    textColor: 'text-gray-600',
   },
   {
     key: 'copper' as const,
     label: 'Copper',
     abbrev: 'cp',
-    textColor: 'text-orange-600',
   },
 ] as const;
 

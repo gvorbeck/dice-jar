@@ -3,6 +3,7 @@ import { Typography, Badge, Image } from '@/components/ui/core/display';
 import { NumberInput, Button } from '@/components/ui/core/primitives';
 import type { TableColumn } from '@/components/ui/composite';
 import type { CombatantWithInitiative } from '@/types';
+import './Combat.css';
 
 interface InitiativeTableProps {
   combatants: CombatantWithInitiative[];
@@ -20,24 +21,20 @@ interface InitiativeTableProps {
 // Helper: Render combatant name cell
 function renderCombatantNameCell(combatant: CombatantWithInitiative, isCurrentTurn: boolean) {
   return (
-    <div
-      className={`flex items-center gap-2 p-1 rounded transition-colors max-w-[250px] ${
-        isCurrentTurn ? 'bg-amber-900/30 border border-amber-500/50' : ''
-      }`}
-    >
+    <div className="initiative-name" data-current={isCurrentTurn || undefined}>
       {combatant.avatar && typeof combatant.avatar === 'string' && (
-        <Image variant="avatar" size="xs" src={combatant.avatar} alt={`${combatant.name} avatar`} className="flex-shrink-0" />
+        <Image variant="avatar" size="xs" src={combatant.avatar} alt={`${combatant.name} avatar`} />
       )}
-      <div className="flex-1 min-w-0">
-        <Typography variant="bodySmall" color="zinc" className="font-medium truncate block leading-tight" title={combatant.name}>
+      <div>
+        <Typography variant="bodySmall" color="zinc" title={combatant.name}>
           {combatant.name}
         </Typography>
-        <div className="flex items-center gap-1 mt-0.5">
+        <div className="initiative-meta">
           <Typography variant="caption" color="secondary">
             AC {combatant.ac}
           </Typography>
           {combatant.isPlayer && (
-            <Badge variant="secondary" size="sm" className="text-xs px-1 py-0 h-4">
+            <Badge variant="secondary" size="sm">
               PLAYER
             </Badge>
           )}
@@ -81,7 +78,7 @@ function createInitiativeColumn(onUpdateInitiative: (combatant: CombatantWithIni
           minValue={1}
           maxValue={c.isPlayer ? 6 : 10}
           aria-label={`Initiative for ${c.name}`}
-          className="w-20 text-center"
+          className="initiative-input"
         />
       );
     },
@@ -104,7 +101,7 @@ function createHpColumn(
       const { current: currentHp, max: maxHp } = c.hp;
 
       return (
-        <div className="flex flex-col items-center gap-0.5">
+        <div className="initiative-hp">
           <NumberInput
             value={currentHp}
             onChange={(value) => {
@@ -115,7 +112,7 @@ function createHpColumn(
             minValue={0}
             maxValue={maxHp}
             aria-label={`Current HP for ${c.name}`}
-            className="w-14 text-center text-sm h-8"
+            className="initiative-hp-input"
           />
         </div>
       );
@@ -144,7 +141,7 @@ function createDeleteColumn(
           }}
           variant="destructive"
           size="sm"
-          className="p-2 min-w-0"
+          className="initiative-delete"
           icon="trash"
           iconSize="sm"
           aria-label={`Remove ${c.name} from combat`}
@@ -219,7 +216,7 @@ export default function InitiativeTable({
   return (
     <div>
       {hasUnrolledMonsters && onRollInitiativeForMonsters && (
-        <div className="mb-3">
+        <div className="initiative-roll">
           <Button
             onClick={() => {
               onRollInitiativeForMonsters();

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/core/primitives';
 import { SectionWrapper } from '@/components/ui/core/layout';
 import type { EncounterType } from '@/types';
+import './Encounters.css';
 
 interface EncounterTypeSelectorProps {
   selectedType: EncounterType;
@@ -16,14 +17,14 @@ const ENCOUNTER_TYPES: { type: EncounterType; label: string }[] = [
 export default function EncounterTypeSelector({ selectedType, onTypeChange }: EncounterTypeSelectorProps) {
   return (
     <SectionWrapper title="Encounter Type">
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Choose encounter type" aria-describedby="encounter-type-help">
+      <div className="encounter-picks" role="group" aria-label="Choose encounter type" aria-describedby="encounter-type-help">
         {ENCOUNTER_TYPES.map(({ type, label }) => (
           <Button
             key={type}
             variant={selectedType === type ? 'primary' : 'secondary'}
             size="sm"
             onClick={() => onTypeChange(type)}
-            className="capitalize"
+            data-capitalize
             aria-pressed={selectedType === type}
           >
             {label}

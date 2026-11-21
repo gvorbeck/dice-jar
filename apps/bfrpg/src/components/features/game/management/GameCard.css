@@ -1,0 +1,21 @@
+@layer components {
+  .game-notes > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .game-notes-head {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 3);
+  }
+  .game-notes .typography[data-variant='body'] {
+    font-size: var(--text-sm);
+    line-height: 1.625;
+    color: var(--zinc-300);
+  }
+  .game-stats {
+    padding-top: calc(var(--space) * 2);
+  }
+  .game-stats .stat-card {
+    border-color: color-mix(in oklab, var(--zinc-700) 50%, transparent);
+  }
+}

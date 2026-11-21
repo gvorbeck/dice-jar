@@ -39,7 +39,6 @@ export interface TreasureTypeConfig {
 export interface CoinConfig {
   key: string;
   label: string;
-  color: string;
 }
 
 // Dice and mechanics types

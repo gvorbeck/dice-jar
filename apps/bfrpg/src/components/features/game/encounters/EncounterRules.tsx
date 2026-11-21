@@ -2,6 +2,7 @@ import { Typography } from '@/components/ui/core/display';
 import { Card } from '@/components/ui/core/display';
 import { SectionWrapper } from '@/components/ui/core/layout';
 import type { EncounterType } from '@/types';
+import './Encounters.css';
 
 interface EncounterRulesProps {
   encounterType: EncounterType;
@@ -10,7 +11,7 @@ interface EncounterRulesProps {
 export default function EncounterRules({ encounterType }: EncounterRulesProps) {
   return (
     <SectionWrapper title="Encounter Rules">
-      <Card variant="nested" size="compact" className="space-y-2">
+      <Card variant="nested" size="compact" className="encounter-notes">
         <Typography variant="bodySmall" color="secondary">
           <strong>Encounter Check:</strong> Roll 1d6, encounter occurs on a roll of 1
         </Typography>

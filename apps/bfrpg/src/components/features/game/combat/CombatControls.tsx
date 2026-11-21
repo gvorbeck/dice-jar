@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/core/primitives';
 import { Typography, Card } from '@/components/ui/core/display';
+import './Combat.css';
 
 interface CombatControlsProps {
   isCombatActive: boolean;
@@ -30,8 +31,8 @@ export default function CombatControls({
 }: CombatControlsProps) {
   return (
     <>
-      <Card size="compact" variant="nested" className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <Card size="compact" variant="nested" className="combat-bar">
+        <div className="combat-bar-controls">
           {!isCombatActive ? (
             <Button
               onClick={onStartCombat}
@@ -53,8 +54,8 @@ export default function CombatControls({
         </div>
 
         {isCombatActive && (
-          <div className="text-right" role="status" aria-live="polite">
-            <Typography variant="body" color="zinc" className="font-semibold">
+          <div className="combat-bar-status" role="status" aria-live="polite">
+            <Typography variant="body" color="zinc">
               Round {round}
             </Typography>
             <Typography variant="bodySmall" color="secondary">
@@ -65,7 +66,7 @@ export default function CombatControls({
       </Card>
 
       {isCombatActive && (
-        <Typography variant="bodySmall" color="muted" className="mt-1">
+        <Typography variant="bodySmall" color="muted" className="combat-hint">
           Shortcuts: Space (Next) • E (End)
         </Typography>
       )}

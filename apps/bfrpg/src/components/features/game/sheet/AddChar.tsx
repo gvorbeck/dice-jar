@@ -2,8 +2,8 @@ import { memo, useState, useCallback } from 'react';
 import { TextInput } from '@/components/ui/core/primitives';
 import { Button } from '@/components/ui/core/primitives';
 import { SectionWrapper } from '@/components/ui/core/layout';
-import { GAME_SHEET_STYLES } from '@/constants';
 import type { GamePlayer } from '@/types';
+import './AddChar.css';
 
 // Enhanced error messages for better user experience
 const ERROR_MESSAGES = {
@@ -104,10 +104,10 @@ export const AddChar = memo(({ onAddPlayer, className = '', disabled = false, ex
 
   return (
     <SectionWrapper title="Add Character" className={className} collapsible={true} collapsibleKey="add-character">
-      <div className="p-4 space-y-3">
+      <div className="add-char">
         {/* Horizontal layout for input and button */}
-        <div className="flex gap-3 items-center">
-          <div className="flex-1">
+        <div className="add-char-row">
+          <div>
             <TextInput
               type="url"
               value={url}
@@ -128,7 +128,6 @@ export const AddChar = memo(({ onAddPlayer, className = '', disabled = false, ex
             loadingText="Adding..."
             variant="primary"
             size="md"
-            className="flex-shrink-0"
           >
             Add Character
           </Button>
@@ -136,7 +135,7 @@ export const AddChar = memo(({ onAddPlayer, className = '', disabled = false, ex
 
         {/* Error message below the input/button row */}
         {error && (
-          <div id="add-char-error" className={`text-sm ${GAME_SHEET_STYLES.colors.text.error}`} role="alert">
+          <div id="add-char-error" className="add-char-error" role="alert">
             {error}
           </div>
         )}

@@ -1,6 +1,7 @@
 import { SectionWrapper } from '@/components/ui/core/layout';
 import CombatantCard from './CombatantCard';
 import type { CombatantWithInitiative } from '@/types';
+import './Combat.css';
 
 interface CombatantsListProps {
   title: string;
@@ -14,7 +15,7 @@ export default function CombatantsList({ title, combatants, variant, onAction }:
 
   return (
     <SectionWrapper title={title}>
-      <div className="space-y-3 p-3">
+      <div className="combatants-list">
         {combatants.map((combatant, index) => (
           <CombatantCard
             key={`combatant-${combatant.name}-${combatant.ac || 'no-ac'}-${index}`}

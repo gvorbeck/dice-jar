@@ -1,12 +1,13 @@
 import { memo, useState, useCallback } from 'react';
 import type { GamePlayer } from '@/types';
-import { GAME_SHEET_STYLES, LOADING_MESSAGES } from '@/constants';
+import { LOADING_MESSAGES } from '@/constants';
 import { HorizontalRule } from '@/components/ui/composite';
 import { SectionWrapper } from '@/components/ui/core/layout';
 import { LoadingState } from '@/components/ui/core/feedback';
 import { DeletionModal } from '@/components/modals/base/ConfirmationModal';
 import { useDataResolver } from '@/hooks';
 import { PlayerCard } from './PlayerCard';
+import './PlayersSection.css';
 
 interface PlayersSectionProps {
   players: GamePlayer[];
@@ -64,8 +65,8 @@ export const PlayersSection = memo(({ players, showDivider = false, onDeletePlay
     <>
       {showDivider && <HorizontalRule />}
       <SectionWrapper title={`Players (${players.length})`}>
-        <div className="p-4">
-          <div className={`${GAME_SHEET_STYLES.layout.cardGrid} ${GAME_SHEET_STYLES.spacing.cardGap}`}>
+        <div className="players-body">
+          <div className="players-grid">
             {players.map((player, index) => (
               <PlayerCard
                 key={`${player.user}-${player.character}-${index}`}
@@ -76,7 +77,7 @@ export const PlayersSection = memo(({ players, showDivider = false, onDeletePlay
             ))}
           </div>
 
-          {isLoading && <LoadingState message={LOADING_MESSAGES.loadingPlayerData} variant="inline" className="py-4" />}
+          {isLoading && <LoadingState message={LOADING_MESSAGES.loadingPlayerData} variant="inline" className="players-loading" />}
         </div>
       </SectionWrapper>
 

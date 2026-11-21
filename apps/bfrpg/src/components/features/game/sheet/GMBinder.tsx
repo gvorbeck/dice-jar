@@ -7,6 +7,7 @@ import { TurnUndeadTab } from './TurnUndeadTab';
 import { useDataResolver } from '@/hooks';
 import { CLASSES_WITH_SKILLS } from '@/constants';
 import type { Game, GameCombatant } from '@/types';
+import './GMBinder.css';
 
 interface GMBinderProps {
   className?: string;
@@ -62,7 +63,7 @@ export const GMBinder = memo(({ className, game, onAddToCombat }: GMBinderProps)
 
   return (
     <SectionWrapper title="GM Binder" {...(className && { className })} collapsible={true} collapsibleKey="gm-binder">
-      <div className="p-4">
+      <div className="gm-binder">
         <Tabs value={selectedTab} onValueChange={handleTabChange}>
           <TabList aria-label="GM resources">
             <Tab value="spells">Spells</Tab>

@@ -1,0 +1,274 @@
+@layer components {
+  .treasure > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .treasure-types > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .treasure-subtype > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .treasure-kinds {
+    display: grid;
+    gap: calc(var(--space) * 3);
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .treasure-kinds .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--space) * 2);
+    height: 3rem;
+    font-weight: 500;
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .treasure-kinds .btn[data-hovered],
+  .treasure-kinds .btn[data-focused] {
+    transform: scale(1.02);
+  }
+  .treasure-center {
+    display: flex;
+    justify-content: center;
+  }
+
+  .treasure-error,
+  .treasure-fallback.card {
+    --edge: var(--red-300);
+    --tint: var(--red-50);
+    --ink: var(--red-600);
+    --ink-strong: var(--red-800);
+    --ink-soft: var(--red-700);
+    border: 2px solid var(--edge);
+    background: var(--tint);
+  }
+  .treasure-error {
+    padding: calc(var(--space) * 4);
+    border-radius: var(--radius-lg);
+  }
+  .treasure-error-head {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+  }
+  .treasure-error .icon,
+  .treasure-fallback .icon {
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .treasure-error-head .typography {
+    color: var(--ink-strong);
+  }
+  .treasure-error > .typography {
+    margin: var(--space) 0 0 calc(var(--space) * 6);
+    color: var(--ink-soft);
+  }
+  .treasure-fallback-body {
+    padding: calc(var(--space) * 4);
+    text-align: center;
+  }
+  .treasure-fallback .icon {
+    margin: 0 auto calc(var(--space) * 2);
+  }
+  .treasure-fallback .typography[data-variant='h6'] {
+    margin-bottom: calc(var(--space) * 2);
+    color: var(--ink-strong);
+  }
+  .treasure-fallback .typography[data-variant='bodySmall'] {
+    margin-bottom: calc(var(--space) * 3);
+    color: var(--ink-soft);
+  }
+  .treasure-fallback .btn:first-of-type {
+    margin-right: calc(var(--space) * 2);
+  }
+
+  .treasure-result.card {
+    border-color: var(--zinc-200);
+    background: var(--white);
+    box-shadow:
+      0 10px 15px -3px color-mix(in srgb, var(--black) 10%, transparent),
+      0 4px 6px -4px color-mix(in srgb, var(--black) 10%, transparent);
+  }
+  .treasure-result-body > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .treasure-result-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .treasure-result-head > div {
+    display: flex;
+    gap: calc(var(--space) * 2);
+  }
+  .treasure-section > .typography {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .treasure-grid {
+    display: grid;
+    gap: calc(var(--space) * 2);
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .treasure-grid[data-kind='coins'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .treasure-chip {
+    --tint: var(--amber-50);
+    --edge: var(--amber-200);
+    --ink: var(--amber-900);
+    --accent: var(--amber-600);
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+    padding: calc(var(--space) * 2);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    background: var(--tint);
+  }
+  .treasure-chip span {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .treasure-chip .icon {
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .treasure-chip[data-kind='gem'],
+  .treasure-chip[data-kind='magic'] {
+    align-items: flex-start;
+  }
+  .treasure-chip[data-kind='gem'] {
+    --tint: var(--purple-50);
+    --edge: var(--purple-200);
+    --ink: var(--purple-900);
+    --accent: var(--purple-600);
+  }
+  .treasure-chip[data-kind='magic'] {
+    --tint: var(--blue-50);
+    --edge: var(--blue-200);
+    --ink: var(--blue-900);
+    --accent: var(--blue-600);
+    padding: calc(var(--space) * 3);
+  }
+  .treasure-chip[data-kind='gem'] .icon,
+  .treasure-chip[data-kind='magic'] .icon {
+    margin-top: calc(var(--space) * 0.5);
+  }
+  .treasure-chip[data-kind='gem'] span,
+  .treasure-chip[data-kind='magic'] span {
+    line-height: 1.25;
+  }
+  .treasure-chip[data-kind='gem'] span {
+    font-weight: 400;
+  }
+  .treasure-chip[data-coin='platinum'] {
+    --accent: var(--purple-600);
+  }
+  .treasure-chip[data-coin='gold'] {
+    --accent: var(--yellow-600);
+  }
+  .treasure-chip[data-coin='electrum'] {
+    --accent: var(--blue-600);
+  }
+  .treasure-chip[data-coin='silver'] {
+    --accent: var(--gray-600);
+  }
+  .treasure-chip[data-coin='copper'] {
+    --accent: var(--orange-600);
+  }
+  .treasure-details {
+    margin-top: calc(var(--space) * 4);
+  }
+  .treasure-details summary {
+    cursor: pointer;
+    padding: var(--space) calc(var(--space) * 2);
+    border-radius: var(--radius);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    font-weight: 500;
+    color: var(--zinc-800);
+    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .treasure-details summary:hover,
+  .treasure-details summary:focus {
+    color: var(--zinc-900);
+  }
+  .treasure-details summary:focus {
+    box-shadow: 0 0 0 2px var(--blue-500);
+  }
+  .treasure-details-body {
+    margin-top: calc(var(--space) * 3);
+    padding: calc(var(--space) * 3);
+    border: 1px solid var(--zinc-200);
+    border-radius: var(--radius);
+    background: var(--zinc-50);
+  }
+  @media (min-width: 40rem) {
+    .treasure-kinds {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .treasure-grid[data-kind='coins'] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .treasure-grid[data-wide='gem'] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .treasure-grid[data-wide='magic'] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .treasure-grid[data-kind='coins'] {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .treasure-grid[data-wide='gem'] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (prefers-color-scheme: dark) {
+    .treasure-error,
+    .treasure-fallback.card {
+      --edge: var(--red-700);
+      --tint: color-mix(in oklab, var(--red-900) 20%, transparent);
+      --ink: var(--red-400);
+      --ink-strong: var(--red-200);
+      --ink-soft: var(--red-300);
+    }
+    .treasure-result.card {
+      border-color: var(--zinc-700);
+      background: var(--zinc-800);
+    }
+    .treasure-chip {
+      --tint: color-mix(in oklab, var(--amber-900) 20%, transparent);
+      --edge: var(--amber-700);
+      --ink: var(--amber-100);
+    }
+    .treasure-chip[data-coin] .icon {
+      filter: brightness(1.25);
+    }
+    .treasure-chip[data-kind='gem'] {
+      --tint: color-mix(in oklab, var(--purple-900) 20%, transparent);
+      --edge: var(--purple-700);
+      --ink: var(--purple-100);
+      --accent: var(--purple-400);
+    }
+    .treasure-chip[data-kind='magic'] {
+      --tint: color-mix(in oklab, var(--blue-900) 20%, transparent);
+      --edge: var(--blue-700);
+      --ink: var(--blue-100);
+      --accent: var(--blue-400);
+    }
+    .treasure-details summary {
+      color: var(--zinc-200);
+    }
+    .treasure-details summary:hover,
+    .treasure-details summary:focus {
+      color: var(--zinc-100);
+    }
+    .treasure-details-body {
+      border-color: var(--zinc-700);
+      background: color-mix(in oklab, var(--zinc-800) 50%, transparent);
+    }
+  }
+}

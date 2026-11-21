@@ -4,6 +4,7 @@ import { SectionWrapper } from '@/components/ui/core/layout';
 import { TextArea } from '@/components/ui/core/primitives';
 import { Typography } from '@/components/ui/core/display';
 import { useDebouncedUpdate } from '@/hooks';
+import './GameNotesSection.css';
 
 interface GameNotesSectionProps {
   notes: string;
@@ -32,9 +33,9 @@ export const GameNotesSection = memo(({ notes, showDivider = false, editable = f
     <>
       {showDivider && <HorizontalRule />}
       <SectionWrapper title="Game Notes">
-        <div className="p-6">
+        <div className="game-notes-body">
           {editable ? (
-            <div className="space-y-2">
+            <div className="game-notes-edit">
               <TextArea
                 value={debouncedNotes.value}
                 onChange={debouncedNotes.onChange}
@@ -44,19 +45,17 @@ export const GameNotesSection = memo(({ notes, showDivider = false, editable = f
                 rows={12}
                 showClearButton={true}
                 aria-label="Game notes"
-                className="!bg-zinc-800/50 !border-zinc-600/50 leading-relaxed"
+                className="note-input"
                 resize="vertical"
               />
-              <div className="flex items-center justify-between text-xs text-zinc-500">
+              <div className="note-foot">
                 <span>{debouncedNotes.value.length} / 5000 characters</span>
-                <span className="text-zinc-600">
-                  {debouncedNotes.isSaving ? 'Saving...' : 'Saves automatically after you stop typing (500ms)'}
-                </span>
+                <span>{debouncedNotes.isSaving ? 'Saving...' : 'Saves automatically after you stop typing (500ms)'}</span>
               </div>
             </div>
           ) : (
-            <div className="prose prose-zinc prose-invert max-w-none">
-              <Typography variant="body" color="secondary" className="whitespace-pre-wrap leading-relaxed">
+            <div className="game-notes-read">
+              <Typography variant="body" color="secondary">
                 {notes}
               </Typography>
             </div>

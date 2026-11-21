@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/core/primitives';
 import { Icon } from '@/components/ui';
 import type { Cantrip } from '@/types';
 import type { SpellTypeInfo } from '@/types';
+import './CantripCard.css';
 
 interface CantripCardProps {
   cantrip: Cantrip;
@@ -12,7 +13,7 @@ interface CantripCardProps {
   className?: string;
 }
 
-export default function CantripCard({ cantrip, spellTypeInfo, onRemove, showRemove = true, className = '' }: CantripCardProps) {
+export default function CantripCard({ cantrip, spellTypeInfo, onRemove, showRemove = true, className }: CantripCardProps) {
   return (
     <Card
       className={className}
@@ -20,26 +21,18 @@ export default function CantripCard({ cantrip, spellTypeInfo, onRemove, showRemo
       role="article"
       aria-labelledby={`cantrip-${cantrip.name.replace(/\s+/g, '-').toLowerCase()}-title`}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 space-y-3 min-w-0">
-          <div className="flex items-center gap-3">
-            <Icon name="lightning" size="md" className="text-blue-400" aria-hidden={true} />
-            <Typography
-              variant="subHeading"
-              className="text-zinc-100"
-              id={`cantrip-${cantrip.name.replace(/\s+/g, '-').toLowerCase()}-title`}
-            >
+      <div className="cantrip-card-row">
+        <div className="cantrip-card-main">
+          <div className="cantrip-card-title">
+            <Icon name="lightning" size="md" aria-hidden={true} />
+            <Typography variant="subHeading" id={`cantrip-${cantrip.name.replace(/\s+/g, '-').toLowerCase()}-title`}>
               {cantrip.name}
             </Typography>
             <Badge variant="status" aria-label={`This is a ${spellTypeInfo.singular}`}>
               {spellTypeInfo.capitalizedSingular}
             </Badge>
           </div>
-          <Typography
-            variant="caption"
-            className="text-zinc-400 text-sm"
-            aria-describedby={`cantrip-${cantrip.name.replace(/\s+/g, '-').toLowerCase()}-title`}
-          >
+          <Typography variant="caption" aria-describedby={`cantrip-${cantrip.name.replace(/\s+/g, '-').toLowerCase()}-title`}>
             {cantrip.description}
           </Typography>
         </div>
@@ -48,7 +41,7 @@ export default function CantripCard({ cantrip, spellTypeInfo, onRemove, showRemo
             size="sm"
             variant="ghost"
             onClick={() => onRemove(cantrip.name)}
-            className="text-zinc-400 hover:text-red-400 flex-shrink-0"
+            className="cantrip-remove"
             aria-label={`Remove ${cantrip.name} ${spellTypeInfo.singular}`}
             icon="trash"
           />

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/core/primitives';
 import { SectionWrapper } from '@/components/ui/core/layout';
 import type { EncounterType, DungeonLevel, WildernessType, CityType } from '@/types';
+import './Encounters.css';
 
 interface EncounterSubtypeSelectorProps {
   encounterType: EncounterType;
@@ -41,7 +42,7 @@ export default function EncounterSubtypeSelector({
   if (encounterType === 'dungeon') {
     return (
       <SectionWrapper title="Dungeon Level">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Select dungeon level" aria-describedby="dungeon-level-help">
+        <div className="encounter-picks" role="group" aria-label="Select dungeon level" aria-describedby="dungeon-level-help">
           {DUNGEON_LEVELS.map((level) => (
             <Button
               key={level}
@@ -64,14 +65,13 @@ export default function EncounterSubtypeSelector({
   if (encounterType === 'wilderness') {
     return (
       <SectionWrapper title="Terrain Type">
-        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Select terrain type" aria-describedby="terrain-type-help">
+        <div className="encounter-picks" data-grid role="group" aria-label="Select terrain type" aria-describedby="terrain-type-help">
           {WILDERNESS_TYPES.map((terrain) => (
             <Button
               key={terrain}
               variant={wildernessType === terrain ? 'primary' : 'secondary'}
               size="sm"
               onClick={() => onWildernessTypeChange(terrain)}
-              className="text-xs"
               aria-pressed={wildernessType === terrain}
             >
               {terrain}
@@ -88,7 +88,7 @@ export default function EncounterSubtypeSelector({
   if (encounterType === 'city') {
     return (
       <SectionWrapper title="Time of Day">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Select time of day" aria-describedby="time-of-day-help">
+        <div className="encounter-picks" role="group" aria-label="Select time of day" aria-describedby="time-of-day-help">
           {CITY_TYPES.map((time) => (
             <Button
               key={time}

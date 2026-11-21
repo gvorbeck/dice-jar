@@ -6,6 +6,7 @@ import type { TableColumn } from '@/components/ui/composite/Table';
 import { TURN_UNDEAD_TABLE, formatTurnUndeadResult } from '@/data/turnUndead';
 import type { Game } from '@/types';
 import { usePlayerCharacters } from '@/hooks';
+import './TurnUndeadTab.css';
 
 interface TurnUndeadTabProps {
   game: Game;
@@ -32,32 +33,32 @@ const formatDisplayValue = (value: string | number): string => {
   return `${value}+`;
 };
 
-// Helper to get color class based on value
-const getColorClass = (value: string | number): string => {
-  if (value === 'D') return 'text-green-400 font-semibold';
-  if (value === 'T') return 'text-blue-400 font-semibold';
-  if (value === 'No') return 'text-red-400/60';
-  return 'text-zinc-300';
+// Helper to name how a result reads on the table
+const getResult = (value: string | number): 'destroy' | 'turn' | 'none' | 'roll' => {
+  if (value === 'D') return 'destroy';
+  if (value === 'T') return 'turn';
+  if (value === 'No') return 'none';
+  return 'roll';
 };
 
 // Extracted components to avoid inline component definitions
-const UndeadTypeCell = ({ undeadType }: { undeadType: string }) => <span className="font-medium text-zinc-100">{undeadType}</span>;
+const UndeadTypeCell = ({ undeadType }: { undeadType: string }) => <span className="undead-type">{undeadType}</span>;
 
-const HitDiceCell = ({ hitDice }: { hitDice: string }) => <span className="text-zinc-400 text-xs">{hitDice}</span>;
+const HitDiceCell = ({ hitDice }: { hitDice: string }) => <span className="undead-dice">{hitDice}</span>;
 
 const ClericHeader = ({ name, level }: { name: string; level: number }) => (
-  <div className="flex flex-col w-full text-center">
-    <span className="text-xs">{name}</span>
-    <span className="text-[10px] text-amber-300/70 font-normal">(Lvl {level})</span>
+  <div className="undead-cleric">
+    <span>{name}</span>
+    <span>(Lvl {level})</span>
   </div>
 );
 
 const TurnUndeadCell = ({ value }: { value: string | number }) => {
   const displayValue = formatDisplayValue(value);
-  const colorClass = getColorClass(value);
+  const result = getResult(value);
 
   return (
-    <span className={colorClass} title={formatTurnUndeadResult(value)}>
+    <span className="undead-result" data-result={result} title={formatTurnUndeadResult(value)}>
       {displayValue}
     </span>
   );
@@ -158,17 +159,17 @@ const TurnUndeadTabContent = memo(({ game, className }: TurnUndeadTabProps) => {
 
   return (
     <section className={className} aria-label="Turn Undead reference table">
-      <Card className="overflow-hidden">
-        <div className="p-4 border-b border-zinc-700">
+      <Card className="undead-card">
+        <div className="undead-head">
           <Typography variant="h4" weight="semibold">
             Turn Undead Table
           </Typography>
-          <Typography variant="caption" color="muted" className="mt-1 block">
+          <Typography variant="caption" color="muted">
             Roll 1d20. Numbers show minimum roll needed to turn. T = Auto Turn, D = Auto Destroy
           </Typography>
         </div>
 
-        <div className="p-4">
+        <div className="undead-body">
           <Table
             columns={columns as TableColumn<Record<string, unknown>>[]}
             data={tableData as Record<string, unknown>[]}
@@ -180,23 +181,23 @@ const TurnUndeadTabContent = memo(({ game, className }: TurnUndeadTabProps) => {
           />
         </div>
 
-        <div className="px-4 pb-4 space-y-2">
-          <div className="text-xs text-zinc-400" role="note">
+        <div className="undead-legend">
+          <div className="undead-key" role="note">
             <Typography variant="caption" color="muted" weight="semibold">
               Legend:
             </Typography>
-            <ul className="mt-1 space-y-1 ml-4 list-disc">
+            <ul>
               <li>
-                <span className="text-zinc-300">Number (e.g., 13+)</span> - Minimum d20 roll needed to turn
+                <span>Number (e.g., 13+)</span> - Minimum d20 roll needed to turn
               </li>
               <li>
-                <span className="text-blue-400 font-semibold">T</span> - Auto Turn (undead automatically turned, no roll needed)
+                <span data-result="turn">T</span> - Auto Turn (undead automatically turned, no roll needed)
               </li>
               <li>
-                <span className="text-green-400 font-semibold">D</span> - Auto Destroy (undead automatically destroyed)
+                <span data-result="destroy">D</span> - Auto Destroy (undead automatically destroyed)
               </li>
               <li>
-                <span className="text-red-400/60">—</span> - Cannot Turn (character cannot affect these undead)
+                <span data-result="none">—</span> - Cannot Turn (character cannot affect these undead)
               </li>
             </ul>
           </div>

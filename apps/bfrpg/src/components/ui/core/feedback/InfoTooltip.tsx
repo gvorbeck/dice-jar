@@ -13,8 +13,6 @@ interface InfoTooltipProps {
   iconName?: IconName;
   /** Icon size */
   iconSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  /** Additional CSS classes for the icon */
-  iconClassName?: string;
   /** Whether to disable the tooltip */
   disabled?: boolean;
   /** Accessible label for screen readers */
@@ -31,11 +29,10 @@ export default function InfoTooltip({
   className,
   iconName = 'info-question',
   iconSize = 'sm',
-  iconClassName,
   disabled = false,
   ariaLabel = 'More information',
 }: InfoTooltipProps) {
-  const finalIconClassName = iconClassName || cn('info-tip-icon', className);
+  const finalIconClassName = cn('info-tip-icon', className);
 
   return (
     <Tooltip content={content} disabled={disabled}>

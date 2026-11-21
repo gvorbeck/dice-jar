@@ -109,6 +109,18 @@
   .hero-name {
     overflow-wrap: break-word;
   }
+  .hero-card[data-size='sm'] .hero-name.typography:not([data-editable]) {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl-lh);
+  }
+  .hero-card[data-size='md'] .hero-name.typography:not([data-editable]) {
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl-lh);
+  }
+  .hero-card[data-size='lg'] .hero-name.typography:not([data-editable]) {
+    font-size: var(--text-3xl);
+    line-height: var(--text-3xl-lh);
+  }
   .hero-name[data-editable] {
     cursor: pointer;
     border-radius: var(--radius);
@@ -223,6 +235,10 @@
       font-size: var(--text-3xl);
       line-height: var(--text-3xl-lh);
     }
+    .hero-card[data-size='lg'] .hero-name.typography:not([data-editable]) {
+      font-size: var(--text-4xl);
+      line-height: var(--text-4xl-lh);
+    }
   }
   /* The gear in the hero's corner. Square padding from 640px; below it the size's own padding applies. */
   .btn.hero-settings {
@@ -270,5 +286,57 @@
   .avatar-edit:hover .btn.avatar-overlay,
   .btn.avatar-overlay[data-focus-visible] {
     opacity: 1;
+  }
+}
+
+@layer components {
+  /* The game sheet's banner is the same layout in lime. */
+  .hero-card[data-theme='lime'] {
+    border-color: var(--lime-600);
+    background-image: linear-gradient(to bottom right in oklab, var(--lime-400), var(--lime-500));
+    box-shadow: 0 6px 0 0 var(--lime-900);
+  }
+  .hero-card[data-theme='lime'] .hero-avatar .icon {
+    color: var(--lime-300);
+  }
+  .hero-card[data-theme='lime'] .hero-name-row {
+    max-width: none;
+  }
+  .hero-card[data-theme='lime'] .hero-name-row[data-clickable] {
+    cursor: pointer;
+  }
+  .hero-card[data-theme='lime'] .hero-name[data-clickable]:focus {
+    border-radius: var(--radius);
+    box-shadow:
+      0 0 0 2px var(--lime-400),
+      0 0 0 4px var(--lime-600);
+  }
+  .hero-card[data-theme='lime'] .hero-edit-icon {
+    right: 0;
+  }
+  .game-hero-tools {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    justify-content: center;
+    gap: var(--space);
+    margin-top: calc(var(--space) * 2);
+  }
+  .game-hero-tools-wide {
+    display: none;
+  }
+  @media (min-width: 40rem) {
+    .hero-card[data-theme='lime'] .hero-edit-icon {
+      right: 0;
+    }
+    .game-hero-tools {
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: calc(var(--space) * 2);
+      margin-top: 0;
+    }
+    .game-hero-tools-wide {
+      display: block;
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/core/primitives';
 import { Typography, Card, Badge, Image } from '@/components/ui/core/display';
 import type { CombatantWithInitiative } from '@/types';
+import './Combat.css';
 
 interface CombatantCardProps {
   combatant: CombatantWithInitiative;
@@ -15,17 +16,18 @@ export default function CombatantCard({ combatant, index, variant, onAction, isA
     <Card
       size="compact"
       hover
-      className={isActive ? 'border-amber-500 bg-amber-900/20' : undefined}
+      className="combatant"
+      data-active={isActive || undefined}
       role="listitem"
       aria-label={`${combatant.name}, ${combatant.isPlayer ? 'Player' : 'Monster'}, AC ${combatant.ac}`}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="combatant-row">
+        <div className="combatant-who">
           {combatant.avatar && typeof combatant.avatar === 'string' && (
-            <Image variant="avatar" size="xs" src={combatant.avatar} alt={`${combatant.name} avatar`} className="flex-shrink-0" />
+            <Image variant="avatar" size="xs" src={combatant.avatar} alt={`${combatant.name} avatar`} />
           )}
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
+          <div>
+            <div className="combatant-name">
               <Typography variant="body" color="zinc">
                 {combatant.name}
               </Typography>

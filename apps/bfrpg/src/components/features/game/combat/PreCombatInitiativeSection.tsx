@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/core/primitives';
 import InitiativeTable from './InitiativeTable';
 import type { CombatantWithInitiative } from '@/types';
 import { rollInitiative } from '@/utils';
+import './Combat.css';
 
 interface PreCombatInitiativeSectionProps {
   combatants: CombatantWithInitiative[];
@@ -22,9 +23,9 @@ export default function PreCombatInitiativeSection({
 
   return (
     <SectionWrapper title="Set Initiative" collapsible collapsibleKey="pre-combat-initiative">
-      <div className="p-2">
-        <div className="mb-3">
-          <Typography variant="bodySmall" color="secondary" className="mb-3">
+      <div className="precombat">
+        <div className="precombat-intro">
+          <Typography variant="bodySmall" color="secondary">
             Set custom initiative values before starting combat, or leave at 0 to auto-roll when combat begins.
           </Typography>
 
@@ -50,7 +51,6 @@ export default function PreCombatInitiativeSection({
               }}
               variant="secondary"
               size="sm"
-              className="mb-3"
             >
               Roll Initiative for Monsters
             </Button>

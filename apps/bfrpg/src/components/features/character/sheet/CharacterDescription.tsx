@@ -43,7 +43,7 @@ export default function CharacterDescription({
             rows={size === 'lg' ? 12 : size === 'md' ? 8 : 6}
             showClearButton={true}
             aria-label="Character description and notes"
-            className="desc-input"
+            className="note-input"
             resize="vertical"
           />
         ) : (
@@ -51,7 +51,7 @@ export default function CharacterDescription({
         )}
 
         {editable && (
-          <div className="desc-foot">
+          <div className="note-foot">
             <span>{debouncedDescription.value.length} / 5000 characters</span>
             <span>{debouncedDescription.isSaving ? 'Saving...' : 'Saves automatically after you stop typing (500ms)'}</span>
           </div>

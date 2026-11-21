@@ -3,7 +3,6 @@ import { Accordion } from '@/components/ui/core/layout';
 import { Card, Typography } from '@/components/ui/core/display';
 import { LoadingState } from '@/components/ui/core/feedback';
 import { useLoadingState } from '@/hooks';
-import { GAME_SHEET_STYLES } from '@/constants';
 import { CACHE_KEYS } from '@/constants';
 import { GM_BINDER_MESSAGES } from '@/constants';
 import { categorizeMonster, createSearchableText } from '@/utils';
@@ -70,10 +69,8 @@ export const BestiaryTab = memo(({ onAddToCombat }: BestiaryTabProps) => {
 
   if (monsters.length === 0) {
     return (
-      <Card variant="standard" className="p-8 text-center">
-        <Typography variant="body" className={GAME_SHEET_STYLES.colors.text.secondary}>
-          {GM_BINDER_MESSAGES.NO_MONSTERS}
-        </Typography>
+      <Card variant="standard" className="empty-card">
+        <Typography variant="body">{GM_BINDER_MESSAGES.NO_MONSTERS}</Typography>
       </Card>
     );
   }

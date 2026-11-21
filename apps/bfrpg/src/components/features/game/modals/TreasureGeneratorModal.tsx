@@ -9,6 +9,7 @@ import { generateTreasure, formatTreasureResult, logger, getCoinsToDisplay, hasC
 import { TREASURE_TYPES, LAIR_TREASURE_TYPES, INDIVIDUAL_TREASURE_TYPES, UNGUARDED_TREASURE_LEVELS } from '@/constants';
 import type { IndividualTreasureType, LairTreasureType, TreasureResult, TreasureType, UnguardedTreasureLevel } from '@/types';
 import '../GameButtons.css';
+import './TreasureGeneratorModal.css';
 
 interface TreasureGeneratorModalProps {
   isOpen: boolean;
@@ -120,21 +121,20 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Treasure Generator" size="lg">
-      <div className="space-y-6">
+      <div className="treasure">
         {/* Treasure Type Selection */}
-        <div className="space-y-4">
+        <div className="treasure-types">
           <Typography variant="h3" weight="semibold">
             Select Treasure Type
           </Typography>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup" aria-label="Treasure type selection">
+          <div className="treasure-kinds" role="radiogroup" aria-label="Treasure type selection">
             {TREASURE_TYPES.map((type) => (
               <Button
                 key={type.value}
                 variant={treasureType === type.value ? 'primary' : 'secondary'}
                 size="md"
                 onClick={() => setTreasureType(type.value as TreasureType)}
-                className="h-12 flex items-center justify-center gap-2 font-medium transition-all hover:scale-[1.02] focus:scale-[1.02]"
                 icon={type.icon as IconName}
                 iconSize="sm"
                 role="radio"
@@ -148,7 +148,7 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
         </div>
 
         {/* Subtype Selection */}
-        <div className="space-y-3">
+        <div className="treasure-subtype">
           <Typography variant="body" weight="medium" color="primary">
             {treasureType === 'lair' && 'Select Lair Type'}
             {treasureType === 'individual' && 'Select Individual Type'}
@@ -197,21 +197,19 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-700 rounded-lg p-4">
-            <div className="flex items-center gap-2">
-              <Icon name="exclamation-triangle" size="sm" className="text-red-600 dark:text-red-400 flex-shrink-0" />
-              <Typography variant="bodySmall" weight="semibold" className="text-red-800 dark:text-red-200">
+          <div className="treasure-error" id="generation-error">
+            <div className="treasure-error-head">
+              <Icon name="exclamation-triangle" size="sm" />
+              <Typography variant="bodySmall" weight="semibold">
                 Error generating treasure
               </Typography>
             </div>
-            <Typography variant="bodySmall" className="text-red-700 dark:text-red-300 mt-1 ml-6">
-              {error}
-            </Typography>
+            <Typography variant="bodySmall">{error}</Typography>
           </div>
         )}
 
         {/* Generate Button */}
-        <div className="flex justify-center">
+        <div className="treasure-center">
           <Button
             variant="primary"
             size="lg"
@@ -220,7 +218,7 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
             className="generate-button"
             icon="dice"
             iconSize="md"
-            iconClassName={isGenerating ? 'animate-spin' : ''}
+            data-busy={isGenerating || undefined}
             aria-label="Generate treasure"
             title="Generate treasure"
             aria-describedby={error ? 'generation-error' : undefined}
@@ -229,7 +227,7 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
 
         {/* Loading State */}
         {isGenerating && (
-          <div className="flex justify-center">
+          <div className="treasure-center">
             <LoadingState variant="inline" message="Generating treasure..." />
           </div>
         )}
@@ -238,16 +236,16 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
         {generatedTreasure && (
           <ErrorBoundary
             fallback={
-              <Card className="bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-700">
-                <div className="p-4 text-center">
-                  <Icon name="exclamation-triangle" size="md" className="text-red-600 dark:text-red-400 mx-auto mb-2" />
-                  <Typography variant="h6" color="secondary" weight="semibold" className="mb-2 text-red-800 dark:text-red-200">
+              <Card className="treasure-fallback">
+                <div className="treasure-fallback-body">
+                  <Icon name="exclamation-triangle" size="md" />
+                  <Typography variant="h6" color="secondary" weight="semibold">
                     Error Displaying Treasure
                   </Typography>
-                  <Typography variant="bodySmall" className="text-red-700 dark:text-red-300 mb-3">
+                  <Typography variant="bodySmall">
                     There was a problem displaying the generated treasure. The treasure data may be corrupted.
                   </Typography>
-                  <Button variant="secondary" size="sm" onClick={handleReset} className="mr-2">
+                  <Button variant="secondary" size="sm" onClick={handleReset}>
                     Try Again
                   </Button>
                   <Button variant="primary" size="sm" onClick={handleGenerate}>
@@ -257,13 +255,13 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
               </Card>
             }
           >
-            <Card className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 shadow-lg">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
+            <Card className="treasure-result">
+              <div className="treasure-result-body">
+                <div className="treasure-result-head">
                   <Typography variant="h3" weight="bold" color="primary">
                     {generatedTreasure.description}
                   </Typography>
-                  <div className="flex gap-2">
+                  <div>
                     <Button variant="ghost" size="sm" onClick={handleCopy} icon="copy" iconSize="sm" title="Copy treasure to clipboard" />
                     <Button variant="ghost" size="sm" onClick={handleReset} icon="close" iconSize="sm" title="Clear treasure result" />
                   </div>
@@ -271,19 +269,15 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
 
                 {/* Coins */}
                 {shouldShowCoins && (
-                  <div>
-                    <Typography variant="body" weight="semibold" className="mb-3">
+                  <div className="treasure-section">
+                    <Typography variant="body" weight="semibold">
                       Coins:
                     </Typography>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-sm" role="list" aria-label="Coin amounts">
+                    <div className="treasure-grid" data-kind="coins" role="list" aria-label="Coin amounts">
                       {coinsToDisplay.map((coin) => (
-                        <div
-                          key={coin.key}
-                          className="flex items-center gap-2 p-2 bg-amber-50 dark:bg-amber-900/20 rounded border border-amber-200 dark:border-amber-700"
-                          role="listitem"
-                        >
-                          <Icon name="coin" size="xs" className={`${coin.color} dark:brightness-125`} aria-hidden={true} />
-                          <span className="font-medium text-amber-900 dark:text-amber-100" aria-label={`${coin.amount} ${coin.key} pieces`}>
+                        <div key={coin.key} className="treasure-chip" data-coin={coin.key} role="listitem">
+                          <Icon name="coin" size="xs" aria-hidden={true} />
+                          <span aria-label={`${coin.amount} ${coin.key} pieces`}>
                             {coin.amount} {coin.label}
                           </span>
                         </div>
@@ -294,22 +288,15 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
 
                 {/* Gems & Jewelry */}
                 {generatedTreasure.gemsAndJewelry.length > 0 && (
-                  <div>
-                    <Typography variant="body" weight="semibold" className="mb-3">
+                  <div className="treasure-section">
+                    <Typography variant="body" weight="semibold">
                       Gems & Jewelry:
                     </Typography>
-                    <div
-                      className={`grid gap-2 text-sm ${
-                        generatedTreasure.gemsAndJewelry.length > 6 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
-                      }`}
-                    >
+                    <div className="treasure-grid" data-wide={generatedTreasure.gemsAndJewelry.length > 6 ? 'gem' : undefined}>
                       {generatedTreasure.gemsAndJewelry.map((item, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start gap-2 p-2 bg-purple-50 dark:bg-purple-900/20 rounded border border-purple-200 dark:border-purple-700"
-                        >
-                          <Icon name="star" size="xs" className="text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
-                          <span className="text-purple-900 dark:text-purple-100 leading-tight">{item}</span>
+                        <div key={index} className="treasure-chip" data-kind="gem">
+                          <Icon name="star" size="xs" />
+                          <span>{item}</span>
                         </div>
                       ))}
                     </div>
@@ -318,22 +305,15 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
 
                 {/* Magic Items */}
                 {generatedTreasure.magicItems.length > 0 && (
-                  <div>
-                    <Typography variant="body" weight="semibold" className="mb-3">
+                  <div className="treasure-section">
+                    <Typography variant="body" weight="semibold">
                       Magic Items:
                     </Typography>
-                    <div
-                      className={`grid gap-2 text-sm ${
-                        generatedTreasure.magicItems.length > 4 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
-                      }`}
-                    >
+                    <div className="treasure-grid" data-wide={generatedTreasure.magicItems.length > 4 ? 'magic' : undefined}>
                       {generatedTreasure.magicItems.map((item, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-700"
-                        >
-                          <Icon name="lightning" size="xs" className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                          <span className="text-blue-900 dark:text-blue-100 leading-tight font-medium">{item}</span>
+                        <div key={index} className="treasure-chip" data-kind="magic">
+                          <Icon name="lightning" size="xs" />
+                          <span>{item}</span>
                         </div>
                       ))}
                     </div>
@@ -342,11 +322,9 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
 
                 {/* Generation Details */}
                 {generatedTreasure.breakdown.length > 0 && (
-                  <details className="mt-4">
-                    <summary className="cursor-pointer text-sm font-medium text-zinc-800 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-zinc-100 focus:text-zinc-900 dark:focus:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1 transition-colors">
-                      Generation Details
-                    </summary>
-                    <div className="mt-3 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded border border-zinc-200 dark:border-zinc-700">
+                  <details className="treasure-details">
+                    <summary>Generation Details</summary>
+                    <div className="treasure-details-body">
                       <List variant="grid" spacing="tight" size="sm">
                         {generatedTreasure.breakdown.map((detail, index) => (
                           <GridListItem key={index}>{detail}</GridListItem>
