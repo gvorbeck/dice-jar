@@ -8,8 +8,6 @@
 [![React](https://img.shields.io/badge/React-19.1-61dafb?style=flat&logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.1-646cff?style=flat&logo=vite)](https://vitejs.dev/)
-[![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5.x-ff6b6b?style=flat&logo=react-query)](https://tanstack.com/query)
-[![Zustand](https://img.shields.io/badge/Zustand-5.x-000000?style=flat&logo=zustand)](https://zustand-demo.pmnd.rs/)
 [![Firebase](https://img.shields.io/badge/Firebase-12.2-ffca28?style=flat&logo=firebase)](https://firebase.google.com/)
 [![Vitest](https://img.shields.io/badge/Vitest-4.0-729b1b?style=flat&logo=vitest)](https://vitest.dev/)
 [![Playwright](https://img.shields.io/badge/Playwright-1.55-45ba4b?style=flat&logo=playwright)](https://playwright.dev/)
@@ -40,9 +38,10 @@ Codex.Quest is a comprehensive web-based character creation and management syste
 - **TypeScript 5.9** for type-safe development
 - **Vite 7.1** for fast development and optimized builds
 - **Plain CSS** with design tokens (`src/styles/tokens.css`), one stylesheet beside each component, and `@dice-jar/cn` for conditional classes
-- **Wouter 3.7** for lightweight client-side routing
-- **TanStack Query 5.x** for server state management and caching
-- **Zustand 5.x** for client-side state management with persistence
+- **react-router-dom 7** for client-side routing
+- **`useSub`** (`@dice-jar/browser`) for live Firestore data, and **`@dice-jar/diff`** so saves send only the changed fields
+- **`createStore`** (`src/lib/store.ts`) for client-side state kept in local storage
+- **`@dice-jar/dice`** for dice notation
 
 ### Backend & Services
 

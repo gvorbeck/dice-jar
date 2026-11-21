@@ -91,25 +91,16 @@ export default function ImportCharacterModal({ isOpen, onClose, userId }: Import
       }
 
       // 5. Save character (without ID to create new)
-      saveCharacter(
-        {
-          userId,
-          character: migratedCharacter,
-          // No characterId = create new character
-        },
-        {
-          onSuccess: () => {
-            notifications.showSuccess(`Successfully imported ${migratedCharacter.name}`);
-            onClose();
-            setSelectedFile(null);
-            setError(null);
-          },
-          onError: (error) => {
-            logger.error('Save error:', error);
-            setError('Failed to save character. Please try again.');
-          },
-        },
-      );
+      // No characterId = create new character
+      const id = await saveCharacter({ userId, character: migratedCharacter });
+      if (id === undefined) {
+        setError('Failed to save character. Please try again.');
+        return;
+      }
+      notifications.showSuccess(`Successfully imported ${migratedCharacter.name}`);
+      onClose();
+      setSelectedFile(null);
+      setError(null);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
       setError(errorMessage);

@@ -3,7 +3,7 @@ import { Modal } from '@/components/modals';
 import { Button, TextInput, FormField } from '@/components/ui/core/primitives';
 import { Icon } from '@/components/ui/core/display';
 import { TextHeader } from '@/components/ui/composite/TextHeader';
-import { roller, getErrorMessage } from '@/utils';
+import { rollNotation } from '@dice-jar/dice';
 import { useNotificationContext } from '@/hooks';
 import './DiceRollerModal.css';
 
@@ -14,7 +14,6 @@ interface DiceRollerModalProps {
 
 export default function DiceRollerModal({ isOpen, onClose }: DiceRollerModalProps) {
   const [diceNotation, setDiceNotation] = useState('');
-  const [isRolling, setIsRolling] = useState(false);
   const { showSuccess, showError } = useNotificationContext();
 
   const handleRoll = async () => {
@@ -23,49 +22,39 @@ export default function DiceRollerModal({ isOpen, onClose }: DiceRollerModalProp
       return;
     }
 
-    setIsRolling(true);
+    const formula = diceNotation.trim();
+    const parsed = rollNotation(formula);
+    if (!parsed.ok) {
+      showError(parsed.error, { title: 'Roll Failed' });
+      return;
+    }
+    const result = parsed.outcome;
 
-    try {
-      const result = roller(diceNotation.trim());
-
-      // Create a detailed result message
-      const resultMessage = (
-        <div className="dice-result">
-          <TextHeader variant="h5" size="md" underlined={false}>
-            <Icon name="dice" size="sm" />
-            Roll Result: {result.total}
-          </TextHeader>
-          <div className="dice-result-lines">
-            <div>
-              <strong>Formula:</strong> {result.formula}
-            </div>
-            <div>
-              <strong>Breakdown:</strong> {result.breakdown}
-            </div>
-            {result.rolls.length > 0 && (
-              <div>
-                <strong>Individual Rolls:</strong> [{result.rolls.join(', ')}]
-              </div>
-            )}
+    // Create a detailed result message
+    const resultMessage = (
+      <div className="dice-result">
+        <TextHeader variant="h5" size="md" underlined={false}>
+          <Icon name="dice" size="sm" />
+          Roll Result: {result.total}
+        </TextHeader>
+        <div className="dice-result-lines">
+          <div>
+            <strong>Formula:</strong> {formula}
+          </div>
+          <div>
+            <strong>Breakdown:</strong> {result.breakdown}
           </div>
         </div>
-      );
+      </div>
+    );
 
-      showSuccess(resultMessage, {
-        title: `Rolled ${result.formula}`,
-        dismissible: true,
-      });
+    showSuccess(resultMessage, {
+      title: `Rolled ${formula}`,
+      dismissible: true,
+    });
 
-      // Clear the input after successful roll
-      setDiceNotation('');
-    } catch (error) {
-      const errorMessage = getErrorMessage(error, 'Invalid dice notation');
-      showError(errorMessage, {
-        title: 'Roll Failed',
-      });
-    } finally {
-      setIsRolling(false);
-    }
+    // Clear the input after successful roll
+    setDiceNotation('');
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
@@ -77,36 +66,27 @@ export default function DiceRollerModal({ isOpen, onClose }: DiceRollerModalProp
 
   const handleClose = () => {
     setDiceNotation('');
-    setIsRolling(false);
     onClose();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Dice Roller" size="md">
       <div className="modal-stack">
-        <FormField label="Dice Notation" hint="Examples: 1d20, 3d6+2, 4d6L (drop lowest), 2d20K (keep highest)">
+        <FormField label="Dice Notation" hint="Examples: 1d20, 3d6+2, 4d6dl1 (drop lowest), 2d20kh1 (keep highest)">
           <TextInput
             value={diceNotation}
             onChange={setDiceNotation}
             onKeyDown={handleKeyPress}
-            placeholder="e.g., 3d6, 1d20+5, 4d6L"
-            disabled={isRolling}
+            placeholder="e.g., 3d6, 1d20+5, 4d6dl1"
             aria-label="Enter dice notation"
           />
         </FormField>
 
         <div className="dice-roll-actions modal-actions">
-          <Button variant="secondary" onClick={handleClose} disabled={isRolling}>
+          <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button
-            variant="primary"
-            onClick={handleRoll}
-            loading={isRolling}
-            loadingText="Rolling..."
-            disabled={!diceNotation.trim()}
-            icon="dice"
-          >
+          <Button variant="primary" onClick={handleRoll} disabled={!diceNotation.trim()} icon="dice">
             Roll
           </Button>
         </div>

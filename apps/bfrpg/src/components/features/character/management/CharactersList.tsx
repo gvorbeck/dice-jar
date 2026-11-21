@@ -40,7 +40,7 @@ function sortCharacters(characters: CharacterListItem[], sortBy: SortOption): Ch
 }
 
 export function CharactersList() {
-  const { data: characters = [], isLoading, isFetching, error, refetch } = useEnhancedCharacters();
+  const { data: characters = [], isLoading, error } = useEnhancedCharacters();
 
   const { user } = useAuth();
   const { deleteCharacter, isDeleting } = useCharacterMutations();
@@ -53,7 +53,7 @@ export function CharactersList() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
 
   // Use custom hook for loading state management
-  const loading = useInitialLoadingState(isLoading, isFetching, characters.length > 0);
+  const loading = useInitialLoadingState(isLoading);
 
   const sortedCharacters = useMemo(() => sortCharacters(characters, sortBy), [characters, sortBy]);
 
@@ -68,9 +68,10 @@ export function CharactersList() {
   const handleConfirmDelete = () => {
     if (!user || !deleteState.character) return;
 
-    deleteCharacter({
+    void deleteCharacter({
       userId: user.uid,
       characterId: deleteState.character.id,
+      characterName: deleteState.character.name,
     });
 
     setDeleteState({ isOpen: false, character: null });
@@ -136,7 +137,6 @@ export function CharactersList() {
             isDeleting={isDeleting && deleteState.character?.id === character.id}
           />
         )}
-        onRetry={refetch}
       />
 
       {/* Delete Confirmation Modal */}

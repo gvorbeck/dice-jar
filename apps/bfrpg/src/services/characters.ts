@@ -1,11 +1,11 @@
 // Character service for Firebase Firestore operations
-import { collection, getDocs, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, setDoc, deleteDoc, type DocumentReference } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { FIREBASE_COLLECTIONS } from '@/constants';
-import type { AuthUser } from './auth';
 import type { Character } from '@/types';
 import { processCharacterData, isLegacyCharacter, CURRENT_VERSION } from './characterMigration';
 import { handleServiceError, logger } from '@/utils';
+import { forget, remember, saveDiff } from './diffSave';
 
 // Simple interface for listing characters - we don't need the full Character type
 export interface CharacterListItem {
@@ -19,166 +19,92 @@ export interface CharacterListItem {
   hasTurnUndead?: boolean;
 }
 
-/**
- * Fetch all characters for a specific user
- */
-export const getUserCharacters = async (user: AuthUser): Promise<CharacterListItem[]> => {
-  try {
-    // Use the correct Firestore path structure: /users/{userId}/characters
-    const charactersRef = collection(db, FIREBASE_COLLECTIONS.USERS, user.uid, FIREBASE_COLLECTIONS.CHARACTERS);
-    const querySnapshot = await getDocs(charactersRef);
+const charactersRef = (userId: string) => collection(db, FIREBASE_COLLECTIONS.USERS, userId, FIREBASE_COLLECTIONS.CHARACTERS);
+const characterRef = (userId: string, characterId: string) => doc(charactersRef(userId), characterId);
+const slot = (userId: string, characterId: string) => `characters/${userId}/${characterId}`;
 
-    const characters: CharacterListItem[] = [];
-    const migrationPromises: Promise<void>[] = [];
+/** Saves a character that was stored in an older shape back in the current one. */
+const persistMigration = (ref: DocumentReference, migrated: Character) =>
+  setDoc(ref, migrated).catch((error) => logger.error(`Failed to persist migration for character ${ref.id}:`, error));
 
-    querySnapshot.forEach((docSnapshot) => {
-      const data = docSnapshot.data();
-      const wasLegacy = isLegacyCharacter(data);
-
-      if (wasLegacy) {
-        // Only run full migration processing for legacy characters
-        logger.info(`Migrating legacy character in list: ${data['name'] || docSnapshot.id}`);
-        const processedData = processCharacterData(data);
-
-        // Extract only the properties needed for CharacterListItem
-        const listItem: CharacterListItem = {
-          id: docSnapshot.id,
-          name: processedData.name || 'Unnamed Character',
-        };
-        if (processedData.race) listItem.race = processedData.race;
-        if (processedData.class) listItem.class = processedData.class;
-        if (processedData.level) listItem.level = processedData.level;
-        if (processedData.hp) listItem.hp = processedData.hp;
-        if (processedData.xp) listItem.xp = processedData.xp;
-
-        characters.push(listItem);
-
-        // Save the migrated data back to Firebase asynchronously
-        const docRef = doc(db, FIREBASE_COLLECTIONS.USERS, user.uid, FIREBASE_COLLECTIONS.CHARACTERS, docSnapshot.id);
-        const migrationPromise = setDoc(docRef, processedData).catch((error) => {
-          logger.error(`Failed to persist migration for character ${docSnapshot.id}:`, error);
-        });
-        migrationPromises.push(migrationPromise);
-      } else {
-        // For current characters, extract only the properties needed for CharacterListItem
-        const listItem: CharacterListItem = {
-          id: docSnapshot.id,
-          name: (data['name'] as string) || 'Unnamed Character',
-        };
-        if (data['race']) listItem.race = data['race'] as string;
-        if (data['class']) listItem.class = data['class'] as string;
-        if (data['level']) listItem.level = data['level'] as number;
-        if (data['hp']) listItem.hp = data['hp'] as { current?: number; max?: number } | number;
-        if (data['xp']) listItem.xp = data['xp'] as number;
-
-        characters.push(listItem);
-      }
-    });
-
-    // Wait for all migrations to complete before returning
-    if (migrationPromises.length > 0) {
-      try {
-        await Promise.all(migrationPromises);
-        logger.info(`Successfully persisted ${migrationPromises.length} character migrations to Firebase`);
-      } catch {
-        logger.warn('Some character migrations failed to persist, but continuing with fetched data');
-      }
-    } else {
-      logger.debug('No legacy characters found - all characters are current version');
-    }
-
-    return characters;
-  } catch (error) {
-    handleServiceError(error, {
-      action: 'fetching user characters',
-      context: { userId: user.uid },
-    });
-  }
+const toListItem = (id: string, data: Record<string, unknown>): CharacterListItem => {
+  const item: CharacterListItem = { id, name: (data['name'] as string) || 'Unnamed Character' };
+  if (data['race']) item.race = data['race'] as string;
+  if (data['class']) item.class = data['class'] as string;
+  if (data['level']) item.level = data['level'] as number;
+  if (data['hp']) item.hp = data['hp'] as { current?: number; max?: number } | number;
+  if (data['xp']) item.xp = data['xp'] as number;
+  return item;
 };
 
-/**
- * Fetch a single character by ID (for future use)
- */
+/** Live list of a user's characters. */
+export const watchUserCharacters = (userId: string, ok: (characters: CharacterListItem[]) => void, bad: (e: Error) => void) =>
+  onSnapshot(
+    charactersRef(userId),
+    (snapshot) => {
+      ok(
+        snapshot.docs.map((d) => {
+          const data = d.data();
+          if (!isLegacyCharacter(data)) return toListItem(d.id, data);
+          logger.info(`Migrating legacy character in list: ${data['name'] || d.id}`);
+          const migrated = processCharacterData(data);
+          void persistMigration(d.ref, migrated);
+          return toListItem(d.id, migrated as unknown as Record<string, unknown>);
+        }),
+      );
+    },
+    bad,
+  );
+
+/** Live view of one character; null when it doesn't exist. */
+export const watchCharacter = (userId: string, characterId: string, ok: (character: Character | null) => void, bad: (e: Error) => void) =>
+  onSnapshot(
+    characterRef(userId, characterId),
+    (snapshot) => {
+      if (!snapshot.exists()) {
+        forget(slot(userId, characterId));
+        ok(null);
+        return;
+      }
+      const data = snapshot.data();
+      const character = processCharacterData(data);
+      if (isLegacyCharacter(data)) void persistMigration(snapshot.ref, character);
+      remember(slot(userId, characterId), character);
+      ok(character);
+    },
+    bad,
+  );
+
+/** One look at a character, for places that don't need it live. */
 export const getCharacterById = async (userId: string, characterId: string): Promise<Character | null> => {
   try {
-    const characterRef = doc(db, FIREBASE_COLLECTIONS.USERS, userId, FIREBASE_COLLECTIONS.CHARACTERS, characterId);
-    const docSnap = await getDoc(characterRef);
-
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      const wasLegacy = isLegacyCharacter(data);
-      const processedData = processCharacterData(data);
-
-      // If this was a legacy character, save the migrated data back to Firebase
-      if (wasLegacy) {
-        try {
-          await setDoc(characterRef, processedData);
-          logger.info(`Successfully persisted migration for character ${characterId}`);
-        } catch (error) {
-          logger.error(`Failed to persist migration for character ${characterId}:`, error);
-        }
-      }
-
-      return processedData;
-    } else {
-      return null;
-    }
+    const snapshot = await getDoc(characterRef(userId, characterId));
+    return snapshot.exists() ? processCharacterData(snapshot.data()) : null;
   } catch (error) {
-    handleServiceError(error, {
-      action: 'fetching character',
-      context: { userId, characterId },
-    });
+    handleServiceError(error, { action: 'fetching character', context: { userId, characterId } });
   }
 };
 
-/**
- * Save a character to Firebase
- */
+/** Saves a character: only the changed fields when it was read in this tab; a new one gets a fresh id. */
 export const saveCharacter = async (userId: string, character: Character, characterId?: string): Promise<string> => {
   try {
-    // Ensure character has current version
-    const dataToSave = {
-      ...character,
-      settings: {
-        ...character.settings,
-        version: CURRENT_VERSION,
-      },
-    };
-
-    if (characterId) {
-      // Update existing character
-      const characterRef = doc(db, FIREBASE_COLLECTIONS.USERS, userId, FIREBASE_COLLECTIONS.CHARACTERS, characterId);
-      await setDoc(characterRef, dataToSave);
-      logger.info(`Successfully updated character ${characterId}`);
-      return characterId;
-    } else {
-      // Create new character with auto-generated ID
-      const charactersRef = collection(db, FIREBASE_COLLECTIONS.USERS, userId, FIREBASE_COLLECTIONS.CHARACTERS);
-      const docRef = doc(charactersRef);
-      await setDoc(docRef, dataToSave);
-      logger.info(`Successfully created character ${docRef.id}`);
-      return docRef.id;
-    }
+    const dataToSave = { ...character, settings: { ...character.settings, version: CURRENT_VERSION } };
+    const ref = characterId ? characterRef(userId, characterId) : doc(charactersRef(userId));
+    await saveDiff(ref, slot(userId, ref.id), dataToSave as unknown as Record<string, unknown>, Boolean(characterId));
+    logger.info(`Successfully saved character ${ref.id}`);
+    return ref.id;
   } catch (error) {
-    handleServiceError(error, {
-      action: 'saving character',
-      context: { userId, characterId, characterName: character.name },
-    });
+    handleServiceError(error, { action: 'saving character', context: { userId, characterId, characterName: character.name } });
   }
 };
 
-/**
- * Delete a character from Firebase
- */
+/** Delete a character from Firebase */
 export const deleteCharacter = async (userId: string, characterId: string): Promise<void> => {
   try {
-    const characterRef = doc(db, FIREBASE_COLLECTIONS.USERS, userId, FIREBASE_COLLECTIONS.CHARACTERS, characterId);
-    await deleteDoc(characterRef);
+    await deleteDoc(characterRef(userId, characterId));
+    forget(slot(userId, characterId));
     logger.info(`Successfully deleted character ${characterId}`);
   } catch (error) {
-    handleServiceError(error, {
-      action: 'deleting character',
-      context: { userId, characterId },
-    });
+    handleServiceError(error, { action: 'deleting character', context: { userId, characterId } });
   }
 };

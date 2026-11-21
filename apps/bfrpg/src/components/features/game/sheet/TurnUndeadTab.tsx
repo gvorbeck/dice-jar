@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
 import { Card, Typography } from '@/components/ui/core/display';
-import { LoadingState, Callout, ErrorBoundary } from '@/components/ui/core/feedback';
+import { ErrorBoundary } from '@dice-jar/browser';
+import { LoadingState, Callout, ErrorPage } from '@/components/ui/core/feedback';
 import Table from '@/components/ui/composite/Table';
 import type { TableColumn } from '@/components/ui/composite/Table';
 import { TURN_UNDEAD_TABLE, formatTurnUndeadResult } from '@/data/turnUndead';
@@ -211,7 +212,15 @@ TurnUndeadTabContent.displayName = 'TurnUndeadTabContent';
 
 // Export with ErrorBoundary wrapper
 export const TurnUndeadTab = (props: TurnUndeadTabProps) => (
-  <ErrorBoundary>
+  <ErrorBoundary
+    fallback={
+      <ErrorPage
+        title="Something went wrong"
+        message="We're sorry, but an unexpected error occurred. Please try refreshing the page."
+        showHomeLink={false}
+      />
+    }
+  >
     <TurnUndeadTabContent {...props} />
   </ErrorBoundary>
 );

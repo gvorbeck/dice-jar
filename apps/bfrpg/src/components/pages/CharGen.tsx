@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useMemo } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
+import { useTitle } from '@dice-jar/browser';
 import Stepper from '@/components/ui/composite/Stepper';
 import { Breadcrumb } from '@/components/ui/composite';
 import { PageWrapper } from '@/components/ui/core/layout';
@@ -22,7 +23,8 @@ import './CharGen.css';
 
 function CharGen() {
   const { user } = useAuth();
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
+  useTitle('New character | Codex.Quest');
 
   // Replace multiple useLocalStorage calls with Zustand store
   const {
@@ -50,7 +52,7 @@ function CharGen() {
 
   // Replace manual save logic with mutation
   const { saveCharacter, isSaving, saveError } = useCharacterMutations({
-    onSaveSuccess: (characterId) => setLocation(`/u/${user?.uid}/c/${characterId}`),
+    onSaveSuccess: (characterId) => navigate(`/u/${user?.uid}/c/${characterId}`),
   });
 
   // Ensure the character always has the complete structure by merging with empty character

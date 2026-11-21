@@ -1,5 +1,6 @@
-import { collection, doc, onSnapshot, runTransaction, updateDoc } from 'firebase/firestore';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { collection, doc, onSnapshot, runTransaction, updateDoc, type FirestoreError } from 'firebase/firestore';
+import { useCallback, useMemo } from 'react';
+import { useSub, type Sub } from '@dice-jar/browser';
 import { useLatest } from './useLatest';
 import { db } from '@/lib/firebase';
 import { useSaveStatusOptional } from '@/ui/SaveStatus/SaveStatusContext';
@@ -65,15 +66,43 @@ const saveErrorMessage = (error: unknown): string =>
       ? FIRESTORE_ERROR_MESSAGES[error.code]!
       : SAVE_ERROR_MESSAGE;
 
-export const useGame = (gameId: string): UseGameResult => {
-  const [docRaw, setDocRaw] = useState<Record<string, unknown> | null | undefined>(undefined);
-  const [characterDocs, setCharacterDocs] = useState<Stored[] | undefined>(undefined);
-  const [rollDocs, setRollDocs] = useState<Stored[] | undefined>(undefined);
-  const [loadError, setLoadError] = useState<string | null>(null);
+const stored = (snap: { docs: { id: string; data: () => unknown }[] }): Stored[] =>
+  snap.docs.map((d) => ({ id: d.id, data: d.data() as Record<string, unknown> }));
 
-  const gameRef = useMemo(() => doc(db, GAMES_COLLECTION, gameId), [gameId]);
+// data: the game document, or null when it does not exist.
+const subGame: Sub<Record<string, unknown> | null> = (id, ok, bad) => {
+  const gameRef = doc(db, GAMES_COLLECTION, id);
+  let nameTried = false;
+  return onSnapshot(
+    gameRef,
+    (snapshot) => {
+      const data = snapshot.exists() ? (snapshot.data() as Record<string, unknown>) : null;
+      if (data?.schemaVersion === 2 && typeof data.name !== 'string' && !nameTried) {
+        nameTried = true; // once per open: a write the rules refuse is not retried on every snapshot
+        nameMissingGame(gameRef);
+      }
+      ok(data);
+    },
+    bad,
+  );
+};
+// An empty id means the game is missing or not moved yet: nothing to listen to, and a rules refusal on its subcollections must not hide that.
+const nothing = () => () => {};
+const subCharacters: Sub<Stored[]> = (id, ok, bad) =>
+  id ? onSnapshot(collection(db, GAMES_COLLECTION, id, 'characters'), (snap) => ok(stored(snap)), bad) : nothing();
+const subRolls: Sub<Stored[]> = (id, ok, bad) =>
+  id ? onSnapshot(collection(db, GAMES_COLLECTION, id, 'rolls'), (snap) => ok(stored(snap)), bad) : nothing();
+
+export const useGame = (gameId: string): UseGameResult => {
+  const { data: docRaw, error: gameError } = useSub(gameId, subGame);
   // A game keeps its characters and rolls in their own documents (MIGRATION.md).
   const moved = v2.isMoved(docRaw ?? undefined);
+  const { data: characterDocs, error: characterError } = useSub(moved ? gameId : '', subCharacters);
+  const { data: rollDocs, error: rollError } = useSub(moved ? gameId : '', subRolls);
+  const failure = gameError ?? characterError ?? rollError;
+  const loadError = failure ? friendlyFirestoreError(failure as FirestoreError) : null;
+
+  const gameRef = useMemo(() => doc(db, GAMES_COLLECTION, gameId), [gameId]);
 
   // Report every persisted write to the app-wide save-status indicator and the
   // error Toast. Held in refs so wrapping a mutation doesn't add the (per-render)
@@ -107,46 +136,6 @@ export const useGame = (gameId: string): UseGameResult => {
     [addToastRef, saveStatusRef],
   );
 
-  useEffect(() => {
-    // Back to the loading state before (re)subscribing, so a previous game's data never shows for the new one.
-    setDocRaw(undefined);
-    setCharacterDocs(undefined);
-    setRollDocs(undefined);
-    setLoadError(null);
-    let nameTried = false;
-    return onSnapshot(
-      gameRef,
-      (snapshot) => {
-        const data = snapshot.exists() ? (snapshot.data() as Record<string, unknown>) : null;
-        if (data?.schemaVersion === 2 && typeof data.name !== 'string' && !nameTried) {
-          nameTried = true; // once per open: a write the rules refuse is not retried on every snapshot
-          nameMissingGame(gameRef);
-        }
-        setDocRaw(data);
-        setLoadError(null);
-      },
-      (err) => setLoadError(friendlyFirestoreError(err)),
-    );
-  }, [gameRef]);
-
-  useEffect(() => {
-    if (!moved) return;
-    const stored = (snap: { docs: { id: string; data: () => unknown }[] }) =>
-      snap.docs.map((d) => ({ id: d.id, data: d.data() as Record<string, unknown> }));
-    const fail = (err: Parameters<typeof friendlyFirestoreError>[0]) => setLoadError(friendlyFirestoreError(err));
-    const stopCharacters = onSnapshot(
-      collection(db, GAMES_COLLECTION, gameId, 'characters'),
-      (snap) => setCharacterDocs(stored(snap)),
-      fail,
-    );
-    const stopRolls = onSnapshot(collection(db, GAMES_COLLECTION, gameId, 'rolls'), (snap) => setRollDocs(stored(snap)), fail);
-    return () => {
-      stopCharacters();
-      stopRolls();
-    };
-  }, [gameId, moved]);
-
-  // shortcut: when a game is moved while open, the page shows loading until both subcollections have arrived; upgrade by keeping the last game on screen.
   const { game, loading, parseFailed } = useMemo(() => {
     const waiting = docRaw === undefined || (moved && (characterDocs === undefined || rollDocs === undefined));
     if (waiting || !docRaw) return { game: null, loading: waiting && !loadError, parseFailed: false };

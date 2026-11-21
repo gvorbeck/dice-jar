@@ -7,7 +7,7 @@ import { useAuth, useInitialLoadingState } from '@/hooks';
 import { useState } from 'react';
 
 export function GamesList() {
-  const { data: games = [], isLoading, isFetching, error, refetch } = useEnhancedGames();
+  const { data: games = [], isLoading, error } = useEnhancedGames();
 
   const { user } = useAuth();
   const { deleteGame, isDeleting } = useGameMutations();
@@ -17,7 +17,7 @@ export function GamesList() {
   }>({ isOpen: false, game: null });
 
   // Use custom hook for loading state management
-  const loading = useInitialLoadingState(isLoading, isFetching, games.length > 0);
+  const loading = useInitialLoadingState(isLoading);
 
   const handleDeleteGame = (gameId: string, gameName: string) => {
     if (!user) return;
@@ -30,9 +30,10 @@ export function GamesList() {
   const handleConfirmDelete = () => {
     if (!user || !deleteState.game) return;
 
-    deleteGame({
+    void deleteGame({
       userId: user.uid,
       gameId: deleteState.game.id,
+      gameName: deleteState.game.name,
     });
 
     setDeleteState({ isOpen: false, game: null });
@@ -72,7 +73,6 @@ export function GamesList() {
             isDeleting={isDeleting && deleteState.game?.id === game.id}
           />
         )}
-        onRetry={refetch}
       />
 
       {/* Delete Confirmation Modal */}

@@ -1,4 +1,5 @@
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
+import { useTitle } from '@dice-jar/browser';
 import { Card, Image } from '@/components/ui';
 import { FABGroup } from '@/components/ui/core/primitives/FloatingActionButton';
 import { Icon, HeroSection, FeatureCard } from '@/components/ui/composite';
@@ -15,7 +16,8 @@ import './Home.css';
 function Home() {
   const { user, loading: authLoading } = useAuth();
   const { data: characters = [], isLoading: charactersLoading } = useEnhancedCharacters();
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
+  useTitle('Codex.Quest | Basic Fantasy RPG character generator');
 
   const hasCharacters = characters.length > 0;
   const showWelcomeContent = !authLoading && (!user || (!hasCharacters && !charactersLoading));
@@ -107,7 +109,7 @@ function Home() {
               label: 'New Character',
               variant: 'primary' as const,
               size: 'lg' as const,
-              onClick: () => setLocation('/new-character?new=true'),
+              onClick: () => navigate('/new-character?new=true'),
               children: <Icon name="dice" size="lg" aria-hidden />,
             },
             {
@@ -115,7 +117,7 @@ function Home() {
               label: 'New Game',
               variant: 'secondary' as const,
               size: 'lg' as const,
-              onClick: () => setLocation('/new-game'),
+              onClick: () => navigate('/new-game'),
               children: <Icon name="shield" size="lg" aria-hidden />,
             },
           ]}

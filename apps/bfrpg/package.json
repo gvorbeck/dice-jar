@@ -19,18 +19,18 @@
     "check": "npm run lint && npm run typecheck && npm run knip && npm run test:coverage"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.89.0",
-    "@tanstack/react-query-devtools": "^5.89.0",
     "firebase": "^13.2.0",
     "react": "^19.3.1",
     "react-aria-components": "^1.22.1",
     "react-dom": "^19.3.1",
-    "wouter": "^3.7.1",
-    "zustand": "^5.0.8"
+    "react-router-dom": "^7.18.5"
   },
   "devDependencies": {
     "@dice-jar/browser": "*",
     "@dice-jar/cn": "*",
+    "@dice-jar/diff": "*",
+    "@dice-jar/dice": "*",
+    "@dice-jar/stale-build": "*",
     "@playwright/test": "^1.65.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.2",

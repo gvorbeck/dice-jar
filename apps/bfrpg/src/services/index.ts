@@ -40,9 +40,9 @@ const gameService = isMockMode() ? mockGameService : firebaseGameService;
 const authService = isMockMode() ? mockAuthService : firebaseAuthService;
 
 // Re-export service functions with consistent names
-export const { getUserCharacters, getCharacterById, saveCharacter, deleteCharacter } = characterService;
+export const { watchUserCharacters, watchCharacter, getCharacterById, saveCharacter, deleteCharacter } = characterService;
 
-export const { getUserGames, getGameById, saveGame, deleteGame } = gameService;
+export const { watchUserGames, watchGame, saveGame, deleteGame } = gameService;
 
 export const { signInWithEmail, signUpWithEmail, signInWithGoogle, sendPasswordReset, signOut, onAuthStateChange } = authService;
 

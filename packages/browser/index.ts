@@ -64,3 +64,4 @@ export { ErrorBoundary } from './ErrorBoundary';
 export { DiceJarCredit } from './DiceJarCredit';
 export { SkipLink, useFocusMain } from './focus';
 export { useTitle } from './useTitle';
+export { useSub, useLoad, type Sub } from './useSub';

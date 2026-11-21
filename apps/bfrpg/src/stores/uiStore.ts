@@ -1,5 +1,4 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createStore } from '@/lib/store';
 
 interface UiStore {
   collapsedSections: Record<string, boolean>;
@@ -10,36 +9,32 @@ interface UiStore {
   isSectionCollapsed: (key: string) => boolean;
 }
 
-export const useUiStore = create<UiStore>()(
-  persist(
-    (set, get) => ({
-      collapsedSections: {},
+export const useUiStore = createStore<UiStore>(
+  'ui-store',
+  (set, get) => ({
+    collapsedSections: {},
 
-      toggleSection: (key) =>
-        set((state) => ({
-          collapsedSections: {
-            ...state.collapsedSections,
-            [key]: !state.collapsedSections[key],
-          },
-        })),
+    toggleSection: (key) =>
+      set((state) => ({
+        collapsedSections: {
+          ...state.collapsedSections,
+          [key]: !state.collapsedSections[key],
+        },
+      })),
 
-      setSectionCollapsed: (key, collapsed) =>
-        set((state) => ({
-          collapsedSections: {
-            ...state.collapsedSections,
-            [key]: collapsed,
-          },
-        })),
+    setSectionCollapsed: (key, collapsed) =>
+      set((state) => ({
+        collapsedSections: {
+          ...state.collapsedSections,
+          [key]: collapsed,
+        },
+      })),
 
-      isSectionCollapsed: (key) => {
-        return get().collapsedSections[key] || false;
-      },
-    }),
-    {
-      name: 'ui-store',
-      partialize: (state) => ({
-        collapsedSections: state.collapsedSections,
-      }),
+    isSectionCollapsed: (key) => {
+      return get().collapsedSections[key] || false;
     },
-  ),
+  }),
+  (state) => ({
+    collapsedSections: state.collapsedSections,
+  }),
 );

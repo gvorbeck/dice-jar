@@ -7,6 +7,7 @@ import type { Game } from '@/types';
 import type { AuthUser } from './auth';
 import { getAllSampleGames } from '@/data/sampleGames';
 import { logger } from '@/utils';
+import { mockWatch, notifyMock } from '@/lib/mockWatch';
 
 const STORAGE_KEY = 'mock_games';
 const SAMPLE_DATA_INITIALIZED_KEY = 'mock_games_sample_initialized';
@@ -116,6 +117,7 @@ export const saveGame = async (_userId: string, game: Omit<Game, 'id'>, gameId?:
   }
 
   saveGames(games);
+  notifyMock();
   logger.info(`🎭 Mock mode: Saved game "${gameName}" (${finalGameId})`);
 
   return finalGameId;
@@ -138,6 +140,7 @@ export const deleteGame = async (_userId: string, gameId: string): Promise<void>
   const deletedGame = games[gameIndex];
   games.splice(gameIndex, 1);
   saveGames(games);
+  notifyMock();
 
   logger.info(`🎭 Mock mode: Deleted game "${deletedGame?.name}" (${gameId})`);
 };
@@ -169,3 +172,9 @@ export const clearAllData = (): void => {
 export const exportMockData = (): Game[] => {
   return getStoredGames();
 };
+
+export const watchUserGames = (userId: string, ok: (g: Game[]) => void, bad: (e: Error) => void) =>
+  mockWatch(() => getUserGames({ uid: userId } as AuthUser), ok, bad);
+
+export const watchGame = (userId: string, gameId: string, ok: (g: Game | null) => void, bad: (e: Error) => void) =>
+  mockWatch(() => getGameById(userId, gameId), ok, bad);

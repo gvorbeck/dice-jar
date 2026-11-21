@@ -1,3 +1,4 @@
+import { useTitle } from '@dice-jar/browser';
 import { useState, useCallback } from 'react';
 import { PageWrapper } from '@/components/ui/core/layout';
 import { Card, Typography, Button } from '@/components/ui';
@@ -24,6 +25,7 @@ const emptyGame: DraftGame = {
 };
 
 function GameGen() {
+  useTitle('New game | Codex.Quest');
   const { user } = useAuth();
   const { navigateToEntity, navigateHome } = useGameNavigation();
   const [game, setGame] = useState<DraftGame>(emptyGame);

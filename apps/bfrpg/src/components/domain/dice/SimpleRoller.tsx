@@ -1,7 +1,7 @@
 import React, { useState, useId, useEffect } from 'react';
 import { Button } from '@/components/ui';
 import { NumberInput } from '@/components/ui/core/primitives';
-import { roller, logger } from '@/utils';
+import { rollNotation } from '@dice-jar/dice';
 import './SimpleRoller.css';
 
 interface SimpleRollerProps {
@@ -36,33 +36,30 @@ const SimpleRoller: React.FC<SimpleRollerProps> = ({ formula, label, initialValu
   }, [initialValue]);
 
   const handleRoll = () => {
-    try {
-      const result = roller(formula);
-      const newValue = result.total;
-      setValue(newValue);
-      onChange?.(newValue);
-
-      // Create detailed result description for screen readers
-      const rollDescription = `Rolled ${formula}: total result is ${newValue}${
-        result.rolls ? ` (individual rolls: ${result.rolls.join(', ')})` : ''
-      }`;
-      setLastRollResult(rollDescription);
-
-      // Announce the result to screen readers
-      setTimeout(() => {
-        const announcer = document.getElementById('dice-announcer');
-        if (announcer) {
-          announcer.textContent = rollDescription;
-          // Clear after announcement
-          setTimeout(() => {
-            announcer.textContent = '';
-          }, 1000);
-        }
-      }, 100);
-    } catch (error) {
-      logger.error('Failed to roll dice:', error);
-      setLastRollResult(`Failed to roll ${formula}: ${error}`);
+    const parsed = rollNotation(formula);
+    if (!parsed.ok) {
+      setLastRollResult(`Failed to roll ${formula}: ${parsed.error}`);
+      return;
     }
+    const { total, breakdown } = parsed.outcome;
+    setValue(total);
+    onChange?.(total);
+
+    // Create detailed result description for screen readers
+    const rollDescription = `Rolled ${formula}: total result is ${total} (${breakdown})`;
+    setLastRollResult(rollDescription);
+
+    // Announce the result to screen readers
+    setTimeout(() => {
+      const announcer = document.getElementById('dice-announcer');
+      if (announcer) {
+        announcer.textContent = rollDescription;
+        // Clear after announcement
+        setTimeout(() => {
+          announcer.textContent = '';
+        }, 1000);
+      }
+    }, 100);
   };
 
   const handleInputChange = (newValue: number | undefined) => {

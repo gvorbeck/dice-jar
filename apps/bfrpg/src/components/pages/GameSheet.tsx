@@ -1,4 +1,5 @@
-import { useRoute } from 'wouter';
+import { useParams } from 'react-router-dom';
+import { useTitle } from '@dice-jar/browser';
 import { useMemo, useCallback, useState, Suspense } from 'react';
 import { Breadcrumb } from '@/components/ui/composite';
 import { PageWrapper } from '@/components/ui/core/layout';
@@ -23,7 +24,7 @@ import './GameSheet.css';
 
 export default function GameSheet() {
   const { user } = useAuth();
-  const [, params] = useRoute('/u/:userId/g/:gameId');
+  const params = useParams<{ userId: string; gameId: string }>();
   const [isTreasureModalOpen, setIsTreasureModalOpen] = useState(false);
   const [isCombatTrackerModalOpen, setIsCombatTrackerModalOpen] = useState(false);
   const [isEncounterGeneratorModalOpen, setIsEncounterGeneratorModalOpen] = useState(false);
@@ -33,6 +34,7 @@ export default function GameSheet() {
 
   const game = gameData?.game;
   const isGameMaster = gameData?.isOwner || false;
+  useTitle(game?.name ? `${game.name} | Codex.Quest` : 'Game | Codex.Quest');
 
   // Use enhanced game mutations
   const { saveGame, isSaving } = useGameMutations();
@@ -59,7 +61,7 @@ export default function GameSheet() {
     (updatedGame: Game) => {
       if (!user || !gameId) return;
 
-      saveGame({
+      void saveGame({
         userId: user.uid,
         game: updatedGame,
         gameId,

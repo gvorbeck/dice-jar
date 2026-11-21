@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { useLoad } from '@/lib/useSub';
+import { useLoad } from '@dice-jar/browser';
 import { gameUrl } from '@/lib/paths';
 import { Loading } from '@/ui/bits';
 import { Link, useParams } from 'react-router-dom';

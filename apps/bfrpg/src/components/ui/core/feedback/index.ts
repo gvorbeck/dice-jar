@@ -7,8 +7,6 @@ export { default as ErrorDisplay } from './ErrorDisplay';
 export { default as NotificationContainer } from './NotificationContainer';
 export { LoadingState } from './LoadingState';
 export { SkeletonCard, SkeletonTableRow, SkeletonStatBlock, SkeletonList } from './Skeleton';
-export { ErrorBoundary } from './ErrorBoundary';
-export { CharGenErrorBoundary, HomeErrorBoundary, GameGenErrorBoundary, SheetErrorBoundary } from './errorBoundaries';
-export { NotificationErrorBoundary } from './NotificationErrorBoundary';
+export { ErrorPage, NotificationsDown } from './ErrorPage';
 
 // Export types

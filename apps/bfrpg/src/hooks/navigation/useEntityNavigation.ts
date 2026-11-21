@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { STORAGE_KEYS } from '@/constants';
 
 interface EntityNavigationConfig {
@@ -14,7 +14,7 @@ interface EntityNavigationConfig {
  * Provides consistent behavior for clearing storage and navigating to entity sheets
  */
 function useEntityNavigation(config: EntityNavigationConfig) {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
 
   const navigateToEntity = useCallback(
     (userId: string, entityId: string) => {
@@ -25,9 +25,9 @@ function useEntityNavigation(config: EntityNavigationConfig) {
 
       // Navigate to the entity sheet
       const routePath = config.getRoutePath(userId, entityId);
-      setLocation(routePath);
+      navigate(routePath);
     },
-    [config, setLocation],
+    [config, navigate],
   );
 
   const navigateHome = useCallback(
@@ -40,9 +40,9 @@ function useEntityNavigation(config: EntityNavigationConfig) {
       }
 
       // Navigate to home
-      setLocation('/');
+      navigate('/');
     },
-    [config, setLocation],
+    [config, navigate],
   );
 
   return { navigateToEntity, navigateHome };

@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui';
 import { Icon } from '@/components/ui/core/display';
 import { Card } from '@/components/ui/core/display';
@@ -20,7 +20,7 @@ export function BaseCard({ id, name, user, href, onDelete, onCopy, isDeleting, c
   return (
     <Card variant="gradient" size="default" className="base-card">
       {/* Clickable overlay for entire card */}
-      <Link href={href} className="base-card-link" aria-label={`View ${name}`} />
+      <Link to={href} className="base-card-link" aria-label={`View ${name}`} />
 
       {/* Background decoration */}
       <div className="base-card-glow" data-corner="top-right" />

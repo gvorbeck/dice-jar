@@ -44,7 +44,6 @@ export interface CoinConfig {
 // Dice and mechanics types
 export interface DiceResult {
   total: number;
-  rolls: number[];
   formula: string;
   breakdown: string;
 }

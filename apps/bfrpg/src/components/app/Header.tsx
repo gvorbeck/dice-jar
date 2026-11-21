@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { Button, Image } from '@/components/ui';
 import { Typography } from '@/components/ui/core/display';
@@ -62,7 +62,7 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
           <div className="site-bar">
             {/* Logo & Brand */}
             <div className="site-brand-wrap">
-              <Link href="/" aria-label={`${isMockMode() ? 'Codex.Mock' : 'Codex.Quest'} - Go to homepage`} className="site-brand">
+              <Link to="/" aria-label={`${isMockMode() ? 'Codex.Mock' : 'Codex.Quest'} - Go to homepage`} className="site-brand">
                 <div className="site-logo-wrap">
                   <Image
                     variant="logo"

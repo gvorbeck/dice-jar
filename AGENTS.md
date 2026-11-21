@@ -4,8 +4,9 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 
 ## Rules
 
-- Make the smallest change that fully works. Reuse what's in `packages/` and the app's own `src/lib`, `src/rules`, `src/model` before writing anything new. No abstractions, options, wrappers or "for later" code nobody asked for.
+- Make the smallest change that fully works. Reuse what's in `packages/` and the app's own `src/lib`, `src/rules`, `src/model` before writing anything new. No abstractions, options, wrappers or "for later" code nobody asked for. Use ponytail skills where appropriate.
 - A PR may change more than one app, for example to move shared code into `packages/` and switch every app to it. A workflow still labels each PR with the name of every app it touches.
+- Apps look different and play different games, but they work the same way: one mechanism per job (loading live data, saving, dice, errors, routing, state), written so the code reads as one hand's. Before writing a mechanism, find how the other apps do it. If one already has it, use it; if the others differ from each other, say so and ask which is the standard. A new app-local wrapper around a shared package (for example a second dice helper beside `@dice-jar/dice`) is the same mechanism written twice: call the package directly.
 - An app never imports from another app. Code used by two apps moves to `packages/`, and the same PR switches every app that has its own copy over to it and deletes the copy; code used by one stays in that app.
 - A change in `packages/` must pass the checks of every app that uses it.
 - UI: React Aria Components, the shared UI components and the CSS tokens. No inline styles, no new hex colors, no other UI or CSS library. Add a token if one is missing.

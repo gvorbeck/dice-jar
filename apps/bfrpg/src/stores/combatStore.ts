@@ -1,5 +1,4 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createStore } from '@/lib/store';
 import type { CombatantWithInitiative } from '@/types';
 
 // Combat state interface for persistence
@@ -35,53 +34,49 @@ const defaultCombatState: CombatState = {
   isActive: false,
 };
 
-export const useCombatStore = create<CombatStore>()(
-  persist(
-    (set, get) => ({
-      games: {},
+export const useCombatStore = createStore<CombatStore>(
+  'combat-store',
+  (set, get) => ({
+    games: {},
 
-      setCombatState: (gameId, state) =>
-        set((store) => ({
-          games: {
-            ...store.games,
-            [gameId]: {
-              combatState: state,
-              preCombatInitiatives: store.games[gameId]?.preCombatInitiatives || {},
-            },
+    setCombatState: (gameId, state) =>
+      set((store) => ({
+        games: {
+          ...store.games,
+          [gameId]: {
+            combatState: state,
+            preCombatInitiatives: store.games[gameId]?.preCombatInitiatives || {},
           },
-        })),
+        },
+      })),
 
-      getCombatState: (gameId) => {
-        const state = get().games[gameId]?.combatState;
-        return state || defaultCombatState;
-      },
-
-      setPreCombatInitiatives: (gameId, initiatives) =>
-        set((store) => ({
-          games: {
-            ...store.games,
-            [gameId]: {
-              combatState: store.games[gameId]?.combatState || defaultCombatState,
-              preCombatInitiatives: initiatives,
-            },
-          },
-        })),
-
-      getPreCombatInitiatives: (gameId) => {
-        return get().games[gameId]?.preCombatInitiatives || {};
-      },
-
-      clearGameCombatData: (gameId) =>
-        set((store) => {
-          const { [gameId]: _, ...remainingGames } = store.games;
-          return { games: remainingGames };
-        }),
-    }),
-    {
-      name: 'combat-store',
-      partialize: (state) => ({
-        games: state.games,
-      }),
+    getCombatState: (gameId) => {
+      const state = get().games[gameId]?.combatState;
+      return state || defaultCombatState;
     },
-  ),
+
+    setPreCombatInitiatives: (gameId, initiatives) =>
+      set((store) => ({
+        games: {
+          ...store.games,
+          [gameId]: {
+            combatState: store.games[gameId]?.combatState || defaultCombatState,
+            preCombatInitiatives: initiatives,
+          },
+        },
+      })),
+
+    getPreCombatInitiatives: (gameId) => {
+      return get().games[gameId]?.preCombatInitiatives || {};
+    },
+
+    clearGameCombatData: (gameId) =>
+      set((store) => {
+        const { [gameId]: _, ...remainingGames } = store.games;
+        return { games: remainingGames };
+      }),
+  }),
+  (state) => ({
+    games: state.games,
+  }),
 );

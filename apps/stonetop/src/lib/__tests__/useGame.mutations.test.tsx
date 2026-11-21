@@ -9,6 +9,8 @@ vi.mock('firebase/app', () => ({ initializeApp: () => ({}) }));
 vi.mock('firebase/firestore', () => firestoreMockModule());
 vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
 
+import { onSnapshot } from 'firebase/firestore';
+
 import { createElement, type ReactNode } from 'react';
 import { SaveStatusContext } from '@/ui/SaveStatus/SaveStatusContext';
 import { useGame } from '../useGame';
@@ -115,14 +117,31 @@ describe('useGame mutations', () => {
   });
 
   it('does not add a character before the party has loaded, so an empty copy cannot overwrite one that exists', async () => {
-    firestoreStore.set(GAME_PATH, { name: 'Old', createdAt: 5, characters: [] }); // not moved: no party listener, so no party yet
+    firestoreStore.set(GAME_PATH, { name: 'Old', createdAt: 5, characters: [], schemaVersion: 2 });
     firestoreStore.set(`${GAME_PATH}/characters/a`, { id: 'a', name: 'Kept', playbook: 'heavy', level: 1, order: 0 });
+    // The party listener never answers, as when the first snapshot is still on its way.
+    const real = vi.mocked(onSnapshot).getMockImplementation()!;
+    vi.mocked(onSnapshot).mockImplementation(((ref: { path: string }, ...rest: unknown[]) =>
+      ref.path.endsWith('/characters') ? () => {} : (real as (...a: unknown[]) => unknown)(ref, ...rest)) as never);
+    try {
+      const { result } = renderGame();
+      await act(async () => {
+        await expect(result.current.addCharacter(char('a', { name: 'Fresh' }))).rejects.toThrow('still loading');
+      });
+    } finally {
+      vi.mocked(onSnapshot).mockImplementation(real);
+    }
+    expect(firestoreStore.get(`${GAME_PATH}/characters/a`)).toMatchObject({ name: 'Kept' });
+  });
+
+  it('does not listen to the party of a game that is missing or not moved, so a refused read cannot hide that', async () => {
+    firestoreStore.set(GAME_PATH, { name: 'Old', createdAt: 5, characters: [char('a')] });
+    vi.mocked(onSnapshot).mockClear();
     const { result } = renderGame();
     await waitFor(() => expect(result.current.loading).toBe(false));
-    await act(async () => {
-      await expect(result.current.addCharacter(char('a', { name: 'Fresh' }))).rejects.toThrow('still loading');
-    });
-    expect(firestoreStore.get(`${GAME_PATH}/characters/a`)).toMatchObject({ name: 'Kept' });
+    const paths = vi.mocked(onSnapshot).mock.calls.map(([ref]) => (ref as unknown as { path: string }).path);
+    expect(paths).toEqual([GAME_PATH]);
+    expect(result.current.error).toMatch(/couldn't be read/);
   });
 
   it('reports the game as null (not an error) when the doc does not exist', async () => {

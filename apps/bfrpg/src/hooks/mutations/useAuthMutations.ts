@@ -1,43 +1,21 @@
-import { useMutation } from '@tanstack/react-query';
 import { sendPasswordReset, signInWithGoogle } from '@/services';
 import { getErrorMessage, logger } from '@/utils';
+import { useAction } from './useAction';
 
 /**
- * Authentication-related mutations
+ * Authentication-related actions
  */
 export function useAuthMutations() {
-  const passwordResetMutation = useMutation({
-    mutationFn: (email: string) => sendPasswordReset(email),
-    onError: (error) => {
-      logger.error('Password reset error:', error);
-    },
-  });
+  const reset = useAction(sendPasswordReset, (error) => logger.error('Password reset error:', error));
+  const google = useAction(signInWithGoogle, (error) => logger.error('Google sign-in error:', error));
 
-  const googleSignInMutation = useMutation({
-    mutationFn: () => signInWithGoogle(),
-    onError: (error) => {
-      logger.error('Google sign-in error:', error);
-    },
+  const shape = <A extends unknown[], R>(a: ReturnType<typeof useAction<A, R>>) => ({
+    mutateAsync: a.run,
+    isPending: a.isPending,
+    error: a.error ? getErrorMessage(a.error) : null,
+    isError: !!a.error,
+    isSuccess: a.isSuccess,
+    reset: a.reset,
   });
-
-  return {
-    sendPasswordReset: {
-      mutate: passwordResetMutation.mutate,
-      mutateAsync: passwordResetMutation.mutateAsync,
-      isPending: passwordResetMutation.isPending,
-      error: passwordResetMutation.error ? getErrorMessage(passwordResetMutation.error) : null,
-      isError: passwordResetMutation.isError,
-      isSuccess: passwordResetMutation.isSuccess,
-      reset: passwordResetMutation.reset,
-    },
-    signInWithGoogle: {
-      mutate: googleSignInMutation.mutate,
-      mutateAsync: googleSignInMutation.mutateAsync,
-      isPending: googleSignInMutation.isPending,
-      error: googleSignInMutation.error ? getErrorMessage(googleSignInMutation.error) : null,
-      isError: googleSignInMutation.isError,
-      isSuccess: googleSignInMutation.isSuccess,
-      reset: googleSignInMutation.reset,
-    },
-  };
+  return { sendPasswordReset: shape(reset), signInWithGoogle: shape(google) };
 }

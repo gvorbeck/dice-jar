@@ -2,7 +2,7 @@ import type { NotificationSystem } from '@/types';
 import { logger } from '@/utils';
 
 /**
- * Global error handler for TanStack Query and application errors
+ * Global error handler for data loading and application errors
  * Provides consistent error handling, user feedback, and retry mechanisms
  */
 class GlobalErrorHandler {

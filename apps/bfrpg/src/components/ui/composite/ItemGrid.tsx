@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { Typography, Button } from '@/components/ui';
 import { Icon } from '@/components/ui/core/display';
 import type { IconName } from '@/components/ui/core/display';
@@ -84,7 +84,7 @@ export function ItemGrid<T extends { id: string }>({ items, loading, error, empt
           </Typography>
         </div>
         {emptyState.action && (
-          <Link href={emptyState.action.href}>
+          <Link to={emptyState.action.href}>
             <Button variant="primary" size="lg" icon="plus" iconSize="sm">
               {emptyState.action.label}
             </Button>

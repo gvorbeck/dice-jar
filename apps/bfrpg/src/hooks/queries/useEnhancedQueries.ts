@@ -1,121 +1,73 @@
-import { useQuery } from '@tanstack/react-query';
-import { useNotificationContext } from '@/hooks';
-import { createMutationHandlers } from '@/lib/globalErrorHandler';
-import { queryKeys } from '@/lib/queryKeys';
-import { useAuth } from '@/hooks';
 import { useEffect } from 'react';
-import { getUserCharacters, getCharacterById, getUserGames, getGameById } from '@/services';
+import { useSub, type Sub } from '@dice-jar/browser';
+import { useNotificationContext, useAuth } from '@/hooks';
+import { createMutationHandlers } from '@/lib/globalErrorHandler';
+import { watchUserCharacters, watchCharacter, watchUserGames, watchGame } from '@/services';
 import type { Character, Game } from '@/types';
 import type { CharacterListItem } from '@/services/characters';
 
-/**
- * Enhanced characters query with consistent error handling
- */
+const nothing = () => () => {};
+// A half-empty key (a route param still missing) must not reach doc()/collection(), which throw on an empty segment.
+const parts = (key: string): [string, string] | null => {
+  const [a, b] = key.split('/');
+  return a && b ? [a, b] : null;
+};
+
+const subCharacters: Sub<CharacterListItem[]> = (userId, ok, bad) => (userId ? watchUserCharacters(userId, ok, bad) : nothing());
+const subCharacter: Sub<Character | null> = (key, ok, bad) => {
+  const p = parts(key);
+  return p ? watchCharacter(...p, ok, bad) : nothing();
+};
+const subGames: Sub<Game[]> = (userId, ok, bad) => (userId ? watchUserGames(userId, ok, bad) : nothing());
+const subGame: Sub<Game | null> = (key, ok, bad) => {
+  const p = parts(key);
+  return p ? watchGame(...p, ok, bad) : nothing();
+};
+
+/** Shows a load failure once, in the app's notification style. */
+function useReportError(error: Error | undefined, entityType: string) {
+  const { queryError } = createMutationHandlers(useNotificationContext());
+  useEffect(() => {
+    if (error) queryError(error, { entityType });
+  }, [error, entityType, queryError]);
+}
+
+/** The signed-in user's characters, live. */
 export function useEnhancedCharacters() {
   const { user } = useAuth();
-  const notifications = useNotificationContext();
-  const { queryError } = createMutationHandlers(notifications);
-
-  const query = useQuery<CharacterListItem[]>({
-    queryKey: queryKeys.characters.user(user?.uid || ''),
-    queryFn: () => getUserCharacters(user!),
-    enabled: !!user,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-  });
-
-  // Handle errors with useEffect
-  useEffect(() => {
-    if (query.error) {
-      queryError(query.error, { entityType: 'characters' });
-    }
-  }, [query.error, queryError]);
-
-  return query;
+  const { data, error } = useSub(user?.uid ?? '', subCharacters);
+  useReportError(error, 'characters');
+  return { data, error, isLoading: !!user && !data && !error };
 }
 
-/**
- * Enhanced character sheet query with consistent error handling
- */
+/** One character, live, with whether the signed-in user owns it. */
 export function useEnhancedCharacterSheet(userId: string, characterId: string) {
   const { user } = useAuth();
-  const notifications = useNotificationContext();
-  const { queryError } = createMutationHandlers(notifications);
-
-  const isOwner = Boolean(user && userId === user.uid);
-
-  const query = useQuery({
-    queryKey: queryKeys.characters.detail(userId, characterId),
-    queryFn: () => getCharacterById(userId, characterId),
-    enabled: !!userId && !!characterId,
-    staleTime: 30 * 1000, // 30 seconds
-    select: (data: Character | null) => ({
-      character: data,
-      isOwner,
-    }),
-  });
-
-  // Handle errors with useEffect
-  useEffect(() => {
-    if (query.error) {
-      queryError(query.error, { entityType: 'character' });
-    }
-  }, [query.error, queryError]);
-
-  return query;
+  const { data, error } = useSub(`${userId}/${characterId}`, subCharacter);
+  useReportError(error, 'character');
+  return {
+    data: data === undefined ? undefined : { character: data, isOwner: Boolean(user && userId === user.uid) },
+    error,
+    isLoading: !!userId && !!characterId && data === undefined && !error,
+  };
 }
 
-/**
- * Enhanced games query with consistent error handling
- */
+/** The signed-in user's games, live. */
 export function useEnhancedGames() {
   const { user } = useAuth();
-  const notifications = useNotificationContext();
-  const { queryError } = createMutationHandlers(notifications);
-
-  const query = useQuery<Game[]>({
-    queryKey: queryKeys.games.user(user?.uid || ''),
-    queryFn: () => getUserGames(user!),
-    enabled: !!user,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
-  // Handle errors with useEffect
-  useEffect(() => {
-    if (query.error) {
-      queryError(query.error, { entityType: 'games' });
-    }
-  }, [query.error, queryError]);
-
-  return query;
+  const { data, error } = useSub(user?.uid ?? '', subGames);
+  useReportError(error, 'games');
+  return { data, error, isLoading: !!user && !data && !error };
 }
 
-/**
- * Enhanced game query with consistent error handling
- */
+/** One game, live, with whether the signed-in user owns it. */
 export function useEnhancedGame(userId: string, gameId: string) {
   const { user } = useAuth();
-  const notifications = useNotificationContext();
-  const { queryError } = createMutationHandlers(notifications);
-
-  const isOwner = Boolean(user && userId === user.uid);
-
-  const query = useQuery({
-    queryKey: queryKeys.games.detail(userId, gameId),
-    queryFn: () => getGameById(userId, gameId),
-    enabled: !!userId && !!gameId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    select: (data: Game | null) => ({
-      game: data,
-      isOwner,
-    }),
-  });
-
-  // Handle errors with useEffect
-  useEffect(() => {
-    if (query.error) {
-      queryError(query.error, { entityType: 'game' });
-    }
-  }, [query.error, queryError]);
-
-  return query;
+  const { data, error } = useSub(`${userId}/${gameId}`, subGame);
+  useReportError(error, 'game');
+  return {
+    data: data === undefined ? undefined : { game: data, isOwner: Boolean(user && userId === user.uid) },
+    error,
+    isLoading: !!userId && !!gameId && data === undefined && !error,
+  };
 }

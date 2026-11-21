@@ -1,8 +1,7 @@
 import { Suspense, lazy, useState, useEffect } from 'react';
 import './App.css';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
-import { ErrorBoundary, NotificationContainer, NotificationErrorBoundary, LoadingState } from '@/components/ui/core/feedback';
+import { ErrorBoundary } from '@dice-jar/browser';
+import { ErrorPage, NotificationContainer, NotificationsDown, LoadingState } from '@/components/ui/core/feedback';
 import { Header } from '@/components/app/Header';
 import { Footer } from '@/components/app/Footer';
 import { Routes } from '@/components/app/Routes';
@@ -13,15 +12,6 @@ import { initializeFavicon } from '@/utils/favicon';
 import { getInitialAlerts, type AlertConfig } from '@/constants';
 
 const SignInModal = lazy(() => import('./components/modals/auth/SignInModal'));
-
-// Conditionally import DevTools only in development
-const ReactQueryDevtools = import.meta.env.DEV
-  ? lazy(() =>
-      import('@tanstack/react-query-devtools').then((module) => ({
-        default: module.ReactQueryDevtools,
-      })),
-    )
-  : null;
 
 // Inner app component that uses the notification context
 function AppContent() {
@@ -70,25 +60,20 @@ function App() {
   const notifications = useNotifications();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ErrorBoundary>
-        <NotificationContext.Provider value={notifications}>
-          <AppContent />
+    <ErrorBoundary
+      fallback={
+        <ErrorPage title="Something went wrong" message="We're sorry, but an unexpected error occurred. Please try refreshing the page." />
+      }
+    >
+      <NotificationContext.Provider value={notifications}>
+        <AppContent />
 
-          {/* Global Notification Container */}
-          <NotificationErrorBoundary>
-            <NotificationContainer notifications={notifications.notifications} onDismiss={notifications.dismissNotification} />
-          </NotificationErrorBoundary>
-        </NotificationContext.Provider>
-      </ErrorBoundary>
-
-      {/* React Query DevTools - only in development */}
-      {import.meta.env.DEV && ReactQueryDevtools && (
-        <Suspense fallback={null}>
-          <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
-        </Suspense>
-      )}
-    </QueryClientProvider>
+        {/* Global Notification Container */}
+        <ErrorBoundary fallback={<NotificationsDown />}>
+          <NotificationContainer notifications={notifications.notifications} onDismiss={notifications.dismissNotification} />
+        </ErrorBoundary>
+      </NotificationContext.Provider>
+    </ErrorBoundary>
   );
 }
 

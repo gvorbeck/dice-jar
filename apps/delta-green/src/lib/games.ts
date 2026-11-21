@@ -12,7 +12,7 @@ import {
   serverTimestamp,
   type DocumentData,
 } from 'firebase/firestore';
-import { useSub, type Sub } from './useSub';
+import { useSub, type Sub } from '@dice-jar/browser';
 import { agentLabel } from '@/model/names';
 import { db } from './firebase';
 import { agentPath, agentsPath, gamePath, pendingSanPath, rollsPath } from './paths';

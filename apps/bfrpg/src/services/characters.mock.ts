@@ -14,6 +14,7 @@ import type { CharacterListItem } from './characters';
 import { getAllSampleCharacters } from '@/data/sampleCharacters';
 import { processCharacterData } from './characterMigration';
 import { logger } from '@/utils';
+import { mockWatch, notifyMock } from '@/lib/mockWatch';
 // Mock service constants
 const MOCK_NETWORK_DELAY_MS = 100;
 const STORAGE_KEY = 'mock_characters';
@@ -138,6 +139,7 @@ export const saveCharacter = async (_userId: string, character: Character, chara
   }
 
   saveCharacters(characters);
+  notifyMock();
   logger.info(`🎭 Mock mode: Saved character "${character.name}" (${finalCharacterId})`);
 
   return finalCharacterId;
@@ -160,6 +162,7 @@ export const deleteCharacter = async (_userId: string, characterId: string): Pro
   const deletedCharacter = characters[characterIndex];
   characters.splice(characterIndex, 1);
   saveCharacters(characters);
+  notifyMock();
 
   logger.info(`🎭 Mock mode: Deleted character "${deletedCharacter?.name}" (${characterId})`);
 };
@@ -172,6 +175,7 @@ export const resetToSampleData = (): void => {
   localStorage.removeItem(SAMPLE_DATA_INITIALIZED_KEY);
   localStorage.removeItem(STORAGE_KEY);
   initializeSampleData();
+  notifyMock();
   logger.info('🎭 Mock mode: Reset to sample data');
 };
 
@@ -182,6 +186,7 @@ export const resetToSampleData = (): void => {
 export const clearAllData = (): void => {
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(SAMPLE_DATA_INITIALIZED_KEY);
+  notifyMock();
   logger.info('🎭 Mock mode: Cleared all character data');
 };
 
@@ -191,3 +196,9 @@ export const clearAllData = (): void => {
 export const exportMockData = (): Character[] => {
   return getStoredCharacters();
 };
+
+export const watchUserCharacters = (userId: string, ok: (c: CharacterListItem[]) => void, bad: (e: Error) => void) =>
+  mockWatch(() => getUserCharacters({ uid: userId } as AuthUser), ok, bad);
+
+export const watchCharacter = (userId: string, characterId: string, ok: (c: Character | null) => void, bad: (e: Error) => void) =>
+  mockWatch(() => getCharacterById(userId, characterId), ok, bad);

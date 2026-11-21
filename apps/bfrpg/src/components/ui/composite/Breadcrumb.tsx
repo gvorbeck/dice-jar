@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { Icon } from '@/components/ui';
 import List, { ListItem } from './List';
 import { cn } from '@dice-jar/cn';
@@ -46,7 +46,7 @@ function Breadcrumb({ items, separator, className }: BreadcrumbProps) {
                     {item.label}
                   </span>
                 ) : item.href ? (
-                  <Link href={item.href} className="crumb-link">
+                  <Link to={item.href} className="crumb-link">
                     {item.label}
                   </Link>
                 ) : (

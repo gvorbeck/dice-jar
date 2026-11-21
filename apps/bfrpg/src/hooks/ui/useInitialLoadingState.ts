@@ -6,27 +6,22 @@ import { useState } from 'react';
  * This hook ensures that loading skeletons are shown:
  * 1. On initial component mount (prevents flash of empty state)
  * 2. During initial data loading
- * 3. When fetching data and no cached data is available
  *
  * @param isLoading - Whether the query is in initial loading state
- * @param isFetching - Whether the query is currently fetching (includes background refetch)
- * @param hasData - Whether any data is currently available
  * @returns boolean indicating whether loading skeleton should be shown
  */
-export function useInitialLoadingState(isLoading: boolean, isFetching: boolean, hasData: boolean): boolean {
+export function useInitialLoadingState(isLoading: boolean): boolean {
   const [isInitialMount, setIsInitialMount] = useState(true);
   const [prevIsLoading, setPrevIsLoading] = useState(isLoading);
-  const [prevIsFetching, setPrevIsFetching] = useState(isFetching);
 
   // Adjust state during render when loading state changes
   // This is the React-recommended pattern for derived state
-  if (isLoading !== prevIsLoading || isFetching !== prevIsFetching) {
+  if (isLoading !== prevIsLoading) {
     setPrevIsLoading(isLoading);
-    setPrevIsFetching(isFetching);
-    if (!isLoading && !isFetching && isInitialMount) {
+    if (!isLoading && isInitialMount) {
       setIsInitialMount(false);
     }
   }
 
-  return isInitialMount || isLoading || (isFetching && !hasData);
+  return isInitialMount || isLoading;
 }

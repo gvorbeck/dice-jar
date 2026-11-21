@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { roller, GAME_MECHANICS, DICE_LIMITS } from '@/utils/mechanics';
+import { roller, GAME_MECHANICS } from '@/utils/mechanics';
 import {
   cascadeValidateCharacter,
   hasValidAbilityScores,
@@ -24,12 +24,10 @@ describe('Game Mechanics Tests', () => {
         expect.objectContaining({
           formula: '3d6',
           total: expect.any(Number),
-          rolls: expect.arrayContaining([expect.any(Number)]),
           breakdown: expect.any(String),
         }),
       );
 
-      expect(result.rolls).toHaveLength(3);
       expect(result.total).toBeGreaterThanOrEqual(3);
       expect(result.total).toBeLessThanOrEqual(18);
 
@@ -62,10 +60,11 @@ describe('Game Mechanics Tests', () => {
       mockRandom.mockRestore();
     });
 
-    it('respects dice limits', () => {
-      expect(DICE_LIMITS.MAX_DICE_COUNT).toBe(100);
-      expect(DICE_LIMITS.MIN_DICE_SIDES).toBe(1);
+    it('accepts the formulas the dice roller hint suggests', () => {
+      for (const f of ['1d20', '3d6+2', '4d6dl1', '2d20kh1']) expect(() => roller(f)).not.toThrow();
+    });
 
+    it('respects dice limits', () => {
       // Test that invalid dice expressions are handled
       expect(() => roller('101d6')).toThrow();
       expect(() => roller('1d0')).toThrow();

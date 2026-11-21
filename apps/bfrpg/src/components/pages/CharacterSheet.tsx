@@ -1,4 +1,5 @@
-import { useRoute } from 'wouter';
+import { useParams } from 'react-router-dom';
+import { useTitle } from '@dice-jar/browser';
 import { useMemo, useCallback } from 'react';
 import { allClasses } from '@/data';
 import { Breadcrumb, HorizontalRule } from '@/components/ui/composite';
@@ -29,7 +30,7 @@ import { canCastSpells, hasCantrips, hasSpells, calculateModifier, getClassById,
 import './CharacterSheet.css';
 
 export default function CharacterSheet() {
-  const [, params] = useRoute('/u/:userId/c/:characterId');
+  const params = useParams<{ userId: string; characterId: string }>();
 
   // Use the enhanced character sheet hook and mutations
   const characterQuery = useEnhancedCharacterSheet(params?.userId || '', params?.characterId || '');
@@ -38,6 +39,7 @@ export default function CharacterSheet() {
   const character = characterQuery.data?.character;
   const isOwner = characterQuery.data?.isOwner || false;
   const loading = characterQuery.isLoading;
+  useTitle(character?.name ? `${character.name} | Codex.Quest` : 'Character | Codex.Quest');
   const error = characterQuery.error;
 
   // Use the dice roller hook
