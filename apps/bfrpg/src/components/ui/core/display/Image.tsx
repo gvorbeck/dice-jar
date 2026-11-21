@@ -1,6 +1,7 @@
 import { forwardRef, useState } from 'react';
 import type { ImgHTMLAttributes } from 'react';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
+import './Image.css';
 
 type ImageVariant = 'logo' | 'avatar' | 'standard';
 type ImageSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -13,22 +14,6 @@ interface ImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'size'> {
   fallback?: string | React.ReactElement;
   onError?: (error: React.SyntheticEvent<HTMLImageElement>) => void;
 }
-
-// Size styles constant - extracted to module level for performance
-const SIZE_STYLES: Record<ImageSize, string> = {
-  xs: 'w-6 h-6',
-  sm: 'w-12 h-12',
-  md: 'w-16 h-16',
-  lg: 'w-24 h-24',
-  xl: 'w-32 h-32',
-};
-
-// Helper to get variant styles
-const getVariantStyles = (size?: ImageSize): Record<ImageVariant, string> => ({
-  logo: '',
-  avatar: cn('rounded-full object-cover border-2 border-zinc-600', size ? SIZE_STYLES[size] : ''),
-  standard: 'object-cover',
-});
 
 /**
  * Image component with consistent loading, error handling, and styling patterns.
@@ -59,26 +44,13 @@ const Image = forwardRef<HTMLImageElement, ImageProps>(
     const defaultLoading = variant === 'logo' ? 'eager' : 'lazy';
     const imageLoading = loading ?? defaultLoading;
 
-    // Get variant styles
-    const variantStyles = getVariantStyles(size);
-    const imageClasses = cn(variantStyles[variant], className);
-
     // Show fallback if error occurred and fallback is provided
     if (hasError && fallback) {
       // If fallback is a string (e.g., initials), render as text
       if (typeof fallback === 'string') {
-        const fallbackClasses = cn(
-          'flex items-center justify-center bg-zinc-700 border-2 border-zinc-600 flex-shrink-0',
-          variant === 'avatar' && 'rounded-full',
-          size ? SIZE_STYLES[size] : '',
-          className,
-        );
-
         return (
-          <div className={fallbackClasses} aria-label={alt}>
-            <span className="text-zinc-300 font-bold" aria-hidden="true">
-              {fallback}
-            </span>
+          <div className={cn('img-fallback', className)} data-variant={variant} data-size={size} aria-label={alt}>
+            <span aria-hidden="true">{fallback}</span>
           </div>
         );
       }
@@ -92,7 +64,19 @@ const Image = forwardRef<HTMLImageElement, ImageProps>(
       return null;
     }
 
-    return <img ref={ref} src={src} alt={alt} loading={imageLoading} onError={handleError} className={imageClasses} {...props} />;
+    return (
+      <img
+        ref={ref}
+        src={src}
+        alt={alt}
+        loading={imageLoading}
+        onError={handleError}
+        className={cn('img', className)}
+        data-variant={variant}
+        data-size={size}
+        {...props}
+      />
+    );
   },
 );
 

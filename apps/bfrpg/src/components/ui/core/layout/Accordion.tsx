@@ -2,6 +2,8 @@ import React, { useState, useId, useMemo, useCallback } from 'react';
 import { TextInput } from '@/components/ui/core/primitives';
 import { Card, Typography } from '@/components/ui/core/display';
 import { useDebounce } from '@/hooks';
+import { cn } from '@dice-jar/cn';
+import './Accordion.css';
 
 interface AccordionItem {
   name: string;
@@ -41,39 +43,19 @@ const AccordionSection: React.FC<AccordionSectionProps> = ({
   const contentId = `${sectionId}-content`;
 
   return (
-    <div className="accordion-section border border-zinc-700 rounded-lg overflow-hidden bg-zinc-950 shadow-[0_4px_0_0_#3f3f46] mb-4">
-      <button
-        type="button"
-        aria-expanded={isExpanded}
-        aria-controls={contentId}
-        onClick={onToggle}
-        className={`
-          w-full px-6 py-4 text-left font-semibold text-base
-          bg-zinc-950 text-zinc-400 border-none
-          hover:bg-zinc-900 hover:text-amber-400
-          focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-950
-          transition-all duration-200
-          flex items-center justify-between
-          active:translate-y-0.5 active:shadow-[0_2px_0_0_#3f3f46]
-        `}
-      >
-        <span className="flex items-center gap-2">
-          <span className="text-amber-400">{title.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}</span>
-          {showCount && <span className="text-zinc-400 text-sm font-normal">({itemCount})</span>}
+    <div className="accordion-section">
+      <button type="button" aria-expanded={isExpanded} aria-controls={contentId} onClick={onToggle} className="accordion-head">
+        <span className="accordion-title">
+          <span>{title.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}</span>
+          {showCount && <span className="accordion-count">({itemCount})</span>}
         </span>
-        <span
-          aria-hidden="true"
-          className={`
-            text-amber-400 transition-transform duration-200 font-bold text-lg
-            ${isExpanded ? 'rotate-90' : 'rotate-0'}
-          `}
-        >
+        <span aria-hidden="true" className="accordion-arrow">
           ▶
         </span>
       </button>
 
       {isExpanded && (
-        <div id={contentId} className="bg-zinc-900 border-t border-zinc-700 p-4" role="region" aria-labelledby={sectionId}>
+        <div id={contentId} className="accordion-body" role="region" aria-labelledby={sectionId}>
           {children}
         </div>
       )}
@@ -87,7 +69,7 @@ function Accordion<T extends AccordionItem>({
   labelProperty = 'name' as keyof T,
   searchPlaceholder = 'Search items...',
   renderItem,
-  className = '',
+  className,
   showCounts = true,
   showSearch = true,
 }: AccordionProps<T>) {
@@ -168,7 +150,7 @@ function Accordion<T extends AccordionItem>({
   }, []);
 
   return (
-    <div className={`accordion space-y-4 ${className}`}>
+    <div className={cn('accordion', className)}>
       {/* Search/Filter Bar */}
       {showSearch && (
         <Card variant="standard">
@@ -180,7 +162,7 @@ function Accordion<T extends AccordionItem>({
             aria-label="Filter accordion items"
             aria-describedby={`${accordionId}-description`}
           />
-          <div id={`${accordionId}-description`} aria-live="polite" className="text-sm text-zinc-400 mt-2">
+          <div id={`${accordionId}-description`} aria-live="polite" className="accordion-note">
             {debouncedSearchTerm ? `Showing ${totalFilteredCount} items matching "${debouncedSearchTerm}"` : `${items.length} total items`}
           </div>
         </Card>
@@ -189,8 +171,8 @@ function Accordion<T extends AccordionItem>({
       {/* Accordion Sections */}
       <div role="region" aria-label="Accordion content">
         {Object.keys(groupedItems).length === 0 ? (
-          <div className="bg-zinc-800 rounded-lg p-8 text-center border border-zinc-700 shadow-[0_4px_0_0_#3f3f46]">
-            <Typography variant="body" color="muted" className="text-lg">
+          <div className="accordion-empty">
+            <Typography variant="body" color="muted">
               {debouncedSearchTerm ? 'No items match your search.' : 'No items available.'}
             </Typography>
           </div>
@@ -205,13 +187,9 @@ function Accordion<T extends AccordionItem>({
               itemCount={categoryItems.length}
               showCount={showCounts}
             >
-              <div role="list" className="space-y-2">
+              <div role="list">
                 {categoryItems.map((item, index) => (
-                  <div
-                    key={`${category}-${index}`}
-                    role="listitem"
-                    className="p-3 rounded-md border border-zinc-700 bg-zinc-800 transition-all duration-200"
-                  >
+                  <div key={`${category}-${index}`} role="listitem" className="accordion-item">
                     {renderItem(item, index)}
                   </div>
                 ))}

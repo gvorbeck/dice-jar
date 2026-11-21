@@ -2,6 +2,7 @@ import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { Typography } from '@/components/ui/core/display';
 import { logger } from '@/utils';
+import './NotificationErrorBoundary.css';
 
 interface Props {
   children: ReactNode;
@@ -45,11 +46,7 @@ export class NotificationErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       // Provide minimal fallback UI with accessibility support
       return (
-        <div
-          role="alert"
-          aria-live="assertive"
-          className="fixed top-4 right-4 z-50 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-xl p-4 max-w-sm"
-        >
+        <div role="alert" aria-live="assertive" className="notification-fallback">
           <Typography variant="helper" color="secondary">
             Notification system temporarily unavailable
           </Typography>

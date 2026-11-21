@@ -1,0 +1,34 @@
+@layer components {
+  .confirm > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .confirm .typography[data-variant='body'] {
+    line-height: 1.625;
+  }
+  .confirm-flavor.typography {
+    font-style: italic;
+    text-align: center;
+    line-height: 1.625;
+  }
+  .confirm-field > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .confirm-input {
+    position: relative;
+  }
+  .confirm-mark {
+    position: absolute;
+    top: 50%;
+    right: calc(var(--space) * 3);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .confirm-actions {
+    display: flex;
+    gap: calc(var(--space) * 3);
+    padding-top: calc(var(--space) * 2);
+  }
+  .confirm-actions .btn {
+    flex: 1 1 0%;
+  }
+}

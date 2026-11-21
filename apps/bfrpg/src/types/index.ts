@@ -49,16 +49,7 @@ export type {
 } from './game';
 
 // UI types
-export type {
-  ButtonVariant,
-  ButtonSize,
-  BaseButtonProps,
-  PropValidationResult,
-  UseLoadingStateOptions,
-  LoadingState,
-  ShowNotificationOptions,
-  NotificationSystem,
-} from './ui';
+export type { BaseButtonProps, UseLoadingStateOptions, LoadingState, ShowNotificationOptions, NotificationSystem } from './ui';
 
 // Encounter types
 export type { EncounterType, CityType, DungeonLevel, WildernessType } from './encounters';

@@ -1,0 +1,5 @@
+@layer components {
+  .requirement-card .info-card-header {
+    margin-bottom: calc(var(--space) * 3);
+  }
+}

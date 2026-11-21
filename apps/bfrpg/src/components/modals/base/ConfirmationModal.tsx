@@ -3,6 +3,7 @@ import Modal from './Modal';
 import { Button, Typography, TextInput, Callout } from '@/components/ui';
 import { Icon } from '@/components/ui/core/display';
 import { getEntityDeletionDescription } from '@/utils';
+import './ConfirmationModal.css';
 
 type EntityType = 'character' | 'game' | 'player';
 
@@ -107,24 +108,24 @@ function ConfirmationModal({
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={title} size="md">
-      <div className="space-y-6">
+      <div className="confirm">
         {/* Warning Section */}
         <Callout variant={variant} title={description} size="lg">
-          <Typography variant="body" className="leading-relaxed">
-            <strong className="text-accent-foreground">"{entityName}"</strong> {getEntityDeletionDescription(variant, entityName, title)}
+          <Typography variant="body">
+            <strong>"{entityName}"</strong> {getEntityDeletionDescription(variant, entityName, title)}
           </Typography>
         </Callout>
 
         {/* Atmospheric flavor text */}
         <Callout variant="neutral" size="sm">
-          <Typography variant="helper" className="text-muted-foreground italic text-center leading-relaxed">
+          <Typography variant="helper" className="confirm-flavor">
             "{flavorText}"
           </Typography>
         </Callout>
 
         {/* Confirmation Input */}
-        <div className="space-y-4">
-          <Typography variant="body" className="text-foreground" id="confirm-description">
+        <div className="confirm-field">
+          <Typography variant="body" id="confirm-description">
             To confirm this {variant === 'error' ? 'irreversible' : ''} action, type{' '}
             <Typography variant="code" color={variant === 'error' ? 'red' : 'amber'} as="code">
               {confirmText}
@@ -132,7 +133,7 @@ function ConfirmationModal({
             in the field below:
           </Typography>
 
-          <div className="relative">
+          <div className="confirm-input">
             <TextInput
               value={inputText}
               onChange={setInputText}
@@ -152,21 +153,16 @@ function ConfirmationModal({
 
             {/* Visual validation indicator */}
             {inputText && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                <Icon
-                  name={isConfirmValid ? 'check-circle' : 'x-circle'}
-                  size="sm"
-                  className={isConfirmValid ? 'text-success' : 'text-warning'}
-                  aria-hidden={true}
-                />
+              <div className="confirm-mark">
+                <Icon name={isConfirmValid ? 'check-circle' : 'x-circle'} size="sm" aria-hidden={true} />
               </div>
             )}
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 pt-2">
-          <Button variant="secondary" onClick={handleClose} disabled={isProcessing} className="flex-1">
+        <div className="confirm-actions">
+          <Button variant="secondary" onClick={handleClose} disabled={isProcessing}>
             Cancel
           </Button>
           <Button
@@ -175,7 +171,6 @@ function ConfirmationModal({
             disabled={!isConfirmValid || isProcessing}
             loading={isProcessing}
             loadingText={loadingText}
-            className="flex-1"
             aria-describedby={!isConfirmValid ? 'confirm-description' : undefined}
             icon={iconName}
             iconSize="sm"

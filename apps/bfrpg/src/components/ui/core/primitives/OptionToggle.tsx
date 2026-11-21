@@ -1,5 +1,7 @@
 import { Switch } from '@/components/ui/core/primitives';
 import { Typography } from '@/components/ui/core/display';
+import { cn } from '@dice-jar/cn';
+import './OptionToggle.css';
 
 interface OptionToggleProps {
   title: string;
@@ -10,9 +12,9 @@ interface OptionToggleProps {
   className?: string;
 }
 
-export function OptionToggle({ title, description, switchLabel, checked, onCheckedChange, className = '' }: OptionToggleProps) {
+export function OptionToggle({ title, description, switchLabel, checked, onCheckedChange, className }: OptionToggleProps) {
   return (
-    <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${className}`}>
+    <div className={cn('option-toggle', className)}>
       <div>
         <Typography variant="baseSectionHeading" color="zinc">
           {title}

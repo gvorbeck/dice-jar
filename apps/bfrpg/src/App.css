@@ -119,16 +119,6 @@ h6 {
   background: var(--zinc-800);
 }
 
-/* Notification progress bar animation */
-@keyframes shrink {
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0%;
-  }
-}
-
 /* Skeleton shimmer animation */
 @keyframes shimmer {
   0% {

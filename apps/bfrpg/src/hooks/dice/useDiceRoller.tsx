@@ -17,7 +17,7 @@ export function useDiceRoller(): UseDiceRollerReturn {
 
   const DiceRollerFAB = useCallback(
     ({ disabled }: { disabled?: boolean }) => (
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className="fab-corner">
         <FloatingActionButton
           onClick={openRoller}
           aria-label="Open dice roller"

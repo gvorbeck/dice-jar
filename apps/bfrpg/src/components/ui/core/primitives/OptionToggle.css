@@ -1,0 +1,14 @@
+@layer components {
+  .option-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space) * 4);
+  }
+  @media (min-width: 40rem) {
+    .option-toggle {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+}

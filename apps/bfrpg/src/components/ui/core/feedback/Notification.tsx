@@ -1,15 +1,10 @@
-import { forwardRef, useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { forwardRef, useEffect, useState, useCallback, useRef } from 'react';
 import type { ReactNode, HTMLAttributes } from 'react';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
 import { Typography } from '@/components/ui/core/display';
 import { Button } from '@/components/ui/core/primitives';
-import {
-  NOTIFICATION_CONSTANTS,
-  PRIORITY_STYLES,
-  POSITION_ANIMATIONS,
-  PRIORITY_PROGRESS_COLORS,
-  BASE_NOTIFICATION_STYLES,
-} from '@/constants';
+import { NOTIFICATION_CONSTANTS } from '@/constants';
+import './Notification.css';
 
 type NotificationPriority = 'info' | 'success' | 'warning' | 'error';
 export type NotificationPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
@@ -56,6 +51,7 @@ const Notification = forwardRef<HTMLDivElement, NotificationProps>(
     const dismissTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const notificationRef = useRef<HTMLDivElement>(null);
+    const timerRef = useRef<HTMLDivElement>(null);
     const previousFocusRef = useRef<HTMLElement | null>(null);
 
     const handleDismiss = useCallback(() => {
@@ -106,6 +102,15 @@ const Notification = forwardRef<HTMLDivElement, NotificationProps>(
       };
     }, []);
 
+    // Once per notification: an inline ref callback would restart the bar on every re-render
+    const timerShown = duration > 0 && isVisible && !isAnimatingOut;
+    useEffect(() => {
+      if (!timerShown) return undefined;
+      // jsdom has no animate()
+      const animation = timerRef.current?.animate?.([{ width: '100%' }, { width: '0%' }], { duration, easing: 'linear', fill: 'forwards' });
+      return () => animation?.cancel();
+    }, [timerShown, duration]);
+
     // Focus management for critical notifications with restoration
     useEffect(() => {
       if (isVisible && priority === 'error' && notificationRef.current) {
@@ -134,44 +139,6 @@ const Notification = forwardRef<HTMLDivElement, NotificationProps>(
       return undefined;
     }, [isVisible, priority]);
 
-    // Memoize style lookups to prevent recalculation on every render
-    const styles = useMemo(() => PRIORITY_STYLES[priority], [priority]);
-    const animations = useMemo(() => POSITION_ANIMATIONS[position], [position]);
-
-    // Animation state classes - memoized to prevent recalculation
-    const getAnimationClass = useCallback(() => {
-      if (!isVisible) return animations.initial;
-      if (isAnimatingOut) return animations.exit;
-      return animations.enter;
-    }, [isVisible, isAnimatingOut, animations]);
-
-    // Memoize notification classes to prevent unnecessary re-renders
-    const notificationClasses = useMemo(
-      () =>
-        cn(
-          // Base styles
-          ...BASE_NOTIFICATION_STYLES,
-
-          // Priority-based colors
-          styles.bg,
-          styles.border,
-          styles.shadow,
-
-          // Animation state
-          getAnimationClass(),
-
-          // Opacity for fade effect
-          isVisible && !isAnimatingOut ? 'opacity-100' : 'opacity-0',
-
-          className,
-        ),
-      [styles, isVisible, isAnimatingOut, getAnimationClass, className],
-    );
-
-    const accentClasses = cn('absolute left-0 top-0 bottom-0 w-1 rounded-l-xl', styles.accent);
-    const contentClasses = cn('pl-4', dismissible ? 'pr-12' : 'pr-4');
-    const progressClasses = cn('h-full transition-all ease-linear', PRIORITY_PROGRESS_COLORS[priority]);
-
     return (
       <div
         ref={(node) => {
@@ -182,7 +149,10 @@ const Notification = forwardRef<HTMLDivElement, NotificationProps>(
             ref.current = node;
           }
         }}
-        className={notificationClasses}
+        className={cn('notification', className)}
+        data-priority={priority}
+        data-position={position}
+        data-shown={(isVisible && !isAnimatingOut) || undefined}
         role="alert"
         aria-live={priority === 'error' ? 'assertive' : 'polite'}
         aria-atomic="true"
@@ -190,7 +160,7 @@ const Notification = forwardRef<HTMLDivElement, NotificationProps>(
         {...props}
       >
         {/* Accent bar */}
-        <div className={accentClasses} />
+        <div className="notification-accent" />
 
         {/* Close button */}
         {dismissible && (
@@ -198,7 +168,7 @@ const Notification = forwardRef<HTMLDivElement, NotificationProps>(
             onClick={handleDismiss}
             variant="ghost"
             size="sm"
-            className="absolute top-3 right-3 w-7 h-7 !p-0 !min-h-0 !border-0 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
+            className="notification-close"
             aria-label="Dismiss notification"
             icon="close"
             iconSize="sm"
@@ -206,28 +176,23 @@ const Notification = forwardRef<HTMLDivElement, NotificationProps>(
         )}
 
         {/* Content */}
-        <div className={contentClasses}>
+        <div className="notification-body" data-dismissible={dismissible || undefined}>
           {title && (
-            <Typography variant="h6" color={styles.titleColor} className="mb-2 font-semibold">
+            <Typography variant="h6" color="slate">
               {title}
             </Typography>
           )}
 
-          <Typography variant="body" color={styles.messageColor} className="leading-relaxed">
+          <Typography variant="body" color="slate">
             {message}
           </Typography>
         </div>
 
         {/* Progress bar for timed notifications (only when duration > 0) */}
         {duration > 0 && isVisible && !isAnimatingOut && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/5 dark:bg-white/5 overflow-hidden rounded-b-xl">
-            <div
-              className={progressClasses}
-              // shortcut: inline style for a per-notification duration, same upgrade as NotificationContainer
-              style={{
-                animation: `shrink ${duration}ms linear forwards`,
-              }}
-            />
+          <div className="notification-timer">
+            {/* Web Animations API: the duration is per notification, so it can't live in the stylesheet or an inline style */}
+            <div ref={timerRef} />
           </div>
         )}
       </div>

@@ -3,6 +3,7 @@ import type { ErrorInfo, ReactNode } from 'react';
 import { Link } from 'wouter';
 import { logger } from '@/utils';
 import { TextHeader, Typography, Button } from '@/components/ui';
+import './SharedErrorBoundary.css';
 
 interface Props {
   children: ReactNode;
@@ -84,24 +85,20 @@ export class SharedErrorBoundary extends Component<Props, State> {
       const { showHomeLink = true } = this.props;
 
       return (
-        <section className="text-center py-16" role="alert">
+        <section className="error-page" role="alert">
           <TextHeader variant="h2" size="lg">
             {title}
           </TextHeader>
-          <Typography variant="body" color="secondary" className="mb-6">
+          <Typography variant="body" color="secondary">
             {message}
           </Typography>
-          <div className="space-x-4">
+          <div className="error-page-actions">
             <Button onClick={() => window.location.reload()}>Refresh Page</Button>
-            {showHomeLink && (
-              <Link href="/" className="text-highlight hover:text-highlight-hover transition-colors">
-                Return to Homepage
-              </Link>
-            )}
+            {showHomeLink && <Link href="/">Return to Homepage</Link>}
           </div>
-          <details className="mt-6 text-left max-w-md mx-auto">
-            <summary className="text-sm text-primary-300 cursor-pointer">Error details (for developers)</summary>
-            <pre className="mt-2 text-xs text-primary-400 bg-primary-800 p-3 rounded overflow-auto">{this.state.error?.message}</pre>
+          <details>
+            <summary>Error details (for developers)</summary>
+            <pre>{this.state.error?.message}</pre>
           </details>
         </section>
       );

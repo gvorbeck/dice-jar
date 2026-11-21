@@ -1,7 +1,7 @@
 import { forwardRef, useState, useCallback } from 'react';
 import { SectionHeader } from '@/components';
-import { DESIGN_TOKENS } from '@/constants';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
+import './SectionWrapper.css';
 import { useUiStore } from '@/stores';
 
 interface SectionWrapperProps {
@@ -14,7 +14,7 @@ interface SectionWrapperProps {
 }
 
 const SectionWrapper = forwardRef<HTMLDivElement, SectionWrapperProps>(
-  ({ title, className = '', size = 'md', children, collapsible = false, collapsibleKey }, ref) => {
+  ({ title, className, size = 'md', children, collapsible = false, collapsibleKey }, ref) => {
     // Use Zustand store to persist collapse state if collapsibleKey is provided
     const collapsedSections = useUiStore((state) => state.collapsedSections);
     const setSectionCollapsed = useUiStore((state) => state.setSectionCollapsed);
@@ -38,32 +38,13 @@ const SectionWrapper = forwardRef<HTMLDivElement, SectionWrapperProps>(
       [isCollapsed, collapsibleKey, setSectionCollapsed, setLocalCollapsed],
     );
 
-    const containerClasses = cn(
-      DESIGN_TOKENS.colors.bg.accent,
-      DESIGN_TOKENS.effects.rounded,
-      'overflow-hidden relative',
-      'border-2',
-      DESIGN_TOKENS.colors.border.primary,
-      DESIGN_TOKENS.effects.shadow,
-      DESIGN_TOKENS.effects.transition,
-      'hover:shadow-[0_6px_0_0_#3f3f46,0_0_25px_rgba(0,0,0,0.4)]',
-      'group',
-      className,
-    );
-
-    const collapseButtonClasses = cn(
-      'p-1 rounded transition-transform duration-200',
-      'hover:bg-white/10 focus:bg-white/10 focus:outline-none',
-      'focus:ring-2 focus:ring-amber-400/50',
-      isCollapsed && 'rotate-180',
-    );
-
     // Create collapse button as extra content if collapsible
     const collapseButton = collapsible ? (
       <button
         type="button"
         onClick={toggleCollapse}
-        className={collapseButtonClasses}
+        className="section-toggle"
+        data-collapsed={isCollapsed || undefined}
         aria-label={isCollapsed ? 'Expand section' : 'Collapse section'}
         aria-expanded={!isCollapsed}
       >
@@ -83,7 +64,7 @@ const SectionWrapper = forwardRef<HTMLDivElement, SectionWrapperProps>(
     ) : undefined;
 
     return (
-      <div ref={ref} className={containerClasses}>
+      <div ref={ref} className={cn('section', className)}>
         <SectionHeader title={title} extra={collapseButton} size={size} />
         {!isCollapsed && children}
       </div>

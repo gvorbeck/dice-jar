@@ -102,7 +102,6 @@ function Home() {
       {/* Floating Action Button Group for authenticated users */}
       {!authLoading && user && (
         <FABGroup
-          position="bottom-right"
           actions={[
             {
               key: 'new-character',
@@ -128,8 +127,6 @@ function Home() {
             size: 'lg' as const,
             children: <Icon name="plus" size="lg" aria-hidden />,
           }}
-          expandDirection="up"
-          showLabels={true}
         />
       )}
     </PageWrapper>

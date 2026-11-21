@@ -6,22 +6,14 @@
 import type { ButtonHTMLAttributes } from 'react';
 
 // Button types
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'accent';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'accent';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface BaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   loadingText?: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
-}
-
-// Validation types
-export interface PropValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings: string[];
-  context?: Record<string, unknown>;
 }
 
 // Loading state types

@@ -1,9 +1,8 @@
 import { Tooltip } from '@/components/ui/core/feedback';
 import { Icon, type IconName } from '@/components/ui/core/display/Icon';
 import type { ReactNode } from 'react';
-
-// Default styles for consistent theming
-const DEFAULT_ICON_STYLES = 'text-zinc-500 hover:text-zinc-300 cursor-help transition-colors duration-200';
+import { cn } from '@dice-jar/cn';
+import './InfoTooltip.css';
 
 interface InfoTooltipProps {
   /** The content to show in the tooltip */
@@ -29,18 +28,18 @@ interface InfoTooltipProps {
  */
 export default function InfoTooltip({
   content,
-  className = '',
+  className,
   iconName = 'info-question',
   iconSize = 'sm',
   iconClassName,
   disabled = false,
   ariaLabel = 'More information',
 }: InfoTooltipProps) {
-  const finalIconClassName = iconClassName || `${DEFAULT_ICON_STYLES} ${className}`;
+  const finalIconClassName = iconClassName || cn('info-tip-icon', className);
 
   return (
     <Tooltip content={content} disabled={disabled}>
-      <div role="button" tabIndex={0} aria-label={ariaLabel} className="inline-block">
+      <div role="button" tabIndex={0} aria-label={ariaLabel} className="info-tip">
         <Icon
           name={iconName}
           size={iconSize}

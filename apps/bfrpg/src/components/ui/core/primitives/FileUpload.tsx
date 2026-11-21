@@ -1,7 +1,9 @@
-import { cn, logger } from '@/utils';
+import { logger } from '@/utils';
+import { cn } from '@dice-jar/cn';
 import React, { useRef, useState, useId } from 'react';
 import Button from './Button';
 import { Icon } from '@/components/ui';
+import './FileUpload.css';
 
 interface FileUploadProps {
   onFileSelect: (file: File | null) => void;
@@ -118,12 +120,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
     handleFileSelect(file);
   };
 
-  const dropZoneClasses = cn(
-    'border-2 border-dashed rounded-lg p-6 text-center transition-colors mt-2',
-    dragOver ? 'border-amber-400 bg-amber-400/10' : 'border-zinc-600 hover:border-zinc-500',
-    disabled && 'opacity-60 cursor-not-allowed',
-  );
-
   return (
     <div>
       <label htmlFor={inputId}>
@@ -148,15 +144,23 @@ const FileUpload: React.FC<FileUploadProps> = ({
       />
 
       {/* Drop zone */}
-      <div role="presentation" onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} className={dropZoneClasses}>
+      <div
+        role="presentation"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className="upload-zone"
+        data-over={dragOver || undefined}
+        data-disabled={disabled || undefined}
+      >
         {selectedFileName ? (
-          <div className="space-y-4">
-            <div className="flex items-center justify-center gap-2 text-lime-400">
+          <div>
+            <div className="upload-done">
               <Icon name="check" size="sm" />
-              <span className="font-medium">{selectedFileName}</span>
+              <span>{selectedFileName}</span>
             </div>
-            <div className="text-zinc-400 text-sm">Click to change or drag a new file here</div>
-            <div className="flex gap-2 justify-center">
+            <div className="upload-hint">Click to change or drag a new file here</div>
+            <div className="upload-actions">
               <Button
                 type="button"
                 variant="secondary"
@@ -182,11 +186,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="text-zinc-400">
-              <Icon name="photo" size="xl" className="mx-auto mb-4" />
+          <div>
+            <div className="upload-icon">
+              <Icon name="photo" size="xl" />
             </div>
-            <div className="space-y-2">
+            <div className="upload-pick">
               <Button
                 type="button"
                 variant="secondary"
@@ -200,14 +204,16 @@ const FileUpload: React.FC<FileUploadProps> = ({
               >
                 {dragOver ? 'Drop your file here' : 'Click to select a file'}
               </Button>
-              <div className="text-zinc-500 text-sm">or drag and drop a file here</div>
+              <div className="upload-hint" data-faint>
+                or drag and drop a file here
+              </div>
             </div>
           </div>
         )}
       </div>
 
       {error && (
-        <div id={errorId} role="alert" aria-live="assertive" className="text-sm mt-1 text-red-400">
+        <div id={errorId} role="alert" aria-live="assertive" className="upload-error">
           {error}
         </div>
       )}

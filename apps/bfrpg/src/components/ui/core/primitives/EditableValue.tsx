@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, forwardRef } from 'react';
 import { NumberInput } from '@/components/ui/core/primitives';
 import { Icon } from '@/components/ui/core/display';
-import { DESIGN_TOKENS } from '@/constants';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
+import './EditableValue.css';
 
 interface EditableValueProps {
   /** Current value */
@@ -38,12 +38,12 @@ const EditableValue = forwardRef<HTMLDivElement, EditableValueProps>(
     {
       value,
       onChange,
-      minValue = DESIGN_TOKENS.inputs.editableValue.minValue,
-      maxValue = DESIGN_TOKENS.inputs.editableValue.maxValue,
+      minValue = 0,
+      maxValue = 999999,
       editable = false,
       displayValue,
-      displayClassName = '',
-      inputClassName = '',
+      displayClassName,
+      inputClassName,
       size = 'md',
       ariaLabel,
       showEditIcon = true,
@@ -147,24 +147,6 @@ const EditableValue = forwardRef<HTMLDivElement, EditableValueProps>(
       }
     };
 
-    // Compute class names outside of JSX
-    const inputClasses = cn(
-      'text-center',
-      DESIGN_TOKENS.colors.bg.input,
-      DESIGN_TOKENS.colors.border.input,
-      DESIGN_TOKENS.colors.text.primary,
-      inputClassName,
-    );
-
-    const displayClasses = cn('relative', DESIGN_TOKENS.effects.transition, editable && 'cursor-pointer', displayClassName);
-
-    const iconClasses = cn(
-      DESIGN_TOKENS.colors.text.secondary,
-      'opacity-0 group-hover:opacity-100',
-      'transition-opacity duration-200',
-      'absolute -top-1 right-2',
-    );
-
     if (isEditing && editable) {
       return (
         <NumberInput
@@ -176,7 +158,7 @@ const EditableValue = forwardRef<HTMLDivElement, EditableValueProps>(
           minValue={minValue}
           maxValue={maxValue}
           size={size}
-          className={inputClasses}
+          className={cn('editable-input', inputClassName)}
           {...(ariaLabel && { 'aria-label': ariaLabel })}
         />
       );
@@ -185,13 +167,14 @@ const EditableValue = forwardRef<HTMLDivElement, EditableValueProps>(
     return (
       <div
         ref={ref}
-        className={displayClasses}
+        className={cn('editable', displayClassName)}
+        data-editable={editable || undefined}
         aria-label={editable ? `${ariaLabel} (click to edit)` : ariaLabel}
         {...(editable && { onClick: handleClick, onKeyDown: handleKeyDown, role: 'button', tabIndex: 0 })}
         {...displayProps}
       >
         {displayValue ?? value}
-        {editable && showEditIcon && <Icon name="edit" size="xs" className={iconClasses} aria-hidden={true} />}
+        {editable && showEditIcon && <Icon name="edit" size="xs" className="editable-icon" aria-hidden={true} />}
       </div>
     );
   },
