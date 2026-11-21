@@ -35,7 +35,7 @@ export default defineConfig({
         'src/test/**',
       ],
       // shortcut: interim floor at the imported app's measured coverage (owner-approved 2026-11-20); raise it with every test added, reach 77/74/68/78 in the tests phase
-      thresholds: { lines: 15, statements: 14, branches: 10, functions: 9 },
+      thresholds: { lines: 15, statements: 15, branches: 10, functions: 9 },
     },
   },
   resolve: {

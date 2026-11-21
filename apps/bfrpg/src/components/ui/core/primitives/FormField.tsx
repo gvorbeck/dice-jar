@@ -1,8 +1,8 @@
 import { useId, cloneElement, isValidElement } from 'react';
 import type { ReactNode } from 'react';
-import { Typography } from '@/components/ui/core/display';
 import { Icon } from '@/components/ui/core/display';
-import { DESIGN_TOKENS } from '@/constants';
+import { cn } from '@dice-jar/cn';
+import './FormField.css';
 
 interface ValidationResult {
   isValid: boolean;
@@ -39,17 +39,17 @@ export default function FormField({
   const hintId = hint ? `${fieldId}-hint` : undefined;
 
   return (
-    <div className={`space-y-2 ${className}`}>
-      <label htmlFor={fieldId} className={`block text-sm font-medium ${DESIGN_TOKENS.colors.text.primary} ${labelClassName}`}>
+    <div className={cn('form-field', className)}>
+      <label htmlFor={fieldId} className={cn('form-field-label', labelClassName)}>
         {label}
         {required && (
-          <span className="text-red-400 ml-1" aria-label="required">
+          <span className="form-field-required" aria-label="required">
             *
           </span>
         )}
       </label>
 
-      <div className="relative">
+      <div className="form-field-control">
         {isValidElement(children)
           ? cloneElement(children as React.ReactElement<Record<string, unknown>>, {
               id: fieldId,
@@ -61,13 +61,13 @@ export default function FormField({
       </div>
 
       {hint && (
-        <Typography variant="caption" color="muted" id={hintId} className={DESIGN_TOKENS.colors.text.secondary}>
+        <span id={hintId} className="form-field-hint">
           {hint}
-        </Typography>
+        </span>
       )}
 
       {finalError && (
-        <div id={errorId} className="flex items-center gap-1 text-sm text-red-400" role="alert" aria-live="polite">
+        <div id={errorId} className="form-field-error" role="alert" aria-live="polite">
           <Icon name="exclamation-triangle" size="xs" />
           {finalError}
         </div>

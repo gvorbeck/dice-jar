@@ -1,6 +1,8 @@
 import React, { forwardRef, useState, useId, useEffect } from 'react';
+import { Button as AriaButton, TextArea as AriaTextArea } from 'react-aria-components';
 import { Icon } from '@/components';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
+import './TextArea.css';
 
 type TextAreaSize = 'sm' | 'md' | 'lg';
 
@@ -107,67 +109,28 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 
     const showClear = showClearButton && inputValue && inputValue.length > 0 && !disabled;
 
-    // Compact styling for smaller TextField
-    const baseStyles = [
-      'w-full transition-all duration-150',
-      'border rounded',
-      'bg-zinc-800/50 text-zinc-100 border-zinc-600/50',
-      'placeholder:text-zinc-400/70',
-      'focus:outline-none focus:ring-1 focus:ring-amber-400/50 focus:ring-offset-1 focus:ring-offset-zinc-900',
-      'focus:border-amber-400/60 focus:bg-zinc-750',
-      'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-zinc-900/30',
-    ];
-
-    // Error state styles
-    const errorStyles = error
-      ? ['border-red-500/60 focus:border-red-400/60 focus:ring-red-400/50', 'bg-red-950/10 focus:bg-red-950/20']
-      : [];
-
-    // Size styles for textarea - accounting for multiple lines
-    const sizeStyles = {
-      sm: 'px-2 py-1.5 text-xs',
-      md: 'px-3 py-2 text-sm',
-      lg: 'px-4 py-2.5 text-base',
-    };
-
-    // Resize styles
-    const resizeStyles = {
-      none: 'resize-none',
-      both: 'resize',
-      horizontal: 'resize-x',
-      vertical: 'resize-y',
-    };
-
-    // Clear button styles - positioned at top right for textarea
-    const clearButtonStyles = [
-      'absolute right-1.5 top-2',
-      'w-4 h-4 rounded-full',
-      'flex items-center justify-center',
-      'text-zinc-500 hover:text-zinc-300',
-      'hover:bg-zinc-600/50 transition-colors duration-150',
-      'focus:outline-none focus:ring-1 focus:ring-amber-400/50',
-      'z-10',
-    ];
-
-    // Adjust input padding when clear button is shown
-    const inputPaddingClass = showClear ? 'pr-6' : '';
-
-    // Combine all styles for textarea
-    const textAreaClasses = cn(...baseStyles, ...errorStyles, sizeStyles[size], resizeStyles[resize], inputPaddingClass, className);
+    const textAreaClasses = cn(
+      'text-area',
+      `text-area-${size}`,
+      `text-area-${resize}`,
+      error && 'text-area-error',
+      showClear && 'text-area-clearable',
+      className,
+    );
 
     const effectiveAriaLabel = ariaLabel || label;
 
     return (
-      <div className="relative">
+      <div className="text-area-wrap">
         {label && (
-          <label htmlFor={inputId} className="block text-xs text-zinc-300 mb-1 font-medium">
+          <label htmlFor={inputId} className="text-area-label">
             {label}
-            {required && <span className="text-red-400 ml-1">*</span>}
+            {required && <span className="text-area-required">*</span>}
           </label>
         )}
 
-        <div className="relative">
-          <textarea
+        <div className="text-area-wrap">
+          <AriaTextArea
             ref={ref}
             id={inputId}
             name={name}
@@ -190,9 +153,9 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           />
 
           {showClear && (
-            <button type="button" id={clearButtonId} onClick={handleClear} aria-label="Clear input" className={cn(...clearButtonStyles)}>
+            <AriaButton id={clearButtonId} onPress={handleClear} aria-label="Clear input" className="text-area-clear">
               <Icon name="close" size="xs" aria-hidden={true} />
-            </button>
+            </AriaButton>
           )}
         </div>
       </div>

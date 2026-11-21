@@ -17,6 +17,7 @@ test.describe('look baseline', () => {
 
       const shot = async (page: Page, name: string, info: TestInfo) => {
         await page.waitForLoadState('networkidle');
+        await page.mouse.move(0, 0); // a hovered button changes its shadow
         const png = await page.screenshot({ fullPage: true, animations: 'disabled' });
         if (compare) expect(png).toMatchSnapshot(`${vp}-${name}.png`, { maxDiffPixelRatio: 0 });
         else {
@@ -59,6 +60,64 @@ test.describe('look baseline', () => {
       test('game sheet', async ({ page }, info) => {
         await page.goto(await hrefOf(page, '/g/', 'Games'));
         await shot(page, 'game-sheet', info);
+      });
+      // Rolls decide what the creation steps show, so pin Math.random for the tests that roll.
+      const seeded = async (page: Page) =>
+        page.addInitScript(() => {
+          let a = 123456789;
+          Math.random = () => {
+            a = (a + 0x6d2b79f5) | 0;
+            let t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        });
+
+      test('creation steps', async ({ page }, info) => {
+        await seeded(page);
+        await page.goto('/new-character');
+        await page.getByRole('button', { name: 'Roll All Abilities' }).click();
+        await expect(page.getByRole('heading', { name: 'Ability Scores', exact: true })).toBeVisible();
+        await shot(page, 'creation-1-abilities', info);
+        const next = page.getByRole('button', { name: 'Next', exact: true });
+        await next.click();
+        await page.getByLabel('Race*').selectOption('human');
+        await shot(page, 'creation-2-race', info);
+        await next.click();
+        await page.getByLabel('Class*').selectOption('fighter');
+        await shot(page, 'creation-3-class', info);
+        await next.click();
+        await page
+          .getByRole('button', { name: /roll.*d8/i })
+          .first()
+          .click();
+        await shot(page, 'creation-4-hit-points', info);
+        await next.click();
+        await expect(page.locator('#step-content-heading').filter({ hasText: 'Equipment' })).toBeVisible();
+        await shot(page, 'creation-5-equipment', info);
+        await next.click();
+        await page.getByLabel(/character name/i).fill('Test Fighter');
+        await shot(page, 'creation-6-review', info);
+      });
+      test('import and export modals', async ({ page }, info) => {
+        await page.goto('/');
+        await page.getByRole('button', { name: 'Import' }).click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await shot(page, 'modal-import', info);
+        await page.keyboard.press('Escape');
+        await page.getByRole('button', { name: 'Export' }).click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await shot(page, 'modal-export', info);
+      });
+      test('sheet modals', async ({ page }, info) => {
+        await page.goto(await hrefOf(page, '/c/'));
+        await page.getByRole('button', { name: 'Open character settings' }).click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await shot(page, 'modal-settings', info);
+        await page.keyboard.press('Escape');
+        await page.getByRole('button', { name: 'Create custom equipment' }).click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await shot(page, 'modal-custom-equipment', info);
       });
       test('not found', async ({ page }, info) => {
         await page.goto('/no-such-page');

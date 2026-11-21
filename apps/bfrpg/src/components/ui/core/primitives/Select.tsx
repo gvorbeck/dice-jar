@@ -1,7 +1,8 @@
 import { forwardRef, useId } from 'react';
 import type { SelectHTMLAttributes } from 'react';
 import { Icon } from '@/components/ui/core/display/Icon';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
+import './Select.css';
 
 export interface SelectOption {
   value: string;
@@ -61,55 +62,20 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       }
     };
 
-    // Base styles consistent with Button component
-    const baseStyles = [
-      'w-full transition-all duration-150',
-      'border-2 rounded-lg',
-      'bg-zinc-800 text-zinc-100 border-zinc-600',
-      'focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900',
-      'focus:border-amber-400 focus:bg-zinc-700',
-      'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-zinc-900',
-      'appearance-none', // Remove default select arrow
-      'cursor-pointer',
-    ];
-
-    // Error state styles
-    const errorStyles = error ? ['border-red-500 focus:border-red-400 focus:ring-red-400', 'bg-red-950/20 focus:bg-red-950/30'] : [];
-
-    // Shadow styles - 3D effect like Button
-    const shadowStyles = [
-      'shadow-[0_3px_0_0_#3f3f46]', // zinc-700 shadow
-      'focus:shadow-[0_4px_0_0_#b45309]', // amber-700 shadow when focused
-      error ? 'shadow-[0_3px_0_0_#b91c1c]' : '', // red-700 shadow for errors
-    ];
-
-    // Size styles - extra right padding to make room for chevron icon
-    const sizeStyles = {
-      sm: 'pl-3 pr-10 py-2 text-sm min-h-[36px]',
-      md: 'pl-4 pr-12 py-3 text-base min-h-[44px]',
-      lg: 'pl-5 pr-14 py-4 text-lg min-h-[52px]',
-    };
-
-    // Label styles
-    const labelStyles = ['block font-medium text-zinc-100 mb-2', size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-lg' : 'text-base'];
-
-    // Combine all styles
-    const selectClasses = cn(...baseStyles, ...errorStyles, ...shadowStyles, sizeStyles[size], className);
-
-    const labelClasses = cn(...labelStyles);
+    const selectClasses = cn('select', `select-${size}`, error && 'select-error', className);
 
     return (
-      <div className="relative">
-        <label htmlFor={selectId} className={labelClasses}>
+      <div>
+        <label htmlFor={selectId} className={cn('select-label', `select-label-${size}`)}>
           {label}
           {required && (
-            <span className="text-red-400 ml-1" aria-label="required">
+            <span className="select-required" aria-label="required">
               *
             </span>
           )}
         </label>
 
-        <div className="relative">
+        <div className="select-control">
           <select
             ref={ref}
             id={selectId}
@@ -134,19 +100,19 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           </select>
 
           {/* Custom dropdown arrow */}
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <Icon name="chevron-down" size="md" className="text-zinc-400" aria-hidden={true} />
+          <div className="select-chevron">
+            <Icon name="chevron-down" size="md" aria-hidden={true} />
           </div>
         </div>
 
         {helperText && (
-          <div id={helperTextId} className="text-sm text-zinc-400 mt-1" role="note">
+          <div id={helperTextId} className="select-help" role="note">
             {helperText}
           </div>
         )}
 
         {error && (
-          <div id={errorId} className="text-sm text-red-400 mt-1" role="alert" aria-live="assertive">
+          <div id={errorId} className="select-message" role="alert" aria-live="assertive">
             {error}
           </div>
         )}

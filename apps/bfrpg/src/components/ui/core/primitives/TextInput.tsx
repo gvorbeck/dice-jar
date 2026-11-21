@@ -1,6 +1,8 @@
 import React, { forwardRef, useState, useId, useEffect } from 'react';
+import { Button as AriaButton, Input } from 'react-aria-components';
 import { Icon } from '@/components';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
+import './TextInput.css';
 
 type TextInputSize = 'sm' | 'md' | 'lg';
 
@@ -106,53 +108,17 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
 
     const showClear = showClearButton && inputValue && inputValue.length > 0 && !disabled;
 
-    // Base styles consistent with Button and NumberInput components
-    const baseStyles = [
-      'w-full transition-all duration-150',
-      'border-2 rounded-lg',
-      'bg-zinc-800 text-zinc-100 border-zinc-600',
-      'placeholder:text-zinc-400',
-      'focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900',
-      'focus:border-amber-400 focus:bg-zinc-700',
-      'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-zinc-900',
-    ];
-
-    // Error state styles
-    const errorStyles = error ? ['border-red-500 focus:border-red-400 focus:ring-red-400', 'bg-red-950/20 focus:bg-red-950/30'] : [];
-
-    // Shadow styles - 3D effect like Button
-    const shadowStyles = [
-      'shadow-[0_3px_0_0_#3f3f46]', // zinc-700 shadow
-      'focus:shadow-[0_4px_0_0_#b45309]', // amber-700 shadow when focused
-      error ? 'shadow-[0_3px_0_0_#b91c1c]' : '', // red-700 shadow for errors
-    ];
-
-    // Size styles
-    const sizeStyles = {
-      sm: 'px-3 py-2 text-sm min-h-[36px]',
-      md: 'px-4 py-3 text-base min-h-[44px]',
-      lg: 'px-5 py-4 text-lg min-h-[52px]',
-    };
-
-    // Clear button styles
-    const clearButtonStyles = [
-      'absolute right-2 top-1/2 -translate-y-1/2',
-      'w-6 h-6 rounded-full',
-      'flex items-center justify-center',
-      'text-zinc-400 hover:text-zinc-200',
-      'hover:bg-zinc-700 transition-colors duration-150',
-      'focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-800',
-    ];
-
-    // Adjust input padding when clear button is shown
-    const inputPaddingClass = showClear ? 'pr-10' : '';
-
-    // Combine all styles
-    const inputClasses = cn(...baseStyles, ...errorStyles, ...shadowStyles, sizeStyles[size], inputPaddingClass, className);
+    const inputClasses = cn(
+      'text-input',
+      `text-input-${size}`,
+      error && 'text-input-error',
+      showClear && 'text-input-clearable',
+      className,
+    );
 
     return (
-      <div className="relative">
-        <input
+      <div className="text-input-wrap">
+        <Input
           ref={ref}
           type={type}
           id={inputId}
@@ -174,9 +140,9 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         />
 
         {showClear && (
-          <button type="button" id={clearButtonId} onClick={handleClear} aria-label="Clear input" className={cn(...clearButtonStyles)}>
+          <AriaButton id={clearButtonId} onPress={handleClear} aria-label="Clear input" className="text-input-clear">
             <Icon name="close" size="sm" aria-hidden={true} />
-          </button>
+          </AriaButton>
         )}
       </div>
     );
