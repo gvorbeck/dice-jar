@@ -44,7 +44,7 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
           </TextHeader>
 
           {monster.variants?.map(([variantName, stats], index) => (
-            <Card key={variantName || `variant-${index}`} variant="nested" className="p-4">
+            <Card key={variantName || `variant-${index}`} variant="nested" size="compact">
               {variantName && (
                 <TextHeader variant="h5" size="sm" underlined={false} className="text-zinc-200 mb-3">
                   {variantName}
@@ -88,7 +88,7 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
 
           {/* Monster description for variants */}
           {monster.description && (
-            <Card variant="nested" className="p-4">
+            <Card variant="nested" size="compact">
               <TextHeader variant="h5" size="sm" underlined={false} className="text-zinc-300 mb-3">
                 Description
               </TextHeader>
@@ -150,7 +150,7 @@ export const MonsterItem = memo(({ monster, onAddToCombat }: MonsterItemProps) =
 
           {/* Monster description for non-variants */}
           {monster.description && (
-            <Card variant="nested" className="p-4">
+            <Card variant="nested" size="compact">
               <TextHeader variant="h5" size="sm" underlined={false} className="text-zinc-300 mb-3">
                 Description
               </TextHeader>

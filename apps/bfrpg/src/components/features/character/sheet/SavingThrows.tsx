@@ -357,7 +357,7 @@ export default function SavingThrows({ character, className = '', size = 'md' }:
       title={
         <div className="flex items-center gap-2">
           <span>Saving Throws</span>
-          <InfoTooltip content={tooltipContent} ariaLabel="Saving throw rules" preferredPosition="above" />
+          <InfoTooltip content={tooltipContent} ariaLabel="Saving throw rules" />
         </div>
       }
       size={size}

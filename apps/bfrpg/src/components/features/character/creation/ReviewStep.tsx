@@ -73,7 +73,7 @@ function ReviewStepComponent({ character, onCharacterChange }: ReviewStepProps) 
       <section className="mb-8">
         <Typography variant="sectionHeading">Character Name</Typography>
 
-        <Card variant="standard">
+        <Card variant="standard" className="p-0">
           <TextInput
             value={character.name}
             onChange={handleNameChange}

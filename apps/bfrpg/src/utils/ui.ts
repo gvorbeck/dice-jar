@@ -4,7 +4,7 @@
  */
 
 import type { ReactNode } from 'react';
-import type { ButtonVariant, ButtonSize, PositioningOptions, TooltipPositionResult, PropValidationResult } from '@/types';
+import type { ButtonVariant, ButtonSize, PropValidationResult } from '@/types';
 
 // ============================================================================
 // FORMATTING UTILITIES
@@ -198,137 +198,6 @@ export const createButtonStyles = (isFAB = false): ButtonStyleConfig => {
 
 export const combineButtonStyles = (base: string[], variant: string[], size: string, className = ''): string => {
   return cn(...base, ...variant, size, className);
-};
-
-// ============================================================================
-// TOOLTIP POSITIONING
-// ============================================================================
-
-const positionCache = new Map<string, TooltipPositionResult>();
-const CACHE_SIZE_LIMIT = 100;
-
-const getResponsivePadding = (): number => {
-  return window.innerWidth < 640 ? 16 : 8; // More padding on mobile
-};
-
-const calculateArrowOffset = (triggerCenterX: number, tooltipLeft: number, tooltipWidth: number): number => {
-  const arrowOffsetFromCenter = triggerCenterX - tooltipLeft;
-  const halfTooltipWidth = tooltipWidth / 2;
-  const maxArrowOffset = halfTooltipWidth - 12; // 12px from edge
-
-  return Math.max(-maxArrowOffset, Math.min(maxArrowOffset, arrowOffsetFromCenter));
-};
-
-const shouldPositionBelow = (triggerRect: DOMRect, tooltipHeight: number, options: PositioningOptions): boolean => {
-  const spaceAbove = triggerRect.top - options.padding - options.gap;
-  const spaceBelow = window.innerHeight - triggerRect.bottom - options.padding - options.gap;
-
-  // If preferred position is below and there's enough space, use below
-  if (options.preferredPosition === 'below' && spaceBelow >= tooltipHeight) {
-    return true;
-  }
-
-  // If preferred position is above and there's enough space, use above
-  if (options.preferredPosition === 'above' && spaceAbove >= tooltipHeight) {
-    return false;
-  }
-
-  // Choose position with more available space
-  return spaceBelow >= spaceAbove;
-};
-
-const calculateVerticalPosition = (triggerRect: DOMRect, tooltipHeight: number, isBelow: boolean, options: PositioningOptions): number => {
-  if (isBelow) {
-    return triggerRect.bottom + options.gap;
-  }
-
-  return triggerRect.top - tooltipHeight - options.gap;
-};
-
-const calculateHorizontalPosition = (triggerRect: DOMRect, tooltipWidth: number, options: PositioningOptions): number => {
-  const triggerCenterX = triggerRect.left + triggerRect.width / 2;
-  const halfTooltipWidth = tooltipWidth / 2;
-  let tooltipLeft = triggerCenterX;
-
-  // Check if tooltip would go off the left edge
-  if (tooltipLeft - halfTooltipWidth < options.padding) {
-    tooltipLeft = options.padding + halfTooltipWidth;
-  }
-  // Check if tooltip would go off the right edge
-  else if (tooltipLeft + halfTooltipWidth > window.innerWidth - options.padding) {
-    tooltipLeft = window.innerWidth - options.padding - halfTooltipWidth;
-  }
-
-  return tooltipLeft;
-};
-
-function createCacheKey(triggerRect: DOMRect, tooltipRect: DOMRect, options: PositioningOptions): string {
-  return `${triggerRect.left},${triggerRect.top},${triggerRect.width},${triggerRect.height}|${tooltipRect.width},${tooltipRect.height}|${options.padding},${options.gap},${options.preferredPosition}`;
-}
-
-function manageCacheSize(): void {
-  if (positionCache.size > CACHE_SIZE_LIMIT) {
-    const firstKey = positionCache.keys().next().value as string;
-    if (firstKey) {
-      positionCache.delete(firstKey);
-    }
-  }
-}
-
-const calculateTooltipPosition = (
-  triggerRect: DOMRect,
-  tooltipRect: DOMRect,
-  options: PositioningOptions = {
-    padding: getResponsivePadding(),
-    gap: 4,
-    preferredPosition: 'above',
-  },
-): TooltipPositionResult => {
-  // Check cache first
-  const cacheKey = createCacheKey(triggerRect, tooltipRect, options);
-  if (positionCache.has(cacheKey)) {
-    return positionCache.get(cacheKey)!;
-  }
-
-  const tooltipWidth = tooltipRect.width || 200; // Fallback width
-  const tooltipHeight = tooltipRect.height || 40; // Fallback height
-
-  // Determine vertical positioning
-  const isBelow = shouldPositionBelow(triggerRect, tooltipHeight, options);
-
-  // Calculate positions
-  const top = calculateVerticalPosition(triggerRect, tooltipHeight, isBelow, options);
-  const left = calculateHorizontalPosition(triggerRect, tooltipWidth, options);
-
-  // Calculate arrow offset
-  const triggerCenterX = triggerRect.left + triggerRect.width / 2;
-  const arrowOffset = calculateArrowOffset(triggerCenterX, left, tooltipWidth);
-
-  const result: TooltipPositionResult = {
-    position: { top, left },
-    isBelow,
-    arrowOffset,
-  };
-
-  // Cache the result
-  manageCacheSize();
-  positionCache.set(cacheKey, result);
-
-  return result;
-};
-
-export const createTooltipPositioner = (defaultOptions: Partial<PositioningOptions> = {}) => {
-  const options: PositioningOptions = {
-    padding: getResponsivePadding(),
-    gap: 4,
-    preferredPosition: 'above',
-    ...defaultOptions,
-  };
-
-  return (triggerRect: DOMRect, tooltipRect: DOMRect, overrides?: Partial<PositioningOptions>) => {
-    const finalOptions = { ...options, ...overrides };
-    return calculateTooltipPosition(triggerRect, tooltipRect, finalOptions);
-  };
 };
 
 // ============================================================================

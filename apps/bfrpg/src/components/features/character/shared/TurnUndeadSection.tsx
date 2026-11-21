@@ -35,7 +35,7 @@ export default function TurnUndeadSection({ className = '' }: TurnUndeadSectionP
         Faith-based ability • Can retry if successful, but cannot retry for one full turn if failed
       </Typography>
 
-      <Card variant="standard" className="p-4">
+      <Card variant="standard" size="compact">
         <Typography variant="body" className="text-zinc-300">
           Clerics can Turn the undead, that is, drive away undead monsters by means of faith alone. The Cleric brandishes their holy symbol
           and calls upon the power of their divine patron. The player rolls 1d20 and tells the GM the result.

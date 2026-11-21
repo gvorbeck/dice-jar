@@ -1,0 +1,91 @@
+/* In the components layer so a caller's Tailwind utility (p-3, mb-6) still overrides it while both systems coexist. */
+@layer components {
+  /* The solid shadow under a card is its "depth"; the shadow prop picks how deep, the variant picks the colour. */
+  .card {
+    --depth: 3px;
+    --depth-color: var(--zinc-700);
+    border: 2px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--panel);
+    box-shadow: 0 var(--depth) 0 0 var(--depth-color);
+  }
+  .card[data-size='compact'] {
+    padding: calc(var(--space) * 4);
+  }
+  .card[data-size='default'] {
+    padding: calc(var(--space) * 6);
+  }
+
+  .card[data-shadow='soft'] {
+    --depth: 2px;
+    --depth-color: var(--zinc-600);
+  }
+  .card[data-shadow='elevated'] {
+    --depth: 4px;
+    --depth-color: var(--zinc-800);
+  }
+
+  .card[data-variant='info'] {
+    background: color-mix(in oklab, var(--amber-950) 20%, transparent);
+    border-color: var(--amber-600);
+  }
+  .card[data-variant='info'][data-shadow='soft'] {
+    --depth-color: var(--amber-600);
+  }
+  .card[data-variant='info'][data-shadow='standard'] {
+    --depth-color: var(--amber-700);
+  }
+  .card[data-variant='info'][data-shadow='elevated'] {
+    --depth-color: var(--amber-800);
+  }
+
+  .card[data-variant='success'] {
+    background: color-mix(in oklab, var(--lime-950) 20%, transparent);
+    border-color: var(--lime-600);
+  }
+  .card[data-variant='success'][data-shadow='standard'] {
+    --depth-color: var(--lime-600);
+  }
+  .card[data-variant='success'][data-shadow='elevated'] {
+    --depth-color: var(--lime-700);
+  }
+
+  .card[data-variant='nested'] {
+    background: color-mix(in oklab, var(--zinc-800) 50%, transparent);
+    border-color: color-mix(in oklab, var(--amber-700) 30%, transparent);
+  }
+
+  .card[data-variant='gradient'] {
+    background: linear-gradient(
+      to bottom right,
+      color-mix(in oklab, var(--zinc-800) 50%, transparent),
+      color-mix(in oklab, var(--zinc-900) 80%, transparent)
+    );
+    border-color: color-mix(in oklab, var(--zinc-700) 50%, transparent);
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* The old hero used colours that were never defined, so it had no fill and a text-coloured border. */
+  .card[data-variant='hero'] {
+    position: relative;
+    background: none;
+    border-color: currentcolor;
+  }
+
+  @media (hover: hover) {
+    .card[data-variant='gradient']:hover {
+      border-color: color-mix(in oklab, var(--amber-500) 50%, transparent);
+      box-shadow:
+        0 10px 15px -3px color-mix(in oklab, var(--amber-500) 10%, transparent),
+        0 4px 6px -4px color-mix(in oklab, var(--amber-500) 10%, transparent);
+      transform: translateY(calc(var(--space) * -1));
+    }
+    .card[data-hover]:hover {
+      --depth: 4px;
+      transform: translateY(calc(var(--space) * -0.5));
+    }
+  }
+  .card[data-hover] {
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

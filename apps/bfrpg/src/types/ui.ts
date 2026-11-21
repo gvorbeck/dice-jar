@@ -16,29 +16,6 @@ export interface BaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   size?: ButtonSize;
 }
 
-// Tooltip types
-export interface TooltipPosition {
-  top: number;
-  left: number;
-}
-
-export interface PositioningOptions {
-  /** Minimum distance from screen edge */
-  padding: number;
-  /** Gap between tooltip and trigger element */
-  gap: number;
-  /** Preferred position relative to trigger */
-  preferredPosition: 'above' | 'below';
-}
-
-export interface TooltipPositionResult {
-  position: TooltipPosition;
-  wasAdjusted?: boolean;
-  placement?: 'above' | 'below';
-  isBelow?: boolean;
-  arrowOffset?: number;
-}
-
 // Validation types
 export interface PropValidationResult {
   isValid: boolean;

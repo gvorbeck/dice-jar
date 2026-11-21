@@ -9,7 +9,7 @@ interface EmptyStateProps {
 
 export const EmptyState = ({ isOwner, onCreateScroll }: EmptyStateProps) => {
   return (
-    <Card className="p-6 text-center">
+    <Card className="text-center">
       <div className="mx-auto mb-3">
         <Icon name="clipboard" size="xl" className="text-zinc-400" />
       </div>

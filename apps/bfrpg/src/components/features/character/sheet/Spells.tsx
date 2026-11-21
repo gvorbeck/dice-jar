@@ -107,7 +107,7 @@ const SpellSection = ({
         {...(editButtonText?.includes('Add') && { className: 'mb-6' })}
       />
     ) : (
-      <Card variant="standard" className={`p-4 ${editButtonText?.includes('Add') ? 'mb-6' : ''}`}>
+      <Card variant="standard" size="compact" className={editButtonText?.includes('Add') ? 'mb-6' : undefined}>
         <Typography variant="body" className="text-zinc-400 text-center">
           {emptyStateMessage}
         </Typography>

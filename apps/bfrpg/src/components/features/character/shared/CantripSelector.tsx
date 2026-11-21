@@ -149,7 +149,7 @@ const CantripSelector = forwardRef<HTMLElement, CantripSelectorProps>((props, re
             }
           />
 
-          <Card variant="standard" className="p-4">
+          <Card variant="standard" size="compact">
             <Typography variant="body" className="text-zinc-400 text-center">
               {emptyMessage}
             </Typography>

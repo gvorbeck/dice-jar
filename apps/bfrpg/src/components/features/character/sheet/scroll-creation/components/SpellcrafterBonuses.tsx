@@ -14,7 +14,7 @@ export const SpellcrafterBonuses = ({ bonuses }: SpellcrafterBonusesProps) => {
   return (
     <div className="mb-6">
       <SectionHeader title="Spellcrafter Bonuses" size="md" className="mb-3" />
-      <Card className="p-4">
+      <Card size="compact">
         <div className="space-y-1 text-sm">
           <div className="flex items-center gap-2">
             <Icon name="star" size="sm" />+{bonuses.researchRollBonus}% research roll bonus

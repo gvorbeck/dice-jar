@@ -1,6 +1,5 @@
 import { Tooltip } from '@/components/ui/core/feedback';
 import { Icon, type IconName } from '@/components/ui/core/display/Icon';
-import type { PositioningOptions } from '@/types';
 import type { ReactNode } from 'react';
 
 // Default styles for consistent theming
@@ -17,10 +16,6 @@ interface InfoTooltipProps {
   iconSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   /** Additional CSS classes for the icon */
   iconClassName?: string;
-  /** Preferred position for the tooltip */
-  preferredPosition?: 'above' | 'below' | undefined;
-  /** Custom positioning options for the tooltip */
-  positioningOptions?: Partial<PositioningOptions> | undefined;
   /** Whether to disable the tooltip */
   disabled?: boolean;
   /** Accessible label for screen readers */
@@ -38,15 +33,13 @@ export default function InfoTooltip({
   iconName = 'info-question',
   iconSize = 'sm',
   iconClassName,
-  preferredPosition,
-  positioningOptions,
   disabled = false,
   ariaLabel = 'More information',
 }: InfoTooltipProps) {
   const finalIconClassName = iconClassName || `${DEFAULT_ICON_STYLES} ${className}`;
 
   return (
-    <Tooltip content={content} preferredPosition={preferredPosition} positioningOptions={positioningOptions} disabled={disabled}>
+    <Tooltip content={content} disabled={disabled}>
       <div role="button" tabIndex={0} aria-label={ariaLabel} className="inline-block">
         <Icon
           name={iconName}

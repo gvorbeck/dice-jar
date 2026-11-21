@@ -94,6 +94,7 @@
 
   --font-title: 'Wellfleet', serif;
   --space: 0.25rem; /* one Tailwind step; spacing is calc(var(--space) * n) */
+  --z-tooltip: 9999;
   --page-w: 80rem; /* max-w-7xl */
   --focus-ring: 2px solid var(--amber-400);
   --scrollbar-thumb-border: var(--zinc-700);

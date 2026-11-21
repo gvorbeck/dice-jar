@@ -39,7 +39,7 @@ export const ActiveScrolls = ({ projects, isOwner, onUpdateProject, onCompletePr
       <SectionHeader title="Active Scrolls" size="md" className="mb-3" />
       <div className="space-y-3">
         {projects.map((project) => (
-          <Card key={project.id} className="p-4">
+          <Card key={project.id} size="compact">
             <div className="flex justify-between items-start mb-2">
               <div>
                 <Typography variant="h5">{project.spellName}</Typography>
