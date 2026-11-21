@@ -4,6 +4,7 @@ import { SectionWrapper, Accordion } from '@/components/ui/core/layout';
 import { Card, Typography } from '@/components/ui/core/display';
 import { Button } from '@/components/ui/core/primitives';
 import { SectionHeader } from '@/components/ui';
+import type { StatusDotColor } from '@/components/ui/composite/StatusDot';
 import { SkeletonList } from '@/components/ui/core/feedback';
 import { Modal } from '@/components/modals';
 import CantripSelector from '@/components/features/character/shared/CantripSelector';
@@ -44,7 +45,7 @@ type DisplayableSpell = SpellWithLevel | CantripWithLevel;
 interface SpellSectionProps {
   title: string;
   items: DisplayableSpell[];
-  dotColor?: string;
+  dotColor?: StatusDotColor;
   usageDescription?: string;
   emptyStateMessage: string;
   editButtonText?: string | undefined;
@@ -91,7 +92,7 @@ const SpellSection = ({
     />
 
     {usageDescription && (
-      <Typography variant="caption" className="text-zinc-500 text-xs block mb-4">
+      <Typography variant="caption" className="text-zinc-500 block mb-4">
         {usageDescription}
       </Typography>
     )}
@@ -224,7 +225,7 @@ export default function Spells({
               <SpellSection
                 title={spellSystemInfo.spellType}
                 items={cantrips}
-                dotColor="bg-blue-400"
+                dotColor="blue"
                 usageDescription={`Daily Uses: Level + ${spellSystemInfo.abilityBonus} • No preparation required`}
                 emptyStateMessage={`No ${spellSystemInfo.spellTypeLower} known yet.${
                   canEdit ? ` Click 'Edit ${spellSystemInfo.spellType}' to add some.` : ''
@@ -245,9 +246,7 @@ export default function Spells({
             <Typography variant="body" className="text-lg">
               No spells known
             </Typography>
-            <Typography variant="caption" className="text-sm">
-              This character doesn't know any spells yet.
-            </Typography>
+            <Typography variant="helper">This character doesn't know any spells yet.</Typography>
           </div>
         )}
       </div>

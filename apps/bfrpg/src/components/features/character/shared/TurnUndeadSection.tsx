@@ -22,7 +22,7 @@ export default function TurnUndeadSection({ className = '' }: TurnUndeadSectionP
             Turn Undead
           </span>
         }
-        dotColor="bg-purple-400"
+        dotColor="purple"
         extra={
           <Button size="sm" variant="secondary" onClick={handleTurnUndeadRoll} icon="dice">
             Roll d20
@@ -31,7 +31,7 @@ export default function TurnUndeadSection({ className = '' }: TurnUndeadSectionP
         className="mb-4"
       />
 
-      <Typography variant="caption" className="text-zinc-500 text-xs block mb-4">
+      <Typography variant="caption" className="text-zinc-500 block mb-4">
         Faith-based ability • Can retry if successful, but cannot retry for one full turn if failed
       </Typography>
 

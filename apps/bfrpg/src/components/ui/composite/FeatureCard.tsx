@@ -1,5 +1,7 @@
+import { cn } from '@dice-jar/cn';
 import { Icon } from '@/components/ui/core/display';
 import type { IconName } from '@/components/ui/core/display';
+import './FeatureCard.css';
 
 interface FeatureCardProps {
   icon: IconName;
@@ -8,13 +10,13 @@ interface FeatureCardProps {
   className?: string;
 }
 
-export function FeatureCard({ icon, title, description, className = '' }: FeatureCardProps) {
+export function FeatureCard({ icon, title, description, className }: FeatureCardProps) {
   return (
-    <div className={`flex items-start gap-4 p-4 rounded-xl bg-primary-800/30 border border-border/30 ${className}`}>
-      <Icon name={icon} size="lg" className="text-highlight-400 mt-1 flex-shrink-0" />
+    <div className={cn('feature-card', className)}>
+      <Icon name={icon} size="lg" />
       <div>
-        <h4 className="font-semibold text-text-primary mb-2">{title}</h4>
-        <p className="text-text-secondary text-sm">{description}</p>
+        <h4>{title}</h4>
+        <p>{description}</p>
       </div>
     </div>
   );

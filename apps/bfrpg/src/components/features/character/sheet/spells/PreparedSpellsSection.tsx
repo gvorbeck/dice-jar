@@ -49,7 +49,7 @@ export default function PreparedSpellsSection({
         className="mb-4"
       />
 
-      <Typography variant="caption" className="text-zinc-500 text-xs block mt-2 mb-4">
+      <Typography variant="caption" className="text-zinc-500 block mt-2 mb-4">
         You can prepare any spell of a level for which you have slots. Choose wisely - these are your spells for the day.
       </Typography>
 

@@ -30,12 +30,7 @@ const RollableButton = forwardRef<HTMLButtonElement, RollableButtonProps>(
         {...props}
       >
         <div className="rollable-lead">
-          <StatusDot
-            size="xs"
-            status="inactive"
-            className="rollable-dot transition-colors duration-200 flex-shrink-0"
-            ariaLabel="Rollable button indicator"
-          />
+          <StatusDot size="xs" status="inactive" className="rollable-dot" ariaLabel="Rollable button indicator" />
           <span className={labelClasses}>{label}</span>
         </div>
         <div className={valueClasses}>{value}</div>

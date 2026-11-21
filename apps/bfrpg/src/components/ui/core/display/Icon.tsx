@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { logger, cn } from '@/utils';
-import { DESIGN_TOKENS } from '@/constants';
+import './Icon.css';
 
 /**
  * Centralized icon component that replaces inline SVGs throughout the app.
@@ -313,16 +313,13 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(
       return null;
     }
 
-    const sizeClass = DESIGN_TOKENS.icons[size];
     const isDecorative = !title && !ariaLabel;
-
-    // Build class names
-    const classes = cn(sizeClass, className);
 
     return (
       <svg
         ref={ref}
-        className={classes}
+        className={cn('icon', className)}
+        data-size={size}
         fill={iconData.fill ? 'currentColor' : 'none'}
         stroke={iconData.stroke ? 'currentColor' : 'none'}
         strokeWidth={iconData.stroke ? 2 : undefined}

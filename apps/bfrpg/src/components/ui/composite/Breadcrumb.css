@@ -1,0 +1,57 @@
+@layer components {
+  .crumbs {
+    display: flex;
+    align-items: center;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .crumb {
+    display: flex;
+    align-items: center;
+  }
+  .crumb-body {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 1.5);
+  }
+  .crumb-icon,
+  .crumb-sep {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .crumb-sep {
+    margin-left: calc(var(--space) * 2);
+  }
+  .crumb-sep .icon {
+    color: var(--zinc-500);
+    flex-shrink: 0;
+  }
+  .crumb-current,
+  .crumb-link,
+  .crumb-text {
+    font-weight: 500;
+    line-height: 1;
+  }
+  .crumb-current {
+    color: var(--amber-400);
+  }
+  .crumb-text {
+    color: var(--zinc-400);
+  }
+  .crumb-link {
+    color: var(--zinc-300);
+    border-radius: var(--radius);
+    padding: calc(var(--space) * 0.5) var(--space);
+    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .crumb-link:hover {
+    color: var(--amber-400);
+  }
+  .crumb-link:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--zinc-900),
+      0 0 0 4px var(--amber-400);
+  }
+}

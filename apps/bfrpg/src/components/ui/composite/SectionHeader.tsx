@@ -1,39 +1,27 @@
 import type { ReactNode } from 'react';
-import { DESIGN_TOKENS, SIZE_STYLES } from '@/constants';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
 import StatusDot from './StatusDot';
+import type { StatusDotColor } from './StatusDot';
+import './SectionHeader.css';
 
 interface SectionHeaderProps {
   title: ReactNode;
   extra?: ReactNode;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
-  dotColor?: string;
+  dotColor?: StatusDotColor;
 }
 
-export default function SectionHeader({ title, extra, size = 'md', className = '', dotColor }: SectionHeaderProps) {
-  const currentSize = SIZE_STYLES[size];
-
-  const headerClasses = cn(
-    'flex items-center justify-between',
-    'border-b-2',
-    DESIGN_TOKENS.colors.border.secondary,
-    currentSize.header,
-    DESIGN_TOKENS.colors.bg.header,
-    'backdrop-blur-sm',
-    'rounded-t-xl',
-    className,
-  );
-
+export default function SectionHeader({ title, extra, size = 'md', className, dotColor }: SectionHeaderProps) {
   return (
-    <div className={headerClasses}>
+    <div className={cn('section-header', className)} data-size={size}>
       {title && (
-        <div className={`font-bold ${DESIGN_TOKENS.colors.text.primary} flex items-center gap-2`}>
+        <div className="section-header-title">
           <StatusDot {...(dotColor && { color: dotColor })} ariaLabel="Section header indicator" />
           {title}
         </div>
       )}
-      {extra && <div className={DESIGN_TOKENS.colors.text.muted}>{extra}</div>}
+      {extra && <div className="section-header-extra">{extra}</div>}
     </div>
   );
 }

@@ -1,0 +1,22 @@
+@layer components {
+  .feature-card {
+    display: flex;
+    align-items: flex-start;
+    gap: calc(var(--space) * 4);
+    padding: calc(var(--space) * 4);
+    border-radius: var(--radius-xl);
+    border: 1px solid;
+  }
+  .feature-card .icon {
+    margin-top: var(--space);
+    flex-shrink: 0;
+  }
+  .feature-card h4 {
+    font-weight: 600;
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .feature-card p {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+}

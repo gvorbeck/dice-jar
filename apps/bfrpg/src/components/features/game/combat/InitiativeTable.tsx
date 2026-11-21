@@ -29,11 +29,11 @@ function renderCombatantNameCell(combatant: CombatantWithInitiative, isCurrentTu
         <Image variant="avatar" size="xs" src={combatant.avatar} alt={`${combatant.name} avatar`} className="flex-shrink-0" />
       )}
       <div className="flex-1 min-w-0">
-        <Typography variant="bodySmall" color="zinc" className="font-medium truncate block text-sm leading-tight" title={combatant.name}>
+        <Typography variant="bodySmall" color="zinc" className="font-medium truncate block leading-tight" title={combatant.name}>
           {combatant.name}
         </Typography>
         <div className="flex items-center gap-1 mt-0.5">
-          <Typography variant="caption" color="secondary" className="text-xs">
+          <Typography variant="caption" color="secondary">
             AC {combatant.ac}
           </Typography>
           {combatant.isPlayer && (

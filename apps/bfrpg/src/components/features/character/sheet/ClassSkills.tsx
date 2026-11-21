@@ -91,7 +91,7 @@ export default function ClassSkills({
 
   const detailsContent = (
     <Card id={detailsContentId} className="mt-4" variant="nested" size="compact">
-      <Typography variant="h4" weight="semibold" className="mb-3 text-sm">
+      <Typography variant="h4" weight="semibold" className="mb-3">
         {abilityType} Descriptions:
       </Typography>
       <div className="space-y-2 text-xs">

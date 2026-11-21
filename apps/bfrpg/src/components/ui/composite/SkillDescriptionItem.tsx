@@ -1,39 +1,12 @@
 import type { ReactNode } from 'react';
 import { Typography } from '@/components/ui/core/display';
-import { DESIGN_TOKENS } from '@/constants';
-import { cn } from '@/utils';
+import { cn } from '@dice-jar/cn';
 import StatusDot from './StatusDot';
+import './SkillDescriptionItem.css';
 
 type SkillDescriptionItemVariant = 'simple' | 'decorated';
 type SkillDescriptionItemColor = 'amber' | 'lime' | 'blue';
 type SkillDescriptionItemSemantic = 'div' | 'dl';
-
-// Extract color styles to prevent recreation on every render
-const COLOR_STYLES = {
-  amber: {
-    bullet: 'bg-amber-400',
-    bulletHover: 'group-hover/card:bg-amber-300',
-    text: 'text-amber-400 group-hover/card:text-amber-300',
-  },
-  lime: {
-    bullet: 'bg-lime-400',
-    bulletHover: 'group-hover/card:bg-lime-300',
-    text: 'text-lime-400 group-hover/card:text-lime-300',
-  },
-  blue: {
-    bullet: 'bg-blue-400',
-    bulletHover: 'group-hover/card:bg-blue-300',
-    text: 'text-blue-300 group-hover/card:text-blue-200',
-  },
-} as const;
-
-// Extract color constants for consistent theming
-const STYLE_CONSTANTS = {
-  decoratedDescription: DESIGN_TOKENS.colors.text.primary,
-  simpleTitle: 'text-blue-300', // Keep existing blue for simple variant
-  simpleDescription: DESIGN_TOKENS.colors.text.muted,
-  transition: 'transition-colors duration-200',
-} as const;
 
 interface SkillDescriptionItemProps {
   title: string;
@@ -57,43 +30,35 @@ export default function SkillDescriptionItem({
   variant = 'simple',
   color = 'amber',
   semantic = 'div',
-  className = '',
+  className,
 }: SkillDescriptionItemProps) {
-  // Add prop validation with fallback
-  const currentColorStyle = COLOR_STYLES[color] ?? COLOR_STYLES.amber;
-
-  // Hoist all className computations
-  const containerClassName = cn('space-y-1', className);
-  const titleContainerClassName = 'flex items-center gap-2 mb-3';
-  const statusDotClassName = cn(STYLE_CONSTANTS.transition, currentColorStyle.bulletHover);
-  const titleClassName = cn(STYLE_CONSTANTS.transition, currentColorStyle.text);
-  const decoratedDescClassName = cn(STYLE_CONSTANTS.decoratedDescription, 'text-sm leading-relaxed');
-  const simpleDescClassName = cn(STYLE_CONSTANTS.simpleDescription, 'pl-2');
+  const containerClassName = cn('skill-item', className);
+  const dotColor = color;
 
   if (variant === 'decorated') {
     if (semantic === 'dl') {
       return (
-        <dl className={containerClassName}>
-          <dt className={titleContainerClassName}>
-            <StatusDot color={currentColorStyle.bullet} className={statusDotClassName} ariaLabel="Skill or description item" />
-            <Typography variant="bodySmall" weight="semibold" className={titleClassName}>
+        <dl className={containerClassName} data-color={color}>
+          <dt className="skill-item-head">
+            <StatusDot color={dotColor} ariaLabel="Skill or description item" />
+            <Typography variant="bodySmall" weight="semibold" className="skill-item-title">
               {title}
             </Typography>
           </dt>
-          <dd className={decoratedDescClassName}>{description}</dd>
+          <dd className="skill-item-text">{description}</dd>
         </dl>
       );
     }
 
     return (
-      <div className={containerClassName}>
-        <div className={titleContainerClassName}>
-          <StatusDot color={currentColorStyle.bullet} className={statusDotClassName} ariaLabel="Skill or description item" />
-          <Typography variant="bodySmall" weight="semibold" className={titleClassName}>
+      <div className={containerClassName} data-color={color}>
+        <div className="skill-item-head">
+          <StatusDot color={dotColor} ariaLabel="Skill or description item" />
+          <Typography variant="bodySmall" weight="semibold" className="skill-item-title">
             {title}
           </Typography>
         </div>
-        <div className={decoratedDescClassName}>{description}</div>
+        <div className="skill-item-text">{description}</div>
       </div>
     );
   }
@@ -101,14 +66,14 @@ export default function SkillDescriptionItem({
   // Simple variant (default)
   if (semantic === 'dl') {
     return (
-      <dl className={containerClassName}>
+      <dl className={containerClassName} data-color={color}>
         <dt>
-          <Typography variant="body" weight="medium" className={STYLE_CONSTANTS.simpleTitle}>
+          <Typography variant="body" weight="medium" className="skill-item-simple-title">
             {title}:
           </Typography>
         </dt>
         <dd>
-          <Typography variant="body" className={simpleDescClassName}>
+          <Typography variant="body" className="skill-item-simple-text">
             {description}
           </Typography>
         </dd>
@@ -117,11 +82,11 @@ export default function SkillDescriptionItem({
   }
 
   return (
-    <div className={containerClassName}>
-      <Typography variant="body" weight="medium" className={STYLE_CONSTANTS.simpleTitle}>
+    <div className={containerClassName} data-color={color}>
+      <Typography variant="body" weight="medium" className="skill-item-simple-title">
         {title}:
       </Typography>
-      <Typography variant="body" className={simpleDescClassName}>
+      <Typography variant="body" className="skill-item-simple-text">
         {description}
       </Typography>
     </div>

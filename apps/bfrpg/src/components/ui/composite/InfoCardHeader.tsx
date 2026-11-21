@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
+import { cn } from '@dice-jar/cn';
 import { Badge, Typography } from '@/components/ui/core/display';
-import { DESIGN_TOKENS, LAYOUT_STYLES } from '@/constants';
+import './InfoCardHeader.css';
 
 interface InfoCardHeaderProps {
   icon: ReactNode;
@@ -10,28 +11,16 @@ interface InfoCardHeaderProps {
     variant?: 'supplemental' | 'status' | 'warning';
   };
   iconSize?: 'sm' | 'md' | 'lg';
-  textColor?: string;
   className?: string;
 }
 
-export default function InfoCardHeader({
-  icon,
-  title,
-  badge,
-  iconSize = 'md',
-  textColor = 'text-amber-100',
-  className = '',
-}: InfoCardHeaderProps) {
-  const iconSizeClass = {
-    sm: DESIGN_TOKENS.icons.sm,
-    md: DESIGN_TOKENS.icons.md,
-    lg: DESIGN_TOKENS.icons.lg,
-  }[iconSize];
-
+export default function InfoCardHeader({ icon, title, badge, iconSize = 'md', className }: InfoCardHeaderProps) {
   return (
-    <div className={`${LAYOUT_STYLES.iconTextLarge} ${className}`}>
-      <div className={`${iconSizeClass} flex-shrink-0 text-amber-400`}>{icon}</div>
-      <Typography variant="h5" weight="semibold" className={`${textColor} m-0`}>
+    <div className={cn('info-card-header', className)}>
+      <div className="info-card-icon" data-size={iconSize}>
+        {icon}
+      </div>
+      <Typography variant="h5" weight="semibold" className="info-card-title">
         {title}
       </Typography>
       {badge && <Badge variant={badge.variant || 'supplemental'}>{badge.text}</Badge>}

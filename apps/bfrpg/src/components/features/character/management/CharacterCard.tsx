@@ -31,12 +31,12 @@ const CharacterCard = memo(function CharacterCard({ character, user, onDelete, i
         <div className="flex-1 min-w-0">
           <Typography
             variant="h4"
-            className="text-zinc-100 group-hover:text-amber-300 transition-colors duration-300 truncate font-bold tracking-wide text-lg sm:text-xl"
+            className="text-zinc-100 group-hover:text-amber-300 transition-colors duration-300 truncate font-bold tracking-wide"
           >
             {character.name}
           </Typography>
           {character.level && (
-            <Typography variant="caption" className="text-amber-400 font-medium mt-1 text-sm">
+            <Typography variant="helper" className="text-amber-400 font-medium mt-1">
               Level {character.level}
             </Typography>
           )}

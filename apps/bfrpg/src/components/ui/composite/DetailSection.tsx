@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Card, Typography } from '@/components/ui/core/display';
-import { DESIGN_TOKENS } from '@/constants';
+import './DetailSection.css';
 
 interface DetailSectionProps {
   icon: ReactNode;
@@ -10,11 +10,11 @@ interface DetailSectionProps {
   className?: string;
 }
 
-export default function DetailSection({ icon, title, children, variant = 'nested', className = '' }: DetailSectionProps) {
+export default function DetailSection({ icon, title, children, variant = 'nested', className }: DetailSectionProps) {
   return (
     <Card variant={variant} className={className}>
       <Typography variant="subHeadingSpaced">
-        <div className={DESIGN_TOKENS.icons.sm}>{icon}</div>
+        <div className="detail-icon">{icon}</div>
         {title}
       </Typography>
       {children}

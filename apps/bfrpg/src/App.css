@@ -168,3 +168,9 @@ h6 {
     display: none !important;
   }
 }
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

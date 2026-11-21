@@ -8,6 +8,7 @@ import { logger } from '@/utils';
 import { DOM_IDS, CSS_CLASSES, HTML_ROLES } from '@/constants';
 import { GlobalAlert } from '@/components/app/GlobalAlert';
 import type { AlertConfig } from '@/constants';
+import './Header.css';
 
 interface HeaderProps {
   setIsSignInModalOpen: (open: boolean) => void;
@@ -56,31 +57,22 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
         Skip to main content
       </a>
 
-      <header role={HTML_ROLES.BANNER} className="bg-primary-900 backdrop-blur-sm shadow-xl">
-        <nav role="navigation" aria-label="Main navigation" className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between h-20 mx-1">
+      <header role={HTML_ROLES.BANNER} className="site-header">
+        <nav role="navigation" aria-label="Main navigation" className="site-nav">
+          <div className="site-bar">
             {/* Logo & Brand */}
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <Link
-                href="/"
-                aria-label={`${isMockMode() ? 'Codex.Mock' : 'Codex.Quest'} - Go to homepage`}
-                className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-200 group"
-              >
-                <div className="relative">
+            <div className="site-brand-wrap">
+              <Link href="/" aria-label={`${isMockMode() ? 'Codex.Mock' : 'Codex.Quest'} - Go to homepage`} className="site-brand">
+                <div className="site-logo-wrap">
                   <Image
                     variant="logo"
                     src="/images/logo.webp"
                     alt={`${isMockMode() ? 'Codex.Mock' : 'Codex.Quest'} logo`}
-                    className="w-10 h-10 sm:w-12 sm:h-12 transition-transform duration-200 group-hover:scale-105"
+                    className="site-logo"
                   />
-                  <div className="absolute inset-0 bg-amber-400/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 blur-sm -z-10"></div>
+                  <div className="site-glow"></div>
                 </div>
-                <Typography
-                  variant="h3"
-                  as="h1"
-                  color="amber"
-                  className="font-title font-bold text-2xl sm:text-3xl tracking-tight bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent group-hover:from-amber-200 group-hover:to-amber-400 transition-all duration-200"
-                >
+                <Typography variant="h3" as="h1" color="amber" className="site-title">
                   {isMockMode() ? 'Codex.Mock' : 'Codex.Quest'}
                 </Typography>
               </Link>
@@ -88,7 +80,7 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
 
             {/* Mock Mode Reset Button */}
             {isMockMode() && (
-              <div className="flex items-center">
+              <div className="site-row">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -102,15 +94,15 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
             )}
 
             {/* Desktop Authentication */}
-            <div className="hidden md:block">
-              <div className="flex items-center space-x-4">
+            <div className="site-bar-end">
+              <div className="site-auth">
                 {user ? (
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
+                  <div className="site-auth">
+                    <div className="site-user">
                       <Typography variant="bodySmall" color="amber" weight="medium">
                         {user.email?.split('@')[0]}
                       </Typography>
-                      <Typography variant="caption" color="secondary" className="block">
+                      <Typography variant="caption" color="secondary">
                         Signed in
                       </Typography>
                     </div>
@@ -127,7 +119,7 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className="site-menu-toggle">
               <Button
                 variant="ghost"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -136,7 +128,6 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
                 aria-label="Toggle mobile menu"
                 icon={!isMobileMenuOpen ? 'menu' : 'close'}
                 iconSize="lg"
-                iconClassName="transition-transform duration-200 group-hover:scale-110"
               >
                 <span className="sr-only">{isMobileMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
               </Button>
@@ -144,22 +135,17 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
           </div>
 
           {/* Mobile menu */}
-          <div
-            className={`md:hidden transition-all duration-300 ease-in-out ${
-              isMobileMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-            }`}
-            id="mobile-menu"
-          >
-            <div className="px-4 pt-4 pb-6 space-y-3 mt-4 bg-primary-800/50 backdrop-blur-sm">
+          <div className="site-menu" data-open={isMobileMenuOpen || undefined} id="mobile-menu">
+            <div className="site-menu-inner">
               {/* Mobile Authentication */}
               <div>
                 {user ? (
-                  <div className="space-y-3">
-                    <div className="px-4 py-3 rounded-lg bg-primary-700/30">
+                  <div className="site-menu-stack">
+                    <div className="site-menu-user">
                       <Typography variant="bodySmall" color="amber" weight="medium">
                         {user.email?.split('@')[0]}
                       </Typography>
-                      <Typography variant="caption" color="secondary" className="block mt-1">
+                      <Typography variant="caption" color="secondary">
                         {user.email}
                       </Typography>
                     </div>
@@ -171,7 +157,7 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
                       }}
                       icon="close"
                       iconSize="sm"
-                      iconClassName="ml-auto opacity-60 group-hover:opacity-100 transition-opacity duration-200"
+                      className="site-menu-signout"
                     >
                       <span>Sign Out</span>
                     </Button>
@@ -193,7 +179,7 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
         </nav>
       </header>
       {alerts.length > 0 && (
-        <div className="space-y-0">
+        <div className="site-alerts">
           {alerts.map((alert, index) => (
             <GlobalAlert key={`alert-${index}`} alert={alert} onClose={() => onAlertClose(index)} />
           ))}

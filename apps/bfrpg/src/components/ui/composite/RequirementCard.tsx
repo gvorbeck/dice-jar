@@ -10,7 +10,7 @@ interface RequirementCardProps {
   className?: string;
 }
 
-export function RequirementCard({ title, message, icon, variant = 'info', className = '' }: RequirementCardProps) {
+export function RequirementCard({ title, message, icon, variant = 'info', className }: RequirementCardProps) {
   return (
     <Card variant={variant} className={className}>
       <InfoCardHeader icon={icon} title={title} iconSize="md" className="mb-3" />

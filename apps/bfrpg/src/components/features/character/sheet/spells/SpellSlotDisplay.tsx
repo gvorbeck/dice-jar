@@ -14,7 +14,7 @@ export default function SpellSlotDisplay({ spellSlots }: SpellSlotDisplayProps) 
 
   return (
     <section aria-labelledby="spell-slots-heading">
-      <SectionHeader title="Spell Slots per Day" dotColor="bg-purple-400" className="mb-3" />
+      <SectionHeader title="Spell Slots per Day" dotColor="purple" className="mb-3" />
       <Card variant="nested" size="compact" className="mb-6 bg-gradient-to-r from-purple-950/30 to-indigo-950/30 border-purple-800/30">
         <div className="flex flex-wrap gap-2">
           {Object.entries(spellSlots)
