@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { useTitle } from '@/lib/useTitle';
+import { useTitle } from '@dice-jar/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { GameGuard } from '../GameGuard';

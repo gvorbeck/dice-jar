@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useToast } from '@dice-jar/browser';
 import { INSERT_TABS, getInsertTab, type InsertOption } from '@/lib/insertTabs';
 import type { Character, CharacterData } from '@/model';
 

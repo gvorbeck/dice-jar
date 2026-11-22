@@ -112,7 +112,7 @@ h2.eyebrow::before {
   padding-inline: 0.06em; /* room for the offset plates */
   font: 800 clamp(2.5rem, 14vw, 9rem) / 0.95 var(--font-display);
   letter-spacing: -0.04em;
-  white-space: nowrap; /* never break at the hyphen */
+  white-space: nowrap; /* the two words stay on one line */
   /* Misregistered print: magenta and turquoise plates slipped off the white one, all worn by the same speckle. */
   text-shadow:
     -0.035em 0.025em 0 var(--dj-magenta),
@@ -250,20 +250,16 @@ section {
 }
 
 /* A live app's card is a scrap torn out of that app: its own colors and type, ripped along the bottom. */
-.card.dg,
-.card.st {
+.card:not(.soon) {
   mask:
     linear-gradient(black 0 0) top / 100% calc(100% - var(--tear) + 1px) no-repeat,
     var(--tex-torn) bottom / 151px var(--tear) repeat-x;
 }
-.card.dg::before,
-.card.dg::after,
-.card.st::before,
-.card.st::after {
+.card:not(.soon)::before,
+.card:not(.soon)::after {
   content: none;
 }
-.card.dg h3 a::after,
-.card.st h3 a::after {
+.card:not(.soon) h3 a::after {
   bottom: var(--tear); /* above the tear, so the focus ring isn't ripped too */
   border-radius: 0;
 }
@@ -335,6 +331,45 @@ section {
 .card.st:hover {
   background-color: var(--st-panel);
   border-color: var(--st-border-accent);
+}
+
+/* Codex.Quest: a zinc panel with an amber Wellfleet title, and its chunky amber button. */
+.card.cq {
+  border: 2px solid var(--cq-line);
+  border-bottom: 0; /* torn off */
+  border-radius: var(--cq-radius) var(--cq-radius) 0 0;
+  background: linear-gradient(to bottom right, var(--cq-panel), var(--cq-bg));
+  color: var(--cq-fg);
+  font: 400 1rem/1.5 var(--cq-font-sans);
+}
+.card.cq .eyebrow {
+  font: 600 0.75rem/1.4 var(--cq-font-sans);
+  color: var(--cq-dim);
+}
+.card.cq h3 {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--cq-rule);
+  font: 700 clamp(1.5rem, 11cqi, 2rem) / 1.2 var(--cq-font-title);
+  /* The app's logotype: amber gradient lettering. */
+  background: linear-gradient(to right, var(--cq-amber-300), var(--cq-amber-500));
+  background-clip: text;
+  color: transparent;
+}
+.card.cq h3 + p {
+  margin-bottom: 1rem; /* the button's padding replaces card-meta's, so keep a gap above it here */
+}
+.card.cq p.card-meta {
+  align-self: flex-start;
+  padding: 0.25rem 0.75rem;
+  border: 2px solid var(--cq-amber-400);
+  border-radius: var(--cq-radius);
+  box-shadow: 0 4px 0 0 var(--cq-amber-700);
+  font: 600 0.875rem/1.4 var(--cq-font-sans);
+  color: var(--cq-amber-400);
+}
+.card.cq:hover {
+  background-color: transparent;
+  border-color: var(--cq-amber-400);
 }
 
 .about p {

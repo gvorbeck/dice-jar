@@ -17,6 +17,9 @@ const applyTheme = (scheme: ColorScheme) => {
   } else {
     document.documentElement.removeAttribute('data-theme');
   }
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--surface-page').trim());
 };
 
 export const useColorScheme = () => {

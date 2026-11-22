@@ -88,24 +88,6 @@ export const STAT_GROUPS = [
   };
 });
 
-// Shown when a Firestore write fails. Both useGame's central reportSave wrapper
-// and useDebouncedSave's per-field handler toast this on failure; the Toast
-// dedupes by exact message, so a debounced field that fails through both paths
-// collapses to one toast. Keep them sharing this constant — diverging the text
-// would silently produce double toasts.
-export const SAVE_ERROR_MESSAGE = "Couldn't save your changes — check your connection.";
-
-// Shown when a write is rejected with Firestore's `invalid-argument` code. That code covers more
-// than one cause — the game doc exceeding the 1 MiB per-doc ceiling, but also a malformed value
-// (e.g. an `undefined` field, an illegal field-path character) that's a bug in this app rather
-// than something the player did. Firestore doesn't distinguish these with different codes, and we
-// can't reliably tell them apart from the client, so the wording stays neutral rather than
-// guessing "too large" and sending the player hunting for content to delete that isn't the actual
-// problem. Both save paths (useGame's reportSave and useDebouncedSave's handler) map the code to
-// this same string so the Toast dedupe collapses them to one — same reason SAVE_ERROR_MESSAGE is shared.
-export const INVALID_WRITE_MESSAGE =
-  "Couldn't save that change — the game may have grown too large, or something went wrong on our end. Try again, and if it keeps happening, trim some content (long notes, unused characters) or report it at github.com/gvorbeck/dice-jar/issues.";
-
 export interface PlaybookOption {
   value: PlaybookType;
   label: string;
@@ -205,6 +187,7 @@ export const getPlaybook = (value: PlaybookType): PlaybookOption | undefined => 
 
 // Keep what a player types inside what firestore.rules accepts; the rules allow more, so older data stays writable.
 export const NAME_MAX_LENGTH = 100;
+// Keep at or below the parser's own cap in @dice-jar/dice, which rejects longer rolls.
 export const NOTATION_MAX_LENGTH = 500;
 // The longest name or label a roll carries (firestore.rules); logging a roll shortens a longer one rather than losing the roll.
 export const ROLL_TEXT_MAX_LENGTH = 200;

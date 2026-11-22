@@ -1,0 +1,6 @@
+@layer components {
+  .page {
+    max-width: 56rem;
+    margin-inline: auto;
+  }
+}

@@ -1,15 +1,32 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { SkipLink } from './Win';
+import { SkipLink } from '@dice-jar/browser';
 
 const TITLE = 'YOURCODENA.ME';
 
+interface Props {
+  subtitle?: string;
+  /** Called instead of following the logo home, for a page that must confirm leaving first. */
+  onHome?: () => void;
+  children?: ReactNode;
+}
+
 /** Skip link plus the top menu bar; `children` are the page's own actions, aligned right. */
-export const MenuBar = ({ subtitle = '// Delta Green agents & rolls', children }: { subtitle?: string; children?: ReactNode }) => (
+export const MenuBar = ({ subtitle = '// Delta Green agents & rolls', onHome, children }: Props) => (
   <>
-    <SkipLink />
+    <SkipLink className="skip" />
     <nav className="menubar" aria-label="Application">
-      <Link to="/" aria-label={TITLE}>
+      <Link
+        to="/"
+        aria-label={TITLE}
+        onClick={
+          onHome &&
+          ((e) => {
+            e.preventDefault();
+            onHome();
+          })
+        }
+      >
         <svg className="logo" viewBox="0 0 5 3" aria-hidden="true" focusable="false">
           <path d="M2 0h1v1H2zM1 1h3v1H1zM0 2h5v1H0z" fill="currentColor" />
         </svg>

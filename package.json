@@ -15,6 +15,7 @@
     "dj": "npm run dev -w apps/dice-jar -- --open",
     "dg": "npm run dev -w apps/delta-green -- --open",
     "st": "npm run dev -w apps/stonetop -- --open",
+    "bf": "npm run dev -w apps/bfrpg -- --open",
     "format": "prettier --write .",
     "lint": "eslint . --max-warnings 0",
     "knip": "knip",
@@ -24,7 +25,7 @@
     "test:coverage": "node scripts/workspaces.js test:coverage",
     "test:rules": "node scripts/workspaces.js test:rules",
     "test:e2e": "node scripts/workspaces.js test:e2e",
-    "test:scripts": "node --test scripts/workspaces.test.js",
+    "test:scripts": "node --test scripts/*.test.js",
     "check": "prettier --check . && npm run lint && npm run knip && npm run test:scripts && npm run typecheck && npm run test:coverage"
   },
   "lint-staged": {

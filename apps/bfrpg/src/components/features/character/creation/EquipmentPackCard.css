@@ -1,0 +1,95 @@
+@layer components {
+  .pack.card {
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .pack[data-affordable] {
+    cursor: pointer;
+  }
+  .pack:not([data-affordable]) {
+    cursor: not-allowed;
+  }
+  .pack[data-affordable]:not([data-selected]):hover {
+    box-shadow:
+      0 0 0 1px var(--zinc-400),
+      0 var(--depth) 0 0 var(--depth-color);
+  }
+  .pack[data-selected] {
+    box-shadow:
+      0 0 0 2px var(--lime-400),
+      0 var(--depth) 0 0 var(--depth-color);
+  }
+  .pack-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .pack-head > div {
+    flex: 1 1 0%;
+  }
+  .pack-head .typography[data-variant='h6'] {
+    margin-bottom: var(--space);
+  }
+  .pack-badges {
+    display: flex;
+    gap: calc(var(--space) * 2);
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .pack-head .typography[data-variant='bodySmall'] {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .pack-costs {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .pack-costs > div {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 4);
+  }
+  .pack-costs > div > div {
+    display: flex;
+    align-items: center;
+    gap: var(--space);
+  }
+  .pack-cost {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    font-weight: 500;
+  }
+  .pack-costs .icon {
+    color: var(--zinc-400);
+  }
+  .pack-weight {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--zinc-400);
+  }
+  .pack-coin .icon {
+    color: var(--amber-400);
+  }
+  .pack[data-affordable] .pack-coin .icon {
+    color: var(--amber-400);
+  }
+  .pack:not([data-affordable]) .pack-coin .icon,
+  .pack:not([data-affordable]) .pack-cost {
+    color: var(--red-400);
+  }
+  .pack-items > :not(:last-child) {
+    margin-bottom: var(--space);
+  }
+  .pack-items > div {
+    display: flex;
+    justify-content: space-between;
+  }
+  .pack-confirm {
+    margin-top: calc(var(--space) * 4);
+    padding-top: calc(var(--space) * 4);
+    border-top: 1px solid color-mix(in oklab, var(--lime-400) 20%, transparent);
+  }
+  .pack-confirm .btn {
+    width: 100%;
+  }
+}

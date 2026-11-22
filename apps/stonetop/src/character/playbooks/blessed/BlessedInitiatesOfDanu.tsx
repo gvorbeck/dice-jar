@@ -1,9 +1,9 @@
 import { useState, useCallback, memo } from 'react';
-import { useLatest } from '@/lib/useLatest';
-import { useFirestoreSync } from '@/lib/useFirestoreSync';
+import { useLatest } from '@dice-jar/browser';
+import { useFirestoreSync } from '@dice-jar/browser';
 import { resolvePlaybookFeatures } from '@/lib/resolvePlaybookFeatures';
 import { useCrewSave } from '../shared/useCrewSave';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useToast } from '@dice-jar/browser';
 import { Input, Radio, RadioGroup, Text, CheckboxGroup } from '@/ui';
 import { PlaybookSection } from '@/playbook/PlaybookSection';
 import { StatBox, LoyaltyRow } from '../shared/CrewWidgets';

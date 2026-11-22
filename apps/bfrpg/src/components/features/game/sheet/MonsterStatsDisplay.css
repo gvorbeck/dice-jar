@@ -1,0 +1,20 @@
+@layer components {
+  .monster-stats {
+    display: grid;
+    gap: calc(var(--space) * 2);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .monster-stats .monster-damage .stat-card-value {
+    font-family: var(--font-mono);
+  }
+  @media (min-width: 40rem) {
+    .monster-stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .monster-stats {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+}

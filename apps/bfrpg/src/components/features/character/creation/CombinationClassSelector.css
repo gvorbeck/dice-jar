@@ -1,0 +1,14 @@
+@layer components {
+  .combo-nested.card {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .combo-abilities > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .combo-abilities .typography[data-variant='body'] {
+    font-weight: 600;
+  }
+  .combo-badge.badge {
+    text-transform: capitalize;
+  }
+}

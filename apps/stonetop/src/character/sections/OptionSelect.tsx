@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useLatest } from '@/lib/useLatest';
+import { useLatest } from '@dice-jar/browser';
 import type { ReactNode } from 'react';
 import { Radio, RadioGroup, Input, Text } from '@/ui';
-import { useToastOptional } from '@/ui/Toast/ToastContext';
-import { useDebouncedSave } from '@/lib/useDebouncedSave';
-import { useFirestoreSync } from '@/lib/useFirestoreSync';
+import { useToastOptional } from '@dice-jar/browser';
+import { useDebouncedSave } from '@dice-jar/browser';
+import { useFirestoreSync } from '@dice-jar/browser';
 import { useCollapsibleSection } from '@/lib/useCollapsibleSection';
 import { PlaybookSection } from '@/playbook/PlaybookSection';
 import type { RadioOption } from '@/model';

@@ -1,0 +1,50 @@
+@layer components {
+  .img[data-variant='standard'],
+  .img[data-variant='avatar'] {
+    object-fit: cover;
+  }
+  .img[data-variant='avatar'] {
+    border: 2px solid var(--zinc-600);
+    border-radius: 9999px;
+  }
+  .img-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 2px solid var(--zinc-600);
+    background: var(--zinc-700);
+  }
+  .img-fallback[data-variant='avatar'] {
+    border-radius: 9999px;
+  }
+  .img-fallback span {
+    font-weight: 700;
+    color: var(--zinc-300);
+  }
+  .img[data-variant='avatar'][data-size='xs'],
+  .img-fallback[data-size='xs'] {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .img[data-variant='avatar'][data-size='sm'],
+  .img-fallback[data-size='sm'] {
+    width: 3rem;
+    height: 3rem;
+  }
+  .img[data-variant='avatar'][data-size='md'],
+  .img-fallback[data-size='md'] {
+    width: 4rem;
+    height: 4rem;
+  }
+  .img[data-variant='avatar'][data-size='lg'],
+  .img-fallback[data-size='lg'] {
+    width: 6rem;
+    height: 6rem;
+  }
+  .img[data-variant='avatar'][data-size='xl'],
+  .img-fallback[data-size='xl'] {
+    width: 8rem;
+    height: 8rem;
+  }
+}

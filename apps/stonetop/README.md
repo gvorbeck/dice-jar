@@ -93,7 +93,7 @@ src/
 │   ├── CharacterPlaybook/ # Individual character sheet
 │   ├── GmPlaybook/       # GM reference
 │   └── SteadingPlaybook/ # Steading reference
-├── lib/                  # Non-visual code: hooks (useGame, useDebouncedSave, …), Firestore access, dice, parsing
+├── lib/                  # Non-visual code: hooks (useGame, useOptimisticField, …), Firestore access, dice, parsing
 ├── model/                # Shared TypeScript types
 ├── rules/                # Game data: moves, arcana, character creation
 └── styles/               # tokens.css and app.css, imported once from main.tsx

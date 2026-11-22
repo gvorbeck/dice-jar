@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { toastModuleMock } from '@/test/toastMock';
 import type { CharacterData } from '@/model';
 
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
 
 import { BlessedSacredPouch } from '../BlessedSacredPouch';
 

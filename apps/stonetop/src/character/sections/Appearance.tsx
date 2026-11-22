@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react';
-import { useLatest } from '@/lib/useLatest';
-import { useDebouncedSave } from '@/lib/useDebouncedSave';
+import { useLatest } from '@dice-jar/browser';
+import { useDebouncedSave } from '@dice-jar/browser';
 import { useCollapsibleSection } from '@/lib/useCollapsibleSection';
 import { useOptimisticField } from '@/lib/useOptimisticField';
 import { Checkbox, Input, Radio, RadioGroup, Text } from '@/ui';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useToast } from '@dice-jar/browser';
 import { PlaybookSection } from '@/playbook/PlaybookSection';
 import type { AppearanceRows } from '@/rules/characterCreation/appearanceOptions';
 import type { CharacterData } from '@/model';

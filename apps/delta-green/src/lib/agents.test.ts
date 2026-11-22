@@ -57,7 +57,7 @@ vi.mock('firebase/firestore', () => {
   };
 });
 
-const { advanceAll, createAgent, readImport, saveCharacter, saveLive } = await import('./agents');
+const { advanceAll, createAgent, loadAgent, readImport, saveCharacter, saveLive } = await import('./agents');
 const { createGame, logRoll } = await import('./games');
 
 /** The hasOnly list of the first match block whose path starts with `path`. */
@@ -128,6 +128,79 @@ describe('saveLive sends only what changed', () => {
     commit = async () => {};
     await saveLive('g', 'a3', live({ hp: 3, wp: 4 }));
     expect(writes.updates.at(-1)).toEqual([{ 'live.hp': 3, 'live.wp': 4, updatedAt: expect.any(Number) }]);
+  });
+
+  it("a rejected save is sent again even after a later save went out, and a later rejection doesn't undo that", async () => {
+    await saveLive('g', 'a5', live());
+    let reject: (e: Error) => void = () => {};
+    commit = () =>
+      new Promise<void>((_, r) => {
+        reject = r;
+      });
+    const first = saveLive('g', 'a5', live({ hp: 3 }));
+    commit = async () => {};
+    await saveLive('g', 'a5', live({ hp: 3, wp: 4 })); // sends only wp: hp is already "sent"
+    expect(writes.updates.at(-1)).toEqual([{ 'live.wp': 4, updatedAt: expect.any(Number) }]);
+    reject(new Error('rejected'));
+    await expect(first).rejects.toThrow('rejected');
+    await saveLive('g', 'a5', live({ hp: 3, wp: 4 }));
+    expect(writes.updates.at(-1)).toEqual([{ 'live.hp': 3, 'live.wp': 4, updatedAt: expect.any(Number) }]);
+  });
+
+  it('two overlapping rejections leave the changes of both to be sent again', async () => {
+    await saveLive('g', 'a6', live());
+    const rejects: Array<(e: Error) => void> = [];
+    commit = () =>
+      new Promise<void>((_, r) => {
+        rejects.push(r);
+      });
+    const first = saveLive('g', 'a6', live({ hp: 3 }));
+    const second = saveLive('g', 'a6', live({ hp: 3, wp: 4 }));
+    rejects[0]!(new Error('no'));
+    await expect(first).rejects.toThrow('no');
+    rejects[1]!(new Error('no'));
+    await expect(second).rejects.toThrow('no');
+    commit = async () => {};
+    await saveLive('g', 'a6', live({ hp: 3, wp: 4 }));
+    expect(writes.updates.at(-1)).toEqual([{ 'live.hp': 3, 'live.wp': 4, updatedAt: expect.any(Number) }]);
+  });
+
+  it('three overlapping saves where the rejections come out of order still leave every change to be sent again', async () => {
+    await saveLive('g', 'a7', live());
+    const rejects: Array<(e: Error) => void> = [];
+    commit = () =>
+      new Promise<void>((_, r) => {
+        rejects.push(r);
+      });
+    const sends = [
+      saveLive('g', 'a7', live({ hp: 3 })),
+      saveLive('g', 'a7', live({ hp: 3, wp: 4 })),
+      saveLive('g', 'a7', live({ hp: 3, wp: 4, san: 20 })),
+    ];
+    for (const i of [0, 2, 1]) {
+      rejects[i]!(new Error('no'));
+      await expect(sends[i]).rejects.toThrow('no');
+    }
+    commit = async () => {};
+    await saveLive('g', 'a7', live({ hp: 3, wp: 4, san: 20 }));
+    expect(writes.updates.at(-1)).toEqual([{ 'live.hp': 3, 'live.wp': 4, 'live.san': 20, updatedAt: expect.any(Number) }]);
+  });
+
+  it('a rejection that arrives after a reload does not put the old base back', async () => {
+    await saveLive('g', 'a8', live());
+    let reject: (e: Error) => void = () => {};
+    commit = () =>
+      new Promise<void>((_, r) => {
+        reject = r;
+      });
+    const pending = saveLive('g', 'a8', live({ hp: 3 }));
+    commit = async () => {};
+    docs.set('games/g/agents/a8', { character: newCharacter(), live: live({ wp: 7 }) }); // what the server holds when the sheet is reloaded
+    await loadAgent('g', 'a8');
+    reject(new Error('no'));
+    await expect(pending).rejects.toThrow('no');
+    await saveLive('g', 'a8', live({ hp: 3, wp: 7 }));
+    expect(writes.updates.at(-1)).toEqual([{ 'live.hp': 3, updatedAt: expect.any(Number) }]); // not wp: the reload's value stays the base
   });
 
   it('a value put back while the previous save is still in flight is sent', async () => {

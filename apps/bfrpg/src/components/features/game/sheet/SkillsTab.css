@@ -1,0 +1,94 @@
+@layer components {
+  .skills-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+  }
+  .skills-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--zinc-900);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .skills-table th {
+    padding: calc(var(--space) * 2) calc(var(--space) * 3);
+    border-bottom: 2px solid color-mix(in oklab, var(--amber-500) 50%, transparent);
+    background: var(--zinc-700);
+    text-align: left;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    color: var(--amber-400);
+  }
+  .skills-hint {
+    cursor: help;
+    border-bottom: 1px dotted color-mix(in oklab, var(--amber-400) 50%, transparent);
+  }
+  .skills-table tbody tr {
+    border-bottom: 1px solid var(--zinc-700);
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .skills-table tbody tr:nth-child(even) {
+    background: color-mix(in oklab, var(--zinc-800) 30%, transparent);
+  }
+  .skills-table tbody tr:hover {
+    background: color-mix(in oklab, var(--zinc-800) 50%, transparent);
+  }
+  .skills-table tbody tr[data-player='true'] {
+    border-color: color-mix(in oklab, var(--amber-500) 30%, transparent);
+    background: color-mix(in oklab, var(--amber-900) 20%, transparent);
+  }
+  .skills-table tbody tr[data-player='true']:hover {
+    background: color-mix(in oklab, var(--amber-900) 30%, transparent);
+  }
+  .skills-table td {
+    padding: calc(var(--space) * 2) calc(var(--space) * 3);
+    text-align: left;
+    color: var(--zinc-300);
+  }
+  .skills-table [data-align='center'] {
+    text-align: center;
+  }
+  .skills-table [data-align='right'] {
+    text-align: right;
+  }
+  .skills-card.card {
+    overflow: hidden;
+  }
+  .skills-card-head {
+    padding: calc(var(--space) * 4);
+    border-bottom: 1px solid var(--zinc-700);
+  }
+  .skills-card-body {
+    padding: calc(var(--space) * 4);
+  }
+  .skills-note {
+    padding: 0 calc(var(--space) * 4) calc(var(--space) * 4);
+  }
+  .skills-note > div {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-400);
+  }
+  .skills-swatch {
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--amber-500) 30%, transparent);
+    border-radius: var(--radius);
+    background: color-mix(in oklab, var(--amber-900) 20%, transparent);
+  }
+  .skills-empty {
+    padding: calc(var(--space) * 6);
+    text-align: center;
+  }
+  .skills-empty .typography[data-variant='caption'] {
+    display: block;
+    margin-top: calc(var(--space) * 2);
+  }
+  .skills-tables > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+}

@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// Everything lives under its owner: users/{uid}/characters/{id} and users/{uid}/games/{id}.
+// A character sheet is shared by link, so anyone may read one character they have the path to; only the owner lists or writes.
+// A game is private to its owner. Players' characters are what a GM reads, never other users' games.
+// shortcut: writes aren't shape-checked (the owner can store any fields), upgrade: add hasOnly key lists and size bounds like the other apps once Phase 7 fixes the stored shape.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/characters/{id} {
+      allow get: if true;
+      allow list, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /users/{userId}/games/{id} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

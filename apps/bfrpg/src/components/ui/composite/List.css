@@ -1,0 +1,93 @@
+@layer components {
+  .list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .list[data-size='sm'] {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .list[data-size='md'] {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .list[data-size='lg'] {
+    font-size: var(--text-base);
+    line-height: var(--text-base-lh);
+  }
+  .list[data-variant='disc'] {
+    list-style: disc inside;
+  }
+  .list[data-variant='steps'] {
+    list-style: decimal inside;
+  }
+  .list[data-variant='breadcrumb'] {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+  }
+  .list[data-variant='grid'] {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .list[data-variant='grid'][data-spacing='tight'] {
+    gap: var(--space);
+  }
+  .list[data-variant='grid'][data-spacing='normal'] {
+    gap: calc(var(--space) * 2);
+  }
+  .list[data-variant='grid'][data-spacing='loose'] {
+    gap: calc(var(--space) * 3);
+  }
+  .list[data-variant='disc'][data-spacing='tight'] > :not(:last-child),
+  .list[data-variant='steps'][data-spacing='tight'] > :not(:last-child) {
+    margin-bottom: var(--space);
+  }
+  .list[data-variant='disc'][data-spacing='normal'] > :not(:last-child),
+  .list[data-variant='steps'][data-spacing='normal'] > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .list[data-variant='disc'][data-spacing='loose'] > :not(:last-child),
+  .list[data-variant='steps'][data-spacing='loose'] > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .list-row {
+    display: flex;
+    align-items: flex-start;
+  }
+  .list-row[data-icon] {
+    gap: calc(var(--space) * 2);
+  }
+  .list-row-icon {
+    margin-top: var(--space);
+    flex-shrink: 0;
+    color: var(--amber-400);
+  }
+  .list-row[data-grid] {
+    padding-block: calc(var(--space) * 0.5);
+    color: var(--zinc-300);
+  }
+  .list-dot {
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: 9999px;
+    background: var(--zinc-400);
+    flex-shrink: 0;
+  }
+  @media (prefers-color-scheme: dark) {
+    .list-dot {
+      background: var(--zinc-500);
+    }
+  }
+  @media (min-width: 40rem) {
+    .list[data-variant='grid'] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .list[data-variant='grid'] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}

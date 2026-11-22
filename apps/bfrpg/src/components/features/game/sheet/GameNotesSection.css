@@ -1,0 +1,12 @@
+@layer components {
+  .game-notes-body {
+    padding: calc(var(--space) * 6);
+  }
+  .game-notes-edit > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .game-notes-read .typography {
+    white-space: pre-wrap;
+    line-height: 1.625;
+  }
+}

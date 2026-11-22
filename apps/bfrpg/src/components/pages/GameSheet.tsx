@@ -1,0 +1,281 @@
+import { useParams } from 'react-router-dom';
+import { useTitle } from '@dice-jar/browser';
+import { useMemo, useCallback, useState, Suspense } from 'react';
+import { Breadcrumb } from '@/components/ui/composite';
+import { PageWrapper } from '@/components/ui/core/layout';
+import { LoadingState } from '@/components/ui/core/feedback';
+import { Typography } from '@/components/ui/core/display';
+import GameHero from '@/components/features/game/sheet/Hero';
+import { PlayersSection } from '@/components/features/game/sheet/PlayersSection';
+import { GameNotesSection } from '@/components/features/game/sheet/GameNotesSection';
+import { GameSheetEmptyState } from '@/components/features/game/sheet/GameSheetEmptyState';
+import { AddChar } from '@/components/features/game/sheet/AddChar';
+import { GMBinder } from '@/components/features/game/sheet/GMBinder';
+import { TreasureGeneratorModal, CombatTrackerModal, EncounterGeneratorModal } from '@/components/modals/LazyModals';
+import { useEnhancedGame } from '@/hooks/queries/useEnhancedQueries';
+import { useGameMutations } from '@/hooks/mutations/useEnhancedMutations';
+import { useDiceRoller } from '@/hooks/dice/useDiceRoller';
+import { useToast } from '@dice-jar/browser';
+import { useAuth } from '@/hooks';
+import { getErrorMessage } from '@/utils';
+import { ERROR_MESSAGES, LOADING_MESSAGES } from '@/constants';
+import type { Game, GamePlayer, GameCombatant } from '@/types';
+import './GameSheet.css';
+
+export default function GameSheet() {
+  const { user } = useAuth();
+  const params = useParams<{ userId: string; gameId: string }>();
+  const [isTreasureModalOpen, setIsTreasureModalOpen] = useState(false);
+  const [isCombatTrackerModalOpen, setIsCombatTrackerModalOpen] = useState(false);
+  const [isEncounterGeneratorModalOpen, setIsEncounterGeneratorModalOpen] = useState(false);
+
+  // Use enhanced game hook with error handling
+  const { data: gameData, isLoading: loading, error } = useEnhancedGame(params?.userId || '', params?.gameId || '');
+
+  const game = gameData?.game;
+  const isGameMaster = gameData?.isOwner || false;
+  useTitle(game?.name ? `${game.name} | Codex.Quest` : 'Game | Codex.Quest');
+
+  // Use enhanced game mutations
+  const { saveGame, isSaving } = useGameMutations();
+
+  // Use the dice roller hook
+  const { DiceRollerFAB, DiceRollerModal } = useDiceRoller();
+
+  const { addToast } = useToast();
+
+  const breadcrumbItems = useMemo(
+    () => [
+      { label: 'Home', href: '/' },
+      { label: game?.name || 'Game', current: true },
+    ],
+    [game?.name],
+  );
+
+  // Extract gameId to match compiler's inferred dependencies
+  const gameId = params?.gameId;
+
+  // Handle game changes using enhanced mutations
+  const handleGameChange = useCallback(
+    (updatedGame: Game) => {
+      if (!user || !params?.userId || !gameId) return;
+
+      void saveGame({
+        userId: params.userId,
+        game: updatedGame,
+        gameId,
+      });
+    },
+    [user, params?.userId, gameId, saveGame],
+  );
+
+  // Handle notes changes
+  const handleNotesChange = useCallback(
+    (notes: string) => {
+      if (!game) return;
+
+      const updatedGame = {
+        ...game,
+        notes,
+      };
+
+      handleGameChange(updatedGame);
+    },
+    [game, handleGameChange],
+  );
+
+  // Handle adding players to the game
+  const handleAddPlayer = useCallback(
+    (newPlayer: GamePlayer) => {
+      if (!game) return;
+
+      const updatedPlayers = [...(game.players || []), newPlayer];
+      const updatedGame = {
+        ...game,
+        players: updatedPlayers,
+      };
+
+      handleGameChange(updatedGame);
+    },
+    [game, handleGameChange],
+  );
+
+  // Handle removing players from the game
+  const handleDeletePlayer = useCallback(
+    (playerToDelete: GamePlayer) => {
+      if (!game) return;
+
+      const updatedPlayers = (game.players || []).filter(
+        (player) => player.user !== playerToDelete.user || player.character !== playerToDelete.character,
+      );
+
+      const updatedGame = {
+        ...game,
+        players: updatedPlayers,
+      };
+
+      handleGameChange(updatedGame);
+    },
+    [game, handleGameChange],
+  );
+
+  // Handle treasure generator modal
+  const handleTreasureGenerate = useCallback(() => {
+    setIsTreasureModalOpen(true);
+  }, []);
+
+  const handleTreasureModalClose = useCallback(() => {
+    setIsTreasureModalOpen(false);
+  }, []);
+
+  // Handle combat tracker modal
+  const handleCombatTrackerOpen = useCallback(() => {
+    setIsCombatTrackerModalOpen(true);
+  }, []);
+
+  const handleCombatTrackerModalClose = useCallback(() => {
+    setIsCombatTrackerModalOpen(false);
+  }, []);
+
+  // Handle encounter generator modal
+  const handleEncounterGeneratorOpen = useCallback(() => {
+    setIsEncounterGeneratorModalOpen(true);
+  }, []);
+
+  const handleEncounterGeneratorModalClose = useCallback(() => {
+    setIsEncounterGeneratorModalOpen(false);
+  }, []);
+
+  // Handle adding combatants to the game
+  const handleAddToCombat = useCallback(
+    (newCombatant: GameCombatant) => {
+      if (!game) return;
+
+      const updatedCombatants = [...(game.combatants || []), newCombatant];
+      const updatedGame = {
+        ...game,
+        combatants: updatedCombatants,
+      };
+
+      handleGameChange(updatedGame);
+
+      // Show success notification
+      addToast(`${newCombatant.name} added to Combat Tracker`, 'success');
+    },
+    [game, handleGameChange, addToast],
+  );
+
+  // Data loading is now handled by useFirebaseSheet hook
+
+  // Memoized content check for empty state
+  const hasContent = useMemo(() => {
+    if (!game) return false;
+    return (game.players && game.players.length > 0) || (game.notes && game.notes.trim().length > 0);
+  }, [game]);
+
+  if (loading) {
+    return <LoadingState message={LOADING_MESSAGES.loadingGame} />;
+  }
+
+  if (error) {
+    return (
+      <div role="alert">
+        <Typography variant="body" color="secondary">
+          Error: {getErrorMessage(error, 'Failed to load game')}
+        </Typography>
+      </div>
+    );
+  }
+
+  if (!game) {
+    return (
+      <div>
+        <Typography variant="body" color="muted">
+          {ERROR_MESSAGES.gameNotFound}
+        </Typography>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <PageWrapper className="game-sheet">
+        <header>
+          <Breadcrumb items={breadcrumbItems} />
+        </header>
+
+        {/* Skip link for accessibility */}
+        <a href="#main-content" className="game-skip">
+          Skip to main content
+        </a>
+
+        {/* Hero section with game info */}
+        <GameHero
+          game={game}
+          editable={!!isGameMaster}
+          onGameChange={handleGameChange}
+          onTreasureGenerate={handleTreasureGenerate}
+          onCombatTrackerOpen={handleCombatTrackerOpen}
+          onEncounterGeneratorOpen={handleEncounterGeneratorOpen}
+        />
+
+        {/* Game Sheet Content */}
+        <main id="main-content" className="game-body">
+          <PlayersSection players={game.players || []} showDivider={false} {...(isGameMaster && { onDeletePlayer: handleDeletePlayer })} />
+
+          {/* Add Character section - only show for game master */}
+          {isGameMaster && (
+            <div className="game-add">
+              <AddChar onAddPlayer={handleAddPlayer} disabled={isSaving} existingPlayers={game.players || []} />
+            </div>
+          )}
+
+          {/* GM Binder section - only show for game master */}
+          {isGameMaster && <GMBinder game={game} onAddToCombat={handleAddToCombat} />}
+
+          <GameNotesSection
+            notes={game.notes || ''}
+            showDivider={!!(game.players && game.players.length > 0) || !!isGameMaster}
+            editable={!!isGameMaster}
+            onNotesChange={handleNotesChange}
+          />
+
+          {/* Empty state when no content */}
+          {!hasContent && <GameSheetEmptyState gameName={game.name} />}
+        </main>
+
+        {/* Dice Roller Modal */}
+        <DiceRollerModal />
+
+        {/* Lazy-loaded Modals with Suspense */}
+        <Suspense fallback={<LoadingState message="Loading treasure generator..." />}>
+          <TreasureGeneratorModal isOpen={isTreasureModalOpen} onClose={handleTreasureModalClose} />
+        </Suspense>
+
+        <Suspense fallback={<LoadingState message="Loading combat tracker..." />}>
+          <CombatTrackerModal
+            isOpen={isCombatTrackerModalOpen}
+            onClose={handleCombatTrackerModalClose}
+            game={game}
+            onUpdateGame={handleGameChange}
+          />
+        </Suspense>
+
+        <Suspense fallback={<LoadingState message="Loading encounter generator..." />}>
+          <EncounterGeneratorModal
+            isOpen={isEncounterGeneratorModalOpen}
+            onClose={handleEncounterGeneratorModalClose}
+            onAddToCombat={handleAddToCombat}
+            onOpenCombatTracker={handleCombatTrackerOpen}
+          />
+        </Suspense>
+      </PageWrapper>
+
+      {/* Update loading indicator */}
+      {isSaving && <LoadingState message={LOADING_MESSAGES.updatingGame} variant="overlay" />}
+
+      {/* Dice Roller FAB */}
+      <DiceRollerFAB disabled={isSaving} />
+    </>
+  );
+}

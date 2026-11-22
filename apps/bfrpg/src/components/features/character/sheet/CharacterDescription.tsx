@@ -1,0 +1,55 @@
+import { TextArea } from '@/components/ui/core/primitives';
+import { SectionWrapper } from '@/components/ui/core/layout';
+import { useDebouncedTextField } from '@dice-jar/browser';
+import type { Character } from '@/types';
+import './CharacterDescription.css';
+
+interface CharacterDescriptionProps {
+  character: Character;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+  editable?: boolean;
+  onDescriptionChange?: (value: string) => void;
+}
+
+export default function CharacterDescription({
+  character,
+  className = '',
+  size = 'md',
+  editable = false,
+  onDescriptionChange,
+}: CharacterDescriptionProps) {
+  // Saves after typing pauses, and at once on blur
+  const debouncedDescription = useDebouncedTextField(character.desc || '', async (value) => onDescriptionChange?.(value), 500);
+
+  return (
+    <SectionWrapper title="Character Description" size={size} className={className}>
+      <div className="desc-body">
+        {editable ? (
+          <TextArea
+            value={debouncedDescription.value}
+            onChange={debouncedDescription.onChange}
+            onBlur={debouncedDescription.onBlur}
+            placeholder="Write your character's backstory, personality, appearance, notes, and anything else you'd like to remember..."
+            maxLength={5000}
+            size={size === 'lg' ? 'md' : 'sm'}
+            rows={size === 'lg' ? 12 : size === 'md' ? 8 : 6}
+            showClearButton={true}
+            aria-label="Character description and notes"
+            className="note-input"
+            resize="vertical"
+          />
+        ) : (
+          character.desc && <div className="desc-text">{character.desc}</div>
+        )}
+
+        {editable && (
+          <div className="note-foot">
+            <span>{debouncedDescription.value.length} / 5000 characters</span>
+            <span>{debouncedDescription.isPending ? 'Saving...' : 'Saves automatically after you stop typing (500ms)'}</span>
+          </div>
+        )}
+      </div>
+    </SectionWrapper>
+  );
+}

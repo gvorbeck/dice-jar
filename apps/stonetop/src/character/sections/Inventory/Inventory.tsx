@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react';
-import { useLatest } from '@/lib/useLatest';
+import { useLatest } from '@dice-jar/browser';
 import { useCharacterField } from '@/lib/useCharacterField';
 import { Divider, PlaybookColumns } from '@/ui';
 import { PlaybookSection } from '@/playbook/PlaybookSection';

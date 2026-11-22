@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { ToastProvider } from '@/ui/Toast/Toast';
+import { ToastProvider } from '@dice-jar/browser';
+import { ToastEntry } from '@/ui/Toast/Toast';
 import { SaveStatusProvider } from '@/ui/SaveStatus/SaveStatusProvider';
 import { SaveStatus } from '@/ui/SaveStatus/SaveStatus';
 import { ErrorBoundary } from '@/ui/ErrorBoundary/ErrorBoundary';
@@ -53,7 +54,7 @@ export const App = () => {
   // when the user navigates elsewhere, instead of blanking the app until reload.
   const { pathname } = useLocation();
   return (
-    <ToastProvider>
+    <ToastProvider Entry={ToastEntry}>
       <SaveStatusProvider>
         <ErrorBoundary resetKey={pathname}>
           <Suspense

@@ -2,8 +2,8 @@ import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } f
 import { cn } from '@dice-jar/cn';
 import { EditorContent, useEditor, useEditorState, type Editor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
-import { useFirestoreSync } from '@/lib/useFirestoreSync';
-import { useLatest } from '@/lib/useLatest';
+import { useFirestoreSync } from '@dice-jar/browser';
+import { useLatest } from '@dice-jar/browser';
 import { useNotesLock } from '@/lib/useNotesLock';
 import { Text } from '@/ui';
 import type { NotesLock } from '@/model';

@@ -1,6 +1,6 @@
 /** A live app has a url and a look (its card's class, dressing it as that app); one still coming has neither. */
 export type GameApp = { name: string; game: string; blurb: string } & (
-  { url: string; look: 'dg' | 'st' } | { url?: undefined; look?: undefined }
+  { url: string; look: 'dg' | 'st' | 'cq' } | { url?: undefined; look?: undefined }
 );
 
 export const APPS: GameApp[] = [
@@ -18,7 +18,13 @@ export const APPS: GameApp[] = [
     url: 'https://hearthfire.camp/',
     look: 'st',
   },
-  { name: 'codex-quest', game: 'Basic Fantasy RPG', blurb: 'Characters for Basic Fantasy RPG.' },
+  {
+    name: 'Codex.Quest',
+    game: 'Basic Fantasy RPG',
+    blurb: 'Roll up a Basic Fantasy RPG character step by step, then bring your party into a shared game, combat included.',
+    url: 'https://codex.quest/',
+    look: 'cq',
+  },
   { name: 'glyph-quest', game: 'Knave', blurb: 'Characters for Knave.' },
 ];
 

@@ -1,0 +1,49 @@
+@layer components {
+  .auth-google > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .auth-google .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--space) * 3);
+    width: 100%;
+    border: 1px solid var(--zinc-700);
+    background: var(--zinc-900);
+    color: var(--zinc-100);
+    box-shadow: var(--shadow-sm);
+  }
+  .auth-google .btn[data-hovered] {
+    background: var(--zinc-700);
+  }
+  .auth-google svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .auth-divider {
+    position: relative;
+  }
+  .auth-divider-line {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+  }
+  .auth-divider-line > div {
+    width: 100%;
+    border-top: 1px solid var(--zinc-700);
+  }
+  .auth-divider-label {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .auth-divider-label span {
+    padding: var(--space) calc(var(--space) * 3);
+    border-radius: var(--radius);
+    background: var(--zinc-900);
+    color: var(--zinc-400);
+  }
+}

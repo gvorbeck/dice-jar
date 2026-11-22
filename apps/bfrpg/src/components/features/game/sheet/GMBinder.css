@@ -1,0 +1,5 @@
+@layer components {
+  .gm-binder {
+    padding: calc(var(--space) * 4);
+  }
+}

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { Text, Input } from '@/ui';
-import { useDebouncedTextField } from '@/lib/useDebouncedTextField';
+import { useDebouncedTextField } from '@dice-jar/browser';
 import type { ContentLists } from '@/model';
 
 interface ContentSectionProps {
@@ -31,9 +31,29 @@ export const ContentSection = ({ content, onSave }: ContentSectionProps) => {
           specifics, now or later, but don't ask for reasons. Fix the fiction. Check in with the player(s). When everyone is ready, move on.
         </Text>
       </div>
-      <Input multiline label="Excluded content" note="(Not part of the game, on-camera or off)" {...excluded} />
-      <Input multiline label="Veiled content" note="(Part of the fiction, but only off-camera)" {...veiled} />
-      <Input multiline label="Special handling" {...special} />
+      <Input
+        multiline
+        label="Excluded content"
+        note="(Not part of the game, on-camera or off)"
+        value={excluded.value}
+        onChange={(e) => excluded.onChange(e.target.value)}
+        onBlur={excluded.onBlur}
+      />
+      <Input
+        multiline
+        label="Veiled content"
+        note="(Part of the fiction, but only off-camera)"
+        value={veiled.value}
+        onChange={(e) => veiled.onChange(e.target.value)}
+        onBlur={veiled.onBlur}
+      />
+      <Input
+        multiline
+        label="Special handling"
+        value={special.value}
+        onChange={(e) => special.onChange(e.target.value)}
+        onBlur={special.onBlur}
+      />
     </div>
   );
 };

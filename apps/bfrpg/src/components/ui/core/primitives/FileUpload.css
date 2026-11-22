@@ -1,0 +1,60 @@
+@layer components {
+  .upload-zone {
+    margin-top: calc(var(--space) * 2);
+    padding: calc(var(--space) * 6);
+    text-align: center;
+    border: 2px dashed var(--zinc-600);
+    border-radius: var(--radius-lg);
+    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .upload-zone:hover {
+    border-color: var(--zinc-500);
+  }
+  .upload-zone[data-over] {
+    border-color: var(--amber-400);
+    background: color-mix(in oklab, var(--amber-400) 10%, transparent);
+  }
+  .upload-zone[data-disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .upload-zone > div > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .upload-done {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--space) * 2);
+    color: var(--lime-400);
+  }
+  .upload-done span {
+    font-weight: 500;
+  }
+  .upload-hint {
+    color: var(--zinc-400);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .upload-actions {
+    display: flex;
+    justify-content: center;
+    gap: calc(var(--space) * 2);
+  }
+  .upload-icon {
+    color: var(--zinc-400);
+  }
+  .upload-icon .icon {
+    margin-inline: auto;
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .upload-pick > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .upload-error {
+    margin-top: var(--space);
+    color: var(--red-400);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+}

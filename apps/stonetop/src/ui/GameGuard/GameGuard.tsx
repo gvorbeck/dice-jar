@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useTitle } from '@/lib/useTitle';
+import { useTitle } from '@dice-jar/browser';
 import { Heading, Text, Button, Spinner } from '@/ui';
 import type { GameSession } from '@/model';
 

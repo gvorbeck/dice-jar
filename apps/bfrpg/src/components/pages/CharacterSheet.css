@@ -1,0 +1,65 @@
+@layer components {
+  .sheet-head {
+    margin-bottom: calc(var(--space) * 8);
+  }
+  .sheet-head > div {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .sheet-page > .hero-card {
+    margin-bottom: calc(var(--space) * 8);
+  }
+  .sheet-body > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .sheet-stats {
+    display: grid;
+    align-items: start;
+    gap: calc(var(--space) * 6);
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .sheet-masonry {
+    column-count: 1;
+    column-gap: calc(var(--space) * 6);
+  }
+  .sheet-cell {
+    break-inside: avoid;
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .sheet-pair {
+    display: grid;
+    gap: calc(var(--space) * 6);
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .sheet-pair > div {
+    break-inside: avoid;
+  }
+  .sheet-pair[data-split] > div {
+    min-width: 0;
+  }
+  @media (min-width: 48rem) {
+    .sheet-masonry {
+      column-count: 2;
+    }
+    .sheet-pair[data-always] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .sheet-stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .sheet-stats > :first-child {
+      grid-column: span 1 / span 1;
+    }
+    .sheet-stats > :last-child {
+      grid-column: span 3 / span 3;
+    }
+    .sheet-pair[data-split] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}

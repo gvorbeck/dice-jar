@@ -1,0 +1,15 @@
+@layer components {
+  .packs-body {
+    padding: calc(var(--space) * 6);
+  }
+  .packs-body > .card,
+  .packs-body > .callout {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .packs-list {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .packs-list > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+}

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useTitle } from '@/lib/useTitle';
+import { useTitle } from '@dice-jar/browser';
 import { PageLayout } from '@/ui/PageLayout/PageLayout';
 import { Button, Heading, Text } from '@/ui';
 

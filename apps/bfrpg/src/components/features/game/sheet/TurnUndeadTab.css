@@ -1,0 +1,78 @@
+@layer components {
+  .undead-type {
+    font-weight: 500;
+    color: var(--zinc-100);
+  }
+  .undead-dice {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-400);
+  }
+  .undead-cleric {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+  }
+  .undead-cleric span:first-child {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .undead-cleric span:last-child {
+    font-size: 10px;
+    font-weight: 400;
+    color: color-mix(in oklab, var(--amber-300) 70%, transparent);
+  }
+  .undead-result {
+    color: var(--zinc-300);
+  }
+  .undead-result[data-result='destroy'],
+  .undead-result[data-result='turn'],
+  .undead-key [data-result] {
+    font-weight: 600;
+  }
+  .undead-result[data-result='destroy'],
+  .undead-key [data-result='destroy'] {
+    color: var(--green-400);
+  }
+  .undead-result[data-result='turn'],
+  .undead-key [data-result='turn'] {
+    color: var(--blue-400);
+  }
+  .undead-result[data-result='none'],
+  .undead-key [data-result='none'] {
+    color: color-mix(in oklab, var(--red-400) 60%, transparent);
+  }
+  .undead-card.card {
+    overflow: hidden;
+  }
+  .undead-head {
+    padding: calc(var(--space) * 4);
+    border-bottom: 1px solid var(--zinc-700);
+  }
+  .undead-head .typography[data-variant='caption'] {
+    display: block;
+    margin-top: var(--space);
+  }
+  .undead-body {
+    padding: calc(var(--space) * 4);
+  }
+  .undead-legend {
+    padding: 0 calc(var(--space) * 4) calc(var(--space) * 4);
+  }
+  .undead-key {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-400);
+  }
+  .undead-key ul {
+    margin: var(--space) 0 0 calc(var(--space) * 4);
+    list-style: disc;
+  }
+  .undead-key li:not(:last-child) {
+    margin-bottom: var(--space);
+  }
+  .undead-key li > span:not([data-result]) {
+    color: var(--zinc-300);
+  }
+}

@@ -1,0 +1,73 @@
+import { Typography } from '@/components/ui/core/display';
+import { SectionWrapper } from '@/components/ui/core/layout';
+import { Button } from '@/components/ui/core/primitives';
+import InitiativeTable from './InitiativeTable';
+import type { CombatantWithInitiative } from '@/types';
+import { roll } from '@dice-jar/dice';
+import './Combat.css';
+
+interface PreCombatInitiativeSectionProps {
+  combatants: CombatantWithInitiative[];
+  onUpdateInitiative: (combatant: CombatantWithInitiative, newInitiative: number) => void;
+  onUpdateMultipleInitiatives?: (updates: Array<{ combatant: CombatantWithInitiative; initiative: number }>) => void;
+  onDeleteCombatant?: (combatant: CombatantWithInitiative, index: number) => void;
+}
+
+export default function PreCombatInitiativeSection({
+  combatants,
+  onUpdateInitiative,
+  onUpdateMultipleInitiatives,
+  onDeleteCombatant,
+}: PreCombatInitiativeSectionProps) {
+  if (combatants.length === 0) return null;
+
+  return (
+    <SectionWrapper title="Set Initiative" collapsible collapsibleKey="pre-combat-initiative">
+      <div className="precombat">
+        <div className="precombat-intro">
+          <Typography variant="bodySmall" color="secondary">
+            Set custom initiative values before starting combat, or leave at 0 to auto-roll when combat begins.
+          </Typography>
+
+          {combatants.some((c) => !c.isPlayer) && (
+            <Button
+              onClick={() => {
+                const monsters = combatants.filter((c) => !c.isPlayer);
+
+                if (onUpdateMultipleInitiatives) {
+                  // Use batch update if available
+                  const updates = monsters.map((combatant) => ({
+                    combatant,
+                    initiative: roll('1d6').total,
+                  }));
+                  onUpdateMultipleInitiatives(updates);
+                } else {
+                  // Fallback to individual updates
+                  monsters.forEach((combatant) => {
+                    const newInitiative = roll('1d6').total;
+                    onUpdateInitiative(combatant, newInitiative);
+                  });
+                }
+              }}
+              variant="secondary"
+              size="sm"
+            >
+              Roll Initiative for Monsters
+            </Button>
+          )}
+        </div>
+
+        <InitiativeTable
+          combatants={combatants}
+          currentTurn={-1}
+          isCombatActive={false}
+          onUpdateInitiative={onUpdateInitiative}
+          onSetCurrentTurn={() => {}} // No-op for pre-combat
+          onUpdateHp={() => {}} // No-op for pre-combat
+          showHp={false}
+          {...(onDeleteCombatant && { onDeleteCombatant })}
+        />
+      </div>
+    </SectionWrapper>
+  );
+}

@@ -1,0 +1,229 @@
+/* Layout patterns several components share; one-off layout lives in the component's own CSS. */
+@layer components {
+  .icon-heading {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+  }
+  /* The padded body of a sheet section; the size comes from the section it sits in. */
+  .sheet-pad[data-size='sm'] {
+    padding: calc(var(--space) * 2);
+  }
+  .sheet-pad[data-size='md'] {
+    padding: calc(var(--space) * 4);
+  }
+  .sheet-pad[data-size='lg'] {
+    padding: calc(var(--space) * 6);
+  }
+  /* A small tinted box for a figure or note on a sheet. */
+  .sheet-chip {
+    border: 1px solid color-mix(in oklab, var(--zinc-600) 80%, transparent);
+    border-radius: var(--radius-lg);
+    background-image: linear-gradient(to bottom right in oklab, var(--zinc-700), var(--zinc-800));
+  }
+  /* Fields stacked in a form; a grid of two or one for fields that sit side by side. */
+  .form-stack > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .form-grid {
+    display: grid;
+    gap: calc(var(--space) * 3);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .form-grid[data-cols='1'] {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .form-section {
+    padding-top: calc(var(--space) * 4);
+    border-top: 1px solid var(--zinc-600);
+  }
+  .form-section > .typography:first-child {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(var(--space) * 3);
+    padding-top: calc(var(--space) * 6);
+    border-top: 1px solid var(--zinc-600);
+  }
+  /* A sheet section's title with its buttons: stacked on a phone, side by side from 640px. */
+  .section-title {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space) * 2);
+    width: 100%;
+  }
+  .section-tools {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space) * 2);
+  }
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: calc(var(--space) * 6);
+    padding-top: calc(var(--space) * 4);
+    border-top: 1px solid var(--zinc-700);
+  }
+  @media (min-width: 40rem) {
+    .section-title,
+    .section-tools {
+      flex-direction: row;
+    }
+    .section-title {
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-tools {
+      margin-left: auto;
+    }
+  }
+  /* Rollable rows stacked in a sheet section. */
+  .roll-list > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .modal-buttons {
+    display: flex;
+    gap: calc(var(--space) * 3);
+    padding-top: calc(var(--space) * 4);
+  }
+  .modal-buttons[data-roomy] {
+    padding-top: calc(var(--space) * 6);
+  }
+  /* A block of a creation step, with the gap before the next one. */
+  .step-block {
+    margin-bottom: calc(var(--space) * 8);
+  }
+  .step-card.card {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .option-stack > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .option-divided {
+    padding-top: calc(var(--space) * 6);
+    border-top: 1px solid var(--zinc-600);
+  }
+  /* An info card's intro text, then its details laid out two across on a wide screen. */
+  .detail-intro {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .detail-grid {
+    display: grid;
+    gap: calc(var(--space) * 6);
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  @media (min-width: 64rem) {
+    .detail-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  /* An info card's title: an amber icon, the name and a badge on one line. */
+  .info-title.typography {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .info-title .icon {
+    flex-shrink: 0;
+    color: var(--amber-400);
+  }
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--space) * 2);
+  }
+  /* The notes box on a sheet and the line of counts under it. */
+  .note-input.text-area,
+  .note-input.text-area[data-focused] {
+    line-height: 1.625;
+    background: color-mix(in oklab, var(--zinc-800) 50%, transparent);
+    border-color: color-mix(in oklab, var(--zinc-600) 50%, transparent);
+  }
+  .note-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-500);
+  }
+  .note-foot span:last-child {
+    color: var(--zinc-600);
+  }
+  .empty-card.card {
+    padding: calc(var(--space) * 8);
+    text-align: center;
+  }
+  .empty-card .typography {
+    color: var(--zinc-400);
+  }
+  /* An input and its button fused into one bar. */
+  .joined-row {
+    display: flex;
+  }
+  .joined-input.text-input {
+    border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 3px 0 0 var(--zinc-700);
+  }
+  .joined-input.text-input[data-focused] {
+    box-shadow: 0 4px 0 0 var(--amber-700);
+  }
+  .joined-button.btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  /* The forms that create a custom spell or item. */
+  .custom-form > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .custom-block > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .custom-block > .typography {
+    color: var(--zinc-200);
+  }
+  .custom-block.form-section > .typography:first-child {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .custom-grid {
+    display: grid;
+    gap: calc(var(--space) * 4);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .custom-grid[data-cols='3'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: calc(var(--space) * 2);
+  }
+  .custom-grid .custom-sub {
+    display: block;
+    margin-bottom: var(--space);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-400);
+  }
+  .custom-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(var(--space) * 3);
+    margin-top: calc(var(--space) * 6);
+    padding-top: calc(var(--space) * 6);
+    border-top: 1px solid var(--zinc-600);
+  }
+  .modal-stack > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .modal-stack > .callout {
+    margin-top: calc(var(--space) * 4);
+  }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(var(--space) * 3);
+    margin-top: calc(var(--space) * 6);
+  }
+}

@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
-import { useLatest } from '@/lib/useLatest';
-import { useFirestoreSync } from '@/lib/useFirestoreSync';
-import { useDebouncedSave } from '@/lib/useDebouncedSave';
+import { useLatest } from '@dice-jar/browser';
+import { useFirestoreSync } from '@dice-jar/browser';
+import { useDebouncedSave } from '@dice-jar/browser';
 import { Heading, Input, Stack } from '@/ui';
 import type { CharacterData } from '@/model';
 

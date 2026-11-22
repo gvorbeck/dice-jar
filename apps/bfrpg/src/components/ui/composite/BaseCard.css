@@ -1,0 +1,101 @@
+@layer components {
+  .base-card {
+    position: relative;
+    min-width: 0;
+    width: 100%;
+  }
+  .base-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    cursor: pointer;
+    border-radius: var(--radius-xl);
+  }
+  .base-card-glow {
+    position: absolute;
+    border-radius: var(--radius-xl);
+    pointer-events: none;
+  }
+  .base-card-glow[data-corner='top-right'] {
+    top: 0;
+    right: 0;
+    width: 6rem;
+    height: 6rem;
+    background-image: linear-gradient(to bottom left in oklab, color-mix(in oklab, var(--amber-500) 5%, transparent), transparent);
+  }
+  .base-card-glow[data-corner='bottom-left'] {
+    bottom: 0;
+    left: 0;
+    width: 4rem;
+    height: 4rem;
+    background-image: linear-gradient(to top right in oklab, color-mix(in oklab, var(--amber-500) 5%, transparent), transparent);
+  }
+  .base-card-body {
+    position: relative;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .base-card-body > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .base-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(var(--space) * 2);
+    padding-top: calc(var(--space) * 2);
+    border-top: 1px solid color-mix(in oklab, var(--zinc-700) 50%, transparent);
+  }
+  .base-card-spinner {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 9999px;
+    border-bottom: 1px solid currentcolor;
+    animation: spin 1s linear infinite;
+  }
+  @media (min-width: 40rem) {
+    .base-card-actions {
+      padding-top: calc(var(--space) * 3);
+    }
+  }
+  /* The copy and delete buttons on a card. Tinted outline, filling on hover; from 640px the padding is square (below it the size's own padding applies). */
+  .btn.card-action {
+    --tint: var(--amber-600);
+    --ring: var(--amber-500);
+    position: relative;
+    z-index: 30;
+    color: var(--amber-400);
+    background: transparent;
+    border-color: color-mix(in oklab, var(--tint) 40%, transparent);
+    border-radius: var(--radius-lg);
+    box-shadow: none;
+    pointer-events: auto;
+    touch-action: manipulation;
+    transition-duration: 200ms;
+  }
+  .btn.card-action-danger {
+    --tint: var(--red-600);
+    --ring: var(--red-500);
+    color: var(--red-400);
+  }
+  .btn.card-action[data-hovered] {
+    color: var(--white);
+    background: var(--tint);
+    border-color: var(--tint);
+    box-shadow:
+      0 10px 15px -3px color-mix(in oklab, var(--tint) 40%, transparent),
+      0 4px 6px -4px color-mix(in oklab, var(--tint) 40%, transparent);
+  }
+  .btn.card-action[data-pressed] {
+    transform: none;
+  }
+  .btn.card-action[data-focused] {
+    box-shadow:
+      0 0 0 2px var(--panel),
+      0 0 0 4px var(--ring);
+  }
+  @media (min-width: 640px) {
+    .btn.card-action {
+      padding: calc(var(--space) * 2.5);
+    }
+  }
+}

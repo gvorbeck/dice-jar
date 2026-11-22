@@ -1,5 +1,5 @@
 import { Text, List, Input } from '@/ui';
-import { useDebouncedTextField } from '@/lib/useDebouncedTextField';
+import { useDebouncedTextField } from '@dice-jar/browser';
 
 interface IWonderProps {
   value: string;
@@ -16,7 +16,14 @@ export const IWonder = ({ value, onSave }: IWonderProps) => {
         <List variant="bullet" items={["you don't know how to answer yet, or", 'you want to answer via play.']} />
         <Text size="xs">Update this list between each session.</Text>
       </div>
-      <Input multiline label="Questions" rows={12} {...questions} />
+      <Input
+        multiline
+        label="Questions"
+        rows={12}
+        value={questions.value}
+        onChange={(e) => questions.onChange(e.target.value)}
+        onBlur={questions.onBlur}
+      />
     </div>
   );
 };

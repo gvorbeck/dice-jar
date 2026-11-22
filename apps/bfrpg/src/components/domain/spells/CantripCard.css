@@ -1,0 +1,38 @@
+@layer components {
+  .cantrip-card-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: calc(var(--space) * 4);
+  }
+  .cantrip-card-main {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+  .cantrip-card-main > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .cantrip-card-title {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 3);
+  }
+  .cantrip-card-title .icon {
+    color: var(--blue-400);
+  }
+  .cantrip-card-title .typography {
+    color: var(--zinc-100);
+  }
+  .cantrip-card-main .typography[data-variant='caption'] {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--zinc-400);
+  }
+  .btn.cantrip-remove {
+    flex-shrink: 0;
+    color: var(--zinc-400);
+  }
+  .btn.cantrip-remove[data-hovered] {
+    color: var(--red-400);
+  }
+}

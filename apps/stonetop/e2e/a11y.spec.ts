@@ -1,30 +1,37 @@
 // Every page, scanned with axe: home, game, GM playbook, steading, a character sheet and the not-found page.
 import { expect, test } from '@playwright/test';
-import { expectAccessible } from '@dice-jar/e2e-helpers';
+import { expectAccessible, expectDiceJarCredit, expectSkipLink } from '@dice-jar/e2e-helpers';
 import { addCharacter, createGame } from './helpers';
 
 test('every page has no accessibility violations', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Create Game' })).toBeVisible();
   await expectAccessible(page);
+  await expectDiceJarCredit(page);
 
   const id = await createGame(page);
   await expectAccessible(page); // empty game
+  await expectDiceJarCredit(page);
 
   await addCharacter(page, 'The Blessed');
   await expectAccessible(page); // game with a character
+  await expectDiceJarCredit(page);
 
   await page.goto(`/game/${id}/blessed`);
   await expectAccessible(page);
+  await expectDiceJarCredit(page);
 
   await page.goto(`/game/${id}/gm`);
   await expectAccessible(page);
+  await expectDiceJarCredit(page);
 
   await page.goto(`/game/${id}/steading`);
   await expectAccessible(page);
+  await expectDiceJarCredit(page);
 
   await page.goto('/no/such/page');
   await expectAccessible(page);
+  await expectDiceJarCredit(page);
 });
 
 test('home, game and a character sheet have no accessibility violations in dark mode', async ({ page }) => {
@@ -36,4 +43,16 @@ test('home, game and a character sheet have no accessibility violations in dark 
   await addCharacter(page, 'The Blessed');
   await page.goto(`/game/${id}/blessed`);
   await expectAccessible(page);
+});
+
+test('the skip link moves focus past the header, and navigating focuses the new page', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Create Game' })).toBeVisible();
+  await expectSkipLink(page);
+
+  await createGame(page);
+  await addCharacter(page, 'The Blessed');
+  await page.getByRole('link', { name: /The Blessed Playbook/ }).click(); // an in-app navigation
+  await expect(page).toHaveURL(/\/blessed$/);
+  await expect(page.getByRole('main')).toBeFocused();
 });

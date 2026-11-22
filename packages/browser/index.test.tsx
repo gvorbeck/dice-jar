@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { downloadJson, store, useCopy } from './index';
+import { downloadJson, downloadText, store, useCopy } from './index';
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -43,6 +43,18 @@ describe('downloadJson', () => {
     expect(document.querySelector('a[download]')).toBeNull();
     vi.advanceTimersByTime(1000);
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:x');
+  });
+});
+
+describe('downloadText', () => {
+  it('downloads the text with its type', async () => {
+    let blob: Blob | undefined;
+    URL.createObjectURL = vi.fn((b: Blob) => ((blob = b), 'blob:y'));
+    URL.revokeObjectURL = vi.fn();
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    downloadText('a.txt', 'hello');
+    expect(blob?.type).toBe('text/plain');
+    expect(await blob?.text()).toBe('hello');
   });
 });
 

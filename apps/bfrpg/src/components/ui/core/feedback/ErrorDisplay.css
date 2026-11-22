@@ -1,0 +1,11 @@
+@layer components {
+  .error-display {
+    padding: calc(var(--space) * 3);
+    border: 1px solid color-mix(in oklab, var(--red-600) 30%, transparent);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--red-950) 20%, transparent);
+    color: var(--red-400);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+}

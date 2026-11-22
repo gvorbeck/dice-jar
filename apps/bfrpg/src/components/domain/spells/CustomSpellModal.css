@@ -1,0 +1,5 @@
+@layer components {
+  .spell-classes > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+}

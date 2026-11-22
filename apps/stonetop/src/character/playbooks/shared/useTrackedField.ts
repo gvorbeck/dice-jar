@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { useLatest } from '@/lib/useLatest';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useLatest } from '@dice-jar/browser';
+import { useToast } from '@dice-jar/browser';
 import type { PlaybookFeatures } from '@/model';
 
 export const useTrackedField = (

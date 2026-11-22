@@ -1,3 +1,5 @@
+import { DiceJarCredit } from '@dice-jar/browser';
+
 /*
  * PageFooter — the legal/credit text at the bottom of every page.
  *
@@ -25,5 +27,7 @@ export const PageFooter = () => (
     <a className="page-footer-link field-focus-visible" href="https://github.com/gvorbeck/dice-jar" target="_blank" rel="noreferrer">
       GitHub
     </a>
+    <br />
+    <DiceJarCredit linkClassName="page-footer-link field-focus-visible" />
   </footer>
 );

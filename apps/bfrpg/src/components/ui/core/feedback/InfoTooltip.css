@@ -1,0 +1,13 @@
+@layer components {
+  .info-tip {
+    display: inline-block;
+  }
+  .info-tip-icon {
+    color: var(--zinc-500);
+    cursor: help;
+    transition: color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .info-tip-icon:hover {
+    color: var(--zinc-300);
+  }
+}

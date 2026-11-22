@@ -1,10 +1,10 @@
 import { useState, useCallback, memo, useId } from 'react';
-import { useLatest } from '@/lib/useLatest';
-import { useFirestoreSync } from '@/lib/useFirestoreSync';
+import { useLatest } from '@dice-jar/browser';
+import { useFirestoreSync } from '@dice-jar/browser';
 import { cn } from '@dice-jar/cn';
 import { Button, Checkbox, Heading, Input, Modal, Text, Tooltip } from '@/ui';
 
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useToast } from '@dice-jar/browser';
 import { PlaybookSection } from '@/playbook/PlaybookSection';
 import { resolvePlaybookFeatures } from '@/lib/resolvePlaybookFeatures';
 import { generateId } from '@/lib/id';

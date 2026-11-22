@@ -1,0 +1,38 @@
+@layer components {
+  .skill-details.card {
+    margin-top: calc(var(--space) * 4);
+  }
+  .skill-details > .typography:first-child {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .skill-descriptions {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .skill-descriptions > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .skill-howto {
+    margin-top: calc(var(--space) * 3);
+    padding-top: calc(var(--space) * 3);
+    border-top: 1px solid var(--zinc-700);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-400);
+  }
+  .skill-howto .text-header {
+    margin-bottom: var(--space);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .skill-toggle {
+    margin-top: calc(var(--space) * 4);
+    padding-top: calc(var(--space) * 4);
+    border-top: 1px solid var(--zinc-700);
+  }
+  .skill-toggle .btn {
+    width: 100%;
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+}

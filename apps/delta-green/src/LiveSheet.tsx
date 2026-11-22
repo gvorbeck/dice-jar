@@ -1,5 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useFocusMain } from '@dice-jar/browser';
+import { useSiteTitle } from '@/lib/useSiteTitle';
 import { STATS, STAT_NAMES, type Stat } from './rules/data/creation';
 import { activeBonds, featureOf, isSuccess, liveOutcome, motivationsOf, professionOf, rollD100, testOutcome, type Outcome } from './rules';
 import { lowHp, pad2, testText, wpNote } from './rules/outcome';
@@ -24,9 +26,8 @@ import { DETAIL_FIELDS, nameOf, type Character } from './model/character';
 import { Btn, ConfirmDialog, Counter, Select, SkillTable, Win } from './ui';
 import { SanSection } from './SanSection';
 import { DiceRoller } from './DiceRoller';
-import { useFocusMain } from './ui/Win';
 import { MenuBar } from './ui/MenuBar';
-import { useTitle } from './pages/Page';
+import { Footer } from './pages/Page';
 import { Alert, CopyButton, Hint, OutcomeText } from './ui/bits';
 import { gameUrl } from './lib/paths';
 import type { HeldSan } from './lib/games';
@@ -116,7 +117,7 @@ export function LiveSheet({ c, init, game }: { c: Character; init: Live; game?: 
     }
   }, [l]);
   const name = nameOf(c);
-  useTitle(`Live: ${name}`);
+  useSiteTitle(`Live: ${name}`);
   useFocusMain();
   const [leaving, setLeaving] = useState(false);
   const [rolls, setRolls] = useState<Roll[]>([]);
@@ -234,8 +235,8 @@ export function LiveSheet({ c, init, game }: { c: Character; init: Live; game?: 
 
   return (
     <>
-      {/* shortcut: game sheets only; on a standalone sheet the logo's in-app link would drop the hash that holds the sheet. Add it there with the Leave dialog if those sheets need it. */}
-      {game && <MenuBar subtitle="// Live sheet" />}
+      {/* A standalone sheet lives in the URL hash, so its logo asks before leaving, like < Home. */}
+      <MenuBar subtitle="// Live sheet" onHome={game ? undefined : () => setLeaving(true)} />
       <main id="main" tabIndex={-1}>
         <h1 className="sr-only">Live sheet: {name}</h1>
         <div className="shell live">
@@ -536,6 +537,7 @@ export function LiveSheet({ c, init, game }: { c: Character; init: Live; game?: 
           </Win>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

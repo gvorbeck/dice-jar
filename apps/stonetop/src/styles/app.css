@@ -68,7 +68,8 @@ a {
 }
 
 /* Visually hides content while keeping it in the accessibility tree. */
-.field-sr-only {
+.field-sr-only,
+.toast-announcer {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -2522,6 +2523,25 @@ a.page-nav-pill:hover {
  * Grows to fill remaining vertical space (keeps footer pinned to bottom).
  * Owns the shared content constraints: padding, max-width, and centering.
  */
+/* Off-screen until focused: the first tab stop on every page. */
+.page-layout-skip {
+  position: absolute;
+  left: var(--spacing-4);
+  top: -4rem;
+  z-index: var(--z-toast);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-overlay);
+  color: var(--text-primary);
+}
+.page-layout-skip:focus {
+  top: var(--spacing-4);
+}
+/* Focus lands here after navigation; the page itself needs no ring. */
+#main:focus {
+  outline: none;
+}
+
 .page-layout-main {
   flex: 1;
   display: flex;

@@ -9,7 +9,17 @@ import { defineConfig } from 'eslint/config';
 const code = ['apps/*/src/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}'];
 
 export default defineConfig(
-  { ignores: ['**/dist', '**/coverage', '**/test-results', '**/playwright-report', '**/node_modules', 'apps/*/functions/lib'] },
+  {
+    ignores: [
+      '**/dist',
+      '**/.scripts',
+      '**/coverage',
+      '**/test-results',
+      '**/playwright-report',
+      '**/node_modules',
+      'apps/*/functions/lib',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   jsxA11y.flatConfigs.strict,

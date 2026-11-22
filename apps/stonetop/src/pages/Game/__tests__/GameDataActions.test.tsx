@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { addToastSpy, toastModuleMock } from '@/test/toastMock';
 import { firestoreMockModule, firestoreStore } from '@/test/firestoreMock';
 
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
 vi.mock('firebase/app', () => ({ initializeApp: () => ({}) }));
 vi.mock('firebase/firestore', () => firestoreMockModule());
 

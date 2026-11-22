@@ -2,6 +2,7 @@
 // Checks that need "did it reach the server?" use a second browser context: it has its own offline cache, so it can only see saved data.
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
+import { expectSkipLink } from '@dice-jar/e2e-helpers';
 import { agentDoc, createAgent, freshPage, hp, savedHp, startAgent } from './helpers';
 import { newCharacter } from '../src/model/character';
 import { encodeSheet, freshLive } from '../src/model/live';
@@ -39,6 +40,25 @@ test('live sheet changes are saved to the server', async ({ page, browser }) => 
   const other = await freshPage(browser);
   await other.goto(agentUrl);
   await expect(hp(other)).toHaveText('11 / 13');
+});
+
+test('edits made offline, one after another, survive closing the tab and reach the server later', async ({ page }) => {
+  const { gameId, agentId, agentUrl } = await createAgent(page);
+  await savedHp(gameId, agentId, 13);
+  await page.context().setOffline(true);
+  await page.getByRole('button', { name: 'Decrease HP' }).click();
+  await expect(hp(page)).toHaveText('12 / 13');
+  await page.waitForTimeout(1000); // past the save delay, so the first edit is written and the second must not wait behind it
+  await page.getByRole('button', { name: 'Decrease HP' }).click();
+  await expect(hp(page)).toHaveText('11 / 13');
+  await page.waitForTimeout(1000);
+  await page.close();
+
+  const context = page.context();
+  await context.setOffline(false);
+  const back = await context.newPage();
+  await back.goto(agentUrl);
+  await savedHp(gameId, agentId, 11);
 });
 
 test("a change saved elsewhere is not replayed over the player's own fix when the sheet is reopened", async ({ page }) => {
@@ -129,10 +149,10 @@ test('the live sheet rolls plain dice', async ({ page }) => {
   await createAgent(page);
   await page.getByLabel('Dice', { exact: true }).fill('2d6 + 1');
   await page.getByRole('button', { name: 'Roll', exact: true }).click();
-  await expect(page.locator('output').filter({ hasText: /^#1 2D6\+1 \(\d\+\d\+1\) → \d+$/ })).toBeVisible(); // typed loosely, shown as the bot shows it
+  await expect(page.locator('output').filter({ hasText: /^#1 2D6\+1 \[\d, \d\] \+ 1 → \d+$/ })).toBeVisible(); // typed loosely, shown normalized
   await page.getByLabel('Dice', { exact: true }).fill('nope');
   await page.getByRole('button', { name: 'Roll', exact: true }).click();
-  await expect(page.getByText(/Write dice like 2D6\+1\./)).toBeVisible();
+  await expect(page.locator('output').filter({ hasText: /^#2 Unexpected "n"\.$/ })).toBeVisible();
 });
 
 test('the Sanity box shows how far an agent is toward adapting', async ({ page }) => {
@@ -264,6 +284,17 @@ test('a standalone sheet keeps its changes in the link', async ({ page }) => {
   await expect.poll(() => page.url()).not.toBe(before); // the link is the save file
   await page.reload();
   await expect(hp(page)).toHaveText('9 / 10');
+});
+
+test('a standalone sheet has the menu bar, and its logo asks before leaving the sheet', async ({ page }) => {
+  const c = newCharacter();
+  await page.goto('/' + encodeSheet(c, freshLive(c)));
+  await expect(hp(page)).toHaveText('10 / 10'); // past the loading fallback
+  await expectSkipLink(page);
+  const sheet = page.url();
+  await page.getByRole('navigation', { name: 'Application' }).getByRole('link', { name: 'YOURCODENA.ME' }).click();
+  await expect(page.getByRole('alertdialog', { name: 'Leave this sheet?' })).toBeVisible();
+  expect(page.url()).toBe(sheet); // nothing lost until Leave is confirmed
 });
 
 test('a SAN loss waiting for a decision keeps its buttons out of the announced region', async ({ page }) => {

@@ -10,7 +10,7 @@ export const App = () => (
         <header className="hero wrap">
           <div className="hero-text">
             <p className="eyebrow">Tabletop RPG tools</p>
-            <h1 className="wordmark">dice-jar</h1>
+            <h1 className="wordmark">Dice Jar</h1>
             <p className="lede">Character creators and party trackers for tabletop roleplaying games. Many worlds, one shelf.</p>
           </div>
           <img

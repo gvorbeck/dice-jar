@@ -1,0 +1,13 @@
+@layer components {
+  .xp-input.text-input {
+    min-height: 48px;
+    padding-block: calc(var(--space) * 4);
+  }
+  .xp-note {
+    margin-top: calc(var(--space) * 2);
+    padding-inline: calc(var(--space) * 2);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--zinc-400);
+  }
+}

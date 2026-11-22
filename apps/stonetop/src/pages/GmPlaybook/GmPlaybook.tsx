@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { useHashTabs } from '@/lib/useHashTabs';
 import { useParams } from 'react-router-dom';
-import { useTitle } from '@/lib/useTitle';
+import { useTitle } from '@dice-jar/browser';
 import { useGame } from '@/lib/useGame';
 import { useNotesActions } from '@/lib/useNotesActions';
 import { SharedNotes, type NotesActions } from '@/playbook/SharedNotes/SharedNotes';
