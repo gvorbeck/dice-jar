@@ -103,6 +103,7 @@ npm run build
 | `npm run test:ui`         | Run unit tests with visual interface                                      |
 | `npm run test:run`        | Run unit tests once (for CI/commits)                                      |
 | `npm run test:coverage`   | Run unit tests with coverage report                                       |
+| `npm run test:rules`      | Test `firestore.rules` in the Firestore emulator (needs Java 21)          |
 | `npm run test:e2e`        | Run end-to-end tests against the emulators (headless)                     |
 | `npm run test:e2e:ui`     | Run E2E tests with visual debugging                                       |
 | `npm run test:e2e:headed` | Run E2E tests with browser visible                                        |

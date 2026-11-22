@@ -1,6 +1,6 @@
 // Character service for Firebase Firestore operations
-import { collection, doc, getDoc, onSnapshot, setDoc, deleteDoc, type DocumentReference } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { collection, doc, getDoc, onSnapshot, deleteDoc, type DocumentReference } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 import { FIREBASE_COLLECTIONS } from '@/constants';
 import type { Character } from '@/types';
 import { processCharacterData, isLegacyCharacter, CURRENT_VERSION } from './characterMigration';
@@ -23,9 +23,14 @@ const charactersRef = (userId: string) => collection(db, FIREBASE_COLLECTIONS.US
 const characterRef = (userId: string, characterId: string) => doc(charactersRef(userId), characterId);
 const slot = (userId: string, characterId: string) => `characters/${userId}/${characterId}`;
 
-/** Saves a character that was stored in an older shape back in the current one. */
-const persistMigration = (ref: DocumentReference, migrated: Character) =>
-  setDoc(ref, migrated).catch((error) => console.error(`Failed to persist migration for character ${ref.id}:`, error));
+/** Saves a character stored in an older shape back in the current one: only the owner may write, and only the changed fields go. */
+const persistMigration = (userId: string, ref: DocumentReference, stored: Record<string, unknown>, migrated: Character) => {
+  if (auth.currentUser?.uid !== userId) return;
+  remember(slot(userId, ref.id), stored);
+  saveDiff(ref, slot(userId, ref.id), migrated as unknown as Record<string, unknown>).catch((error) =>
+    console.error(`Failed to persist migration for character ${ref.id}:`, error),
+  );
+};
 
 const toListItem = (id: string, data: Record<string, unknown>): CharacterListItem => {
   const item: CharacterListItem = { id, name: (data['name'] as string) || 'Unnamed Character' };
@@ -47,7 +52,7 @@ export const watchUserCharacters = (userId: string, ok: (characters: CharacterLi
           const data = d.data();
           if (!isLegacyCharacter(data)) return toListItem(d.id, data);
           const migrated = processCharacterData(data);
-          void persistMigration(d.ref, migrated);
+          persistMigration(userId, d.ref, data, migrated);
           return toListItem(d.id, migrated as unknown as Record<string, unknown>);
         }),
       );
@@ -67,7 +72,7 @@ export const watchCharacter = (userId: string, characterId: string, ok: (charact
       }
       const data = snapshot.data();
       const character = processCharacterData(data);
-      if (isLegacyCharacter(data)) void persistMigration(snapshot.ref, character);
+      if (isLegacyCharacter(data)) persistMigration(userId, snapshot.ref, data, character);
       remember(slot(userId, characterId), character);
       ok(character);
     },

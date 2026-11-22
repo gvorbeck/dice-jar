@@ -17,7 +17,8 @@
     "knip": "knip",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "firebase emulators:exec --only auth,firestore --project demo-bfrpg 'playwright test'",
-    "check": "npm run lint && npm run typecheck && npm run knip && npm run test:coverage"
+    "check": "npm run lint && npm run typecheck && npm run knip && npm run test:coverage",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-bfrpg 'vitest run --config vitest.rules.config.ts'"
   },
   "dependencies": {
     "@dice-jar/firebase": "*",
@@ -33,6 +34,7 @@
     "@dice-jar/dice": "*",
     "@dice-jar/diff": "*",
     "@dice-jar/stale-build": "*",
+    "@firebase/rules-unit-testing": "^6.0.0",
     "@playwright/test": "^1.65.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.2",

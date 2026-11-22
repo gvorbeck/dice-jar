@@ -8,7 +8,7 @@
     "apps/dice-jar": { "entry": ["e2e/*.spec.ts"] },
     "apps/delta-green": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "vitest.rules.config.ts"] },
     "apps/stonetop": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "scripts/*.ts", "vitest.rules.config.ts"] },
-    "apps/bfrpg": { "entry": ["e2e/*.spec.ts", "src/data/sample*.ts"] },
+    "apps/bfrpg": { "entry": ["e2e/*.spec.ts", "test/*.test.ts", "src/data/sample*.ts", "vitest.rules.config.ts"] },
     "apps/delta-green/functions": {
       "entry": ["src/webhookTest.ts", "src/registerCommands.ts", "src/**/*.test.ts"],
       "ignoreDependencies": ["zod"],

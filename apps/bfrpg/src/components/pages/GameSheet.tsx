@@ -58,15 +58,15 @@ export default function GameSheet() {
   // Handle game changes using enhanced mutations
   const handleGameChange = useCallback(
     (updatedGame: Game) => {
-      if (!user || !gameId) return;
+      if (!user || !params?.userId || !gameId) return;
 
       void saveGame({
-        userId: user.uid,
+        userId: params.userId,
         game: updatedGame,
         gameId,
       });
     },
-    [user, gameId, saveGame],
+    [user, params?.userId, gameId, saveGame],
   );
 
   // Handle notes changes
