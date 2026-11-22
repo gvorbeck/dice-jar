@@ -48,6 +48,8 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
     if (!isOpen || !isCombatActive) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Keys typed or pressed in a field or button belong to it: E types an "e", Space presses the button, arrows move the cursor
+      if ((event.target as Element | null)?.closest('input, textarea, select, button, a, [contenteditable]')) return;
       // Use Space and Arrow keys instead of Cmd/Ctrl shortcuts to avoid browser conflicts
       if (!event.ctrlKey && !event.metaKey && !event.altKey) {
         switch (event.key.toLowerCase()) {

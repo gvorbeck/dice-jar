@@ -36,6 +36,10 @@ export const usePlayerCharacters = (game: Game): UsePlayerCharactersReturn => {
       const character: CharacterListItem = {
         id: player.character,
         name: resolved?.characterName || player.character,
+        ...(resolved?.avatar && { avatar: resolved.avatar }),
+        ...(resolved?.hp && { hp: resolved.hp }),
+        ...(resolved?.equipment && { equipment: resolved.equipment }),
+        ...(resolved?.abilities && { abilities: resolved.abilities }),
         ...(resolved?.race && { race: resolved.race }),
         ...(resolved?.class && { class: resolved.class }),
         ...(resolved?.level && { level: resolved.level }),

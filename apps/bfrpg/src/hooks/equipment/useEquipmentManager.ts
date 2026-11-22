@@ -59,7 +59,8 @@ function useEquipmentManagerCore(character: Character | undefined, onEquipmentCh
     (index: number) => {
       if (!onEquipmentChange || !character) return;
 
-      const updatedEquipment = [...cleanedEquipment];
+      // The index is into character.equipment, like update and toggle: cleanedEquipment drops empty items and shifts it.
+      const updatedEquipment = [...character.equipment];
       const item = updatedEquipment[index];
 
       if (!item) return;
@@ -77,7 +78,7 @@ function useEquipmentManagerCore(character: Character | undefined, onEquipmentCh
 
       onEquipmentChange(updatedEquipment);
     },
-    [cleanedEquipment, onEquipmentChange, character],
+    [onEquipmentChange, character],
   );
 
   const updateEquipmentInInventory = useCallback(

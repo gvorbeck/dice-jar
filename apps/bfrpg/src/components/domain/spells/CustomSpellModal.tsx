@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Modal } from '@/components/modals';
-import { Button, Select, TextInput, TextArea, FormField } from '@/components/ui/core/primitives';
+import { CheckboxGroup, FieldError, Label } from 'react-aria-components';
+import { Button, Checkbox, Select, TextInput, TextArea, FormField } from '@/components/ui/core/primitives';
 import { Typography } from '@/components/ui/core/display';
 import type { Spell } from '@/types';
 import './CustomSpellModal.css';
@@ -65,14 +66,6 @@ export default function CustomSpellModal({ isOpen, onClose, onSpellAdd }: Custom
       spellLevel: 1,
     });
     setAttemptedSubmit(false);
-  }, []);
-
-  const handleClassToggle = useCallback((classId: SpellClass) => {
-    setFormData((prev) => {
-      const currentClasses = prev.availableForClasses;
-      const newClasses = currentClasses.includes(classId) ? currentClasses.filter((c) => c !== classId) : [...currentClasses, classId];
-      return { ...prev, availableForClasses: newClasses };
-    });
   }, []);
 
   const handleSubmit = useCallback(() => {
@@ -178,24 +171,26 @@ export default function CustomSpellModal({ isOpen, onClose, onSpellAdd }: Custom
           />
 
           {/* Available Classes */}
-          <FormField
-            label="Available for Classes"
-            required
-            {...(attemptedSubmit && formData.availableForClasses.length === 0 && { error: 'Select at least one class' })}
+          <CheckboxGroup
+            className="form-field"
+            isRequired
+            isInvalid={attemptedSubmit && formData.availableForClasses.length === 0}
+            value={formData.availableForClasses}
+            onChange={(classes) => setFormData((prev) => ({ ...prev, availableForClasses: classes as SpellClass[] }))}
           >
+            <Label className="form-field-label">
+              Available for Classes
+              <span className="form-field-required" aria-hidden="true">
+                *
+              </span>
+            </Label>
             <div className="spell-classes">
               {SPELL_CLASSES.map((spellClass) => (
-                <label key={spellClass.value} className="spell-class">
-                  <input
-                    type="checkbox"
-                    checked={formData.availableForClasses.includes(spellClass.value as SpellClass)}
-                    onChange={() => handleClassToggle(spellClass.value as SpellClass)}
-                  />
-                  <span>{spellClass.label}</span>
-                </label>
+                <Checkbox key={spellClass.value} value={spellClass.value} label={spellClass.label} />
               ))}
             </div>
-          </FormField>
+            <FieldError className="form-field-error">Select at least one class</FieldError>
+          </CheckboxGroup>
         </div>
       </div>
 

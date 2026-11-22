@@ -25,6 +25,8 @@ interface CheckboxProps {
   // lands on the RAC label, not the input, so don't wrap this in FormField (its htmlFor needs a labelable element)
   id?: string;
   name?: string;
+  /** The value this checkbox adds to a surrounding CheckboxGroup */
+  value?: string;
   className?: string;
   'aria-label'?: string;
   'aria-describedby'?: string;

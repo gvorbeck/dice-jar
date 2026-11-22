@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { hasTurnUndeadAbility } from '@/utils';
 import { getCharacterById } from '@/services';
+import type { Character } from '@/types';
 
 interface DataRequest {
   userId: string;
@@ -14,6 +15,10 @@ interface ResolvedData {
   class?: string | undefined;
   level?: number | undefined;
   hasTurnUndead?: boolean | undefined;
+  // What the combat tracker needs from a player
+  hp?: Character['hp'] | undefined;
+  equipment?: Character['equipment'] | undefined;
+  abilities?: Character['abilities'] | undefined;
 }
 
 /** A missing character shows by its id; a failed lookup throws. */
@@ -27,6 +32,9 @@ async function getCharacterSummary(userId: string, characterId: string): Promise
     class: characterData.class,
     level: characterData.level,
     hasTurnUndead: hasTurnUndeadAbility(characterData),
+    hp: characterData.hp,
+    equipment: characterData.equipment,
+    abilities: characterData.abilities,
   };
 }
 

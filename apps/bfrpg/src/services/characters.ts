@@ -16,6 +16,9 @@ export interface CharacterListItem {
   class?: string;
   level?: number;
   hp?: { current?: number; max?: number } | number;
+  avatar?: string;
+  equipment?: Character['equipment'];
+  abilities?: Character['abilities'];
   xp?: number;
   hasTurnUndead?: boolean;
 }
