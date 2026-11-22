@@ -11,7 +11,6 @@ import { CHARACTER_CLASSES } from '@/constants';
 import { CURRENT_VERSION } from '@/services/characterMigration';
 // Note: Using direct imports here to avoid circular dependency with barrel file
 import { GAME_MECHANICS } from './mechanics';
-import { logger } from './data';
 import { isWornArmor, isWornShield } from '@/utils/equipment';
 
 // ============================================================================
@@ -22,7 +21,7 @@ const parseShieldBonus = (shieldAC: string | number, itemName: string): number =
   if (typeof shieldAC === 'string' && shieldAC.startsWith('+')) {
     const bonusValue = parseInt(shieldAC.substring(1), 10);
     if (isNaN(bonusValue)) {
-      logger.warn(`Invalid shield AC value for ${itemName}: ${shieldAC}`);
+      console.warn(`Invalid shield AC value for ${itemName}: ${shieldAC}`);
       return 0;
     }
     return bonusValue;
@@ -52,7 +51,7 @@ export function calculateArmorClass(character: Character | { equipment?: Equipme
   }
 
   if (!isEquipmentArray(equipment)) {
-    logger.warn('Invalid equipment array passed to calculateArmorClass');
+    console.warn('Invalid equipment array passed to calculateArmorClass');
     return GAME_MECHANICS.DEFAULT_UNARMORED_AC;
   }
 

@@ -10,7 +10,7 @@ import { cantripData } from '@/data';
 import { CHARACTER_CLASSES } from '@/constants';
 import { loadSpellsForClass, loadAllFirstLevelSpells, loadAllSpells } from '@/services/dataLoader';
 // Note: Using direct import here to avoid circular dependency with barrel file
-import { roller } from './mechanics';
+import { roll } from '@dice-jar/dice';
 import { canCastSpells, getSpellcastingAbilityModifier } from './character';
 import { allClasses } from '@/data/classes';
 
@@ -192,7 +192,7 @@ export function assignStartingCantrips(character: Character): Cantrip[] {
   const abilityBonus = getSpellcastingAbilityModifier(character);
 
   // Roll 1d4 + ability bonus for number of starting cantrips
-  const rollResult = roller('1d4');
+  const rollResult = roll('1d4');
   const numCantrips = Math.max(0, rollResult.total + abilityBonus);
 
   if (numCantrips === 0) {
@@ -220,15 +220,15 @@ export function assignStartingCantrips(character: Character): Cantrip[] {
 // ============================================================================
 
 export function rollForEncounter(): boolean {
-  return roller('1d6').total === SPELL_CONSTANTS.ENCOUNTER_CHANCE;
+  return roll('1d6').total === SPELL_CONSTANTS.ENCOUNTER_CHANCE;
 }
 
 export function getRandomTableResult<T>(table: readonly T[]): T | null {
   if (table.length === 0) return null;
 
   // Use consistent approach from spellSystem.ts - roll 1d12 but cap to table length
-  const roll = roller(SPELL_CONSTANTS.TABLE_DICE).total;
-  const index = Math.min(roll - 1, table.length - 1);
+  const rolled = roll(SPELL_CONSTANTS.TABLE_DICE).total;
+  const index = Math.min(rolled - 1, table.length - 1);
 
   return table[index] || null;
 }
@@ -249,7 +249,7 @@ function parseCreatureName(encounterName: string): string {
 
 function generateDefaultAC(): number {
   // Default AC for most creatures is around 12-16, with some variation
-  return 12 + roller('1d4').total; // AC 13-16
+  return 12 + roll('1d4').total; // AC 13-16
 }
 
 export function createCombatantFromEncounter(encounterName: string): GameCombatant {

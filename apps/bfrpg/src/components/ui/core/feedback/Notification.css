@@ -22,7 +22,8 @@
       0 10px 15px -3px color-mix(in oklab, var(--glow) 50%, transparent),
       0 4px 6px -4px color-mix(in oklab, var(--glow) 50%, transparent);
     backdrop-filter: blur(12px);
-    transition: all 500ms cubic-bezier(0, 0, 0.2, 1);
+    /* ToastProvider removes a dismissed toast after 200ms (EXIT_DURATION_MS), so the exit must finish in that time. */
+    transition: all 200ms cubic-bezier(0, 0, 0.2, 1);
   }
   .notification[data-priority='success'] {
     --from: var(--lime-50);
@@ -80,17 +81,13 @@
     opacity: 0;
     transform: translateX(100%) scale(0.95);
   }
-  .notification[data-position$='left']:not([data-shown]) {
-    transform: translateX(-100%) scale(0.95);
-  }
-  .notification[data-position='top-center']:not([data-shown]) {
-    transform: translateY(-100%) scale(0.95);
-  }
-  .notification[data-position='bottom-center']:not([data-shown]) {
-    transform: translateY(100%) scale(0.95);
-  }
   .notification[data-shown] {
     opacity: 1;
+    /* A toast is shown from its first render, so the slide-in starts from here. */
+    @starting-style {
+      opacity: 0;
+      transform: translateX(100%) scale(0.95);
+    }
   }
   .notification-accent {
     position: absolute;
@@ -129,71 +126,26 @@
   .notification-body .typography[data-variant='body'] {
     line-height: 1.625;
   }
-  .notification-timer {
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 0.25rem;
-    overflow: hidden;
-    border-bottom-left-radius: var(--radius-xl);
-    border-bottom-right-radius: var(--radius-xl);
-    background: color-mix(in srgb, var(--black) 5%, transparent);
-  }
-  .notification-timer > div {
-    height: 100%;
-    background: var(--accent);
-    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    transition-timing-function: linear;
-  }
   @media (prefers-color-scheme: dark) {
     .notification .btn.notification-close[data-hovered] {
       background: color-mix(in srgb, var(--white) 10%, transparent);
     }
-    .notification-timer {
-      background: color-mix(in srgb, var(--white) 5%, transparent);
-    }
   }
 
-  .notifications {
+  .toast-region {
     position: fixed;
+    top: calc(var(--space) * 4);
+    right: calc(var(--space) * 4);
     z-index: 50;
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
     gap: calc(var(--space) * 3);
     max-height: 100vh;
     overflow: hidden;
     pointer-events: none;
   }
-  /* Notifications that arrive together slide in one after another */
-  .notifications > :nth-child(2) {
-    transition-delay: 50ms;
-  }
-  .notifications > :nth-child(3) {
-    transition-delay: 100ms;
-  }
-  .notifications > :nth-child(n + 4) {
-    transition-delay: 150ms;
-  }
-  .notifications > * {
+  .toast-region > * {
     pointer-events: auto;
-  }
-  .notifications[data-position^='top'] {
-    top: calc(var(--space) * 4);
-  }
-  .notifications[data-position^='bottom'] {
-    bottom: calc(var(--space) * 4);
-    flex-direction: column-reverse;
-  }
-  .notifications[data-position$='right'] {
-    right: calc(var(--space) * 4);
-    align-items: flex-end;
-  }
-  .notifications[data-position$='left'] {
-    left: calc(var(--space) * 4);
-    align-items: flex-start;
-  }
-  .notifications[data-position$='center'] {
-    left: 50%;
-    transform: translateX(-50%);
-    align-items: center;
   }
 }

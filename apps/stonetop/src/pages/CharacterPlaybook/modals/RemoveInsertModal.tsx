@@ -1,6 +1,6 @@
 import { useId, useState, useCallback } from 'react';
 import { Button, Heading, Modal, Text } from '@/ui';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useToast } from '@dice-jar/browser';
 import { getInsertTab, type InsertOption } from '@/lib/insertTabs';
 
 interface RemoveInsertModalProps {

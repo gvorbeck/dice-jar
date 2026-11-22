@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Heading, Text, Input } from '@/ui';
 import { useOptimisticField } from '@/lib/useOptimisticField';
-import { useLatest } from '@/lib/useLatest';
+import { useLatest } from '@dice-jar/browser';
 import { ImprovementList } from './ImprovementList';
 import type { SteadingData } from '@/model';
 

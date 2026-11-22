@@ -1,7 +1,15 @@
 import { useRef, useCallback, useEffect, useState, useInsertionEffect, type MutableRefObject } from 'react';
-import { useToastOptional } from '@/ui/Toast/ToastContext';
+import { useToastOptional } from './toast';
 import { useLatest } from './useLatest';
-import { INVALID_WRITE_MESSAGE, SAVE_ERROR_MESSAGE } from '@/lib/constants';
+
+// Shown when a write fails. An app's own save wrapper toasts this same string, so the toast dedupe collapses a failure
+// reported by both paths into one; diverging the text would silently produce double toasts.
+export const SAVE_ERROR_MESSAGE = "Couldn't save your changes — check your connection.";
+
+// Shown for Firestore's `invalid-argument`, which covers both a document over the 1 MiB ceiling and a malformed value (an app
+// bug); the client can't tell them apart, so the wording stays neutral rather than sending the player to delete content.
+export const INVALID_WRITE_MESSAGE =
+  "Couldn't save that change — the game may have grown too large, or something went wrong on our end. Try again, and if it keeps happening, trim some content (long notes, unused characters) or report it at github.com/gvorbeck/dice-jar/issues.";
 
 interface UseDebouncedSaveReturn<T> {
   onChange: (value: T) => void;
@@ -46,6 +54,8 @@ export const useDebouncedSave = <T>(
   // The value waiting on the debounce timer, so unmount/pagehide can flush it
   // instead of silently discarding it.
   const queuedRef = useRef<{ value: T } | null>(null);
+  // The newest value whose write failed, so unmount/pagehide can send it again once the one automatic retry is spent.
+  const failedRef = useRef<{ value: T } | null>(null);
   const onSaveRef = useLatest(onSave);
   const onErrorRef = useLatest(onError);
   const onSuccessRef = useLatest(onSuccess);
@@ -88,6 +98,7 @@ export const useDebouncedSave = <T>(
             // Only mark saved on success — after a failure, the next flush/change
             // must not be deduped away, or the edit is lost for good.
             lastSavedRef.current = key;
+            failedRef.current = null;
             onSuccessRef.current?.(value);
             if (failedKeyRef.current !== null) {
               failedKeyRef.current = null;
@@ -96,9 +107,10 @@ export const useDebouncedSave = <T>(
           } catch (error) {
             const isFirstFailure = failedKeyRef.current !== key;
             failedKeyRef.current = key;
+            if (mine === latestSaveRef.current) failedRef.current = { value };
             if (onErrorRef.current) onErrorRef.current(error);
             // invalid-argument gets its own line; every other failure uses the generic message. Both
-            // strings match the ones useGame's reportSave emits, so the Toast dedupe collapses the
+            // strings match the ones an app's own save wrapper emits, so the toast dedupe collapses the
             // two paths to one.
             else addToast?.(isInvalidWrite(error) ? INVALID_WRITE_MESSAGE : SAVE_ERROR_MESSAGE, 'error');
             if (isFirstFailure && mine === latestSaveRef.current) {
@@ -136,6 +148,8 @@ export const useDebouncedSave = <T>(
   // lets that legitimate revert write go through.
   const noteRemoteValue = useCallback((value: T) => {
     if (JSON.stringify(value) !== lastSavedRef.current) lastSavedRef.current = null;
+    // The screen now follows the server, so a failed older edit must not be sent over it later.
+    failedRef.current = null;
   }, []);
 
   const onChange = useCallback(
@@ -159,15 +173,15 @@ export const useDebouncedSave = <T>(
 
   // Flush a queued save when the component unmounts or the page is hidden
   // (tab close, mobile app-switch) — timers don't survive either, so without
-  // this the edit is dropped. A scheduled retry is left running on purpose:
-  // it persists the user's edit even after they navigate away.
+  // this the edit is dropped. A value whose write failed is sent again too.
   useEffect(() => {
     const flushQueued = () => {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
         debounceRef.current = null;
       }
-      if (queuedRef.current) void save(queuedRef.current.value);
+      const unsaved = queuedRef.current ?? failedRef.current;
+      if (unsaved) void save(unsaved.value);
     };
     const handleVisibility = () => {
       if (document.visibilityState === 'hidden') flushQueued();

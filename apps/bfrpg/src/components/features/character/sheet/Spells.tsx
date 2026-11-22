@@ -1,4 +1,5 @@
-import { useModal, useNotificationContext } from '@/hooks';
+import { useModal } from '@/hooks';
+import { useToast } from '@dice-jar/browser';
 import type { Character, Spell, Cantrip } from '@/types';
 import { SectionWrapper, Accordion } from '@/components/ui/core/layout';
 import { Card, Typography } from '@/components/ui/core/display';
@@ -122,7 +123,7 @@ export default function Spells({
   const cantripModal = useModal();
   const addSpellModal = useModal();
   const customSpellModal = useModal();
-  const { showSuccess } = useNotificationContext();
+  const { addToast } = useToast();
 
   // Use extracted hooks for spell data processing
   const { knownSpells, cantrips, spellSlots, spellSystemInfo, canCast, spellSystemType } = useSpellData(character);
@@ -298,7 +299,7 @@ export default function Spells({
               ...character,
               spells: updatedSpells,
             });
-            showSuccess(`Custom spell "${newSpell.name}" has been added to your spellbook!`);
+            addToast(`Custom spell "${newSpell.name}" has been added to your spellbook!`, 'success');
           }}
         />
       )}

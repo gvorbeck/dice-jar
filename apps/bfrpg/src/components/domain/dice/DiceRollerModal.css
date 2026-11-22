@@ -1,21 +1,4 @@
 @layer components {
-  .dice-result {
-    text-align: left;
-  }
-  .dice-result .text-header {
-    display: flex;
-    align-items: center;
-    gap: calc(var(--space) * 2);
-    margin-bottom: calc(var(--space) * 2);
-  }
-  .dice-result-lines {
-    font-size: var(--text-sm);
-    line-height: var(--text-sm-lh);
-    color: var(--zinc-300);
-  }
-  .dice-result-lines > :not(:last-child) {
-    margin-bottom: var(--space);
-  }
   .dice-roll-actions .btn:last-child {
     min-width: 100px;
   }

@@ -1,9 +1,9 @@
 // Games service for Firebase Firestore operations
-import { collection, doc, getDoc, onSnapshot, deleteDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { FIREBASE_COLLECTIONS } from '@/constants';
 import type { Game } from '@/types';
-import { handleServiceError, logger } from '@/utils';
+import { handleServiceError } from '@/utils';
 import { forget, remember, saveDiff } from './diffSave';
 
 export type { Game };
@@ -37,21 +37,11 @@ export const watchGame = (userId: string, gameId: string, ok: (game: Game | null
   );
 
 /** One look at a game, for places that don't need it live. */
-export const getGameById = async (userId: string, gameId: string): Promise<Game | null> => {
-  try {
-    const snapshot = await getDoc(gameRef(userId, gameId));
-    return snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as Game) : null;
-  } catch (error) {
-    handleServiceError(error, { action: 'fetching game', context: { userId, gameId } });
-  }
-};
-
 /** Saves a game: only the changed fields when it was read in this tab; a new one gets a fresh id. */
 export const saveGame = async (userId: string, game: Omit<Game, 'id'>, gameId?: string): Promise<string> => {
   try {
     const ref = gameId ? gameRef(userId, gameId) : doc(gamesRef(userId));
     await saveDiff(ref, slot(userId, ref.id), game as Record<string, unknown>, Boolean(gameId));
-    logger.info(`Successfully saved game ${ref.id}`);
     return ref.id;
   } catch (error) {
     handleServiceError(error, { action: 'saving game', context: { userId, gameId, gameName: game['name'] } });
@@ -63,7 +53,6 @@ export const deleteGame = async (userId: string, gameId: string): Promise<void> 
   try {
     await deleteDoc(gameRef(userId, gameId));
     forget(slot(userId, gameId));
-    logger.info(`Deleted game ${gameId} for user ${userId}`);
   } catch (error) {
     handleServiceError(error, { action: 'deleting game', context: { userId, gameId } });
   }

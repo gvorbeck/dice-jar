@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button, Text } from '@/ui';
 import type { GameSession } from '@/model';
-import { useLatest } from '@/lib/useLatest';
+import { useLatest } from '@dice-jar/browser';
 import { buildRelationshipGraph, pairKey, reciprocalLabelOffset, reciprocalPairKeys } from './relationshipGraphData';
 import type { GraphNode } from './relationshipGraphData';
 

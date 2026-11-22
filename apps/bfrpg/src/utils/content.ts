@@ -15,7 +15,7 @@ import type {
 import { COIN_CONFIGS } from '@/constants';
 
 // Note: Using direct import here to avoid circular dependency with barrel file
-import { rollPercentage, roller } from './mechanics';
+import { roll } from '@dice-jar/dice';
 
 // ============================================================================
 // MONSTER UTILITIES
@@ -446,15 +446,15 @@ function generateCurrency(config: TreasureConfig | IndividualTreasureConfig, res
     if (currencyConfig.amount !== '0') {
       // Handle individual treasure (no chance roll needed)
       if (!('chance' in currencyConfig) || currencyConfig.chance === undefined) {
-        const amount = roller(currencyConfig.amount).total;
+        const amount = roll(currencyConfig.amount).total;
         result[currency] = amount;
         if (amount > 0) {
           result.breakdown.push(`${currency}: ${amount} pieces`);
         }
       } else {
         // Handle lair/unguarded treasure (chance roll required)
-        if (rollPercentage() <= currencyConfig.chance) {
-          const amount = roller(currencyConfig.amount).total;
+        if (roll('1d100').total <= currencyConfig.chance) {
+          const amount = roll(currencyConfig.amount).total;
           result[currency] = amount;
           result.breakdown.push(`${currency}: ${amount} pieces`);
         }
@@ -464,22 +464,22 @@ function generateCurrency(config: TreasureConfig | IndividualTreasureConfig, res
 }
 
 function generateGem(): string {
-  const roll = rollPercentage();
+  const rolled = roll('1d100').total;
   let gemType = GEM_TYPES[0]!; // Default to ornamental
 
   for (const type of GEM_TYPES) {
-    if (roll <= type.chance) {
+    if (rolled <= type.chance) {
       gemType = type;
       break;
     }
   }
 
-  const value = gemType.baseValue + roller('1d10').total - 1; // Slight value variation
+  const value = gemType.baseValue + roll('1d10').total - 1; // Slight value variation
   return `${gemType.name} Gem (${value} gp)`;
 }
 
 function generateJewelry(): string {
-  const baseValue = 50 + roller('3d6').total * 10;
+  const baseValue = 50 + roll('3d6').total * 10;
   return `Jewelry Piece (${baseValue} gp)`;
 }
 
@@ -490,8 +490,8 @@ function generateMagicItem(): string {
 
 function generateGemsAndJewelry(config: TreasureConfig, result: TreasureResult): void {
   // Gems
-  if (rollPercentage() <= config.gems.chance) {
-    const gemCount = roller(config.gems.amount).total;
+  if (roll('1d100').total <= config.gems.chance) {
+    const gemCount = roll(config.gems.amount).total;
     for (let i = 0; i < gemCount; i++) {
       result.gemsAndJewelry.push(generateGem());
     }
@@ -499,8 +499,8 @@ function generateGemsAndJewelry(config: TreasureConfig, result: TreasureResult):
   }
 
   // Jewelry
-  if (rollPercentage() <= config.jewelry.chance) {
-    const jewelryCount = roller(config.jewelry.amount).total;
+  if (roll('1d100').total <= config.jewelry.chance) {
+    const jewelryCount = roll(config.jewelry.amount).total;
     for (let i = 0; i < jewelryCount; i++) {
       result.gemsAndJewelry.push(generateJewelry());
     }
@@ -509,7 +509,7 @@ function generateGemsAndJewelry(config: TreasureConfig, result: TreasureResult):
 }
 
 function generateMagicItems(config: TreasureConfig, result: TreasureResult): void {
-  if (rollPercentage() <= config.magic.chance) {
+  if (roll('1d100').total <= config.magic.chance) {
     const itemCount = config.magic.amount;
     for (let i = 0; i < itemCount; i++) {
       result.magicItems.push(generateMagicItem());
@@ -563,21 +563,21 @@ function generateIndividualTreasure(type: IndividualTreasureType): TreasureResul
 
   // Handle gems, jewelry, and magic for U and V types
   if (type === 'U' || type === 'V') {
-    if (config.gems.chance && rollPercentage() <= config.gems.chance) {
-      const gemCount = roller(config.gems.amount).total;
+    if (config.gems.chance && roll('1d100').total <= config.gems.chance) {
+      const gemCount = roll(config.gems.amount).total;
       for (let i = 0; i < gemCount; i++) {
         result.gemsAndJewelry.push(generateGem());
       }
     }
 
-    if (config.jewelry.chance && rollPercentage() <= config.jewelry.chance) {
-      const jewelryCount = roller(config.jewelry.amount).total;
+    if (config.jewelry.chance && roll('1d100').total <= config.jewelry.chance) {
+      const jewelryCount = roll(config.jewelry.amount).total;
       for (let i = 0; i < jewelryCount; i++) {
         result.gemsAndJewelry.push(generateJewelry());
       }
     }
 
-    if (config.magic.chance && rollPercentage() <= config.magic.chance) {
+    if (config.magic.chance && roll('1d100').total <= config.magic.chance) {
       result.magicItems.push(generateMagicItem());
     }
   }

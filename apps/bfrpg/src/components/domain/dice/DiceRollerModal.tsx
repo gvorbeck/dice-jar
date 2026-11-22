@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { Modal } from '@/components/modals';
 import { Button, TextInput, FormField } from '@/components/ui/core/primitives';
-import { Icon } from '@/components/ui/core/display';
-import { TextHeader } from '@/components/ui/composite/TextHeader';
 import { rollNotation } from '@dice-jar/dice';
-import { useNotificationContext } from '@/hooks';
+import { useToast } from '@dice-jar/browser';
 import './DiceRollerModal.css';
 
 interface DiceRollerModalProps {
@@ -14,44 +12,23 @@ interface DiceRollerModalProps {
 
 export default function DiceRollerModal({ isOpen, onClose }: DiceRollerModalProps) {
   const [diceNotation, setDiceNotation] = useState('');
-  const { showSuccess, showError } = useNotificationContext();
+  const { addToast } = useToast();
 
   const handleRoll = async () => {
     if (!diceNotation.trim()) {
-      showError('Please enter dice notation (e.g., 3d6, 1d20+5)');
+      addToast('Please enter dice notation (e.g., 3d6, 1d20+5)', 'error');
       return;
     }
 
     const formula = diceNotation.trim();
     const parsed = rollNotation(formula);
     if (!parsed.ok) {
-      showError(parsed.error, { title: 'Roll Failed' });
+      addToast(parsed.error, 'error');
       return;
     }
     const result = parsed.outcome;
 
-    // Create a detailed result message
-    const resultMessage = (
-      <div className="dice-result">
-        <TextHeader variant="h5" size="md" underlined={false}>
-          <Icon name="dice" size="sm" />
-          Roll Result: {result.total}
-        </TextHeader>
-        <div className="dice-result-lines">
-          <div>
-            <strong>Formula:</strong> {formula}
-          </div>
-          <div>
-            <strong>Breakdown:</strong> {result.breakdown}
-          </div>
-        </div>
-      </div>
-    );
-
-    showSuccess(resultMessage, {
-      title: `Rolled ${formula}`,
-      dismissible: true,
-    });
+    addToast(`Roll result: ${result.total} (${formula}: ${result.breakdown})`, 'success', true);
 
     // Clear the input after successful roll
     setDiceNotation('');

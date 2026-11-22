@@ -2,7 +2,8 @@ import { Button, Card, Typography, Icon } from '@/components/ui';
 import { SimpleRoller } from '@/components/domain/dice';
 import { StepWrapper } from '@/components/ui/core/layout';
 import { InfoCardHeader, StatGrid } from '@/components/ui/composite';
-import { roller, calculateModifier, logger, abilityScoreSchema, Rules, ABILITY_NAMES } from '@/utils';
+import { roll } from '@dice-jar/dice';
+import { calculateModifier, abilityScoreSchema, Rules, ABILITY_NAMES } from '@/utils';
 import type { Character, AbilityScore, BaseStepProps } from '@/types';
 import { memo, useState } from 'react';
 import { useValidation } from '@/validation';
@@ -41,7 +42,7 @@ function AbilityScoreStep({ character, onCharacterChange }: AbilityScoreStepProp
   const updateAbilityScore = (ability: AbilityName, value: number) => {
     // Validate the score before applying
     if (!Rules.isValidAbilityScore.validate(value)) {
-      logger.warn(`Invalid ability score ${value} for ${ability}`);
+      console.warn(`Invalid ability score ${value} for ${ability}`);
       return;
     }
 
@@ -64,7 +65,7 @@ function AbilityScoreStep({ character, onCharacterChange }: AbilityScoreStepProp
 
     ABILITY_NAMES.forEach((ability) => {
       // Roll 3d6 for each ability using the dice roller
-      const result = roller('3d6');
+      const result = roll('3d6');
       const total = result.total;
 
       // Ensure the rolled value is valid

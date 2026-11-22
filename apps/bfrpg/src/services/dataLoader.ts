@@ -6,7 +6,6 @@
 import type { Equipment, Spell } from '@/types';
 import { EQUIPMENT_CATEGORIES, CHARACTER_CLASSES } from '@/constants';
 import { CACHE_KEYS } from '@/constants';
-import { logger } from '@/utils';
 
 // Constants for excluded spells
 const EXCLUDED_SPELLS = {
@@ -125,7 +124,7 @@ async function loadEquipmentByCategory(category: EquipmentCategory): Promise<Equ
     setCachedData(cacheKey, categoryItems);
     return categoryItems;
   } catch (error) {
-    logger.error(`Error loading equipment category ${category}:`, error);
+    console.error(`Error loading equipment category ${category}:`, error);
     return [];
   }
 }
@@ -147,7 +146,7 @@ export async function loadAllEquipment(): Promise<Equipment[]> {
     setCachedData(cacheKey, equipment);
     return equipment;
   } catch (error) {
-    logger.error('Error loading all equipment:', error);
+    console.error('Error loading all equipment:', error);
     return [];
   }
 }
@@ -158,7 +157,7 @@ export async function loadAllEquipment(): Promise<Equipment[]> {
 export async function loadSpellsForClass(classId: string, level?: number): Promise<Spell[]> {
   // Validate classId for known classes (allow custom classes to pass through)
   if (!VALID_CLASS_IDS.has(classId) && !classId.startsWith('custom-')) {
-    logger.warn(`Unknown class ID: ${classId}`);
+    console.warn(`Unknown class ID: ${classId}`);
   }
 
   // Map combination classes to their base spellcasting class for spell lookups
@@ -198,7 +197,7 @@ export async function loadSpellsForClass(classId: string, level?: number): Promi
     setCachedData(cacheKey, filteredSpells);
     return filteredSpells;
   } catch (error) {
-    logger.error(`Error loading spells for ${classId}:`, error);
+    console.error(`Error loading spells for ${classId}:`, error);
     return [];
   }
 }
@@ -229,7 +228,7 @@ export async function loadAllFirstLevelSpells(): Promise<Spell[]> {
     setCachedData(cacheKey, filteredSpells);
     return filteredSpells;
   } catch (error) {
-    logger.error('Error loading all first level spells:', error);
+    console.error('Error loading all first level spells:', error);
     return [];
   }
 }
@@ -254,7 +253,7 @@ export async function loadAllSpells(): Promise<Spell[]> {
     setCachedData(cacheKey, filteredSpells);
     return filteredSpells;
   } catch (error) {
-    logger.error('Error loading all spells:', error);
+    console.error('Error loading all spells:', error);
     return [];
   }
 }
@@ -273,6 +272,6 @@ export async function preloadCriticalData(): Promise<void> {
       loadSpellsForClass(CHARACTER_CLASSES.CLERIC, 1),
     ]);
   } catch (error) {
-    logger.error('Error preloading critical data:', error);
+    console.error('Error preloading critical data:', error);
   }
 }

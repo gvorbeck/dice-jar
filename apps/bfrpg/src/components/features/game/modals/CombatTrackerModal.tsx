@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
 import { Modal } from '@/components/modals';
 import { Typography } from '@/components/ui/core/display';
-import { LoadingState } from '@/components/ui/core/feedback';
 import { SectionWrapper } from '@/components/ui/core/layout';
-import { useLoadingState } from '@/hooks';
 import { useCombatLogic } from '@/hooks';
 import { sortCombatantsByInitiative } from '@/utils';
 import CombatControls from '../combat/CombatControls';
@@ -44,8 +42,6 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
     nextTurn,
     endCombat,
   } = useCombatLogic(game, onUpdateGame);
-
-  const { loading } = useLoadingState();
 
   // Keyboard shortcuts for common combat actions
   useEffect(() => {
@@ -97,7 +93,6 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
         {/* Combat Controls */}
         <CombatControls
           isCombatActive={isCombatActive}
-          isLoading={loading}
           currentCombatantsCount={currentCombatants.length}
           currentCombatant={currentCombatant ? { name: currentCombatant.name } : undefined}
           round={round}
@@ -108,10 +103,9 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
         />
 
         {/* Loading State */}
-        {loading && <LoadingState message="Loading combat data..." />}
 
         {/* No Combatants */}
-        {!loading && currentCombatants.length === 0 && (
+        {currentCombatants.length === 0 && (
           <div className="game-modal-empty" role="status">
             <Typography variant="body" color="secondary">
               No combatants available for combat.
@@ -123,7 +117,7 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
         )}
 
         {/* Initiative Order with Table */}
-        {!loading && combatants.length > 0 && (
+        {combatants.length > 0 && (
           <SectionWrapper title="Initiative Order">
             <div className="game-modal-pad">
               <InitiativeTable
@@ -140,7 +134,7 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
         )}
 
         {/* Pre-Combat Initiative Setting */}
-        {!loading && !isCombatActive && currentCombatants.length > 0 && combatants.length === 0 && (
+        {!isCombatActive && currentCombatants.length > 0 && combatants.length === 0 && (
           <PreCombatInitiativeSection
             combatants={currentCombatantsWithInitiative}
             onUpdateInitiative={updatePreCombatInitiative}
@@ -156,7 +150,7 @@ export default function CombatTrackerModal({ isOpen, onClose, game, onUpdateGame
         )}
 
         {/* Available Players (before combat starts) */}
-        {!loading && !isCombatActive && availablePlayers.length > 0 && (
+        {!isCombatActive && availablePlayers.length > 0 && (
           <CombatantsList
             title="Available Players"
             combatants={availablePlayers}

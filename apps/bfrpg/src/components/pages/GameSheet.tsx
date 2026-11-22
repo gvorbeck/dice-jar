@@ -15,9 +15,9 @@ import { TreasureGeneratorModal, CombatTrackerModal, EncounterGeneratorModal } f
 import { useEnhancedGame } from '@/hooks/queries/useEnhancedQueries';
 import { useGameMutations } from '@/hooks/mutations/useEnhancedMutations';
 import { useDiceRoller } from '@/hooks/dice/useDiceRoller';
-import { useNotificationContext } from '@/hooks';
+import { useToast } from '@dice-jar/browser';
 import { useAuth } from '@/hooks';
-import { logger, getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/utils';
 import { ERROR_MESSAGES, LOADING_MESSAGES } from '@/constants';
 import type { Game, GamePlayer, GameCombatant } from '@/types';
 import './GameSheet.css';
@@ -42,8 +42,7 @@ export default function GameSheet() {
   // Use the dice roller hook
   const { DiceRollerFAB, DiceRollerModal } = useDiceRoller();
 
-  // Use notifications
-  const { showSuccess } = useNotificationContext();
+  const { addToast } = useToast();
 
   const breadcrumbItems = useMemo(
     () => [
@@ -161,11 +160,9 @@ export default function GameSheet() {
       handleGameChange(updatedGame);
 
       // Show success notification
-      showSuccess(`${newCombatant.name} added to Combat Tracker`, {
-        title: 'Monster Added',
-      });
+      addToast(`${newCombatant.name} added to Combat Tracker`, 'success');
     },
-    [game, handleGameChange, showSuccess],
+    [game, handleGameChange, addToast],
   );
 
   // Data loading is now handled by useFirebaseSheet hook
@@ -198,10 +195,6 @@ export default function GameSheet() {
         </Typography>
       </div>
     );
-  }
-
-  if (import.meta.env.MODE === 'development') {
-    logger.debug(`🎲 GAME SHEET DEBUG | ${game.name?.toUpperCase() || 'UNNAMED GAME'}`, game);
   }
 
   return (

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { getErrorMessage, handleServiceError, logger, sanitizeCharacterName } from './data';
+import { getErrorMessage, handleServiceError, sanitizeCharacterName } from './data';
 
 describe('sanitizeCharacterName', () => {
   it('strips tags and characters a name may not hold, then trims', () => {
@@ -18,7 +18,7 @@ describe('getErrorMessage', () => {
 
 describe('handleServiceError', () => {
   it('logs, then throws a ServiceError that keeps its action, context and cause', () => {
-    const log = vi.spyOn(logger, 'error').mockImplementation(() => {});
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     const cause = new Error('network');
     let thrown: unknown;
     try {
@@ -38,7 +38,7 @@ describe('handleServiceError', () => {
   });
 
   it('uses the fallback message when given', () => {
-    vi.spyOn(logger, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => handleServiceError('x', { action: 'load', fallbackMessage: 'Could not load' })).toThrow('Could not load');
   });
 });

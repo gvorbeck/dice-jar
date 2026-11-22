@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import { useCallback, useMemo, memo } from 'react';
+import { useLoad } from '@dice-jar/browser';
 import { Accordion, Card, InfoCardHeader, Typography } from '@/components/ui';
 import { Button } from '@/components/ui';
 import { Icon, type IconName } from '@/components/ui/core/display/Icon';
 import { LoadingState } from '@/components/ui/core/feedback';
-import { logger } from '@/utils';
 import type { Character, Equipment } from '@/types';
 import { loadAllEquipment } from '@/services/dataLoader';
+import { CACHE_KEYS } from '@/constants';
 import { findById } from '@/utils';
 import { convertToGoldFromAbbreviation } from '@/utils/currency';
 import { allRaces, allClasses } from '@/data';
@@ -50,26 +51,12 @@ function createButtonText(canAfford: boolean, restrictionReason?: string): strin
   return text;
 }
 
+const loadEquipment = async () => (await loadAllEquipment()) as EquipmentWithIndex[];
+
 function EquipmentSelector({ character, onEquipmentAdd }: EquipmentSelectorProps) {
-  const [allEquipment, setAllEquipment] = useState<EquipmentWithIndex[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Load equipment data on component mount
-  useEffect(() => {
-    const loadEquipmentData = async () => {
-      try {
-        const equipment = await loadAllEquipment();
-        setAllEquipment(equipment as EquipmentWithIndex[]);
-      } catch (error) {
-        logger.error('Failed to load equipment data:', error);
-        setAllEquipment([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadEquipmentData();
-  }, []);
+  const { data, error } = useLoad(CACHE_KEYS.EQUIPMENT_ALL, loadEquipment);
+  const isLoading = !data && !error;
+  const allEquipment = data ?? [];
 
   // Memoize character restriction data to avoid recalculating on every render
   const characterRestrictionData = useMemo(() => {

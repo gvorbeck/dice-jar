@@ -1,7 +1,7 @@
 import { NumberInput, TextArea } from '@/components/ui/core/primitives';
 import { SectionWrapper } from '@/components/ui/core/layout';
 import { StatusIndicator } from '@/components/ui/composite';
-import { useDebouncedUpdate } from '@/hooks';
+import { useDebouncedTextField } from '@dice-jar/browser';
 import type { Character } from '@/types';
 import './HitPoints.css';
 
@@ -22,15 +22,8 @@ export default function HitPoints({
   onCurrentHPChange,
   onHPNotesChange,
 }: HitPointsProps) {
-  // Use shared debounced update logic for HP notes
-  const debouncedHPNotes = useDebouncedUpdate(character.hp.desc || '', {
-    delay: 500,
-    onUpdate: (value: string) => {
-      if (onHPNotesChange) {
-        onHPNotesChange(value);
-      }
-    },
-  });
+  // Saves after typing pauses, and at once on blur
+  const debouncedHPNotes = useDebouncedTextField(character.hp.desc || '', async (value) => onHPNotesChange?.(value), 500);
 
   const handleCurrentHPChange = (value: number | undefined) => {
     if (value !== undefined && onCurrentHPChange) {
@@ -88,7 +81,7 @@ export default function HitPoints({
                   aria-label="Hit point notes"
                   className="hp-notes"
                 />
-                {debouncedHPNotes.isSaving && <div className="hp-saving">Saving...</div>}
+                {debouncedHPNotes.isPending && <div className="hp-saving">Saving...</div>}
               </>
             ) : (
               character.hp.desc && <div className="sheet-chip hp-desc">{character.hp.desc}</div>

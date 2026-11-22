@@ -3,11 +3,11 @@ import Modal from '@/components/modals/base/Modal';
 import { FileUpload, Button, Accordion } from '@/components/ui';
 import { Callout } from '@/components/ui/core/feedback';
 import { useCharacterMutations } from '@/hooks/mutations/useEnhancedMutations';
-import { useNotificationContext } from '@/hooks';
+import { useRun, useToast } from '@dice-jar/browser';
+import { getErrorMessage } from '@/utils';
 import { processCharacterData } from '@/services/characterMigration';
 import { isValidCharacterStructure, validateImportedCharacter } from '@/validation/character';
 import type { Character } from '@/types';
-import { logger } from '@/utils';
 import './ImportCharacterModal.css';
 
 interface ImportCharacterModalProps {
@@ -38,26 +38,19 @@ const EXAMPLE_CHARACTER = `{
 
 export default function ImportCharacterModal({ isOpen, onClose, userId }: ImportCharacterModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [importing, setImporting] = useState(false);
+  const { busy: importing, err: error, run, clear } = useRun((e) => getErrorMessage(e, 'An unknown error occurred'));
   const { saveCharacter } = useCharacterMutations();
-  const notifications = useNotificationContext();
+  const { addToast } = useToast();
 
   const handleFileSelect = (file: File | null) => {
     setSelectedFile(file);
-    setError(null); // Clear any previous errors
+    clear(); // Clear any previous errors
   };
 
   const handleImport = async () => {
-    if (!selectedFile) {
-      setError('Please select a file to import');
-      return;
-    }
+    await run(async () => {
+      if (!selectedFile) throw new Error('Please select a file to import');
 
-    setImporting(true);
-    setError(null);
-
-    try {
       // 1. Read and parse the file
       const text = await selectedFile.text();
       let rawData: unknown;
@@ -80,7 +73,7 @@ export default function ImportCharacterModal({ isOpen, onClose, userId }: Import
       try {
         migratedCharacter = processCharacterData(rawData);
       } catch (migrationError) {
-        logger.error('Migration error:', migrationError);
+        console.error('Migration error:', migrationError);
         throw new Error('Unable to process character data. The file may be corrupted or use an incompatible format.');
       }
 
@@ -93,27 +86,17 @@ export default function ImportCharacterModal({ isOpen, onClose, userId }: Import
       // 5. Save character (without ID to create new)
       // No characterId = create new character
       const id = await saveCharacter({ userId, character: migratedCharacter });
-      if (id === undefined) {
-        setError('Failed to save character. Please try again.');
-        return;
-      }
-      notifications.showSuccess(`Successfully imported ${migratedCharacter.name}`);
+      if (id === undefined) throw new Error('Failed to save character. Please try again.');
+      addToast(`Successfully imported ${migratedCharacter.name}`, 'success');
       onClose();
       setSelectedFile(null);
-      setError(null);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      setError(errorMessage);
-      logger.error('Import error:', error);
-    } finally {
-      setImporting(false);
-    }
+    });
   };
 
   const handleClose = () => {
     if (importing) return; // Prevent closing while importing
     setSelectedFile(null);
-    setError(null);
+    clear();
     onClose();
   };
 

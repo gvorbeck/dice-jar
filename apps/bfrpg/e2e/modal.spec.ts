@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Modal', () => {
   test('closes on Escape and on outside click, and returns focus to the opener', async ({ page }) => {

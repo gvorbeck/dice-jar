@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { LEVEL_UP_CONSTANTS } from '@/constants';
 import type { Character, Class, TwoHPClass, HPGainResult } from '@/types';
-import { hasCustomClasses, isCustomClass, logger, roller, getErrorMessage } from '@/utils';
+import { hasCustomClasses, isCustomClass, getErrorMessage } from '@/utils';
+import { roll } from '@dice-jar/dice';
 
 interface UseHPGainProps {
   character: Character;
@@ -50,7 +51,7 @@ export function useHPGain({ character, primaryClass, hasRequiredXP, isOpen, next
     } catch (err) {
       const errorMessage = getErrorMessage(err, 'Failed to calculate HP gain');
       setError(errorMessage);
-      logger.error('HP gain calculation error:', err);
+      console.error('HP gain calculation error:', err);
     }
   }
 
@@ -69,7 +70,7 @@ export function useHPGain({ character, primaryClass, hasRequiredXP, isOpen, next
     } catch (err) {
       const errorMessage = getErrorMessage(err, 'Failed to calculate HP gain');
       setError(errorMessage);
-      logger.error('HP gain re-roll error:', err);
+      console.error('HP gain re-roll error:', err);
     }
   }, [character, primaryClass, hasRequiredXP, isOpen, nextLevel, isCustomClassCharacter]);
 
@@ -131,7 +132,7 @@ function calculateHPGainForCustomClass(character: Character, nextLevel: number):
   }
 
   // Levels 1-9: Roll hit die and add Constitution modifier
-  const diceResult = roller(hitDie);
+  const diceResult = roll(hitDie);
   const totalGain = Math.max(1, diceResult.total + constitutionModifier);
 
   return {
@@ -171,7 +172,7 @@ function calculateHPGain(character: Character, primaryClass: Class, nextLevel: n
   }
 
   // Levels 1-9: Roll hit die and add Constitution modifier
-  const diceResult = roller(hitDie);
+  const diceResult = roll(hitDie);
   const totalGain = Math.max(1, diceResult.total + constitutionModifier);
 
   return {

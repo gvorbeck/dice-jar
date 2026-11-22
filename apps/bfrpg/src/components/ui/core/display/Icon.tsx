@@ -1,6 +1,5 @@
 import { forwardRef } from 'react';
 import { cn } from '@dice-jar/cn';
-import { logger } from '@/utils';
 import './Icon.css';
 
 /**
@@ -310,7 +309,7 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(
     const iconData = iconPaths[name];
 
     if (!iconData) {
-      logger.warn(`Icon "${name}" not found`);
+      console.warn(`Icon "${name}" not found`);
       return null;
     }
 

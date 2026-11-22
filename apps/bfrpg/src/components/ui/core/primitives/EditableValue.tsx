@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, forwardRef } from 'react';
 import { NumberInput } from '@/components/ui/core/primitives';
 import { Icon } from '@/components/ui/core/display';
 import { cn } from '@dice-jar/cn';
+import { useDebouncedSave } from '@dice-jar/browser';
 import './EditableValue.css';
 
 interface EditableValueProps {
@@ -57,25 +58,19 @@ const EditableValue = forwardRef<HTMLDivElement, EditableValueProps>(
     const [prevValue, setPrevValue] = useState(value);
     const [lastCommittedValue, setLastCommittedValue] = useState(value);
     const inputRef = useRef<HTMLInputElement>(null);
-    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    // With a delay, writes once typing pauses, and at once on blur or unmount.
+    const { onChange: commitLater, flush, noteRemoteValue } = useDebouncedSave(async (v: number) => onChange?.(v), debounceMs);
 
     // Sync local value when external value changes (but not during active editing)
     if (value !== prevValue) {
       setPrevValue(value);
+      // A value changed elsewhere must not leave our last save looking current, or retyping it is skipped.
+      noteRemoteValue(value);
       if (!isEditing && value !== lastCommittedValue) {
         setLocalValue(value);
         setLastCommittedValue(value);
       }
     }
-
-    // Cleanup debounce timer on unmount
-    useEffect(() => {
-      return () => {
-        if (debounceTimerRef.current) {
-          clearTimeout(debounceTimerRef.current);
-        }
-      };
-    }, []);
 
     // Auto-focus and select when entering edit mode
     useEffect(() => {
@@ -100,44 +95,14 @@ const EditableValue = forwardRef<HTMLDivElement, EditableValueProps>(
 
     const handleValueChange = (newValue: number | undefined) => {
       if (newValue === undefined) return;
-
       setLocalValue(newValue);
-
-      // Clear any existing debounce timer
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-
-      if (debounceMs > 0) {
-        // Debounced: schedule the onChange call
-        debounceTimerRef.current = setTimeout(() => {
-          if (onChange && newValue !== lastCommittedValue) {
-            setLastCommittedValue(newValue);
-            onChange(newValue);
-          }
-          debounceTimerRef.current = null;
-        }, debounceMs);
-      } else {
-        // No debounce: call onChange immediately
-        if (onChange) {
-          setLastCommittedValue(newValue);
-          onChange(newValue);
-        }
-      }
+      setLastCommittedValue(newValue);
+      if (debounceMs > 0) commitLater(newValue);
+      else onChange?.(newValue);
     };
 
     const handleBlur = () => {
-      // On blur, immediately commit any pending debounced value
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-      }
-
-      if (onChange && localValue !== lastCommittedValue) {
-        setLastCommittedValue(localValue);
-        onChange(localValue);
-      }
-
+      if (debounceMs > 0) void flush(localValue);
       setIsEditing(false);
     };
 

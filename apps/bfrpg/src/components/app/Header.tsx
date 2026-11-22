@@ -3,8 +3,7 @@ import { useState } from 'react';
 import { Button, Image } from '@/components/ui';
 import { Typography } from '@/components/ui/core/display';
 import { useAuth } from '@/hooks';
-import { signOut, isMockMode, devUtils } from '@/services';
-import { logger } from '@/utils';
+import { signOut } from '@/services';
 import { DOM_IDS, CSS_CLASSES, HTML_ROLES } from '@/constants';
 import { GlobalAlert } from '@/components/app/GlobalAlert';
 import type { AlertConfig } from '@/constants';
@@ -24,30 +23,7 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
     try {
       await signOut();
     } catch (error) {
-      logger.error('Sign out error:', error);
-    }
-  };
-
-  const getDevUtils = () => {
-    return devUtils || (window as unknown as { devUtils?: typeof devUtils }).devUtils;
-  };
-
-  const handleResetMockData = () => {
-    if (isMockMode()) {
-      const utils = getDevUtils();
-      if (utils) {
-        utils.resetAllData();
-        // Reload the page to see the reset data
-        window.location.reload();
-      } else {
-        // Manual fallback if devUtils isn't available
-        logger.warn('devUtils not available, clearing localStorage manually');
-        localStorage.removeItem('mock_characters');
-        localStorage.removeItem('mock_characters_sample_initialized');
-        localStorage.removeItem('mock_games');
-        localStorage.removeItem('mock_games_sample_initialized');
-        window.location.reload();
-      }
+      console.error('Sign out error:', error);
     }
   };
 
@@ -62,36 +38,16 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
           <div className="site-bar">
             {/* Logo & Brand */}
             <div className="site-brand-wrap">
-              <Link to="/" aria-label={`${isMockMode() ? 'Codex.Mock' : 'Codex.Quest'} - Go to homepage`} className="site-brand">
+              <Link to="/" aria-label={`Codex.Quest - Go to homepage`} className="site-brand">
                 <div className="site-logo-wrap">
-                  <Image
-                    variant="logo"
-                    src="/images/logo.webp"
-                    alt={`${isMockMode() ? 'Codex.Mock' : 'Codex.Quest'} logo`}
-                    className="site-logo"
-                  />
+                  <Image variant="logo" src="/images/logo.webp" alt={`Codex.Quest logo`} className="site-logo" />
                   <div className="site-glow"></div>
                 </div>
                 <Typography variant="h3" as="h1" color="amber" className="site-title">
-                  {isMockMode() ? 'Codex.Mock' : 'Codex.Quest'}
+                  Codex.Quest
                 </Typography>
               </Link>
             </div>
-
-            {/* Mock Mode Reset Button */}
-            {isMockMode() && (
-              <div className="site-row">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleResetMockData}
-                  title="Reset all data to original sample data"
-                  icon="settings"
-                >
-                  Reset Sample Data
-                </Button>
-              </div>
-            )}
 
             {/* Desktop Authentication */}
             <div className="site-bar-end">

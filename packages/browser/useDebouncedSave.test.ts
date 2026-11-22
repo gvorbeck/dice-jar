@@ -1,10 +1,10 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useDebouncedSave } from '../useDebouncedSave';
-import { INVALID_WRITE_MESSAGE } from '@/lib/constants';
+import { INVALID_WRITE_MESSAGE, useDebouncedSave } from './useDebouncedSave';
 
 const addToastSpy = vi.fn();
-vi.mock('@/ui/Toast/ToastContext', () => ({
+vi.mock('./toast', () => ({
   useToastOptional: () => ({ addToast: addToastSpy }),
 }));
 
@@ -307,6 +307,48 @@ describe('useDebouncedSave', () => {
 
     await act(async () => {
       vi.advanceTimersByTime(60000);
+    });
+    expect(onSave).toHaveBeenCalledTimes(2);
+  });
+
+  it('unmount re-sends a value whose save and retry both failed', async () => {
+    const onSave = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('denied'))
+      .mockRejectedValueOnce(new Error('denied'))
+      .mockResolvedValue(undefined);
+    const { result, unmount } = renderHook(() => useDebouncedSave(onSave, 1500));
+
+    await act(async () => {
+      result.current.onChange('hello');
+      vi.advanceTimersByTime(1500);
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(4000);
+    });
+    expect(onSave).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      unmount();
+    });
+    expect(onSave).toHaveBeenCalledTimes(3);
+    expect(onSave).toHaveBeenLastCalledWith('hello');
+  });
+
+  it('does not re-send a failed value once a newer remote value has arrived', async () => {
+    const onSave = vi.fn().mockRejectedValueOnce(new Error('denied')).mockRejectedValueOnce(new Error('denied'));
+    const { result, unmount } = renderHook(() => useDebouncedSave(onSave, 1500));
+
+    await act(async () => {
+      result.current.onChange('A');
+      vi.advanceTimersByTime(1500);
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(4000);
+    });
+    act(() => result.current.noteRemoteValue('C'));
+    await act(async () => {
+      unmount();
     });
     expect(onSave).toHaveBeenCalledTimes(2);
   });

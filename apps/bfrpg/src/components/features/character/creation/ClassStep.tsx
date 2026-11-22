@@ -11,7 +11,6 @@ import {
   findById,
   getFirstLevelSpellsForClass,
   getAllSpellsForCustomClass,
-  logger,
   getSpellTypeInfo,
   getEffectiveSpellcastingClass,
   assignStartingCantrips,
@@ -19,8 +18,8 @@ import {
   hasCustomRace,
 } from '@/utils';
 import type { Spell, Cantrip, BaseStepProps, Character } from '@/types';
-import { useCharacterStore } from '@/stores';
-import { COMBINATION_CLASS_IDS } from '@/constants';
+import { store } from '@dice-jar/browser';
+import { COMBINATION_CLASS_IDS, STORAGE_KEYS } from '@/constants';
 import { memo, useState, useEffect, useMemo } from 'react';
 
 interface ClassStepProps extends BaseStepProps {
@@ -49,9 +48,8 @@ function ClassStepComponent({
   // Track what we've loaded to derive loading state
   const [loadedForClass, setLoadedForClass] = useState<string | null>(null);
 
-  // Use Zustand store for custom class magic toggle
-  const customClassMagicToggle = useCharacterStore((state) => state.preferences.customClassMagicToggle);
-  const updatePreferences = useCharacterStore((state) => state.updatePreferences);
+  // Remembered across visits
+  const [customClassMagicToggle, setCustomClassMagicToggle] = useState(() => store.get(STORAGE_KEYS.CUSTOM_CLASS_MAGIC_TOGGLE) === '1');
 
   // Filter classes based on race restrictions and supplemental content setting
   // Excludes combination classes - those are shown separately via CombinationClassSelector
@@ -160,7 +158,7 @@ function ClassStepComponent({
           setLoadedForClass('custom');
         })
         .catch((error) => {
-          logger.error('Failed to load all spells for custom class:', error);
+          console.error('Failed to load all spells for custom class:', error);
           setAllSpellsForCustomClass([]);
           setLoadedForClass('custom');
         });
@@ -172,7 +170,7 @@ function ClassStepComponent({
           setLoadedForClass(spellcastingClass.classId);
         })
         .catch((error) => {
-          logger.error('Failed to load spells:', error);
+          console.error('Failed to load spells:', error);
           setAvailableSpells([]);
           setLoadedForClass(spellcastingClass.classId);
         });
@@ -320,7 +318,8 @@ function ClassStepComponent({
             onCharacterChange={onCharacterChange}
             customClassMagicToggle={customClassMagicToggle}
             onCustomClassMagicToggle={(value) => {
-              updatePreferences({ customClassMagicToggle: value });
+              setCustomClassMagicToggle(value);
+              store.set(STORAGE_KEYS.CUSTOM_CLASS_MAGIC_TOGGLE, value ? '1' : '0');
               // Clear spells when magic is toggled off
               if (!value) {
                 onCharacterChange({

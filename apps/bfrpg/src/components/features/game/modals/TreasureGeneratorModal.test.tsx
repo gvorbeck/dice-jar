@@ -9,10 +9,7 @@ vi.mock('@/utils', async (orig) => ({
     throw new Error('boom');
   },
 }));
-vi.mock('@/hooks', async (orig) => ({
-  ...(await orig<object>()),
-  useNotificationContext: () => ({ showSuccess: vi.fn(), showError: vi.fn() }),
-}));
+vi.mock('@dice-jar/browser', async (orig) => ({ ...(await orig<object>()), useToast: () => ({ addToast: vi.fn() }) }));
 
 describe('TreasureGeneratorModal', () => {
   it('links the Generate button to the visible error', async () => {

@@ -6,13 +6,10 @@ import { createEmptyCharacter } from '@/utils';
 import type { Character } from '@/types';
 
 // Mock the dice roller to make tests deterministic
+vi.mock('@dice-jar/dice', () => ({
+  roll: vi.fn(() => ({ total: 15, notation: '3d6', breakdown: '[5, 5, 5]' })),
+}));
 vi.mock('@/utils/mechanics', () => ({
-  roller: vi.fn(() => ({
-    total: 15,
-    rolls: [5, 5, 5],
-    formula: '3d6',
-    breakdown: '5, 5, 5',
-  })),
   GAME_MECHANICS: {
     ABILITY_MODIFIERS: [
       { max: 3, modifier: -3 },

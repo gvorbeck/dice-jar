@@ -2,7 +2,8 @@ import { Typography } from '@/components/ui';
 import { BaseCard } from '@/components/ui/composite/BaseCard';
 import { StatusDot, StatCard } from '@/components/ui/composite';
 import type { Game } from '@/types';
-import { useNotificationContext } from '@/hooks';
+import { useCopy } from '@dice-jar/browser';
+import { useToast } from '@dice-jar/browser';
 import { truncateText } from '@/utils';
 import '@/components/features/character/management/CharacterCard.css';
 import './GameCard.css';
@@ -15,20 +16,13 @@ interface GameCardProps {
 }
 
 export function GameCard({ game, user, onDelete, isDeleting }: GameCardProps) {
-  const { showSuccess, showError } = useNotificationContext();
+  const { addToast } = useToast();
+  const [, copy] = useCopy();
   const href = `/u/${user?.uid}/g/${game.id}`;
 
   const handleCopyUrl = async (url: string, gameName: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      showSuccess(`Game URL copied for ${gameName}`, {
-        duration: 3000,
-      });
-    } catch {
-      showError('Failed to copy URL to clipboard', {
-        duration: 5000,
-      });
-    }
+    if (await copy(url)) addToast(`Game URL copied for ${gameName}`, 'success');
+    else addToast('Failed to copy URL to clipboard', 'error');
   };
 
   return (

@@ -40,7 +40,7 @@ Codex.Quest is a comprehensive web-based character creation and management syste
 - **Plain CSS** with design tokens (`src/styles/tokens.css`), one stylesheet beside each component, and `@dice-jar/cn` for conditional classes
 - **react-router-dom 7** for client-side routing
 - **`useSub`** (`@dice-jar/browser`) for live Firestore data, and **`@dice-jar/diff`** so saves send only the changed fields
-- **`createStore`** (`src/lib/store.ts`) for client-side state kept in local storage
+- **`@dice-jar/browser`** for the rest every app shares: `store` (local storage), `useRun` (button actions), `useDebouncedSave` and `useDebouncedTextField` (saving as you type), and `ToastProvider` (notifications)
 - **`@dice-jar/dice`** for dice notation
 
 ### Backend & Services
@@ -57,23 +57,17 @@ Codex.Quest is a comprehensive web-based character creation and management syste
 - Node.js 18+
 - npm
 
-### Quick Start (Mock Mode)
+### Quick Start (Emulators)
 
-**Perfect for contributors and trying out the app:**
+No Firebase project or credentials needed. From the repo root (Java 21 is required for the emulators):
 
 ```bash
-# Clone the repository
-git clone https://github.com/gvorbeck/codex-quest.git
-cd codex-quest
-
-# Install dependencies
 npm install
-
-# Start development server (auto-detects mock mode)
-npm run dev
+npm run emulators -w apps/bfrpg      # Auth and Firestore emulators, in one terminal
+npm run dev:emulated -w apps/bfrpg   # the app against them (.env.emulator), in another
 ```
 
-🎉 **That's it!** The app automatically detects missing Firebase credentials and runs in mock mode with sample data.
+Open the app and use **Sign Up**. The emulators start empty and forget everything when stopped. The `demo-` project ID and dummy keys in `.env.emulator` mean nothing can reach the real Firebase project.
 
 ### Production Installation
 
@@ -97,55 +91,23 @@ npm run build
 
 ### Available Scripts
 
-| Command                   | Description                               |
-| ------------------------- | ----------------------------------------- |
-| `npm run dev`             | Start development server in **mock mode** |
-| `npm run dev:firebase`    | Start development server with Firebase    |
-| `npm run build`           | Build for production (TypeScript + Vite)  |
-| `npm run preview`         | Preview production build locally          |
-| `npm run lint`            | Run ESLint on TypeScript/React files      |
-| `npm run test`            | Run unit tests in watch mode              |
-| `npm run test:ui`         | Run unit tests with visual interface      |
-| `npm run test:run`        | Run unit tests once (for CI/commits)      |
-| `npm run test:coverage`   | Run unit tests with coverage report       |
-| `npm run test:e2e`        | Run end-to-end tests (headless)           |
-| `npm run test:e2e:ui`     | Run E2E tests with visual debugging       |
-| `npm run test:e2e:headed` | Run E2E tests with browser visible        |
-| `npm run test:all`        | Run all tests (unit + E2E)                |
-| `npm run test:ci`         | Full CI pipeline (lint + build + tests)   |
-
-## Mock Mode for Contributors
-
-Codex.Quest features an intelligent mock mode that **automatically activates** when Firebase credentials aren't available. This provides a **zero-setup experience** for contributors and demos.
-
-### Development Utilities
-
-When in mock mode, additional debugging tools are available:
-
-#### UI Reset Button
-
-- **Reset Sample Data** button appears in the header (orange button next to "Codex.Mock")
-- Instantly resets all data back to original sample characters and games
-- Reloads the page automatically to show fresh data
-
-#### Console Commands
-
-```javascript
-// Available in browser console as window.devUtils
-devUtils.resetAllData(); // Reset to sample data
-devUtils.clearAllData(); // Clear all data
-devUtils.signInAsUser(userData); // Test different users
-devUtils.exportCharacterData(); // Export for debugging
-devUtils.exportGameData(); // Export game data
-```
-
-### Manual Mock Mode
-
-Force mock mode even with Firebase credentials:
-
-```bash
-VITE_MOCK_FIREBASE=true npm run dev
-```
+| Command                   | Description                                                               |
+| ------------------------- | ------------------------------------------------------------------------- |
+| `npm run dev`             | Start development server with Firebase (needs `.env`, see `.env.example`) |
+| `npm run dev:emulated`    | Start development server against the emulators                            |
+| `npm run emulators`       | Start the Auth and Firestore emulators                                    |
+| `npm run build`           | Build for production (TypeScript + Vite)                                  |
+| `npm run preview`         | Preview production build locally                                          |
+| `npm run lint`            | Run ESLint on TypeScript/React files                                      |
+| `npm run test`            | Run unit tests in watch mode                                              |
+| `npm run test:ui`         | Run unit tests with visual interface                                      |
+| `npm run test:run`        | Run unit tests once (for CI/commits)                                      |
+| `npm run test:coverage`   | Run unit tests with coverage report                                       |
+| `npm run test:e2e`        | Run end-to-end tests against the emulators (headless)                     |
+| `npm run test:e2e:ui`     | Run E2E tests with visual debugging                                       |
+| `npm run test:e2e:headed` | Run E2E tests with browser visible                                        |
+| `npm run test:all`        | Run all tests (unit + E2E)                                                |
+| `npm run test:ci`         | Full CI pipeline (lint + build + tests)                                   |
 
 ## Testing
 

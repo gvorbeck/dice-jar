@@ -4,9 +4,8 @@ import { TextInput, FormField } from '@/components/ui/core/primitives';
 import { ErrorDisplay } from '@/components/ui/core/feedback';
 import { Modal } from '@/components/modals';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@/components/ui/core/layout/Tabs';
-import { useLoadingState, useAuthMutations } from '@/hooks';
-import { signInWithEmail, signUpWithEmail } from '@/services';
-import { logger } from '@/utils';
+import { useRun } from '@dice-jar/browser';
+import { sendPasswordReset, signInWithEmail, signInWithGoogle, signUpWithEmail } from '@/services';
 import GoogleSignInSection from './GoogleSignInSection';
 import './SignInModal.css';
 
@@ -31,6 +30,19 @@ const AUTH_ERRORS = {
   GOOGLE_SIGN_IN_FAILED: 'Failed to sign in with Google. Please try again.',
   GOOGLE_SIGN_IN_CANCELLED: 'Google sign-in was cancelled.',
 } as const;
+
+// Firebase error code -> what to tell the user; anything else gets the action's own fallback.
+const AUTH_CODES: Record<string, string> = {
+  'auth/user-not-found': AUTH_ERRORS.USER_NOT_FOUND,
+  'auth/wrong-password': AUTH_ERRORS.WRONG_PASSWORD,
+  'auth/invalid-email': AUTH_ERRORS.INVALID_EMAIL,
+  'auth/too-many-requests': AUTH_ERRORS.TOO_MANY_REQUESTS,
+  'auth/email-already-in-use': AUTH_ERRORS.EMAIL_IN_USE,
+  'auth/weak-password': AUTH_ERRORS.WEAK_PASSWORD,
+  'auth/cancelled-popup-request': AUTH_ERRORS.GOOGLE_SIGN_IN_CANCELLED,
+  'auth/popup-closed-by-user': AUTH_ERRORS.GOOGLE_SIGN_IN_CANCELLED,
+};
+const authMessage = (fallback: string) => (error: unknown) => (isFirebaseError(error) && error.code && AUTH_CODES[error.code]) || fallback;
 
 // Custom hooks for form state management
 function useSignInForm() {
@@ -105,8 +117,9 @@ interface SignInModalProps {
 export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
   // Shared state
   const [activeTab, setActiveTab] = useState('signin');
-  const { loading: isLoading, withLoading } = useLoadingState();
-  const [error, setError] = useState('');
+  const { busy: isLoading, err, run, clear } = useRun();
+  const [invalid, setInvalid] = useState(''); // a form problem found before sending anything
+  const error = invalid || err;
   const [resetSuccess, setResetSuccess] = useState(false);
 
   // Form state using custom hooks
@@ -114,142 +127,48 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
   const signUpForm = useSignUpForm();
   const resetForm = usePasswordResetForm();
 
-  // Auth mutations
-  const { sendPasswordReset, signInWithGoogle } = useAuthMutations();
+  const signedIn = (userData: { uid: string; email: string | null }) => {
+    if (onSuccess) onSuccess(userData);
+    else onClose();
+    resetForms();
+  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
-    await withLoading(async () => {
-      try {
-        const userData = await signInWithEmail(signInForm.email, signInForm.password);
-        if (onSuccess) {
-          onSuccess(userData);
-        } else {
-          onClose();
-        }
-        resetForms();
-      } catch (error: unknown) {
-        logger.error('Sign in error:', error);
-        if (isFirebaseError(error)) {
-          if (error.code === 'auth/user-not-found') {
-            setError(AUTH_ERRORS.USER_NOT_FOUND);
-          } else if (error.code === 'auth/wrong-password') {
-            setError(AUTH_ERRORS.WRONG_PASSWORD);
-          } else if (error.code === 'auth/invalid-email') {
-            setError(AUTH_ERRORS.INVALID_EMAIL);
-          } else if (error.code === 'auth/too-many-requests') {
-            setError(AUTH_ERRORS.TOO_MANY_REQUESTS);
-          } else {
-            setError(AUTH_ERRORS.SIGN_IN_FAILED);
-          }
-        } else {
-          setError(AUTH_ERRORS.SIGN_IN_FAILED);
-        }
-      }
-    });
+    setInvalid('');
+    await run(async () => signedIn(await signInWithEmail(signInForm.email, signInForm.password)), authMessage(AUTH_ERRORS.SIGN_IN_FAILED));
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
-    // Validate passwords match
-    if (signUpForm.password !== signUpForm.confirmPassword) {
-      setError(AUTH_ERRORS.PASSWORDS_DONT_MATCH);
-      return;
-    }
-
-    // Validate password strength
-    if (signUpForm.password.length < 6) {
-      setError(AUTH_ERRORS.PASSWORD_TOO_SHORT);
-      return;
-    }
-
-    await withLoading(async () => {
-      try {
-        const userData = await signUpWithEmail(signUpForm.email, signUpForm.password);
-        if (onSuccess) {
-          onSuccess(userData);
-        } else {
-          onClose();
-        }
-        resetForms();
-      } catch (error: unknown) {
-        logger.error('Sign up error:', error);
-        if (isFirebaseError(error)) {
-          if (error.code === 'auth/email-already-in-use') {
-            setError(AUTH_ERRORS.EMAIL_IN_USE);
-          } else if (error.code === 'auth/invalid-email') {
-            setError(AUTH_ERRORS.INVALID_EMAIL);
-          } else if (error.code === 'auth/weak-password') {
-            setError(AUTH_ERRORS.WEAK_PASSWORD);
-          } else {
-            setError(AUTH_ERRORS.SIGN_UP_FAILED);
-          }
-        } else {
-          setError(AUTH_ERRORS.SIGN_UP_FAILED);
-        }
-      }
-    });
+    clear();
+    if (signUpForm.password !== signUpForm.confirmPassword) return setInvalid(AUTH_ERRORS.PASSWORDS_DONT_MATCH);
+    if (signUpForm.password.length < 6) return setInvalid(AUTH_ERRORS.PASSWORD_TOO_SHORT);
+    setInvalid('');
+    await run(async () => signedIn(await signUpWithEmail(signUpForm.email, signUpForm.password)), authMessage(AUTH_ERRORS.SIGN_UP_FAILED));
   };
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setInvalid('');
     setResetSuccess(false);
-
-    try {
-      await sendPasswordReset.mutateAsync(resetForm.email);
+    if (await run(() => sendPasswordReset(resetForm.email), authMessage(AUTH_ERRORS.PASSWORD_RESET_FAILED))) {
       setResetSuccess(true);
       resetForm.reset();
-    } catch (error: unknown) {
-      logger.error('Password reset error:', error);
-      if (isFirebaseError(error)) {
-        if (error.code === 'auth/user-not-found') {
-          setError(AUTH_ERRORS.USER_NOT_FOUND);
-        } else if (error.code === 'auth/invalid-email') {
-          setError(AUTH_ERRORS.INVALID_EMAIL);
-        } else {
-          setError(AUTH_ERRORS.PASSWORD_RESET_FAILED);
-        }
-      } else {
-        setError(AUTH_ERRORS.PASSWORD_RESET_FAILED);
-      }
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setError('');
-
-    try {
-      const userData = await signInWithGoogle.mutateAsync();
-      if (onSuccess) {
-        onSuccess(userData);
-      } else {
-        onClose();
-      }
-      resetForms();
-    } catch (error: unknown) {
-      logger.error('Google sign-in error:', error);
-      if (isFirebaseError(error)) {
-        if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
-          setError(AUTH_ERRORS.GOOGLE_SIGN_IN_CANCELLED);
-        } else {
-          setError(AUTH_ERRORS.GOOGLE_SIGN_IN_FAILED);
-        }
-      } else {
-        setError(AUTH_ERRORS.GOOGLE_SIGN_IN_FAILED);
-      }
-    }
+    setInvalid('');
+    await run(async () => signedIn(await signInWithGoogle()), authMessage(AUTH_ERRORS.GOOGLE_SIGN_IN_FAILED));
   };
 
   const resetForms = () => {
     signInForm.reset();
     signUpForm.reset();
     resetForm.reset();
-    setError('');
+    setInvalid('');
+    clear();
     setResetSuccess(false);
   };
 
@@ -261,7 +180,8 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    setError(''); // Clear errors when switching tabs
+    setInvalid(''); // Clear errors when switching tabs
+    clear();
   };
 
   return (
@@ -277,8 +197,8 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
           <TabPanel value="signin">
             <GoogleSignInSection
               onClick={handleGoogleSignIn}
-              disabled={isLoading || signInWithGoogle.isPending}
-              isPending={signInWithGoogle.isPending}
+              disabled={isLoading}
+              isPending={isLoading}
               dividerText="Or continue with email"
             />
 
@@ -320,8 +240,8 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
           <TabPanel value="signup">
             <GoogleSignInSection
               onClick={handleGoogleSignIn}
-              disabled={isLoading || signInWithGoogle.isPending}
-              isPending={signInWithGoogle.isPending}
+              disabled={isLoading}
+              isPending={isLoading}
               dividerText="Or create account with email"
             />
 
@@ -385,14 +305,14 @@ export default function SignInModal({ isOpen, onClose, onSuccess }: SignInModalP
                     value={resetForm.email}
                     onChange={resetForm.setEmail}
                     placeholder="Enter your email"
-                    disabled={sendPasswordReset.isPending}
+                    disabled={isLoading}
                   />
                 </FormField>
 
                 <ErrorDisplay error={error} />
 
-                <Button type="submit" disabled={sendPasswordReset.isPending || !resetForm.isValid}>
-                  {sendPasswordReset.isPending ? 'Sending...' : 'Send Reset Email'}
+                <Button type="submit" disabled={isLoading || !resetForm.isValid}>
+                  {isLoading ? 'Sending...' : 'Send Reset Email'}
                 </Button>
 
                 <Button type="button" onClick={() => setActiveTab('signin')} variant="ghost">

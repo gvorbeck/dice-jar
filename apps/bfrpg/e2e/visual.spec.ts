@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import type { Page, TestInfo } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 // Look baseline for the style conversion, chromium only.
 //   VISUAL=1 npx playwright test visual --project=chromium            writes full-page PNGs to e2e/visual.spec.ts-snapshots/ (git-ignored)
@@ -16,7 +17,7 @@ test.describe('look baseline', () => {
       test.use({ viewport: size, reducedMotion: 'reduce' });
 
       const shot = async (page: Page, name: string, info: TestInfo) => {
-        await page.waitForLoadState('networkidle');
+        await expect(page.getByText(/^Loading/)).toHaveCount(0); // live listeners keep a connection open, so the network is never idle
         await page.waitForFunction(() => [...document.images].every((i) => i.complete)); // avatars load lazily
         await page.mouse.move(0, 0); // a hovered button changes its shadow
         // a modal sits in the viewport; a full-page capture would resize it
@@ -33,7 +34,7 @@ test.describe('look baseline', () => {
         await page.goto('/');
         if (tab) await page.getByRole('tab', { name: tab }).click();
         const href = await page.locator(`a[href^="/u/"][href*="${pattern}"]`).first().getAttribute('href');
-        if (!href) throw new Error(`no link containing ${pattern} on the home page; is the mock data loaded?`);
+        if (!href) throw new Error(`no link containing ${pattern} on the home page; is the sample data seeded?`);
         return href;
       };
 

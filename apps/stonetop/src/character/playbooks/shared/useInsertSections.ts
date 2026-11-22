@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useLatest } from '@/lib/useLatest';
+import { useLatest } from '@dice-jar/browser';
 import { useOptimisticField } from '@/lib/useOptimisticField';
 import { resolvePlaybookFeatures } from '@/lib/resolvePlaybookFeatures';
 import { useCrewSave } from './useCrewSave';

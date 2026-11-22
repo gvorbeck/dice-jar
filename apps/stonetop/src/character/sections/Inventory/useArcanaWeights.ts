@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useToastOptional } from '@/ui/Toast/ToastContext';
+import { useToastOptional } from '@dice-jar/browser';
 import type { ArcanaMinorEntry, ArcanaMajorEntry } from '@/model';
 
 // Inventory needs each carried arcanum's name and weight, but those live in the large

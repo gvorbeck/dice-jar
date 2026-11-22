@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useDataResolver } from '../queries/useDataResolver';
 import type { CharacterListItem } from '@/services';
 import type { Game } from '@/types';
-import { logger } from '@/utils';
 
 interface UsePlayerCharactersReturn {
   playerCharacters: CharacterListItem[];
@@ -27,7 +26,6 @@ export const usePlayerCharacters = (game: Game): UsePlayerCharactersReturn => {
 
   // Transform resolved data to match CharacterListItem interface
   const gamePlayers = game?.players;
-  const gameName = game?.name;
 
   const playerCharacters = useMemo(() => {
     if (!gamePlayers?.length) return [];
@@ -49,14 +47,8 @@ export const usePlayerCharacters = (game: Game): UsePlayerCharactersReturn => {
       return character;
     });
 
-    logger.debug('Generated player characters from resolved data', {
-      gameId: gameName || 'unnamed-game',
-      playerCount: gamePlayers.length,
-      resolvedCharacterCount: characters.length,
-    });
-
     return characters;
-  }, [gamePlayers, gameName, getResolvedData]);
+  }, [gamePlayers, getResolvedData]);
 
   return {
     playerCharacters,

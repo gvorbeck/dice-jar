@@ -4,7 +4,7 @@ import { db } from '@/lib/firebase';
 import { FIREBASE_COLLECTIONS } from '@/constants';
 import type { Character } from '@/types';
 import { processCharacterData, isLegacyCharacter, CURRENT_VERSION } from './characterMigration';
-import { handleServiceError, logger } from '@/utils';
+import { handleServiceError } from '@/utils';
 import { forget, remember, saveDiff } from './diffSave';
 
 // Simple interface for listing characters - we don't need the full Character type
@@ -25,7 +25,7 @@ const slot = (userId: string, characterId: string) => `characters/${userId}/${ch
 
 /** Saves a character that was stored in an older shape back in the current one. */
 const persistMigration = (ref: DocumentReference, migrated: Character) =>
-  setDoc(ref, migrated).catch((error) => logger.error(`Failed to persist migration for character ${ref.id}:`, error));
+  setDoc(ref, migrated).catch((error) => console.error(`Failed to persist migration for character ${ref.id}:`, error));
 
 const toListItem = (id: string, data: Record<string, unknown>): CharacterListItem => {
   const item: CharacterListItem = { id, name: (data['name'] as string) || 'Unnamed Character' };
@@ -46,7 +46,6 @@ export const watchUserCharacters = (userId: string, ok: (characters: CharacterLi
         snapshot.docs.map((d) => {
           const data = d.data();
           if (!isLegacyCharacter(data)) return toListItem(d.id, data);
-          logger.info(`Migrating legacy character in list: ${data['name'] || d.id}`);
           const migrated = processCharacterData(data);
           void persistMigration(d.ref, migrated);
           return toListItem(d.id, migrated as unknown as Record<string, unknown>);
@@ -91,7 +90,6 @@ export const saveCharacter = async (userId: string, character: Character, charac
     const dataToSave = { ...character, settings: { ...character.settings, version: CURRENT_VERSION } };
     const ref = characterId ? characterRef(userId, characterId) : doc(charactersRef(userId));
     await saveDiff(ref, slot(userId, ref.id), dataToSave as unknown as Record<string, unknown>, Boolean(characterId));
-    logger.info(`Successfully saved character ${ref.id}`);
     return ref.id;
   } catch (error) {
     handleServiceError(error, { action: 'saving character', context: { userId, characterId, characterName: character.name } });
@@ -103,7 +101,6 @@ export const deleteCharacter = async (userId: string, characterId: string): Prom
   try {
     await deleteDoc(characterRef(userId, characterId));
     forget(slot(userId, characterId));
-    logger.info(`Successfully deleted character ${characterId}`);
   } catch (error) {
     handleServiceError(error, { action: 'deleting character', context: { userId, characterId } });
   }

@@ -2,10 +2,10 @@
 export { useAuth } from './auth';
 
 // UI hooks
-export { useModal, useLoadingState, useNotificationContext, useInitialLoadingState } from './ui';
+export { useModal, useInitialLoadingState } from './ui';
 
 // Form and validation hooks
-export { useFormValidation, useDebounce, useDebouncedUpdate, useValidationAnnouncements } from './forms';
+export { useFormValidation, useDebounce, useValidationAnnouncements } from './forms';
 
 // Character hooks
 export { useCharacterCard, usePlayerCharacters, useHPGain } from './character';
@@ -27,7 +27,6 @@ export { useStepAnnouncements } from './a11y';
 
 // TanStack Query hooks (enhanced with error handling)
 export { useDataResolver } from './queries';
-export { useAuthMutations } from './mutations';
 
 // Enhanced error handling and offline hooks
 export { useNetworkStatus } from './network/useNetworkStatus';

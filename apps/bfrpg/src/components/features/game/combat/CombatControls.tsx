@@ -4,7 +4,6 @@ import './Combat.css';
 
 interface CombatControlsProps {
   isCombatActive: boolean;
-  isLoading: boolean;
   currentCombatantsCount: number;
   currentCombatant?:
     | {
@@ -20,7 +19,6 @@ interface CombatControlsProps {
 
 export default function CombatControls({
   isCombatActive,
-  isLoading,
   currentCombatantsCount,
   currentCombatant,
   round,
@@ -34,12 +32,8 @@ export default function CombatControls({
       <Card size="compact" variant="nested" className="combat-bar">
         <div className="combat-bar-controls">
           {!isCombatActive ? (
-            <Button
-              onClick={onStartCombat}
-              disabled={isLoading || currentCombatantsCount === 0 || !allCombatantsHaveInitiative}
-              variant="primary"
-            >
-              {isLoading ? 'Initializing...' : 'Start Combat'}
+            <Button onClick={onStartCombat} disabled={currentCombatantsCount === 0 || !allCombatantsHaveInitiative} variant="primary">
+              Start Combat
             </Button>
           ) : (
             <>

@@ -1,10 +1,9 @@
 /**
  * Game mechanics utilities - consolidated from dice.ts, combatUtils.ts, and gameConstants.ts
- * Contains dice rolling, combat mechanics, and game constants
+ * Contains combat mechanics and game constants
  */
 
-import { rollNotation } from '@dice-jar/dice';
-import type { DiceResult, CombatCharacterData, CombatantHP, CombatantWithInitiative } from '@/types';
+import type { CombatCharacterData, CombatantHP, CombatantWithInitiative } from '@/types';
 
 // ============================================================================
 // GAME CONSTANTS
@@ -43,20 +42,6 @@ export const ENCUMBRANCE = {
 } as const;
 
 // ============================================================================
-// DICE ROLLING SYSTEM
-// ============================================================================
-
-export function roller(formula: string): DiceResult {
-  const parsed = rollNotation(formula);
-  if (!parsed.ok) throw new Error(`Invalid dice formula: ${formula}. ${parsed.error}`);
-  return { total: parsed.outcome.total, formula, breakdown: parsed.outcome.breakdown };
-}
-
-export function rollPercentage(): number {
-  return roller('1d100').total;
-}
-
-// ============================================================================
 // COMBAT UTILITIES
 // ============================================================================
 
@@ -89,24 +74,5 @@ export function sortCombatantsByInitiative(combatants: CombatantWithInitiative[]
       return (b._sortId || 0) - (a._sortId || 0);
     }
     return b.initiative - a.initiative;
-  });
-}
-
-export function rollInitiative(): number {
-  return roller('1d6').total;
-}
-
-export function clearCorruptedCombatData(gameId: string): void {
-  const keys = [`combat-tracker-${gameId || 'temp'}`, `pre-combat-initiatives-${gameId || 'temp'}`];
-
-  keys.forEach((key) => {
-    try {
-      const item = localStorage.getItem(key);
-      if (item && item.includes('undefined')) {
-        localStorage.removeItem(key);
-      }
-    } catch {
-      localStorage.removeItem(key);
-    }
   });
 }

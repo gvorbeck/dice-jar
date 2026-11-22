@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { useNotificationContext } from '@/hooks';
-import { getRandomTableResult, rollForEncounter, delay, createCombatantFromEncounter, logger } from '@/utils';
+import { useToast } from '@dice-jar/browser';
+import { getRandomTableResult, rollForEncounter, delay, createCombatantFromEncounter } from '@/utils';
 import type { GameCombatant } from '@/types';
 import { ENCOUNTER_CONSTANTS } from '@/constants';
 
@@ -15,7 +15,7 @@ export function useEncounterGeneration({ currentTable, onAddToCombat, onOpenComb
   const [encounterOccurs, setEncounterOccurs] = useState<boolean | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const { showSuccess, showError, showInfo } = useNotificationContext();
+  const { addToast } = useToast();
 
   // Function to add encounter to combat tracker
   const handleAddToCombatTracker = useCallback(() => {
@@ -24,10 +24,7 @@ export function useEncounterGeneration({ currentTable, onAddToCombat, onOpenComb
     const combatant = createCombatantFromEncounter(currentEncounter);
     onAddToCombat(combatant);
 
-    showSuccess(`${combatant.name} added to Combat Tracker`, {
-      title: 'Added to Combat',
-      duration: 3000,
-    });
+    addToast(`${combatant.name} added to Combat Tracker`, 'success');
 
     // Optionally open the combat tracker
     if (onOpenCombatTracker) {
@@ -35,13 +32,11 @@ export function useEncounterGeneration({ currentTable, onAddToCombat, onOpenComb
         onOpenCombatTracker();
       }, 500); // Small delay to let the user see the success notification
     }
-  }, [currentEncounter, onAddToCombat, onOpenCombatTracker, showSuccess]);
+  }, [currentEncounter, onAddToCombat, onOpenCombatTracker, addToast]);
 
   const generateEncounter = useCallback(async () => {
     if (!currentTable.length) {
-      showError('No encounter table available for the selected type.', {
-        title: 'Generation Error',
-      });
+      addToast('No encounter table available for the selected type.', 'error');
       return;
     }
 
@@ -66,34 +61,23 @@ export function useEncounterGeneration({ currentTable, onAddToCombat, onOpenComb
         await delay(ENCOUNTER_CONSTANTS.RESULT_DELAY);
         if (encounter) {
           setCurrentEncounter(encounter);
-          showSuccess(`Encounter generated: ${encounter}`, {
-            title: 'Encounter!',
-            duration: 5000,
-          });
+          addToast(`Encounter generated: ${encounter}`, 'success');
         } else {
-          showError('Failed to select encounter from table.', {
-            title: 'Generation Error',
-          });
+          addToast('Failed to select encounter from table.', 'error');
         }
       } else {
-        showInfo('No encounter occurs this time.', {
-          title: 'Peaceful Travel',
-          duration: 3000,
-        });
+        addToast('No encounter occurs this time.', 'info');
       }
     } catch (error) {
-      logger.error('Error generating encounter:', error);
-      showError(error instanceof Error ? error.message : 'An unknown error occurred while generating the encounter.', {
-        title: 'Generation Failed',
-        dismissible: true,
-      });
+      console.error('Error generating encounter:', error);
+      addToast(error instanceof Error ? error.message : 'An unknown error occurred while generating the encounter.', 'error');
       // Reset states on error
       setEncounterOccurs(null);
       setCurrentEncounter(null);
     } finally {
       setIsGenerating(false);
     }
-  }, [currentTable, showSuccess, showError, showInfo]);
+  }, [currentTable, addToast]);
 
   const resetEncounter = useCallback(() => {
     setCurrentEncounter(null);

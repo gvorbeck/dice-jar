@@ -1,10 +1,12 @@
 import { useMemo, useCallback } from 'react';
 import type { CharacterListItem } from '@/services';
-import { useNotificationContext } from '@/hooks';
+import { useCopy } from '@dice-jar/browser';
+import { useToast } from '@dice-jar/browser';
 import { getRaceById, getClassById, isCustomClass, isCustomRace } from '@/utils';
 
 export function useCharacterCard(character: CharacterListItem) {
-  const { showSuccess, showError } = useNotificationContext();
+  const { addToast } = useToast();
+  const [, copy] = useCopy();
 
   // Memoized race name lookup for performance
   const raceName = useMemo(() => {
@@ -41,18 +43,10 @@ export function useCharacterCard(character: CharacterListItem) {
 
   const handleCopyUrl = useCallback(
     async (url: string, characterName: string) => {
-      try {
-        await navigator.clipboard.writeText(url);
-        showSuccess(`Character sheet URL copied for ${characterName}`, {
-          duration: 3000,
-        });
-      } catch {
-        showError('Failed to copy URL to clipboard', {
-          duration: 5000,
-        });
-      }
+      if (await copy(url)) addToast(`Character sheet URL copied for ${characterName}`, 'success');
+      else addToast('Failed to copy URL to clipboard', 'error');
     },
-    [showSuccess, showError],
+    [copy, addToast],
   );
 
   return {

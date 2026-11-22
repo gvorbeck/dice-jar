@@ -1,19 +1,9 @@
-import {
-  FieldPath,
-  arrayRemove,
-  arrayUnion,
-  deleteField,
-  doc,
-  getDoc,
-  onSnapshot,
-  setDoc,
-  writeBatch,
-  type Unsubscribe,
-} from 'firebase/firestore';
+import { FieldPath, arrayRemove, arrayUnion, doc, getDoc, onSnapshot, setDoc, writeBatch, type Unsubscribe } from 'firebase/firestore';
 import { characterFrom, newCharacter, parseCharacter, type Character } from '@/model/character';
 import { advanceSkills, parseLive, type Live } from '@/model/live';
 import { professionOf } from '@/rules';
-import { REMOVED, at, diffPaths, setDelta } from '@dice-jar/diff';
+import { REMOVED, at, diffPaths, setDelta, type Change } from '@dice-jar/diff';
+import { updatePairs } from '@dice-jar/firebase';
 import { db } from './firebase';
 import { agentRef, agentsCol } from './games';
 
@@ -64,16 +54,16 @@ function saveField(g: string, a: string, field: 'character' | 'live', value: unk
   // shortcut: with no live sheet on the server yet, the first one is written whole, so if the Discord bot or another device writes
   // one in the same second, the last write wins (watchLive merges any that arrive first). A transaction would close it, but not offline.
   const leaves = diffPaths(before, value); // one whole-value leaf when `before` is missing or null
-  const main: Pairs = [],
+  const isSet = ([path, v]: Change) => v !== REMOVED && field === 'live' && LIVE_SETS.includes(path.join('.'));
+  const plain = leaves.filter((l) => !isSet(l));
+  const main: Pairs = plain.length ? updatePairs(plain, [field]) : [],
     removals: Pairs = [];
-  for (const [path, v] of leaves) {
+  for (const [path, v] of leaves.filter(isSet)) {
     const fp = new FieldPath(field, ...path);
-    if (v !== REMOVED && field === 'live' && LIVE_SETS.includes(path.join('.'))) {
-      // Union and remove can't touch one field in one update, so removals go in a second write of the same batch.
-      const { add, remove } = setDelta(at(before, path), v);
-      if (add.length) main.push(fp, arrayUnion(...add));
-      if (remove.length) removals.push(fp, arrayRemove(...remove));
-    } else main.push(fp, v === REMOVED ? deleteField() : v);
+    // Union and remove can't touch one field in one update, so removals go in a second write of the same batch.
+    const { add, remove } = setDelta(at(before, path), v);
+    if (add.length) main.push(fp, arrayUnion(...add));
+    if (remove.length) removals.push(fp, arrayRemove(...remove));
   }
   const batch = writeBatch(db);
   const update = (p: Pairs) => {

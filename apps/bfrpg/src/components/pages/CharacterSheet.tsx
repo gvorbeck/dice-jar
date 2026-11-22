@@ -26,7 +26,7 @@ import { useEnhancedCharacterSheet } from '@/hooks/queries/useEnhancedQueries';
 import { useCharacterMutations } from '@/hooks/mutations/useEnhancedMutations';
 import { useDiceRoller } from '@/hooks/dice/useDiceRoller';
 import type { Character, Equipment as EquipmentItem } from '@/types';
-import { canCastSpells, hasCantrips, hasSpells, calculateModifier, getClassById, logger } from '@/utils';
+import { canCastSpells, hasCantrips, hasSpells, calculateModifier, getClassById } from '@/utils';
 import './CharacterSheet.css';
 
 export default function CharacterSheet() {
@@ -183,9 +183,6 @@ export default function CharacterSheet() {
   const hasSpellsSection = hasSpells(character) || hasCantrips(character) || canCastSpells(character);
 
   // Development-only character logging
-  if (import.meta.env.DEV) {
-    logger.info(JSON.stringify(character));
-  }
 
   return (
     <>

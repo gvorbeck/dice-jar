@@ -6,7 +6,6 @@ import type { Character, Equipment, EquipmentPack, PackApplicationResult, Restri
 import { allClasses } from '@/data';
 import { convertToGoldFromAbbreviation, formatCurrency } from '@/utils/currency';
 import { CURRENCY_TYPES, WEAPON_ID_MAPPING, ARMOR_ID_MAPPING } from '@/constants';
-import { logger } from './data';
 import equipmentData from '@/data/equipment/equipment.json';
 import equipmentPacks from '@/data/equipment/equipmentPacks.json';
 
@@ -86,8 +85,6 @@ function initializeEquipmentMaps() {
       equipmentLookupMapById!.set(item['id'], itemRecord);
     }
   });
-
-  logger.info(`Initialized equipment lookup with ${equipmentLookupMapById.size} items`);
 }
 
 /**

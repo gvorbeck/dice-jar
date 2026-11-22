@@ -2,7 +2,6 @@
  * Core validation engine with development-only runtime checks
  */
 
-import { logger } from '@/utils';
 import type { ValidationRule, ValidationSchema, ValidationResult, ValidationContext } from '@/types/validation';
 
 // Development-only validation context
@@ -50,7 +49,7 @@ export function validate<T>(value: T, schema: ValidationSchema<T>, context: Vali
 
       // Only log in development
       if (context.isDevelopment) {
-        logger.error(`Validation rule "${rule.name}" failed:`, error);
+        console.error(`Validation rule "${rule.name}" failed:`, error);
       }
     }
   }

@@ -6,7 +6,7 @@ import { toastModuleMock } from '@/test/toastMock';
 // useOptimisticField (via SteadingNPCs) pulls useToast from @/components/app.
 // Mock the barrel so no ToastProvider is needed (its auto-dismiss timer would
 // otherwise risk hanging teardown).
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
 
 import { SteadingNPCs } from '../SteadingNPCs';
 import type { GameSession, SteadingNPC, SteadingData } from '@/model';

@@ -5,7 +5,7 @@ import { addToastSpy, toastModuleMock } from '@/test/toastMock';
 
 // The modal's only context dependency is useToast; mock it so no ToastProvider
 // is needed (and its auto-dismiss timer can't hang teardown).
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
 
 import { RemoveCharacterModal } from '../RemoveCharacterModal';
 import type { Character } from '@/model';

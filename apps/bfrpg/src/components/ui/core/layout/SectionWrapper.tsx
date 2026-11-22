@@ -2,7 +2,7 @@ import { forwardRef, useState, useCallback } from 'react';
 import { SectionHeader } from '@/components';
 import { cn } from '@dice-jar/cn';
 import './SectionWrapper.css';
-import { useUiStore } from '@/stores';
+import { store } from '@dice-jar/browser';
 
 interface SectionWrapperProps {
   title: React.ReactNode;
@@ -15,27 +15,18 @@ interface SectionWrapperProps {
 
 const SectionWrapper = forwardRef<HTMLDivElement, SectionWrapperProps>(
   ({ title, className, size = 'md', children, collapsible = false, collapsibleKey }, ref) => {
-    // Use Zustand store to persist collapse state if collapsibleKey is provided
-    const collapsedSections = useUiStore((state) => state.collapsedSections);
-    const setSectionCollapsed = useUiStore((state) => state.setSectionCollapsed);
-
-    // Use local state if no collapsibleKey provided
-    const [localCollapsed, setLocalCollapsed] = useState(false);
-
-    // Determine which state to use
-    const isCollapsed = collapsibleKey ? collapsedSections[collapsibleKey] || false : localCollapsed;
+    // With a key, the choice is remembered across visits.
+    const storageKey = collapsibleKey && `section-collapsed:${collapsibleKey}`;
+    const [isCollapsed, setIsCollapsed] = useState(() => (storageKey ? store.get(storageKey) === '1' : false));
 
     const toggleCollapse = useCallback(
       (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
-        if (collapsibleKey) {
-          setSectionCollapsed(collapsibleKey, !isCollapsed);
-        } else {
-          setLocalCollapsed(!isCollapsed);
-        }
+        setIsCollapsed(!isCollapsed);
+        if (storageKey) store.set(storageKey, isCollapsed ? '0' : '1');
       },
-      [isCollapsed, collapsibleKey, setSectionCollapsed, setLocalCollapsed],
+      [isCollapsed, storageKey],
     );
 
     // Create collapse button as extra content if collapsible

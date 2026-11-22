@@ -3,8 +3,8 @@ import { renderHook } from '@testing-library/react';
 
 const { watchCharacter, watchGame } = vi.hoisted(() => ({ watchCharacter: vi.fn(() => () => {}), watchGame: vi.fn(() => () => {}) }));
 vi.mock('@/services', () => ({ watchCharacter, watchGame, watchUserCharacters: vi.fn(), watchUserGames: vi.fn() }));
-vi.mock('@/hooks', () => ({ useAuth: () => ({ user: { uid: 'u' } }), useNotificationContext: () => ({}) }));
-vi.mock('@/lib/globalErrorHandler', () => ({ createMutationHandlers: () => ({ queryError: vi.fn() }) }));
+vi.mock('@/hooks', () => ({ useAuth: () => ({ user: { uid: 'u' } }) }));
+vi.mock('@dice-jar/browser', async (orig) => ({ ...(await orig<object>()), useToast: () => ({ addToast: vi.fn() }) }));
 
 import { useEnhancedCharacterSheet, useEnhancedGame } from './useEnhancedQueries';
 

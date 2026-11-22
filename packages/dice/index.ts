@@ -186,6 +186,13 @@ export const rollNotation = (input: string, rng: Rng = Math.random): DiceRollPar
   }
 };
 
+/** Rolls notation the app wrote itself (a fixed "1d20", a hit die from rules data), where bad notation is a bug: throws instead of returning it. */
+export const roll = (notation: string, rng: Rng = Math.random): DiceRollOutcome => {
+  const parsed = rollNotation(notation, rng);
+  if (!parsed.ok) throw new Error(`Invalid dice notation "${notation}": ${parsed.error}`);
+  return parsed.outcome;
+};
+
 // A trailing dice term with no modifiers, e.g. the "2d6" in "1d8+2d6", so tapping d6 again can bump it
 // to "3d6" instead of appending "+d6". Group 1 is whatever precedes the count, 2 the count, 3 the sides.
 const TRAILING_DICE = /^(.*?(?:^|[+-]))(\d*)d(\d+)$/;

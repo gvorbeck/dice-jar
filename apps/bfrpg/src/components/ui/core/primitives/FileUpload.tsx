@@ -1,4 +1,3 @@
-import { logger } from '@/utils';
 import { cn } from '@dice-jar/cn';
 import React, { useRef, useState, useId } from 'react';
 import Button from './Button';
@@ -73,7 +72,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const validationError = validateFile(file);
     if (validationError) {
       // Could trigger an error callback here if needed
-      logger.error('File validation error:', validationError);
+      console.error('File validation error:', validationError);
       return;
     }
 

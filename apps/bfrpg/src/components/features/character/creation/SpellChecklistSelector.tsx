@@ -4,7 +4,6 @@ import { Icon } from '@/components/ui';
 import { InfoCardHeader, MarkdownText } from '@/components/ui/composite';
 import { TextInput, Checkbox } from '@/components/ui/core/primitives';
 import type { Character, Spell } from '@/types';
-import { logger } from '@/utils';
 import './SpellChecklistSelector.css';
 
 interface SpellChecklistSelectorProps {
@@ -62,7 +61,6 @@ export function SpellChecklistSelector({
 
   const handleSpellToggle = useCallback(
     (spell: Spell, checked: boolean) => {
-      logger.info(JSON.stringify(character.spells));
       const currentSpells = character.spells || [];
 
       if (checked) {

@@ -23,7 +23,6 @@ interface AddCharProps {
 
 export const AddChar = memo(({ onAddPlayer, className = '', disabled = false, existingPlayers = [] }: AddCharProps) => {
   const [url, setUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Check if character is already in the game
@@ -75,7 +74,6 @@ export const AddChar = memo(({ onAddPlayer, className = '', disabled = false, ex
       return;
     }
 
-    setIsLoading(true);
     setError('');
 
     // Create a GamePlayer object with the parsed IDs
@@ -89,17 +87,16 @@ export const AddChar = memo(({ onAddPlayer, className = '', disabled = false, ex
 
     // Clear the input on success
     setUrl('');
-    setIsLoading(false);
   }, [url, parseCharacterUrl, onAddPlayer, isCharacterDuplicate]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Enter' && !disabled && !isLoading) {
+      if (event.key === 'Enter' && !disabled) {
         event.preventDefault();
         handleAddCharacter();
       }
     },
-    [handleAddCharacter, disabled, isLoading],
+    [handleAddCharacter, disabled],
   );
 
   return (
@@ -114,21 +111,14 @@ export const AddChar = memo(({ onAddPlayer, className = '', disabled = false, ex
               onChange={setUrl}
               onKeyDown={handleKeyDown}
               placeholder="Enter character URL (e.g., http://codex.quest/u/.../c/...)"
-              disabled={disabled || isLoading}
+              disabled={disabled}
               error={!!error}
               aria-label="Character URL"
               {...(error && { 'aria-describedby': 'add-char-error' })}
             />
           </div>
 
-          <Button
-            onClick={handleAddCharacter}
-            disabled={disabled || isLoading || !url.trim()}
-            loading={isLoading}
-            loadingText="Adding..."
-            variant="primary"
-            size="md"
-          >
+          <Button onClick={handleAddCharacter} disabled={disabled || !url.trim()} variant="primary" size="md">
             Add Character
           </Button>
         </div>

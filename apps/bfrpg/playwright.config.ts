@@ -27,21 +27,11 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
 
-  /* Configure projects for major browsers */
+  // Chromium only, like the repo's other apps.
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-    },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
     },
 
     /* Test against mobile viewports. */
@@ -65,11 +55,10 @@ export default defineConfig({
     // },
   ],
 
-  /* Run your local dev server before starting the tests */
+  // `npm run test:e2e` starts the Auth and Firestore emulators, then this starts the app pointed at them (.env.emulator).
   webServer: {
-    command: 'VITE_MOCK_FIREBASE=true npm run dev',
+    command: 'npx vite --mode emulator --port 5173 --strictPort',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000, // 2 minutes timeout for dev server to start
   },
 });

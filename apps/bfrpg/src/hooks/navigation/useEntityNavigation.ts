@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { store } from '@dice-jar/browser';
 import { STORAGE_KEYS } from '@/constants';
 
 interface EntityNavigationConfig {
@@ -20,7 +21,7 @@ function useEntityNavigation(config: EntityNavigationConfig) {
     (userId: string, entityId: string) => {
       // Clear localStorage data for fresh start
       config.storageKeysToClear.forEach((key) => {
-        localStorage.removeItem(key);
+        store.remove(key);
       });
 
       // Navigate to the entity sheet
@@ -35,7 +36,7 @@ function useEntityNavigation(config: EntityNavigationConfig) {
       // Clear localStorage data for fresh start
       if (clearStorageOnly) {
         config.storageKeysToClear.forEach((key) => {
-          localStorage.removeItem(key);
+          store.remove(key);
         });
       }
 

@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
-import { useSub, type Sub } from '@dice-jar/browser';
-import { useNotificationContext, useAuth } from '@/hooks';
-import { createMutationHandlers } from '@/lib/globalErrorHandler';
+import { useSub, useToast, type Sub } from '@dice-jar/browser';
+import { useAuth } from '@/hooks';
 import { watchUserCharacters, watchCharacter, watchUserGames, watchGame } from '@/services';
 import type { Character, Game } from '@/types';
 import type { CharacterListItem } from '@/services/characters';
@@ -24,12 +23,14 @@ const subGame: Sub<Game | null> = (key, ok, bad) => {
   return p ? watchGame(...p, ok, bad) : nothing();
 };
 
-/** Shows a load failure once, in the app's notification style. */
+/** Shows a load failure once, as a toast. */
 function useReportError(error: Error | undefined, entityType: string) {
-  const { queryError } = createMutationHandlers(useNotificationContext());
+  const { addToast } = useToast();
   useEffect(() => {
-    if (error) queryError(error, { entityType });
-  }, [error, entityType, queryError]);
+    if (!error) return;
+    const denied = (error as { code?: string }).code === 'permission-denied';
+    addToast(denied ? "You don't have permission to see this." : `Failed to load ${entityType}. Please try again.`, 'error');
+  }, [error, entityType, addToast]);
 }
 
 /** The signed-in user's characters, live. */

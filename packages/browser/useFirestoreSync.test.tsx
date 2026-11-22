@@ -1,7 +1,8 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useRef } from 'react';
-import { useFirestoreSync } from '../useFirestoreSync';
+import { useFirestoreSync } from './useFirestoreSync';
 
 afterEach(() => {
   vi.restoreAllMocks();

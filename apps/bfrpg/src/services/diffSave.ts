@@ -1,5 +1,6 @@
-import { FieldPath, deleteField, getDoc, setDoc, updateDoc, type DocumentReference } from 'firebase/firestore';
-import { REMOVED, diffPaths } from '@dice-jar/diff';
+import { getDoc, setDoc, updateDoc, type DocumentReference } from 'firebase/firestore';
+import { diffPaths } from '@dice-jar/diff';
+import { updatePairs } from '@dice-jar/firebase';
 
 /**
  * What this tab last read or wrote, per document. A save sends only the fields that differ from it, so another device
@@ -33,8 +34,7 @@ export async function saveDiff(ref: DocumentReference, key: string, next: Record
     }
     const leaves = diffPaths(before, next);
     if (!leaves.length) return;
-    const [first, ...rest] = leaves.flatMap(([path, value]) => [new FieldPath(...path), value === REMOVED ? deleteField() : value]);
-    await updateDoc(ref, first as FieldPath, rest[0], ...rest.slice(1));
+    await updateDoc(ref, ...updatePairs(leaves));
   } catch (error) {
     if (known.get(key) === next) {
       if (before === undefined) known.delete(key);

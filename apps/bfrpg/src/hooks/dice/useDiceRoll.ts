@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { useNotificationContext } from '../ui';
-import { roller } from '@/utils';
+import { useToast } from '@dice-jar/browser';
+import { roll } from '@dice-jar/dice';
 
 // Constants for dice rolling
 const CRITICAL_SUCCESS = 20;
@@ -43,65 +43,55 @@ interface PercentileRollOptions {
 type RollOptions = AttackRollOptions | SavingThrowRollOptions | AbilityRollOptions | PercentileRollOptions;
 
 export function useDiceRoll() {
-  const notifications = useNotificationContext();
+  const { addToast } = useToast();
 
   const rollDice = useCallback(
     (options: RollOptions) => {
       try {
-        const roll = roller('1d20');
+        const d20 = roll('1d20');
 
         if (options.type === 'attack') {
           const { bonusType, bonus } = options;
-          const total = roll.total + bonus;
+          const total = d20.total + bonus;
           const formula = formatDiceFormula(bonus);
 
-          notifications.showSuccess(`${bonusType} Attack: ${formula} = ${roll.total}${bonus >= 0 ? '+' : ''}${bonus} = ${total}`, {
-            title: 'Attack Roll',
-          });
+          addToast(`${bonusType} Attack: ${formula} = ${d20.total}${bonus >= 0 ? '+' : ''}${bonus} = ${total}`, 'success', true);
         } else if (options.type === 'savingThrow') {
           const { saveName, targetNumber, modifier } = options;
           const actualModifier = modifier ?? 0;
-          const total = roll.total + actualModifier;
-          const isSuccess = total >= targetNumber || roll.total === CRITICAL_SUCCESS;
-          const isCriticalFailure = roll.total === CRITICAL_FAILURE;
+          const total = d20.total + actualModifier;
+          const isSuccess = total >= targetNumber || d20.total === CRITICAL_SUCCESS;
+          const isCriticalFailure = d20.total === CRITICAL_FAILURE;
 
           let resultMessage;
           if (actualModifier !== 0) {
             const formula = formatDiceFormula(actualModifier);
-            resultMessage = `${saveName}: ${formula} = ${roll.total}${
+            resultMessage = `${saveName}: ${formula} = ${d20.total}${
               actualModifier >= 0 ? '+' : ''
             }${actualModifier} = ${total} vs target ${targetNumber}`;
           } else {
-            resultMessage = `${saveName}: 1d20 = ${roll.total} vs target ${targetNumber}`;
+            resultMessage = `${saveName}: 1d20 = ${d20.total} vs target ${targetNumber}`;
           }
 
           if (isCriticalFailure) {
             resultMessage += ' - Critical Failure!';
-            notifications.showError(resultMessage, {
-              title: 'Saving Throw Failed',
-            });
+            addToast(resultMessage, 'error', true);
           } else if (isSuccess) {
             resultMessage += ' - Success!';
-            notifications.showSuccess(resultMessage, {
-              title: 'Saving Throw',
-            });
+            addToast(resultMessage, 'success', true);
           } else {
             resultMessage += ' - Failed';
-            notifications.showError(resultMessage, {
-              title: 'Saving Throw Failed',
-            });
+            addToast(resultMessage, 'error', true);
           }
         } else if (options.type === 'ability') {
           const { abilityName, modifier } = options;
-          const total = roll.total + modifier;
+          const total = d20.total + modifier;
           const formula = formatDiceFormula(modifier);
 
-          notifications.showSuccess(`${abilityName} Check: ${formula} = ${roll.total}${modifier >= 0 ? '+' : ''}${modifier} = ${total}`, {
-            title: 'Ability Check',
-          });
+          addToast(`${abilityName} Check: ${formula} = ${d20.total}${modifier >= 0 ? '+' : ''}${modifier} = ${total}`, 'success', true);
         } else if (options.type === 'percentile') {
           const { skillName, targetPercentage } = options;
-          const percentileRoll = roller('1d100');
+          const percentileRoll = roll('1d100');
           const result = percentileRoll.total;
 
           // Special cases: 01-05 always succeed, 96-100 always fail
@@ -113,43 +103,29 @@ export function useDiceRoll() {
 
           if (isAutoSuccess && result <= targetPercentage) {
             resultMessage += ' - Success!';
-            notifications.showSuccess(resultMessage, {
-              title: 'Skill Check',
-            });
+            addToast(resultMessage, 'success', true);
           } else if (isAutoSuccess) {
             resultMessage += ' - Critical Success!';
-            notifications.showSuccess(resultMessage, {
-              title: 'Skill Check',
-            });
+            addToast(resultMessage, 'success', true);
           } else if (isAutoFailure && result > targetPercentage) {
             resultMessage += ' - Failure';
-            notifications.showError(resultMessage, {
-              title: 'Skill Check Failed',
-            });
+            addToast(resultMessage, 'error', true);
           } else if (isAutoFailure) {
             resultMessage += ' - Critical Failure!';
-            notifications.showError(resultMessage, {
-              title: 'Skill Check Failed',
-            });
+            addToast(resultMessage, 'error', true);
           } else if (isSuccess) {
             resultMessage += ' - Success!';
-            notifications.showSuccess(resultMessage, {
-              title: 'Skill Check',
-            });
+            addToast(resultMessage, 'success', true);
           } else {
             resultMessage += ' - Failure';
-            notifications.showError(resultMessage, {
-              title: 'Skill Check Failed',
-            });
+            addToast(resultMessage, 'error', true);
           }
         }
       } catch {
-        notifications.showError('Failed to roll dice', {
-          title: 'Roll Error',
-        });
+        addToast('Failed to roll dice', 'error');
       }
     },
-    [notifications],
+    [addToast],
   );
 
   const rollAttack = useCallback(

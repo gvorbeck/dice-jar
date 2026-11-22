@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNotificationContext } from '@/hooks';
+import { useToast } from '@dice-jar/browser';
 
 export interface NetworkStatus {
   isOnline: boolean;
@@ -15,10 +15,8 @@ export function useNetworkStatus(): NetworkStatus {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSlowConnection, setIsSlowConnection] = useState(false);
   const [connectionType, setConnectionType] = useState<string | null>(null);
-  const [hasShownOfflineNotification, setHasShownOfflineNotification] = useState(false);
-  const [offlineNotificationId, setOfflineNotificationId] = useState<string | null>(null);
 
-  const notifications = useNotificationContext();
+  const { addToast } = useToast();
 
   useEffect(() => {
     const updateNetworkStatus = () => {
@@ -27,29 +25,8 @@ export function useNetworkStatus(): NetworkStatus {
 
       setIsOnline(currentlyOnline);
 
-      // Show offline notification when going offline
-      if (wasOnline && !currentlyOnline && !hasShownOfflineNotification) {
-        const notificationId = notifications.showWarning("You're currently offline. Changes will be saved when you reconnect.", {
-          title: 'Offline Mode',
-          duration: 0, // Keep visible until online
-        });
-        setOfflineNotificationId(notificationId);
-        setHasShownOfflineNotification(true);
-      }
-
-      // Show back online notification and dismiss offline notification
-      if (!wasOnline && currentlyOnline) {
-        if (offlineNotificationId) {
-          notifications.dismissNotification(offlineNotificationId);
-          setOfflineNotificationId(null);
-        }
-
-        notifications.showSuccess("You're back online! Any pending changes will be synced.", {
-          title: 'Back Online',
-          duration: 4000,
-        });
-        setHasShownOfflineNotification(false);
-      }
+      // Being offline shows as a banner for as long as it lasts (App); coming back is news, so it toasts.
+      if (!wasOnline && currentlyOnline) addToast("You're back online! Any pending changes will be synced.", 'success');
     };
 
     const updateConnectionInfo = () => {
@@ -91,7 +68,7 @@ export function useNetworkStatus(): NetworkStatus {
         connection.removeEventListener('change', updateConnectionInfo);
       }
     };
-  }, [isOnline, notifications, hasShownOfflineNotification, offlineNotificationId]);
+  }, [isOnline, addToast]);
 
   return {
     isOnline,

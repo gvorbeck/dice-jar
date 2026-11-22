@@ -3,7 +3,7 @@ import { HorizontalRule } from '@/components/ui/composite';
 import { SectionWrapper } from '@/components/ui/core/layout';
 import { TextArea } from '@/components/ui/core/primitives';
 import { Typography } from '@/components/ui/core/display';
-import { useDebouncedUpdate } from '@/hooks';
+import { useDebouncedTextField } from '@dice-jar/browser';
 import './GameNotesSection.css';
 
 interface GameNotesSectionProps {
@@ -14,15 +14,8 @@ interface GameNotesSectionProps {
 }
 
 export const GameNotesSection = memo(({ notes, showDivider = false, editable = false, onNotesChange }: GameNotesSectionProps) => {
-  // Use shared debounced update logic
-  const debouncedNotes = useDebouncedUpdate(notes || '', {
-    delay: 500,
-    onUpdate: (value: string) => {
-      if (onNotesChange) {
-        onNotesChange(value);
-      }
-    },
-  });
+  // Saves after typing pauses, and at once on blur
+  const debouncedNotes = useDebouncedTextField(notes || '', async (value) => onNotesChange?.(value), 500);
 
   // Show section if there are notes OR if it's editable (so user can add notes)
   if (!notes?.trim() && !editable) {
@@ -50,7 +43,7 @@ export const GameNotesSection = memo(({ notes, showDivider = false, editable = f
               />
               <div className="note-foot">
                 <span>{debouncedNotes.value.length} / 5000 characters</span>
-                <span>{debouncedNotes.isSaving ? 'Saving...' : 'Saves automatically after you stop typing (500ms)'}</span>
+                <span>{debouncedNotes.isPending ? 'Saving...' : 'Saves automatically after you stop typing (500ms)'}</span>
               </div>
             </div>
           ) : (

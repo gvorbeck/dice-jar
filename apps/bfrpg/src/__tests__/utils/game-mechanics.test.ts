@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { roller, GAME_MECHANICS } from '@/utils/mechanics';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { GAME_MECHANICS } from '@/utils/mechanics';
 import {
   cascadeValidateCharacter,
   hasValidAbilityScores,
@@ -12,65 +12,6 @@ import { createEmptyCharacter } from '@/utils';
 import type { Character, Race } from '@/types';
 
 describe('Game Mechanics Tests', () => {
-  describe('Dice Rolling Mechanics', () => {
-    it('handles standard dice notation correctly', () => {
-      // Mock Math.random for predictable results
-      const mockRandom = vi.spyOn(Math, 'random');
-      mockRandom.mockReturnValue(0.5); // Always roll middle value
-
-      const result = roller('3d6');
-
-      expect(result).toEqual(
-        expect.objectContaining({
-          formula: '3d6',
-          total: expect.any(Number),
-          breakdown: expect.any(String),
-        }),
-      );
-
-      expect(result.total).toBeGreaterThanOrEqual(3);
-      expect(result.total).toBeLessThanOrEqual(18);
-
-      mockRandom.mockRestore();
-    });
-
-    it('handles dice notation with modifiers', () => {
-      const mockRandom = vi.spyOn(Math, 'random');
-      mockRandom.mockReturnValue(0.5);
-
-      const result = roller('1d20+5');
-
-      expect(result.total).toBeGreaterThanOrEqual(6); // 1 + 5
-      expect(result.total).toBeLessThanOrEqual(25); // 20 + 5
-      expect(result.formula).toBe('1d20+5');
-
-      mockRandom.mockRestore();
-    });
-
-    it('handles complex dice expressions', () => {
-      const mockRandom = vi.spyOn(Math, 'random');
-      mockRandom.mockReturnValue(0.5);
-
-      const result = roller('2d8+1d4+2');
-
-      expect(result.total).toBeGreaterThanOrEqual(5); // 2 + 1 + 2
-      expect(result.total).toBeLessThanOrEqual(22); // 16 + 4 + 2
-      expect(result.formula).toBe('2d8+1d4+2');
-
-      mockRandom.mockRestore();
-    });
-
-    it('accepts the formulas the dice roller hint suggests', () => {
-      for (const f of ['1d20', '3d6+2', '4d6dl1', '2d20kh1']) expect(() => roller(f)).not.toThrow();
-    });
-
-    it('respects dice limits', () => {
-      // Test that invalid dice expressions are handled
-      expect(() => roller('101d6')).toThrow();
-      expect(() => roller('1d0')).toThrow();
-    });
-  });
-
   describe('Character Validation Mechanics', () => {
     let testCharacter: Character;
 

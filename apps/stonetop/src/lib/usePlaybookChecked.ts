@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
-import { useLatest } from './useLatest';
+import { useLatest } from '@dice-jar/browser';
 import { resolvePlaybookFeatures, featurePatch } from '@/lib/resolvePlaybookFeatures';
 import { useOptimisticField } from './useOptimisticField';
-import { useDebouncedSave } from './useDebouncedSave';
-import { useFirestoreSync } from './useFirestoreSync';
+import { useDebouncedSave } from '@dice-jar/browser';
+import { useFirestoreSync } from '@dice-jar/browser';
 import type { CharacterData, PlaybookFeatures } from '@/model';
 
 // Intentionally broad — callers are responsible for passing the right key type.

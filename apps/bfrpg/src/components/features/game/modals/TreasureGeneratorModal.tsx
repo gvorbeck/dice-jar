@@ -3,10 +3,10 @@ import { Modal } from '@/components/modals';
 import { Button, Select } from '@/components/ui/core/primitives';
 import { Typography, Card } from '@/components/ui/core/display';
 import { Icon, List, GridListItem, type IconName } from '@/components/ui/composite';
-import { ErrorBoundary } from '@dice-jar/browser';
+import { ErrorBoundary, useCopy } from '@dice-jar/browser';
 import { LoadingState } from '@/components/ui/core/feedback';
-import { useNotificationContext } from '@/hooks';
-import { generateTreasure, formatTreasureResult, logger, getCoinsToDisplay, hasCoins } from '@/utils';
+import { useToast } from '@dice-jar/browser';
+import { generateTreasure, formatTreasureResult, getCoinsToDisplay, hasCoins } from '@/utils';
 import { TREASURE_TYPES, LAIR_TREASURE_TYPES, INDIVIDUAL_TREASURE_TYPES, UNGUARDED_TREASURE_LEVELS } from '@/constants';
 import type { IndividualTreasureType, LairTreasureType, TreasureResult, TreasureType, UnguardedTreasureLevel } from '@/types';
 import '../GameButtons.css';
@@ -28,7 +28,9 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { showSuccess, showError } = useNotificationContext();
+  const { addToast } = useToast();
+
+  const [, copy] = useCopy();
 
   // Memoize treasure configuration for performance
   const treasureConfig = useMemo(
@@ -48,62 +50,23 @@ export default function TreasureGeneratorModal({ isOpen, onClose }: TreasureGene
       setGeneratedTreasure(treasure);
 
       // Provide success feedback
-      showSuccess('Treasure generated successfully!', {
-        duration: 3000,
-      });
+      addToast('Treasure generated successfully!', 'success');
     } catch (error) {
-      logger.error('Error generating treasure:', error);
+      console.error('Error generating treasure:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred while generating treasure';
       setError(errorMessage);
 
-      showError('Failed to generate treasure. Please try again.', {
-        title: 'Generation Error',
-        duration: 5000,
-      });
+      addToast('Failed to generate treasure. Please try again.', 'error');
     } finally {
       setIsGenerating(false);
     }
-  }, [treasureConfig, showSuccess, showError]);
+  }, [treasureConfig, addToast]);
 
   const handleCopy = useCallback(async () => {
     if (!generatedTreasure) return;
-
-    const formattedText = formatTreasureResult(generatedTreasure);
-
-    try {
-      await navigator.clipboard.writeText(formattedText);
-      showSuccess('Treasure copied to clipboard!', {
-        duration: 3000,
-      });
-    } catch (error) {
-      logger.error('Failed to copy treasure:', error);
-
-      try {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = formattedText;
-        textArea.style.position = 'fixed';
-        textArea.style.opacity = '0';
-        document.body.appendChild(textArea);
-        textArea.select();
-        const success = document.execCommand('copy');
-        document.body.removeChild(textArea);
-
-        if (success) {
-          showSuccess('Treasure copied to clipboard!', {
-            duration: 3000,
-          });
-        } else {
-          throw new Error('Fallback copy failed');
-        }
-      } catch {
-        showError('Failed to copy treasure to clipboard. Please select and copy manually.', {
-          title: 'Copy Failed',
-          duration: 5000,
-        });
-      }
-    }
-  }, [generatedTreasure, showSuccess, showError]);
+    if (await copy(formatTreasureResult(generatedTreasure))) addToast('Treasure copied to clipboard!', 'success');
+    else addToast('Failed to copy treasure to clipboard. Please select and copy manually.', 'error');
+  }, [generatedTreasure, copy, addToast]);
 
   const handleReset = useCallback(() => {
     setGeneratedTreasure(null);

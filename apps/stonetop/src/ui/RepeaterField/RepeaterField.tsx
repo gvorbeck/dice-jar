@@ -2,8 +2,8 @@ import { useState, useEffect, useRef, useCallback, useId, memo } from 'react';
 import { cn } from '@dice-jar/cn';
 import { Button } from '@/ui';
 import { Icon } from '@/ui';
-import { useDebouncedSave } from '@/lib/useDebouncedSave';
-import { useLatest } from '@/lib/useLatest';
+import { useDebouncedSave } from '@dice-jar/browser';
+import { useLatest } from '@dice-jar/browser';
 
 interface BaseItem {
   id: number;

@@ -3,8 +3,6 @@
  * Centralized design tokens, styling patterns, and UI configuration
  */
 
-import { isMockMode } from '@/lib/mockMode';
-
 // DOM Element Configuration
 export const DOM_IDS = {
   MAIN_CONTENT: 'main-content',
@@ -73,14 +71,6 @@ export const ABILITY_BADGE_VARIANTS = {
   'ghoul immunity': 'success',
 } as const;
 
-// Notification System Styling
-export const NOTIFICATION_CONSTANTS = {
-  ANIMATION_DURATION: 400,
-  DEFAULT_DURATION: 0,
-  FOCUS_DELAY: 100,
-  MAX_NOTIFICATIONS: 5,
-} as const;
-
 // Error and Loading Messages
 export const ERROR_MESSAGES = {
   gameNotFound: 'Game not found',
@@ -107,38 +97,8 @@ export interface AlertConfig {
 }
 
 /**
- * Alert for mock mode users
- */
-const MOCK_MODE_ALERT: AlertConfig = {
-  message: 'Running in mock mode - data is stored locally.',
-  type: 'warning',
-  dismissible: true,
-  autoHide: false,
-};
-
-/**
  * Get the appropriate alerts based on app state
  */
 export function getInitialAlerts(): AlertConfig[] {
-  const alerts: AlertConfig[] = [];
-
-  // Always show welcome alert first
-  // alerts.push(WELCOME_ALERT);
-
-  // Add mock mode alert if in mock mode
-  if (typeof window !== 'undefined') {
-    try {
-      if (isMockMode()) {
-        alerts.push(MOCK_MODE_ALERT);
-      }
-    } catch (error) {
-      // Fallback: if we can't determine mock mode, don't add the alert
-      // Use logger when available, otherwise silently fail
-      if (typeof error === 'object' && error !== null) {
-        // Silent fallback - don't show alert if we can't determine mode
-      }
-    }
-  }
-
-  return alerts;
+  return [];
 }

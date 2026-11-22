@@ -16,13 +16,11 @@ interface LanguageEditModalProps {
 export default function LanguageEditModal({ isOpen, onClose, character, onCharacterChange }: LanguageEditModalProps) {
   // Local state for editing
   const [localCharacter, setLocalCharacter] = useState<Character>(character);
-  const [isSaving, setIsSaving] = useState(false);
 
   // Reset local state when modal opens with new character data
   useEffect(() => {
     if (isOpen) {
       setLocalCharacter(character);
-      setIsSaving(false);
     }
   }, [isOpen, character]);
 
@@ -31,18 +29,10 @@ export default function LanguageEditModal({ isOpen, onClose, character, onCharac
     setLocalCharacter(updatedCharacter);
   }, []);
 
-  const handleSave = useCallback(async () => {
-    if (isSaving) return;
-
-    setIsSaving(true);
-    try {
-      // Save to Firebase and close modal
-      onCharacterChange(localCharacter);
-      onClose();
-    } finally {
-      setIsSaving(false);
-    }
-  }, [localCharacter, onCharacterChange, onClose, isSaving]);
+  const handleSave = useCallback(() => {
+    onCharacterChange(localCharacter);
+    onClose();
+  }, [localCharacter, onCharacterChange, onClose]);
 
   const handleCancel = useCallback(() => {
     // Close modal without saving
@@ -58,11 +48,11 @@ export default function LanguageEditModal({ isOpen, onClose, character, onCharac
 
         {/* Modal Action Buttons */}
         <div className="modal-buttons" data-roomy role="group" aria-label="Modal actions">
-          <Button variant="ghost" onClick={handleCancel} disabled={isSaving}>
+          <Button variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSave} disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Save Changes'}
+          <Button variant="primary" onClick={handleSave}>
+            Save Changes
           </Button>
         </div>
       </>

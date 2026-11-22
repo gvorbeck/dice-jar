@@ -4,10 +4,12 @@ import { GameCard } from './GameCard';
 import { useEnhancedGames } from '@/hooks/queries/useEnhancedQueries';
 import { useGameMutations } from '@/hooks/mutations/useEnhancedMutations';
 import { useAuth, useInitialLoadingState } from '@/hooks';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export function GamesList() {
-  const { data: games = [], isLoading, error } = useEnhancedGames();
+  const { data, isLoading, error } = useEnhancedGames();
+  // Firestore lists by document ID, which is random; by name is stable.
+  const games = useMemo(() => [...(data ?? [])].sort((a, b) => a.name.localeCompare(b.name)), [data]);
 
   const { user } = useAuth();
   const { deleteGame, isDeleting } = useGameMutations();

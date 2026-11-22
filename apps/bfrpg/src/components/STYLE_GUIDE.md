@@ -422,66 +422,14 @@ function useCharacterMutations(userId: string) {
 }
 ```
 
-### Zustand (Client State)
+### Client State
+
+State lives in the component that owns it (`useState`), passed down as props. Anything remembered across visits is read and written through `store` from `@dice-jar/browser`, which never throws when storage is blocked:
 
 ```typescript
-// ✅ Typed Zustand stores with persistence
-interface CharacterStore {
-  // Draft character during creation
-  draftCharacter: Character;
-  currentStep: number;
-
-  // User preferences
-  preferences: {
-    includeSupplementalRace: boolean;
-    includeSupplementalClass: boolean;
-    useCombinationClass: boolean;
-    customClassMagicToggle: boolean;
-  };
-
-  // Actions
-  updateDraft: (character: Character) => void;
-  clearDraft: () => void;
-  setStep: (step: number) => void;
-  updatePreferences: (updates: Partial<CharacterStore['preferences']>) => void;
-}
-
-export const useCharacterStore = create<CharacterStore>()(
-  persist(
-    (set, get) => ({
-      draftCharacter: createEmptyCharacter(),
-      currentStep: 0,
-      preferences: {
-        includeSupplementalRace: false,
-        includeSupplementalClass: false,
-        useCombinationClass: false,
-        customClassMagicToggle: false,
-      },
-
-      updateDraft: (character) => set({ draftCharacter: character }),
-
-      clearDraft: () =>
-        set({
-          draftCharacter: createEmptyCharacter(),
-          currentStep: 0,
-        }),
-
-      setStep: (step) => set({ currentStep: step }),
-
-      updatePreferences: (updates) =>
-        set((state) => ({
-          preferences: { ...state.preferences, ...updates },
-        })),
-    }),
-    {
-      name: 'character-creation-store',
-      version: 1,
-    },
-  ),
-);
+const [draft, setDraft] = useState(readDraft); // readDraft parses store.get(KEY), falling back to a fresh draft
+useEffect(() => void store.set(KEY, JSON.stringify(draft)), [draft]);
 ```
-
----
 
 ## Testing & Accessibility
 
@@ -564,7 +512,7 @@ export function CharGenErrorBoundary({ children }: { children: ReactNode }) {
         </Card>
       )}
       onError={(error, errorInfo) => {
-        logger.error("Character creation error:", error, errorInfo);
+        console.error("Character creation error:", error, errorInfo);
       }}
     >
       {children}
@@ -603,7 +551,6 @@ src/
 │   ├── forms/                 # Form validation and handling
 │   └── mutations/             # TanStack Query mutations
 ├── services/                  # Firebase and external API services
-├── stores/                    # Zustand client state stores
 ├── types/                     # TypeScript type definitions
 ├── utils/                     # Pure utility functions
 ├── validation/                # Form and data validation schemas
@@ -628,7 +575,7 @@ npm run preview      # Preview production build
 - ESLint checking
 - TypeScript compilation
 - Prettier formatting
-- No console.log statements (except in logger.ts)
+- No console.log statements; report real errors with console.error
 ```
 
 ### Performance Monitoring
@@ -690,7 +637,7 @@ export default defineConfig({
 
 ---
 
-_This style guide reflects the current Codex.Quest architecture using React 19, TypeScript 5.9, plain CSS, TanStack Query, Zustand, and Firebase. Always prioritize maintainability, performance, and accessibility in your implementations._
+_This style guide reflects the current Codex.Quest architecture using React 19, TypeScript 5.9, plain CSS, TanStack Query, and Firebase. Always prioritize maintainability, performance, and accessibility in your implementations._
 
 ### 2. Performance Optimization
 

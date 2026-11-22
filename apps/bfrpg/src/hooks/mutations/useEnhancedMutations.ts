@@ -1,6 +1,5 @@
 import { useRef } from 'react';
-import { useNotificationContext } from '@/hooks';
-import { createMutationHandlers } from '@/lib/globalErrorHandler';
+import { useRun, useToast } from '@dice-jar/browser';
 import type { Character, Game, EquipmentPack } from '@/types';
 import {
   saveCharacter as saveCharacterService,
@@ -9,12 +8,10 @@ import {
   deleteGame as deleteGameService,
 } from '@/services';
 import { applyEquipmentPackToCharacter } from '@/utils/equipment';
-import { useAction } from './useAction';
-
-const quiet = () => undefined;
+import { getErrorMessage } from '@/utils';
 
 /**
- * Character save / delete / equipment-pack actions with consistent error handling and user feedback.
+ * Character save / delete / equipment-pack actions; each says how it went in a toast.
  * The live listeners show the result, so nothing is updated by hand here.
  */
 export function useCharacterMutations(options?: {
@@ -22,96 +19,85 @@ export function useCharacterMutations(options?: {
   onDeleteSuccess?: () => void;
   onPackApplied?: () => void;
 }) {
-  const { onError, onSuccess } = createMutationHandlers(useNotificationContext());
+  const { addToast } = useToast();
   const opts = useRef(options);
   opts.current = options;
-
-  const save = useAction(
-    (v: { userId: string; character: Character; characterId?: string }) => saveCharacterService(v.userId, v.character, v.characterId),
-    (error, v) => onError(error, { operation: v.characterId ? 'Update' : 'Save', entityType: 'character', entityName: v.character.name }),
-  );
-  const remove = useAction(
-    (v: { userId: string; characterId: string; characterName?: string }) => deleteCharacterService(v.userId, v.characterId),
-    (error, v) => onError(error, { operation: 'Delete', entityType: 'character', entityName: v.characterName || 'Unknown character' }),
-  );
-  const pack = useAction(
-    async (v: { character: Character; pack: EquipmentPack }) => {
-      const { character, result } = applyEquipmentPackToCharacter(v.character, v.pack);
-      if (!result.success) throw new Error(result.error || 'Failed to apply equipment pack');
-      return { character, pack: v.pack };
-    },
-    (error, v) => onError(error, { operation: 'Apply', entityType: 'equipment pack', entityName: v.pack?.name || 'Unknown pack' }),
-  );
+  const save = useRun('Failed to save character. Please try again.');
+  const remove = useRun();
+  const pack = useRun(getErrorMessage);
 
   return {
     /** Resolves to the saved character's ID, or undefined if saving failed (already reported). */
     saveCharacter: async (v: { userId: string; character: Character; characterId?: string }) => {
-      const id = await save.run(v).catch(quiet);
-      if (id === undefined) return undefined;
-      onSuccess({ operation: v.characterId ? 'Update' : 'Save', entityType: 'character', entityName: v.character.name });
+      const verb = v.characterId ? 'update' : 'save';
+      let id: string | undefined;
+      await save.run(async () => void (id = await saveCharacterService(v.userId, v.character, v.characterId)));
+      if (id === undefined) {
+        addToast(`Failed to ${verb} character "${v.character.name}".`, 'error');
+        return undefined;
+      }
+      addToast(`Character "${v.character.name}" ${verb}d.`, 'success');
       opts.current?.onSaveSuccess?.(id);
       return id;
     },
     deleteCharacter: async (v: { userId: string; characterId: string; characterName?: string }) => {
-      const done = await remove.run(v).then(
-        () => true,
-        () => false,
-      );
-      if (!done) return;
-      onSuccess({ operation: 'Delete', entityType: 'character', entityName: v.characterName || 'Unknown character' });
+      const name = v.characterName || 'Unknown character';
+      if (!(await remove.run(() => deleteCharacterService(v.userId, v.characterId)))) {
+        addToast(`Failed to delete character "${name}".`, 'error');
+        return;
+      }
+      addToast(`Character "${name}" deleted.`, 'success');
       opts.current?.onDeleteSuccess?.();
     },
+    /** Resolves to the character with the pack's gear, or undefined if it couldn't be applied (shown in packError). */
     applyEquipmentPack: async (v: { character: Character; pack: EquipmentPack }) => {
-      const applied = await pack.run(v);
-      onSuccess({ operation: 'Apply', entityType: 'equipment pack', entityName: v.pack.name });
+      let applied: Character | undefined;
+      await pack.run(async () => {
+        const { character, result } = applyEquipmentPackToCharacter(v.character, v.pack);
+        if (!result.success) throw new Error(result.error || 'Failed to apply equipment pack');
+        applied = character;
+      });
+      if (!applied) return undefined;
+      addToast(`Equipment pack "${v.pack.name}" applied.`, 'success');
       opts.current?.onPackApplied?.();
       return applied;
     },
-    isSaving: save.isPending,
-    isDeleting: remove.isPending,
-    isApplyingPack: pack.isPending,
-    saveError: save.error,
-    deleteError: remove.error,
-    packError: pack.error,
+    isSaving: save.busy,
+    isDeleting: remove.busy,
+    isApplyingPack: pack.busy,
+    saveError: save.err,
+    packError: pack.err,
   };
 }
 
-/**
- * Game save / delete actions with consistent error handling and user feedback.
- */
+/** Game save / delete actions; each says how it went in a toast. */
 export function useGameMutations(options?: { onSaveSuccess?: () => void; onDeleteSuccess?: () => void }) {
-  const { onError, onSuccess } = createMutationHandlers(useNotificationContext());
+  const { addToast } = useToast();
   const opts = useRef(options);
   opts.current = options;
-
-  const save = useAction(
-    (v: { userId: string; game: Game; gameId?: string }) => saveGameService(v.userId, v.game, v.gameId),
-    (error, v) => onError(error, { operation: v.gameId ? 'Update' : 'Save', entityType: 'game', entityName: v.game.name }),
-  );
-  const remove = useAction(
-    (v: { userId: string; gameId: string; gameName?: string }) => deleteGameService(v.userId, v.gameId),
-    (error, v) => onError(error, { operation: 'Delete', entityType: 'game', entityName: v.gameName || 'Unknown game' }),
-  );
+  const save = useRun();
+  const remove = useRun();
 
   return {
     saveGame: async (v: { userId: string; game: Game; gameId?: string }) => {
-      const id = await save.run(v).catch(quiet);
-      if (id === undefined) return;
-      onSuccess({ operation: v.gameId ? 'Update' : 'Save', entityType: 'game', entityName: v.game.name });
+      const verb = v.gameId ? 'update' : 'save';
+      if (!(await save.run(() => saveGameService(v.userId, v.game, v.gameId)))) {
+        addToast(`Failed to ${verb} game "${v.game.name}".`, 'error');
+        return;
+      }
+      addToast(`Game "${v.game.name}" ${verb}d.`, 'success');
       opts.current?.onSaveSuccess?.();
     },
     deleteGame: async (v: { userId: string; gameId: string; gameName?: string }) => {
-      const done = await remove.run(v).then(
-        () => true,
-        () => false,
-      );
-      if (!done) return;
-      onSuccess({ operation: 'Delete', entityType: 'game', entityName: v.gameName || 'Unknown game' });
+      const name = v.gameName || 'Unknown game';
+      if (!(await remove.run(() => deleteGameService(v.userId, v.gameId)))) {
+        addToast(`Failed to delete game "${name}".`, 'error');
+        return;
+      }
+      addToast(`Game "${name}" deleted.`, 'success');
       opts.current?.onDeleteSuccess?.();
     },
-    isSaving: save.isPending,
-    isDeleting: remove.isPending,
-    saveError: save.error,
-    deleteError: remove.error,
+    isSaving: save.busy,
+    isDeleting: remove.busy,
   };
 }

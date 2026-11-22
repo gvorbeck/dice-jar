@@ -1,30 +1,28 @@
-import { Suspense, lazy, useState, useEffect } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import './App.css';
-import { ErrorBoundary } from '@dice-jar/browser';
-import { ErrorPage, NotificationContainer, NotificationsDown, LoadingState } from '@/components/ui/core/feedback';
+import { ErrorBoundary, ToastProvider } from '@dice-jar/browser';
+import { ErrorPage, Notification, LoadingState } from '@/components/ui/core/feedback';
 import { Header } from '@/components/app/Header';
 import { Footer } from '@/components/app/Footer';
 import { Routes } from '@/components/app/Routes';
 import { useAppData, useNetworkStatus } from '@/hooks';
-import { useNotifications } from '@/hooks/ui/useNotifications';
-import NotificationContext from '@/contexts/NotificationContext';
-import { initializeFavicon } from '@/utils/favicon';
 import { getInitialAlerts, type AlertConfig } from '@/constants';
 
 const SignInModal = lazy(() => import('./components/modals/auth/SignInModal'));
 
-// Inner app component that uses the notification context
+const OFFLINE_ALERT: AlertConfig = {
+  message: "You're offline. Changes will be saved when you reconnect.",
+  type: 'warning',
+  dismissible: false,
+};
+
+// Inner app component, inside the toast provider
 function AppContent() {
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [alerts, setAlerts] = useState<AlertConfig[]>(() => getInitialAlerts());
-  useNetworkStatus(); // This will automatically handle offline/online notifications
+  const { isOnline } = useNetworkStatus();
 
   useAppData();
-
-  // Initialize favicon based on app mode
-  useEffect(() => {
-    initializeFavicon();
-  }, []);
 
   const handleSignInSuccess = () => {
     setIsSignInModalOpen(false);
@@ -36,7 +34,8 @@ function AppContent() {
 
   const headerProps = {
     setIsSignInModalOpen,
-    alerts,
+    // Last, so the dismissible alerts keep their indexes for onAlertClose.
+    alerts: isOnline ? alerts : [...alerts, OFFLINE_ALERT],
     onAlertClose: handleAlertClose,
   };
 
@@ -57,22 +56,15 @@ function AppContent() {
 }
 
 function App() {
-  const notifications = useNotifications();
-
   return (
     <ErrorBoundary
       fallback={
         <ErrorPage title="Something went wrong" message="We're sorry, but an unexpected error occurred. Please try refreshing the page." />
       }
     >
-      <NotificationContext.Provider value={notifications}>
+      <ToastProvider Entry={Notification}>
         <AppContent />
-
-        {/* Global Notification Container */}
-        <ErrorBoundary fallback={<NotificationsDown />}>
-          <NotificationContainer notifications={notifications.notifications} onDismiss={notifications.dismissNotification} />
-        </ErrorBoundary>
-      </NotificationContext.Provider>
+      </ToastProvider>
     </ErrorBoundary>
   );
 }

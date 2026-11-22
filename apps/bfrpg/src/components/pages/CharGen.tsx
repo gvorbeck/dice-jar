@@ -1,6 +1,6 @@
-import { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTitle } from '@dice-jar/browser';
+import { store, useTitle } from '@dice-jar/browser';
 import Stepper from '@/components/ui/composite/Stepper';
 import { Breadcrumb } from '@/components/ui/composite';
 import { PageWrapper } from '@/components/ui/core/layout';
@@ -14,29 +14,46 @@ import EquipmentStep from '@/components/features/character/creation/EquipmentSte
 import { ReviewStep } from '@/components/features/character/creation/ReviewStep';
 import { useAuth, useStepNavigation } from '@/hooks';
 import { useCharacterMutations } from '@/hooks/mutations/useEnhancedMutations';
-import { useCharacterStore } from '@/stores';
 import { useCascadeValidation, createCharacterValidationPipeline } from '@/validation';
 import { allRaces, allClasses } from '@/data';
-import { logger, createEmptyCharacter, getRaceById } from '@/utils';
-import { COMBINATION_CLASS_IDS } from '@/constants';
+import { createEmptyCharacter, getRaceById } from '@/utils';
+import { COMBINATION_CLASS_IDS, STORAGE_KEYS } from '@/constants';
+import type { Character } from '@/types';
+import { readStored } from '@/lib/localState';
 import './CharGen.css';
+
+interface Draft {
+  character: Character;
+  step: number;
+  includeSupplementalRace: boolean;
+  includeSupplementalClass: boolean;
+  useCombinationClass: boolean;
+}
+
+const newDraft = (): Draft => ({
+  character: createEmptyCharacter(),
+  step: 0,
+  includeSupplementalRace: false,
+  includeSupplementalClass: false,
+  useCombinationClass: false,
+});
+
+// The character being made, as last left in this browser.
+const readDraft = () => readStored(STORAGE_KEYS.CHARACTER_DRAFT, newDraft());
 
 function CharGen() {
   const { user } = useAuth();
   const navigate = useNavigate();
   useTitle('New character | Codex.Quest');
 
-  // Replace multiple useLocalStorage calls with Zustand store
-  const {
-    draftCharacter: character,
-    currentStep: step,
-    preferences: { includeSupplementalRace, includeSupplementalClass, useCombinationClass },
-    updateDraft: setCharacter,
-    setStep,
-    nextStep,
-    updatePreferences,
-    clearDraft,
-  } = useCharacterStore();
+  const [draft, setDraft] = useState(readDraft);
+  useEffect(() => void store.set(STORAGE_KEYS.CHARACTER_DRAFT, JSON.stringify(draft)), [draft]);
+  const { character, step, includeSupplementalRace, includeSupplementalClass, useCombinationClass } = draft;
+  const update = useCallback((patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch })), []);
+  const setCharacter = useCallback((c: Character) => update({ character: c }), [update]);
+  const setStep = useCallback((n: number) => update({ step: n }), [update]);
+  const nextStep = useCallback(() => setDraft((d) => ({ ...d, step: d.step + 1 })), []);
+  const clearDraft = useCallback(() => setDraft(newDraft()), []);
 
   // Check for new character creation via URL parameter
   useEffect(() => {
@@ -66,18 +83,9 @@ function CharGen() {
     [character, emptyCharacter],
   );
 
-  // Create wrapper functions for preference updates to match old API
-  const setIncludeSupplementalRace = useCallback(
-    (value: boolean) => updatePreferences({ includeSupplementalRace: value }),
-    [updatePreferences],
-  );
-
-  const setIncludeSupplementalClass = useCallback(
-    (value: boolean) => updatePreferences({ includeSupplementalClass: value }),
-    [updatePreferences],
-  );
-
-  const setUseCombinationClass = useCallback((value: boolean) => updatePreferences({ useCombinationClass: value }), [updatePreferences]);
+  const setIncludeSupplementalRace = useCallback((value: boolean) => update({ includeSupplementalRace: value }), [update]);
+  const setIncludeSupplementalClass = useCallback((value: boolean) => update({ includeSupplementalClass: value }), [update]);
+  const setUseCombinationClass = useCallback((value: boolean) => update({ useCombinationClass: value }), [update]);
 
   // Memoize filtered data to prevent recreation of validation service
   const filteredRaces = useMemo(
@@ -112,10 +120,10 @@ function CharGen() {
       const canUseCombinationClasses = selectedRace?.allowedClasses.some((cls) => COMBINATION_CLASS_IDS.includes(cls));
 
       if (!canUseCombinationClasses) {
-        updatePreferences({ useCombinationClass: false });
+        update({ useCombinationClass: false });
       }
     }
-  }, [character.race, useCombinationClass, updatePreferences]);
+  }, [character.race, useCombinationClass, update]);
 
   // Use step navigation hook for centralized step management
   const { isLastStep, isNextDisabled, validationMessage } = useStepNavigation({
@@ -130,12 +138,12 @@ function CharGen() {
     if (isLastStep) {
       // This is the completion step
       if (!user) {
-        logger.error('User not authenticated');
+        console.error('User not authenticated');
         return;
       }
 
       if (!completeCharacter.name?.trim()) {
-        logger.error('Character name is required');
+        console.error('Character name is required');
         return;
       }
 
@@ -217,10 +225,6 @@ function CharGen() {
     [],
   );
 
-  if (import.meta.env.DEV) {
-    logger.info(JSON.stringify(completeCharacter));
-  }
-
   return (
     <PageWrapper>
       <article>
@@ -246,7 +250,7 @@ function CharGen() {
         {saveError && (
           <div className="new-char-error">
             <Callout variant="error" title="Save Failed">
-              {saveError.message || 'Failed to save character. Please try again.'}
+              {saveError}
             </Callout>
           </div>
         )}

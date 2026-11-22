@@ -42,12 +42,6 @@ export interface CoinConfig {
 }
 
 // Dice and mechanics types
-export interface DiceResult {
-  total: number;
-  formula: string;
-  breakdown: string;
-}
-
 // Combat types
 export interface CombatCharacterData {
   id: string;

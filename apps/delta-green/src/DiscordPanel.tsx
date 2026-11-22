@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Win } from './ui/Win';
 import { Alert, Hint, LineForm } from './ui/bits';
-import { useLoad } from '@dice-jar/browser';
-import { useRun } from './lib/useRun';
+import { useLoad, useRun } from '@dice-jar/browser';
 import { discordError, discordWebhook, type DiscordStatus } from './lib/discord';
 
 /**

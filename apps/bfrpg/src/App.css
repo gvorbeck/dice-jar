@@ -22,7 +22,8 @@ h6 {
 /* Custom accessibility and focus styles */
 
 /* Screen reader only content */
-.sr-only {
+.sr-only,
+.toast-announcer {
   position: absolute;
   width: 1px;
   height: 1px;

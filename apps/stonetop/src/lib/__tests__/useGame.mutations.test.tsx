@@ -2,12 +2,12 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { firestoreMockModule, firestoreStore } from '@/test/firestoreMock';
 import { addToastSpy, toastModuleMock } from '@/test/toastMock';
-import { INVALID_WRITE_MESSAGE, SAVE_ERROR_MESSAGE } from '@/lib/constants';
+import { INVALID_WRITE_MESSAGE, SAVE_ERROR_MESSAGE } from '@dice-jar/browser';
 import { NOTES_CLIENT_ID, NOTES_STALE_MS } from '@/lib/sharedNotes';
 
 vi.mock('firebase/app', () => ({ initializeApp: () => ({}) }));
 vi.mock('firebase/firestore', () => firestoreMockModule());
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
 
 import { onSnapshot } from 'firebase/firestore';
 

@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
+import { useRun } from '@dice-jar/browser';
 import { Modal } from '@/components/modals';
 import { Typography } from '@/components/ui/core/display';
 import { Button } from '@/components/ui/core/primitives';
-import { useHPGain, useLoadingState } from '@/hooks';
-import { logger } from '@/utils';
+import { useHPGain } from '@/hooks';
 import { LEVEL_UP_CONSTANTS } from '@/constants';
 import { isCustomClass, getClassById } from '@/utils';
 import CurrentStatusCard from '../../character/sheet/level-up/CurrentStatusCard';
@@ -22,7 +22,7 @@ interface LevelUpModalProps {
 }
 
 export default function LevelUpModal({ isOpen, onClose, character, classes, onLevelUp }: LevelUpModalProps) {
-  const { loading: isProcessing, setLoading: setIsProcessing } = useLoadingState();
+  const { busy: isProcessing, err: levelUpError, run, clear: clearLevelUpError } = useRun('Level up failed. Please try again.');
 
   // Get the character's class for level up calculations
   const getPrimaryClass = () => {
@@ -78,9 +78,7 @@ export default function LevelUpModal({ isOpen, onClose, character, classes, onLe
   const handleLevelUp = async () => {
     if (!canLevelUp || !hpGainResult) return;
 
-    setIsProcessing(true);
-
-    try {
+    await run(async () => {
       // Simulate processing time
       await new Promise((resolve) => setTimeout(resolve, LEVEL_UP_CONSTANTS.LEVEL_UP_PROCESSING_DELAY));
 
@@ -100,11 +98,7 @@ export default function LevelUpModal({ isOpen, onClose, character, classes, onLe
       }
 
       onClose();
-    } catch (error) {
-      logger.error('Level up failed:', error);
-    } finally {
-      setIsProcessing(false);
-    }
+    });
   };
 
   const handleClose = () => {
@@ -114,9 +108,10 @@ export default function LevelUpModal({ isOpen, onClose, character, classes, onLe
   };
 
   // Handle errors
-  const hasError = hpError;
+  const hasError = hpError || levelUpError;
   const clearErrors = () => {
     clearHPError();
+    clearLevelUpError();
   };
 
   return (
@@ -146,7 +141,7 @@ export default function LevelUpModal({ isOpen, onClose, character, classes, onLe
               An error occurred:
             </Typography>
             <Typography variant="helper" color="secondary">
-              {hpError}
+              {hpError || levelUpError}
             </Typography>
             <Button onClick={clearErrors} variant="destructive" size="sm">
               Dismiss

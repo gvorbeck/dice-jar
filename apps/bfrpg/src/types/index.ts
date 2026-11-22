@@ -35,7 +35,6 @@ export type {
   CurrencyType,
   TreasureTypeConfig,
   CoinConfig,
-  DiceResult,
   CombatCharacterData,
   CombatantHP,
   CombatantWithInitiative,
@@ -49,7 +48,7 @@ export type {
 } from './game';
 
 // UI types
-export type { BaseButtonProps, UseLoadingStateOptions, LoadingState, ShowNotificationOptions, NotificationSystem } from './ui';
+export type { BaseButtonProps } from './ui';
 
 // Encounter types
 export type { EncounterType, CityType, DungeonLevel, WildernessType } from './encounters';

@@ -3,7 +3,7 @@ import { SectionWrapper } from '@/components/ui/core/layout';
 import { Button } from '@/components/ui/core/primitives';
 import InitiativeTable from './InitiativeTable';
 import type { CombatantWithInitiative } from '@/types';
-import { rollInitiative } from '@/utils';
+import { roll } from '@dice-jar/dice';
 import './Combat.css';
 
 interface PreCombatInitiativeSectionProps {
@@ -38,13 +38,13 @@ export default function PreCombatInitiativeSection({
                   // Use batch update if available
                   const updates = monsters.map((combatant) => ({
                     combatant,
-                    initiative: rollInitiative(),
+                    initiative: roll('1d6').total,
                   }));
                   onUpdateMultipleInitiatives(updates);
                 } else {
                   // Fallback to individual updates
                   monsters.forEach((combatant) => {
-                    const newInitiative = rollInitiative();
+                    const newInitiative = roll('1d6').total;
                     onUpdateInitiative(combatant, newInitiative);
                   });
                 }

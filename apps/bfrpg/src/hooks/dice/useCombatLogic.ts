@@ -1,9 +1,11 @@
-import { useCallback, useMemo, useEffect } from 'react';
+import { useCallback, useMemo, useEffect, useState } from 'react';
 import { usePlayerCharacters } from '../character';
-import { useNotificationContext } from '../ui';
-import { useCombatStore } from '@/stores';
+import { useToast } from '@dice-jar/browser';
+import { store } from '@dice-jar/browser';
 import type { CombatantWithInitiative, Game, GameCombatant, CombatCharacterData } from '@/types';
-import { calculateArmorClass, clearCorruptedCombatData, normalizeCombatantHP, rollInitiative, sortCombatantsByInitiative } from '@/utils';
+import { calculateArmorClass, normalizeCombatantHP, sortCombatantsByInitiative } from '@/utils';
+import { readStored } from '@/lib/localState';
+import { roll } from '@dice-jar/dice';
 
 // Stable hash function for generating consistent sort IDs from names
 const hashString = (str: string): number => {
@@ -22,43 +24,44 @@ const hashString = (str: string): number => {
  */
 const getCombatantSortId = (name: string, index: number): number => hashString(`${name}-${index}`);
 
-// Combat logic hook using Zustand combat store
+interface CombatState {
+  combatants: CombatantWithInitiative[];
+  currentTurn: number;
+  round: number;
+  isActive: boolean;
+}
+
+interface SavedCombat {
+  combatState: CombatState;
+  preCombatInitiatives: Record<string, number>;
+}
+
+const EMPTY_COMBAT: SavedCombat = { combatState: { combatants: [], currentTurn: 0, round: 1, isActive: false }, preCombatInitiatives: {} };
+
+// This game's combat as last left in this browser.
+const readCombat = (key: string) => readStored(key, EMPTY_COMBAT);
 
 export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) => void) {
-  const { showSuccess, showError, showInfo } = useNotificationContext();
+  const { addToast } = useToast();
   const { playerCharacters } = usePlayerCharacters(game || ({} as Game));
 
-  // Clear corrupted data on mount
-  useEffect(() => {
-    if (game?.id) {
-      clearCorruptedCombatData(game.id);
-    }
-  }, [game?.id]);
-
-  // Combat store hooks
-  const { getCombatState, setCombatState, getPreCombatInitiatives, setPreCombatInitiatives } = useCombatStore();
-
   const gameId = game?.id || 'temp';
-  const combatState = getCombatState(gameId);
-  const preCombatInitiatives = getPreCombatInitiatives(gameId);
+  const storageKey = `combat:${gameId}`;
+  const [saved, setSaved] = useState(() => readCombat(storageKey));
+  const [savedKey, setSavedKey] = useState(storageKey);
+  if (savedKey !== storageKey) {
+    setSavedKey(storageKey);
+    setSaved(readCombat(storageKey));
+  }
+  useEffect(() => void store.set(storageKey, JSON.stringify(saved)), [storageKey, saved]);
+  const { combatState, preCombatInitiatives } = saved;
 
-  // Helper to update combat state
-  const updateCombatState = useCallback(
-    (newState: typeof combatState) => {
-      setCombatState(gameId, newState);
-    },
-    [gameId, setCombatState],
-  );
-
-  // Helper to update pre-combat initiatives
+  const updateCombatState = useCallback((newState: CombatState) => setSaved((s) => ({ ...s, combatState: newState })), []);
   const updatePreCombatInitiatives = useCallback(
-    (initiatives: Record<string, number>) => {
-      setPreCombatInitiatives(gameId, initiatives);
-    },
-    [gameId, setPreCombatInitiatives],
+    (initiatives: Record<string, number>) => setSaved((s) => ({ ...s, preCombatInitiatives: initiatives })),
+    [],
   );
 
-  // Extract state for easier access
   const { combatants, currentTurn, round, isActive: isCombatActive } = combatState;
 
   // Get available players (not yet added to combat)
@@ -183,11 +186,9 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       };
 
       onUpdateGame(updatedGame);
-      showSuccess(`${player.name} added to combat`, {
-        title: 'Player Added',
-      });
+      addToast(`${player.name} added to combat`, 'success');
     },
-    [game, onUpdateGame, showSuccess],
+    [game, onUpdateGame, addToast],
   );
 
   // Remove combatant from combat
@@ -210,17 +211,15 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       updatePreCombatInitiatives(updatedPreCombatInitiatives);
 
       onUpdateGame(updatedGame);
-      showSuccess(`${combatantToRemove.name} removed from combat`, {
-        title: 'Combatant Removed',
-      });
+      addToast(`${combatantToRemove.name} removed from combat`, 'success');
     },
-    [game, onUpdateGame, currentCombatants, preCombatInitiatives, updatePreCombatInitiatives, showSuccess],
+    [game, onUpdateGame, currentCombatants, preCombatInitiatives, updatePreCombatInitiatives, addToast],
   );
 
   // Initialize combat with all combatants
   const initializeCombat = useCallback(() => {
     if (!game || currentCombatants.length === 0) {
-      showError('No combatants available to start combat');
+      addToast('No combatants available to start combat', 'error');
       return;
     }
 
@@ -229,7 +228,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       const preCombatInitiative = preCombatInitiatives[combatant.name] || 0;
       return {
         ...combatant,
-        initiative: preCombatInitiative > 0 ? preCombatInitiative : rollInitiative(),
+        initiative: preCombatInitiative > 0 ? preCombatInitiative : roll('1d6').total,
         _sortId: getCombatantSortId(combatant.name, index),
       };
     });
@@ -244,10 +243,8 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       isActive: true,
     });
 
-    showSuccess(`Combat initialized! ${sortedCombatants.length} combatants ready.`, {
-      title: 'Combat Started',
-    });
-  }, [game, currentCombatants, preCombatInitiatives, showSuccess, showError, updateCombatState]);
+    addToast(`Combat initialized! ${sortedCombatants.length} combatants ready.`, 'success');
+  }, [game, currentCombatants, preCombatInitiatives, addToast, updateCombatState]);
 
   // Roll initiative for a specific combatant
   const rollInitiativeFor = useCallback(
@@ -255,7 +252,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       const combatant = combatants[combatantIndex];
       if (!combatant) return;
 
-      const newInitiative = rollInitiative();
+      const newInitiative = roll('1d6').total;
       const updatedCombatants = [...combatants];
       updatedCombatants[combatantIndex] = {
         ...combatant,
@@ -271,11 +268,9 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
         combatants: sortedCombatants,
       });
 
-      showInfo(`${combatant.name} rolled ${newInitiative} for initiative`, {
-        title: 'Initiative Roll',
-      });
+      addToast(`${combatant.name} rolled ${newInitiative} for initiative`, 'info', true);
     },
-    [combatants, combatState, showInfo, updateCombatState],
+    [combatants, combatState, addToast, updateCombatState],
   );
 
   // Update pre-combat initiative for a specific combatant
@@ -352,7 +347,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       if (!combatant.isPlayer) {
         return {
           ...combatant,
-          initiative: rollInitiative(),
+          initiative: roll('1d6').total,
           _sortId: getCombatantSortId(combatant.name, index),
         };
       }
@@ -364,10 +359,8 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       combatants: updatedCombatants,
     });
 
-    showInfo(`Rolled initiative for ${monsters.length} monsters`, {
-      title: 'Initiative Rolled',
-    });
-  }, [combatants, combatState, updateCombatState, showInfo]);
+    addToast(`Rolled initiative for ${monsters.length} monsters`, 'info', true);
+  }, [combatants, combatState, updateCombatState, addToast]);
 
   // Update HP for a specific combatant
   const updateCombatantHp = useCallback(
@@ -424,7 +417,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
         currentTurn: 0,
         round: round + 1,
       });
-      showInfo(`Round ${round + 1} begins! Roll initiative for all combatants.`, { title: 'New Round' });
+      addToast(`Round ${round + 1} begins! Roll initiative for all combatants.`, 'info', true);
     } else {
       updateCombatState({
         ...combatState,
@@ -432,11 +425,9 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       });
 
       const currentCombatantInTurn = combatants[newTurn];
-      showInfo(`${currentCombatantInTurn?.name}'s turn`, {
-        title: 'Turn Order',
-      });
+      addToast(`${currentCombatantInTurn?.name}'s turn`, 'info', true);
     }
-  }, [combatants, combatState, currentTurn, round, showInfo, updateCombatState]);
+  }, [combatants, combatState, currentTurn, round, addToast, updateCombatState]);
 
   // End combat
   const endCombat = useCallback(() => {
@@ -446,8 +437,8 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       round: 1,
       isActive: false,
     });
-    showSuccess('Combat ended', { title: 'Combat Complete' });
-  }, [showSuccess, updateCombatState]);
+    addToast('Combat ended', 'success');
+  }, [addToast, updateCombatState]);
 
   return {
     // State

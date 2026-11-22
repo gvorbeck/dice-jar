@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useLatest } from '@/lib/useLatest';
+import { useLatest } from '@dice-jar/browser';
 import { usePlaybookField } from '@/lib/usePlaybookField';
 import { resolvePlaybookFeatures, featurePatch } from '@/lib/resolvePlaybookFeatures';
 import { moveTakeCount } from '@/lib/moveTakeCount';
@@ -13,7 +13,7 @@ import { Text } from '@/ui';
 import { Move } from '../../Move';
 import { LOYAL_TO_THE_END } from '@/rules/moves/ranger';
 import { LoyaltyRow } from '../shared/CrewWidgets';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useToast } from '@dice-jar/browser';
 import type { PlaybookSectionProps, RadioOption } from '@/model';
 
 const ANIMAL_INSTINCT_OPTIONS: RadioOption[] = [

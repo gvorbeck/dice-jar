@@ -42,16 +42,10 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
 
   // Handle pack selection
   const handlePackSelected = async (pack: EquipmentPack) => {
-    try {
-      const { character: updatedCharacter } = await applyEquipmentPack({
-        character,
-        pack,
-      });
-      onCharacterChange(updatedCharacter);
-      setSelectedPack(pack);
-    } catch {
-      // Error is handled by the mutation hook
-    }
+    const updatedCharacter = await applyEquipmentPack({ character, pack });
+    if (!updatedCharacter) return; // shown in packError
+    onCharacterChange(updatedCharacter);
+    setSelectedPack(pack);
   };
 
   const handleRemovePack = () => {
@@ -217,7 +211,7 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
           <TabPanels>
             <TabPanel value="equipment-packs">
               {/* Equipment Pack Error */}
-              <ErrorDisplay error={packError?.message} className="kit-error" />
+              <ErrorDisplay error={packError} className="kit-error" />
 
               {/* Equipment Pack Selector */}
               {showPackSelector && (

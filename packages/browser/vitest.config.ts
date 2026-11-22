@@ -4,7 +4,19 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     coverage: {
-      include: ['index.ts', 'ErrorBoundary.tsx', 'DiceJarCredit.tsx', 'focus.tsx', 'useTitle.ts'],
+      include: [
+        'index.ts',
+        'ErrorBoundary.tsx',
+        'DiceJarCredit.tsx',
+        'focus.tsx',
+        'useTitle.ts',
+        'useRun.ts',
+        'toast.tsx',
+        'useDebouncedSave.ts',
+        'useDebouncedTextField.ts',
+        'useFirestoreSync.ts',
+        'useLatest.ts',
+      ],
       thresholds: { lines: 90, statements: 90, branches: 90, functions: 90 },
     },
   },

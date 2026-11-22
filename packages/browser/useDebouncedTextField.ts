@@ -1,13 +1,14 @@
 import { useState, useCallback } from 'react';
 import { useDebouncedSave } from './useDebouncedSave';
 import { useFirestoreSync } from './useFirestoreSync';
+import { useLatest } from './useLatest';
 
-// Shared state for a single free-text field backed by a debounced Firestore
+// Shared state for a single free-text field (onChange takes the new text, so it suits native inputs and React Aria alike) backed by a debounced Firestore
 // write: local optimistic value, debounce-on-change, flush-on-blur, and a
 // pending guard so remote echoes don't clobber in-flight edits.
 export const useDebouncedTextField = (firestoreValue: string, save: (value: string) => Promise<void>, delay = 1500) => {
   const [value, setValue] = useState(firestoreValue);
-  const { onChange: debouncedChange, flush, isPendingRef, noteRemoteValue } = useDebouncedSave(save, delay);
+  const { onChange: debouncedChange, flush, isPending, isPendingRef, noteRemoteValue } = useDebouncedSave(save, delay);
 
   // Shares the app's one remote-sync gate, which also *defers* a value that lands
   // mid-save and flushes it once the save settles — the hand-rolled guard this
@@ -25,19 +26,16 @@ export const useDebouncedTextField = (firestoreValue: string, save: (value: stri
   );
 
   const onChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setValue(e.target.value);
-      debouncedChange(e.target.value);
+    (next: string) => {
+      setValue(next);
+      debouncedChange(next);
     },
     [debouncedChange],
   );
 
-  const onBlur = useCallback(
-    (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      flush(e.target.value);
-    },
-    [flush],
-  );
+  // Blur writes what is in the field now instead of waiting out the delay.
+  const latest = useLatest(value);
+  const onBlur = useCallback(() => void flush(latest.current), [flush, latest]);
 
-  return { value, onChange, onBlur };
+  return { value, onChange, onBlur, isPending };
 };

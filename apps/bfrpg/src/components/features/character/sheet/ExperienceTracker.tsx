@@ -2,7 +2,6 @@ import React, { useState, useId, useEffect } from 'react';
 import { Button } from '@/components/ui';
 import { TextInput } from '@/components/ui/core/primitives';
 import { LevelUpModal } from '@/components/modals/LazyModals';
-import { logger } from '@/utils';
 import { canLevelUp, hasCustomClasses, getXPToNextLevel } from '@/utils';
 import type { Character, Class } from '@/types';
 import './ExperienceTracker.css';
@@ -115,7 +114,7 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
       // DON'T call onChange for level ups - it would overwrite the full character update
       // onChange is only for XP-only changes, not full character updates
     } catch (error) {
-      logger.error('Failed to update character after level up:', error);
+      console.error('Failed to update character after level up:', error);
     } finally {
       setIsLevelUpModalOpen(false);
     }

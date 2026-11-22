@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { CLASSES_WITH_SKILLS } from '@/constants';
 import type { CharacterListItem } from '@/services';
 import type { SkillClassKey, Game, SkillTableRow, ClassSkillData } from '@/types';
-import { logger, getClassById } from '@/utils';
+import { getClassById } from '@/utils';
 
 /**
  * Custom hook to organize player character skill data by class
@@ -34,7 +34,7 @@ export const useSkillDataByClass = (playerCharacters: CharacterListItem[], game:
       const classInfo = CLASSES_WITH_SKILLS[skillClassId];
 
       if (!classData?.skills) {
-        logger.warn(`Missing skills data for class: ${skillClassId}`);
+        console.warn(`Missing skills data for class: ${skillClassId}`);
         return {
           classId: skillClassId,
           displayName: classInfo.displayName,
@@ -94,11 +94,6 @@ export const useSkillDataByClass = (playerCharacters: CharacterListItem[], game:
         displayName: classInfo.displayName,
         skills: skillRows,
       };
-    });
-
-    logger.debug('Generated skill data by class', {
-      classCount: result.length,
-      totalSkillRows: result.reduce((sum, cls) => sum + cls.skills.length, 0),
     });
 
     return result;

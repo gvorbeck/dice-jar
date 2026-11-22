@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { logger, getClassById } from '@/utils';
+import { getClassById } from '@/utils';
 import { loadSpellsForClass } from '@/services/dataLoader';
 import type { Character, Spell } from '@/types';
 import { CHARACTER_CLASSES } from '@/constants';
@@ -45,7 +45,7 @@ export function useClericSpells(
 
         setAvailableSpells(spellsByLevel);
       } catch (error) {
-        logger.error('Error loading spells for cleric:', error);
+        console.error('Error loading spells for cleric:', error);
       } finally {
         setLoadingSpells(false);
       }

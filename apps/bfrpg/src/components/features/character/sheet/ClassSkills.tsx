@@ -9,7 +9,6 @@ import RollableButton from '@/components/domain/dice/RollableButton';
 import Button from '@/components/ui/core/primitives/Button';
 import { useDiceRoll } from '@/hooks/dice/useDiceRoll';
 import { allClasses } from '@/data';
-import { logger } from '@/utils';
 import type { Character, SkillKey, SkillClassKey } from '@/types';
 import './ClassSkills.css';
 
@@ -61,7 +60,7 @@ export default function ClassSkills({
     const classData = allClasses.find((cls) => cls.id === characterClassInfo.className);
 
     if (!classData?.skills) {
-      logger.warn(`Missing skills for class: ${characterClassInfo.className}`);
+      console.warn(`Missing skills for class: ${characterClassInfo.className}`);
       return null;
     }
 
@@ -71,7 +70,7 @@ export default function ClassSkills({
     const skillsForLevel = classData.skills[level] || classData.skills[SKILL_CONSTANTS.DEFAULT_LEVEL];
 
     if (!skillsForLevel) {
-      logger.warn(`No skill data found for ${characterClassInfo.className} level ${level}`);
+      console.warn(`No skill data found for ${characterClassInfo.className} level ${level}`);
       return null;
     }
 

@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { TextHeader, Typography, Button } from '@/components/ui';
 import './ErrorPage.css';
-import './NotificationsDown.css';
 
 interface ErrorPageProps {
   title: string;
@@ -24,16 +23,5 @@ export function ErrorPage({ title, message, showHomeLink = true }: ErrorPageProp
         {showHomeLink && <Link to="/">Return to Homepage</Link>}
       </div>
     </section>
-  );
-}
-
-/** Stands in for the notification stack if it crashes. */
-export function NotificationsDown() {
-  return (
-    <div role="alert" aria-live="assertive" className="notification-fallback">
-      <Typography variant="helper" color="secondary">
-        Notification system temporarily unavailable
-      </Typography>
-    </div>
   );
 }

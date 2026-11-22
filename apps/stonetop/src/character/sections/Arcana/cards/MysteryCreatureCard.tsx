@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { CreatureCard } from '@/ui';
-import { useLatest } from '@/lib/useLatest';
+import { useLatest } from '@dice-jar/browser';
 import type { Creature } from '@/model';
 
 interface MysteryCreatureCardProps {

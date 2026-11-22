@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { useLoad } from '@dice-jar/browser';
+import { useDebouncedSave, useLoad } from '@dice-jar/browser';
 import { gameUrl } from '@/lib/paths';
 import { Loading } from '@/ui/bits';
 import { Link, useParams } from 'react-router-dom';
@@ -8,7 +8,6 @@ import { LiveSheet, type RemoteLive } from '@/LiveSheet';
 import { DamagedAgent, LIVE_SETS, loadAgent, saveCharacter, saveLive, watchLive } from '@/lib/agents';
 import { mergeRemote } from '@dice-jar/diff';
 import { logRoll, useHeldSan } from '@/lib/games';
-import { useAutosave } from '@/lib/useAutosave';
 import { freshLive, reconcile, untouched, type Live } from '@/model/live';
 import { blocking, validate } from '@/rules';
 import type { Character } from '@/model/character';
@@ -86,20 +85,34 @@ function AgentBody({ gameId, agentId, init }: { gameId: string; agentId: string;
   // Changes someone else saves (Discord damage, a skill checked from Discord, another device) merge into the open sheet,
   // so this tab's next save can't write its stale copy over them. Leaves changed here as well keep this tab's value.
   const [remote, setRemote] = useState<RemoteLive | null>(null);
+  // Each change is written once it has been still for a moment, and at once when the page hides or closes. What was loaded isn't written back.
+  const saveC = useDebouncedSave(
+    (v: Character) => saveCharacter(gameId, agentId, v),
+    600,
+    (e) => report('c')(false, e),
+    () => report('c')(true),
+  ).onChange;
+  const { onChange: saveL, noteRemoteValue } = useDebouncedSave(
+    (v: Live | null) => (v ? saveLive(gameId, agentId, v) : Promise.resolve()),
+    600,
+    (e) => report('live')(false, e),
+    () => report('live')(true),
+  );
   // With no sheet of this tab's on the server yet, the remote one (Discord damage before or just after creation finished)
   // started from the fresh sheet; a sheet still being created takes it whole, so finishing creation can't reset it.
   useEffect(
     () =>
       watchLive(gameId, agentId, (r, known) => {
+        noteRemoteValue(r); // the server moved on, so writing back what this tab last saved is a real change again
         const base = known ?? freshLive(prevC.current);
         const merge = (l: Live) => mergeRemote(base, l, r, LIVE_SETS);
         setLive((l) => (l ? merge(l) : r));
         setRemote({ merge });
       }),
-    [gameId, agentId],
+    [gameId, agentId, noteRemoteValue],
   );
-  useAutosave(c, (v) => saveCharacter(gameId, agentId, v), report('c'));
-  useAutosave(live, (v) => (v ? saveLive(gameId, agentId, v) : Promise.resolve()), report('live'), init.live);
+  useEffect(() => void (c !== init.c && saveC(c)), [c, init.c, saveC]);
+  useEffect(() => void (live !== init.live && saveL(live)), [live, init.live, saveL]);
 
   if (mode === 'live' && live) {
     // `init` is read once when the sheet mounts; later changes flow back through onChange.

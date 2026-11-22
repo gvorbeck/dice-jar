@@ -1,6 +1,14 @@
 import { initializeApp } from 'firebase/app';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
-import { connectFirestoreEmulator, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+import {
+  FieldPath,
+  connectFirestoreEmulator,
+  deleteField,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from 'firebase/firestore';
+import { REMOVED, type Change } from '@dice-jar/diff';
 
 // Config field -> the Vite env var it reads (see the app's .env.example). Fail loud at startup rather than as opaque Firestore errors.
 const envVars = {
@@ -39,3 +47,11 @@ export function initFirestore(env: Env) {
   }
   return { app, db };
 }
+
+/** `diffPaths` changes → the field/value pairs `updateDoc`, `batch.update` and `tx.update` take, each path under `prefix`; a removal deletes the field. Call it only with changes. */
+export const updatePairs = (changes: Change[], prefix: string[] = []) =>
+  changes.flatMap(([path, value]) => [new FieldPath(...prefix, ...path), value === REMOVED ? deleteField() : value]) as [
+    FieldPath,
+    unknown,
+    ...unknown[],
+  ];

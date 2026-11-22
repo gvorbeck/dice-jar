@@ -1,12 +1,12 @@
-import { useTitle } from '@dice-jar/browser';
+import { useRun, useTitle } from '@dice-jar/browser';
 import { useState, useCallback } from 'react';
 import { PageWrapper } from '@/components/ui/core/layout';
 import { Card, Typography, Button } from '@/components/ui';
 import { TextInput, TextArea, FormField } from '@/components/ui/core/primitives';
 import { Breadcrumb } from '@/components/ui/composite';
+import { ErrorDisplay } from '@/components/ui/core/feedback';
 import { useAuth } from '@/hooks';
 import { useGameNavigation } from '@/hooks';
-import { logger } from '@/utils';
 import { saveGame } from '@/services';
 import './GameGen.css';
 
@@ -29,7 +29,7 @@ function GameGen() {
   const { user } = useAuth();
   const { navigateToEntity, navigateHome } = useGameNavigation();
   const [game, setGame] = useState<DraftGame>(emptyGame);
-  const [isSaving, setIsSaving] = useState(false);
+  const { busy: isSaving, err, run } = useRun('Failed to create the game. Please try again.');
 
   const handleNameChange = useCallback((name: string) => {
     setGame((prev) => ({ ...prev, name }));
@@ -42,24 +42,16 @@ function GameGen() {
   const handleSave = useCallback(async () => {
     if (!user || !game.name.trim()) return;
 
-    setIsSaving(true);
-    try {
-      // Save game to Firebase
+    await run(async () => {
       const gameId = await saveGame(user.uid, {
         name: game.name,
         notes: game.notes,
         combatants: game.combatants,
         players: game.players,
       });
-
-      // Navigate to the newly created game sheet and clean up storage
-      navigateToEntity(user.uid, gameId);
-    } catch (error) {
-      logger.error('Error saving game:', error);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [user, game, navigateToEntity]);
+      navigateToEntity(user.uid, gameId); // also clears the draft
+    });
+  }, [user, game, navigateToEntity, run]);
 
   const handleCancel = useCallback(() => {
     // Clear any draft data and navigate to home
@@ -109,6 +101,8 @@ function GameGen() {
             </FormField>
           </div>
         </Card>
+
+        <ErrorDisplay error={err} />
 
         {/* Action Buttons */}
         <div className="new-game-actions">

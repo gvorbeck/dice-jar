@@ -1,6 +1,6 @@
 import { TextArea } from '@/components/ui/core/primitives';
 import { SectionWrapper } from '@/components/ui/core/layout';
-import { useDebouncedUpdate } from '@/hooks';
+import { useDebouncedTextField } from '@dice-jar/browser';
 import type { Character } from '@/types';
 import './CharacterDescription.css';
 
@@ -19,15 +19,8 @@ export default function CharacterDescription({
   editable = false,
   onDescriptionChange,
 }: CharacterDescriptionProps) {
-  // Use shared debounced update logic
-  const debouncedDescription = useDebouncedUpdate(character.desc || '', {
-    delay: 500,
-    onUpdate: (value: string) => {
-      if (onDescriptionChange) {
-        onDescriptionChange(value);
-      }
-    },
-  });
+  // Saves after typing pauses, and at once on blur
+  const debouncedDescription = useDebouncedTextField(character.desc || '', async (value) => onDescriptionChange?.(value), 500);
 
   return (
     <SectionWrapper title="Character Description" size={size} className={className}>
@@ -53,7 +46,7 @@ export default function CharacterDescription({
         {editable && (
           <div className="note-foot">
             <span>{debouncedDescription.value.length} / 5000 characters</span>
-            <span>{debouncedDescription.isSaving ? 'Saving...' : 'Saves automatically after you stop typing (500ms)'}</span>
+            <span>{debouncedDescription.isPending ? 'Saving...' : 'Saves automatically after you stop typing (500ms)'}</span>
           </div>
         )}
       </div>

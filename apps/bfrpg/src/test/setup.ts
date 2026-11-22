@@ -20,6 +20,10 @@ vi.mock('firebase/auth', () => ({
 
 vi.mock('firebase/firestore', () => ({
   getFirestore: vi.fn(() => mockFirestore),
+  initializeFirestore: vi.fn(() => mockFirestore),
+  persistentLocalCache: vi.fn(),
+  persistentMultipleTabManager: vi.fn(),
+  connectFirestoreEmulator: vi.fn(),
   collection: mockFirestore.collection,
   doc: vi.fn(() => ({
     get: vi.fn().mockResolvedValue({
@@ -39,14 +43,3 @@ vi.mock('firebase/firestore', () => ({
   orderBy: vi.fn(),
   limit: vi.fn(),
 }));
-
-// Mock localStorage for testing
-Object.defineProperty(window, 'localStorage', {
-  value: {
-    getItem: vi.fn(),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
-  },
-  writable: true,
-});

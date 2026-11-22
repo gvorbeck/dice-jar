@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { logger, hasTurnUndeadAbility } from '@/utils';
+import { hasTurnUndeadAbility } from '@/utils';
 import { getCharacterById } from '@/services';
 
 interface DataRequest {
@@ -49,7 +49,7 @@ export function useDataResolver(requests: DataRequest[] = []) {
         getCharacterSummary(userId, characterId).then(
           (summary) => setFound((f) => ({ ...f, [key]: summary })),
           (error) => {
-            logger.warn(`Failed to fetch character data for ${userId}/${characterId}:`, error);
+            console.warn(`Failed to fetch character data for ${userId}/${characterId}:`, error);
             setFailed(true);
             setFound((f) => ({ ...f, [key]: { characterName: characterId } }));
           },

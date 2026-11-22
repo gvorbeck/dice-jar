@@ -1,6 +1,5 @@
 // Character migration service for handling legacy data formats
 import { EQUIPMENT_CATEGORIES, CURRENCY_TYPES } from '@/constants';
-import { logger } from '@/utils';
 import { normalizeCurrency } from '@/utils/currency';
 import type { Character } from '@/types';
 
@@ -231,7 +230,6 @@ function migrateLegacyCharacter(legacyData: LegacyCharacterData): LegacyCharacte
 
   // Migrate class names to proper IDs
   // Note: Old characters may have class as array, but we'll convert them in migrateCombinationClasses
-  const originalClasses = migrated['class'];
   if (Array.isArray(migrated['class'])) {
     // Keep as array for now, will be converted in migrateCombinationClasses
     migrated['class'] = migrated['class'].map((className: string) => convertClassToId(className));
@@ -240,25 +238,14 @@ function migrateLegacyCharacter(legacyData: LegacyCharacterData): LegacyCharacte
     migrated['class'] = singleClass ? convertClassToId(singleClass) : '';
   }
 
-  // Log class migration if it changed
-  if (JSON.stringify(originalClasses) !== JSON.stringify(migrated['class'])) {
-    logger.info(`Migrated character classes from ${JSON.stringify(originalClasses)} to ${JSON.stringify(migrated['class'])}`);
-  }
-
   migrated['level'] = migrated['level'] || 1;
   migrated['xp'] = migrated['xp'] || 0;
 
   // Remove "Read Magic" from spells array since it's now automatically added for appropriate classes
   if (Array.isArray(migrated['spells'])) {
-    const originalSpells = migrated['spells'];
     migrated['spells'] = migrated['spells'].filter(
       (spell: unknown) => !(spell && typeof spell === 'object' && 'name' in spell && spell.name === 'Read Magic'),
     );
-
-    // Log spell migration if Read Magic was removed
-    if (originalSpells.length !== (migrated['spells'] as unknown[]).length) {
-      logger.info(`Removed Read Magic from character spells array (now automatically provided)`);
-    }
   }
 
   // Clean up fractional currency (version 2.3 migration)
@@ -272,9 +259,6 @@ function migrateLegacyCharacter(legacyData: LegacyCharacterData): LegacyCharacte
         platinum?: number;
       },
     );
-    logger.debug('Cleaned fractional currency amounts', {
-      currency: migrated['currency'],
-    });
   }
 
   // Set version and preserve/create settings
@@ -304,12 +288,10 @@ function migrateCustomRaces(data: LegacyCharacterData): LegacyCharacterData {
     // If character race is "custom" and has a customRace.name, use the name directly as the race
     if (migrated['race'] === 'custom' && customRace.name) {
       migrated['race'] = customRace.name;
-      logger.info(`Migrated custom race name from customRace.name to race field: ${customRace.name}`);
     }
 
     // Remove the customRace property
     delete migrated['customRace'];
-    logger.info('Removed customRace property after migration to 2.5 format');
   }
 
   return migrated;
@@ -341,7 +323,6 @@ function migrateCustomClasses(data: LegacyCharacterData): LegacyCharacterData {
       // Move the class name to the character.class field
       if (customClass.name) {
         migrated['class'] = customClass.name;
-        logger.info(`Migrated custom class name from customClasses.${firstCustomClassId}.name to class field: ${customClass.name}`);
       }
 
       // Move the hit die to character.hp.die
@@ -353,13 +334,11 @@ function migrateCustomClasses(data: LegacyCharacterData): LegacyCharacterData {
           ...migrated['hp'],
           die: customClass.hitDie,
         };
-        logger.info(`Migrated custom class hit die from customClasses.${firstCustomClassId}.hitDie to hp.die: ${customClass.hitDie}`);
       }
     }
 
     // Remove the customClasses property
     delete migrated['customClasses'];
-    logger.info('Removed customClasses property after migration to 2.4 format');
   }
 
   return migrated;
@@ -383,30 +362,27 @@ function migrateCombinationClasses(data: LegacyCharacterData): LegacyCharacterDa
       // Fighter + Magic-User = fighter-magic-user
       if (sorted[0] === 'fighter' && sorted[1] === 'magic-user') {
         migrated['class'] = 'fighter-magic-user';
-        logger.info(`Migrated combination class ${JSON.stringify(classArray)} to fighter-magic-user`);
       }
       // Magic-User + Thief = magic-user-thief
       else if (sorted[0] === 'magic-user' && sorted[1] === 'thief') {
         migrated['class'] = 'magic-user-thief';
-        logger.info(`Migrated combination class ${JSON.stringify(classArray)} to magic-user-thief`);
       }
       // Invalid combination - keep first class
       else {
         migrated['class'] = classArray[0] || '';
-        logger.warn(`Invalid combination class ${JSON.stringify(classArray)}, using first class: ${classArray[0]}`);
+        console.warn(`Invalid combination class ${JSON.stringify(classArray)}, using first class: ${classArray[0]}`);
       }
     } else if (classArray.length === 1) {
       // Single class in array, convert to string
       migrated['class'] = classArray[0] || '';
-      logger.info(`Converted single-item class array to string: ${classArray[0]}`);
     } else if (classArray.length === 0) {
       // Empty array - set to empty string
       migrated['class'] = '';
-      logger.warn('Empty class array found, set to empty string');
+      console.warn('Empty class array found, set to empty string');
     } else {
       // More than 2 classes - keep first class
       migrated['class'] = classArray[0] || '';
-      logger.warn(`Invalid class array with ${classArray.length} items, using first class: ${classArray[0]}`);
+      console.warn(`Invalid class array with ${classArray.length} items, using first class: ${classArray[0]}`);
     }
   }
 
@@ -427,8 +403,6 @@ export function processCharacterData(data: unknown): Character {
   let migratedData = data as LegacyCharacterData;
 
   if (isLegacyCharacter(migratedData)) {
-    logger.debug(`Migrating legacy character: ${migratedData['name'] || 'Unknown'}`);
-
     // First handle the main legacy migration (pre-2.3)
     migratedData = migrateLegacyCharacter(migratedData);
   }
@@ -436,7 +410,6 @@ export function processCharacterData(data: unknown): Character {
   // Handle version 2.3 to 2.4 migration (custom classes refactor)
   let currentVersion = migratedData['settings']?.version || 0;
   if (currentVersion < VERSION_CUSTOM_CLASSES) {
-    logger.debug(`Migrating character from version ${currentVersion} to ${VERSION_CUSTOM_CLASSES}: ${migratedData['name'] || 'Unknown'}`);
     migratedData = migrateCustomClasses(migratedData);
 
     // Update version to 2.4
@@ -449,7 +422,6 @@ export function processCharacterData(data: unknown): Character {
 
   // Handle version 2.4 to 2.5 migration (custom races refactor)
   if (currentVersion < VERSION_CUSTOM_RACES) {
-    logger.debug(`Migrating character from version ${currentVersion} to ${VERSION_CUSTOM_RACES}: ${migratedData['name'] || 'Unknown'}`);
     migratedData = migrateCustomRaces(migratedData);
 
     // Update version to 2.5
@@ -465,9 +437,6 @@ export function processCharacterData(data: unknown): Character {
   const needsClassMigration = currentVersion < VERSION_COMBINATION_CLASSES || Array.isArray(migratedData['class']);
 
   if (needsClassMigration) {
-    logger.debug(
-      `Migrating character class from version ${currentVersion} to ${VERSION_COMBINATION_CLASSES}: ${migratedData['name'] || 'Unknown'}`,
-    );
     migratedData = migrateCombinationClasses(migratedData);
 
     // Update version to current
