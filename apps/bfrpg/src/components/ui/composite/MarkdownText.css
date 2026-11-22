@@ -1,0 +1,41 @@
+@layer components {
+  .md-text > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .md-text > .typography {
+    color: var(--zinc-300);
+    line-height: 1.625;
+  }
+  .md-text strong {
+    font-weight: 600;
+    color: var(--zinc-200);
+  }
+  .md-table-wrap {
+    overflow-x: auto;
+    margin-block: calc(var(--space) * 4);
+  }
+  .md-table {
+    min-width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--zinc-600);
+    background: var(--zinc-800);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .md-table thead tr {
+    background: var(--zinc-700);
+  }
+  .md-table th,
+  .md-table td {
+    border: 1px solid var(--zinc-600);
+    padding: calc(var(--space) * 2) calc(var(--space) * 3);
+  }
+  .md-table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--zinc-200);
+  }
+  .md-table td {
+    color: var(--zinc-300);
+  }
+}

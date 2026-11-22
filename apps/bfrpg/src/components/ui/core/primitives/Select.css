@@ -1,0 +1,109 @@
+@layer components {
+  /* A native <select> dressed like the text inputs, with its own chevron. */
+  .select-control {
+    position: relative;
+  }
+  .select-label {
+    display: block;
+    margin-bottom: calc(var(--space) * 2);
+    font-weight: 500;
+    color: var(--zinc-100);
+  }
+  .select-label-sm {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .select-label-md {
+    font-size: var(--text-base);
+    line-height: var(--text-base-lh);
+  }
+  .select-label-lg {
+    font-size: var(--text-lg);
+    line-height: var(--text-lg-lh);
+  }
+  .select-required {
+    margin-left: calc(var(--space) * 1);
+    color: var(--red-400);
+  }
+
+  .select {
+    --depth-color: var(--zinc-700);
+    width: 100%;
+    appearance: none;
+    cursor: pointer;
+    color: var(--zinc-100);
+    background: var(--zinc-800);
+    border: 2px solid var(--zinc-600);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 3px 0 0 var(--depth-color);
+    outline: none;
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .select:focus {
+    background: var(--zinc-700);
+    border-color: var(--amber-400);
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 4px var(--amber-400),
+      0 4px 0 0 var(--amber-700);
+  }
+  .select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--zinc-900);
+  }
+  .select-error {
+    --depth-color: var(--red-700);
+    border-color: var(--red-500);
+    background: color-mix(in oklab, var(--red-950) 20%, transparent);
+  }
+  .select-error:focus {
+    border-color: var(--red-400);
+    background: color-mix(in oklab, var(--red-950) 30%, transparent);
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 4px var(--red-400),
+      0 4px 0 0 var(--amber-700);
+  }
+  .select-sm {
+    padding: calc(var(--space) * 2) calc(var(--space) * 10) calc(var(--space) * 2) calc(var(--space) * 3);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    min-height: 36px;
+  }
+  .select-md {
+    padding: calc(var(--space) * 3) calc(var(--space) * 12) calc(var(--space) * 3) calc(var(--space) * 4);
+    font-size: var(--text-base);
+    line-height: var(--text-base-lh);
+    min-height: 44px;
+  }
+  .select-lg {
+    padding: calc(var(--space) * 4) calc(var(--space) * 14) calc(var(--space) * 4) calc(var(--space) * 5);
+    font-size: var(--text-lg);
+    line-height: var(--text-lg-lh);
+    min-height: 52px;
+  }
+
+  .select-chevron {
+    position: absolute;
+    inset-block: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    padding-right: calc(var(--space) * 3);
+    pointer-events: none;
+    color: var(--zinc-400);
+  }
+  .select-help {
+    margin-top: calc(var(--space) * 1);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--zinc-400);
+  }
+  .select-message {
+    margin-top: calc(var(--space) * 1);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--red-400);
+  }
+}

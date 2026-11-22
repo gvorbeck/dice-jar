@@ -3,7 +3,7 @@ import { render, screen, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toastModuleMock, addToastSpy } from '@/test/toastMock';
 
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
 
 import { OptionSelect } from '../OptionSelect';
 import type { RadioOption } from '@/model';

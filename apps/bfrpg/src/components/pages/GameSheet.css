@@ -1,0 +1,43 @@
+@layer components {
+  .game-sheet > header {
+    margin-bottom: calc(var(--space) * 8);
+  }
+  .game-sheet > header .crumbs {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .game-sheet > .hero-card {
+    margin-bottom: calc(var(--space) * 8);
+  }
+  .game-body > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .game-body > .game-add:not(:last-child) {
+    margin-bottom: calc(var(--space) * 8);
+  }
+  /* Hidden until it has keyboard focus, then pinned top left. */
+  .game-skip {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .game-skip:focus {
+    top: calc(var(--space) * 4);
+    left: calc(var(--space) * 4);
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: calc(var(--space) * 2) calc(var(--space) * 4);
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    border-radius: var(--radius);
+    background: var(--amber-400);
+    color: var(--zinc-900);
+  }
+}

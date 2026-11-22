@@ -1,0 +1,8 @@
+@layer components {
+  .class-hit-die.typography {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .class-attribute.typography {
+    text-transform: capitalize;
+  }
+}

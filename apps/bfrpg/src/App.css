@@ -1,0 +1,181 @@
+@layer base, components;
+@import './styles/tokens.css';
+@import './styles/reset.css';
+@import './styles/patterns.css';
+
+/* Apply dark theme to body */
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+/* Apply Wellfleet font to headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-title);
+}
+
+/* Custom accessibility and focus styles */
+
+/* Screen reader only content */
+.sr-only,
+.toast-announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus management with amber highlight */
+*:focus {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute !important;
+  top: -40px !important;
+  left: 6px !important;
+  background: var(--accent) !important;
+  color: var(--bg) !important;
+  padding: 12px 16px !important;
+  text-decoration: none !important;
+  z-index: 9999 !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--black) 30%, transparent) !important;
+  transition: all 0.2s ease-in-out !important;
+  white-space: nowrap !important;
+  transform: translateY(-100%) !important;
+  opacity: 0 !important;
+}
+
+.skip-link:focus {
+  top: 16px !important;
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  outline: var(--focus-ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* Error states with theme colors */
+[aria-invalid='true'] {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 20%, transparent) !important;
+}
+
+[role='alert'] {
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Custom scrollbar styling for dark theme */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--zinc-600) var(--zinc-800); /* thumb, track */
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--zinc-800);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--zinc-600);
+  border-radius: 4px;
+  border: 1px solid var(--scrollbar-thumb-border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--zinc-500);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--zinc-800);
+}
+
+/* Skeleton shimmer animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Print styles */
+@media print {
+  /* Hide header and footer */
+  header[role='banner'],
+  footer[role='contentinfo'] {
+    display: none !important;
+  }
+
+  /* Hide breadcrumb navigation */
+  nav[aria-label='Breadcrumb'] {
+    display: none !important;
+  }
+
+  /* Hide skip link */
+  .skip-link {
+    display: none !important;
+  }
+
+  /* Hide alert banners */
+  [role='alert'] {
+    display: none !important;
+  }
+
+  /* Hide React Query DevTools */
+  .tsqd-open-btn-container,
+  .tsqd-parent-container {
+    display: none !important;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}

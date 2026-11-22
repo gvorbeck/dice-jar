@@ -4,9 +4,9 @@ import { Checkbox, CheckboxGroup, Divider, Icon, Input, List, Text, UseDots } fr
 import type { MoveBlock, MoveDefinition, RightControlSpec } from '@/model';
 import { parseMoveRoll } from '@/lib/parseMoveRoll';
 import { resolveRollStat } from '@/lib/rollDice';
-import { useDebouncedSave } from '@/lib/useDebouncedSave';
-import { useFirestoreSync } from '@/lib/useFirestoreSync';
-import { useLatest } from '@/lib/useLatest';
+import { useDebouncedSave } from '@dice-jar/browser';
+import { useFirestoreSync } from '@dice-jar/browser';
+import { useLatest } from '@dice-jar/browser';
 import { RollAffordance, type StatOption } from './RollAffordance';
 import { useCharacterRollOptional } from './CharacterRollContext';
 

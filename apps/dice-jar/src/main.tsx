@@ -8,6 +8,7 @@ import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/im-fell-english/latin-400.css';
 import '@fontsource/inter/latin-400.css';
 import '@fontsource/inter/latin-600.css';
+import '@fontsource/wellfleet/latin-400.css';
 import './styles/tokens.css';
 import './styles/app.css';
 import { App } from './App';

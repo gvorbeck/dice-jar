@@ -1,0 +1,134 @@
+@layer components {
+  .scrolls-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--space) * 4);
+    width: 100%;
+  }
+  .scrolls-title .btn {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .scrolls-body {
+    padding: calc(var(--space) * 4);
+  }
+  .scrolls-block {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .scrolls-block > .section-header,
+  .scrolls-done > .section-header {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .scrolls-list > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .scrolls-done .scrolls-list > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .scroll-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .scroll-tags {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+    margin-top: var(--space);
+  }
+  .scroll-tools {
+    display: flex;
+    gap: var(--space);
+  }
+  .scroll-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(var(--space) * 4);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .scroll-notes {
+    margin-top: calc(var(--space) * 2);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .scrolls-done .scroll-notes {
+    color: var(--zinc-300);
+  }
+  .scroll-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(var(--space) * 2);
+    margin-top: calc(var(--space) * 3);
+  }
+  .scroll-fields .form-field-label {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .scrolls-done .card.scroll-done {
+    padding: calc(var(--space) * 3);
+  }
+  .scroll-done-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .scroll-done-row > div:first-child {
+    flex: 1 1 0%;
+  }
+  .scroll-cost {
+    display: flex;
+    align-items: flex-start;
+    gap: calc(var(--space) * 3);
+  }
+  .scroll-cost > div:first-child {
+    text-align: right;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--zinc-400);
+  }
+  .scroll-bonuses {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+  }
+  .scroll-bonuses > :not(:last-child) {
+    margin-bottom: var(--space);
+  }
+  .scroll-bonuses > div {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+  }
+  .scroll-empty.card {
+    text-align: center;
+  }
+  .scroll-empty-icon {
+    margin: 0 auto calc(var(--space) * 3);
+  }
+  .scroll-empty-icon .icon {
+    margin-inline: auto;
+    color: var(--zinc-400);
+  }
+  .scroll-empty .typography {
+    margin-bottom: calc(var(--space) * 3);
+    color: var(--zinc-400);
+  }
+  .scroll-estimate {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: calc(var(--space) * 4);
+    padding: calc(var(--space) * 3);
+    border-radius: var(--radius-md);
+    background: var(--zinc-800);
+  }
+  .scroll-form-actions {
+    display: flex;
+    gap: calc(var(--space) * 3);
+    padding-top: calc(var(--space) * 4);
+  }
+  .scroll-form-actions .btn:first-child {
+    flex: 1 1 0%;
+  }
+}

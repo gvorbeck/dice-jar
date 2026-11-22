@@ -68,7 +68,8 @@ a {
 }
 
 /* Visually hides content while keeping it in the accessibility tree. */
-.field-sr-only {
+.field-sr-only,
+.toast-announcer {
   position: absolute;
   width: 1px;
   height: 1px;

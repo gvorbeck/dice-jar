@@ -1,0 +1,16 @@
+@layer components {
+  .rules-tip {
+    max-width: 20rem;
+    white-space: normal;
+  }
+  .rules-tip .text-header {
+    margin-bottom: var(--space);
+  }
+  .rules-tip-list {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .rules-tip-list > :not(:last-child) {
+    margin-bottom: var(--space);
+  }
+}

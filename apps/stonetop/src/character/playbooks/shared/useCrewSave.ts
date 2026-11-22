@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect, useState } from 'react';
-import { useLatest } from '@/lib/useLatest';
+import { useLatest } from '@dice-jar/browser';
 import { featurePatch } from '@/lib/resolvePlaybookFeatures';
 import type { CharacterData } from '@/model';
 

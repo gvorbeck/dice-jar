@@ -1,0 +1,16 @@
+@layer components {
+  .import-example {
+    padding: calc(var(--space) * 4);
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    background: var(--zinc-950);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+  }
+  .import-example code {
+    color: var(--zinc-300);
+  }
+  .modal-stack > .accordion {
+    margin-top: calc(var(--space) * 4);
+  }
+}

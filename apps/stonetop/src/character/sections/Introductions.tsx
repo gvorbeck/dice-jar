@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
-import { useLatest } from '@/lib/useLatest';
-import { useDebouncedSave } from '@/lib/useDebouncedSave';
+import { useLatest } from '@dice-jar/browser';
+import { useDebouncedSave } from '@dice-jar/browser';
 import { useOptimisticField } from '@/lib/useOptimisticField';
 import { CheckboxGroup, Input, List, Text } from '@/ui';
 import { PlaybookSection } from '@/playbook/PlaybookSection';

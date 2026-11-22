@@ -1,8 +1,6 @@
 import {
-  FieldPath,
   collection,
   deleteDoc,
-  deleteField,
   doc,
   getDoc,
   getDocFromCache,
@@ -13,7 +11,8 @@ import {
   updateDoc,
   writeBatch,
 } from 'firebase/firestore';
-import { REMOVED, diffPaths } from '@dice-jar/diff';
+import { diffPaths } from '@dice-jar/diff';
+import { updatePairs } from '@dice-jar/firebase';
 import { db } from '@/lib/firebase';
 import { GAMES_COLLECTION } from '@/lib/constants';
 import { assembleGame, restoredLevel, splitGame, type Stored } from '@/lib/gameShape';
@@ -102,11 +101,7 @@ export const editCharacter = async (
       Object.fromEntries(CHARACTER_FIELDS.filter((field) => field in from).map((field) => [field, from[field]]));
     const changes = diffPaths(known(raw), known({ ...after }));
     if (!changes.length) return undefined;
-    return changes.flatMap(([path, value]) => [new FieldPath(...path), value === REMOVED ? deleteField() : value]) as [
-      FieldPath,
-      unknown,
-      ...unknown[],
-    ];
+    return updatePairs(changes);
   };
   if (confirmed) {
     // Read, guard and write in one transaction: the server reruns it on fresh data if another device wrote meanwhile, so two devices can never both pass a check against the same stale copy.

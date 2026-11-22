@@ -1,4 +1,4 @@
-import { useLatest } from './useLatest';
+import { useLatest } from '@dice-jar/browser';
 import { useOptimisticField } from './useOptimisticField';
 import type { PlaybookFeatures } from '@/model';
 

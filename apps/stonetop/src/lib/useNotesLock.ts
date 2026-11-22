@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLatest } from './useLatest';
+import { useLatest } from '@dice-jar/browser';
 import { NOTES_CLIENT_ID, NOTES_HEARTBEAT_MS, NOTES_IDLE_MS, NOTES_STALE_MS } from '@/lib/sharedNotes';
 import type { NotesLock } from '@/model';
 

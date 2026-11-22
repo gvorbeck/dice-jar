@@ -1,0 +1,60 @@
+@layer components {
+  .learn-note.callout {
+    border-color: color-mix(in oklab, var(--amber-800) 50%, transparent);
+    background: color-mix(in oklab, var(--amber-950) 30%, transparent);
+  }
+  .learn-note .callout-icon .icon {
+    color: var(--amber-400);
+  }
+  .learn-note .typography {
+    color: color-mix(in oklab, var(--amber-300) 80%, transparent);
+  }
+  .learn-loading.loading {
+    padding-block: calc(var(--space) * 8);
+  }
+  .learn-state {
+    padding-block: calc(var(--space) * 8);
+    text-align: center;
+  }
+  .learn-state .callout {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .learn-state .callout-icon .icon {
+    color: var(--red-400);
+  }
+  .learn-state .callout .typography[data-variant='body'] {
+    margin-bottom: calc(var(--space) * 3);
+    color: var(--red-300);
+  }
+  .learn-none .typography:first-child {
+    margin-bottom: calc(var(--space) * 2);
+    color: var(--zinc-400);
+  }
+  .learn-none .typography:last-child {
+    color: var(--zinc-500);
+  }
+  .learn-levels > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .learn-levels > .typography {
+    color: var(--zinc-100);
+  }
+  .learn-level > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .learn-preview {
+    margin-top: calc(var(--space) * 2);
+  }
+  .learn-preview-card {
+    padding: calc(var(--space) * 3);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--zinc-800) 30%, transparent);
+  }
+  .learn-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(var(--space) * 3);
+    padding-top: calc(var(--space) * 4);
+    border-top: 1px solid var(--zinc-700);
+  }
+}

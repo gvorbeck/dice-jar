@@ -1,0 +1,13 @@
+@layer components {
+  .turn-undead > .section-header {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .turn-undead-note.typography {
+    display: block;
+    margin-bottom: calc(var(--space) * 4);
+    color: var(--zinc-500);
+  }
+  .turn-undead .card .typography {
+    color: var(--zinc-300);
+  }
+}

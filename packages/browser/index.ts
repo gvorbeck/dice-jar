@@ -27,9 +27,12 @@ export const store = {
 };
 
 /** Saves `data` to the visitor's downloads as a JSON file. */
-export function downloadJson(name: string, data: unknown) {
+export const downloadJson = (name: string, data: unknown) => downloadText(name, JSON.stringify(data, null, 2), 'application/json');
+
+/** Saves `text` to the visitor's downloads as a file of MIME `type`. */
+export function downloadText(name: string, text: string, type = 'text/plain') {
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+  a.href = URL.createObjectURL(new Blob([text], { type }));
   a.download = name;
   document.body.appendChild(a); // some browsers ignore a click on a detached link
   a.click();
@@ -64,3 +67,10 @@ export { ErrorBoundary } from './ErrorBoundary';
 export { DiceJarCredit } from './DiceJarCredit';
 export { SkipLink, useFocusMain } from './focus';
 export { useTitle } from './useTitle';
+export { useSub, useLoad, type Sub } from './useSub';
+export { useRun } from './useRun';
+export { useDebouncedSave, SAVE_ERROR_MESSAGE, INVALID_WRITE_MESSAGE } from './useDebouncedSave';
+export { useDebouncedTextField } from './useDebouncedTextField';
+export { useFirestoreSync } from './useFirestoreSync';
+export { useLatest } from './useLatest';
+export { ToastProvider, useToast, useToastOptional, type ToastEntryProps, type ToastItem, type ToastVariant } from './toast';

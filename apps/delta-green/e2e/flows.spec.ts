@@ -42,6 +42,25 @@ test('live sheet changes are saved to the server', async ({ page, browser }) => 
   await expect(hp(other)).toHaveText('11 / 13');
 });
 
+test('edits made offline, one after another, survive closing the tab and reach the server later', async ({ page }) => {
+  const { gameId, agentId, agentUrl } = await createAgent(page);
+  await savedHp(gameId, agentId, 13);
+  await page.context().setOffline(true);
+  await page.getByRole('button', { name: 'Decrease HP' }).click();
+  await expect(hp(page)).toHaveText('12 / 13');
+  await page.waitForTimeout(1000); // past the save delay, so the first edit is written and the second must not wait behind it
+  await page.getByRole('button', { name: 'Decrease HP' }).click();
+  await expect(hp(page)).toHaveText('11 / 13');
+  await page.waitForTimeout(1000);
+  await page.close();
+
+  const context = page.context();
+  await context.setOffline(false);
+  const back = await context.newPage();
+  await back.goto(agentUrl);
+  await savedHp(gameId, agentId, 11);
+});
+
 test("a change saved elsewhere is not replayed over the player's own fix when the sheet is reopened", async ({ page }) => {
   const { gameId, agentId } = await createAgent(page);
   await savedHp(gameId, agentId, 13);

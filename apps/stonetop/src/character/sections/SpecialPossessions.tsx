@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useLatest } from '@/lib/useLatest';
+import { useLatest } from '@dice-jar/browser';
 import { useOptimisticField } from '@/lib/useOptimisticField';
-import { useDebouncedTextField } from '@/lib/useDebouncedTextField';
+import { useDebouncedTextField } from '@dice-jar/browser';
 import { cn } from '@dice-jar/cn';
 import { Checkbox, Input, Radio, Text, UseDots } from '@/ui';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useToast } from '@dice-jar/browser';
 import { PlaybookSection } from '@/playbook/PlaybookSection';
 import type { Possession, PossessionSubItem, PlaybookSpecialPossessions } from '@/rules/characterCreation/specialPossessionsOptions';
 import type { CharacterData } from '@/model';
@@ -405,7 +405,9 @@ export const SpecialPossessions = ({ config, data, onSave, level = 1, chooseOver
                     aria-label="Custom possession name"
                     placeholder="Describe possession…"
                     onClick={stopPropagation}
-                    {...customField}
+                    value={customField.value}
+                    onChange={(e) => customField.onChange(e.target.value)}
+                    onBlur={customField.onBlur}
                   />
                 </div>
               )}

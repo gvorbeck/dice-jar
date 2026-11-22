@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, type MutableRefObject } from 'react';
-import { useLatest } from './useLatest';
-import { useFirestoreSync } from './useFirestoreSync';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useLatest } from '@dice-jar/browser';
+import { useFirestoreSync } from '@dice-jar/browser';
+import { useToast } from '@dice-jar/browser';
 
 /**
  * Optimistic local-state field backed by a Firestore write. The single field

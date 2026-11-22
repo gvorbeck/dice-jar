@@ -1,0 +1,23 @@
+@layer components {
+  .players-body {
+    padding: calc(var(--space) * 4);
+  }
+  .players-grid {
+    display: grid;
+    gap: calc(var(--space) * 4);
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .players-loading.loading {
+    padding-block: calc(var(--space) * 4);
+  }
+  @media (min-width: 48rem) {
+    .players-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .players-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}

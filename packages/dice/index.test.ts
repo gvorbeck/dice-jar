@@ -1,5 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { rollNotation, withDie, withModifier } from './index';
+import { roll, rollNotation, withDie, withModifier } from './index';
+
+describe('roll', () => {
+  it('returns the outcome of valid notation', () => {
+    expect(roll('2d6+1', () => 0.5)).toEqual({ notation: '2d6+1', total: 9, breakdown: '[4, 4] + 1' });
+  });
+  it('throws on notation the parser rejects', () => {
+    expect(() => roll('1d0')).toThrow('Invalid dice notation "1d0"');
+    expect(() => roll('101d6')).toThrow();
+  });
+});
 
 // Deterministic rng: yields the given faces for a die with `sides` sides, in order. (face-1)/sides + a
 // nudge lands floor(r*sides)+1 on the face.

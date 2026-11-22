@@ -1,0 +1,23 @@
+@layer components {
+  .site-main {
+    flex: 1 1 0%;
+    width: 100%;
+    max-width: var(--page-w);
+    margin-inline: auto;
+    padding: calc(var(--space) * 8) calc(var(--space) * 4);
+  }
+  .not-found {
+    padding-block: calc(var(--space) * 16);
+    text-align: center;
+  }
+  .not-found a {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  .not-found a:hover {
+    color: var(--accent-hover);
+  }
+  .not-found .typography {
+    margin-bottom: calc(var(--space) * 6);
+  }
+}

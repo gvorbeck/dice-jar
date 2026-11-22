@@ -1,7 +1,7 @@
 // Moves games from one document to subcollections (MIGRATION.md). Without --write it only reports what it would do.
 // Usage: node scripts/migrate-games.ts --backup ./firestore-backup-<timestamp>.json [--write] [--only id,id] [--limit n]
 import * as fs from 'fs';
-import { adminDb } from './admin.ts';
+import { adminDb } from '@dice-jar/admin';
 import { gamesFromBackup } from './backupFile.ts';
 import { migrateAll } from './migrateCore.ts';
 
@@ -36,7 +36,7 @@ const backup = backupFile
 
 console.log(`Mode: ${write ? 'WRITE' : 'DRY RUN (pass --write to move games)'}\n`);
 const started = Date.now();
-const outcomes = await migrateAll(adminDb(), {
+const outcomes = await migrateAll(adminDb('demo-stonetop'), {
   write,
   backup,
   only,

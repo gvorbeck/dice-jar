@@ -1,0 +1,50 @@
+@layer components {
+  .status-dot {
+    border-radius: 9999px;
+    box-shadow: var(--shadow-sm);
+    background: var(--amber-500);
+  }
+  .status-dot[data-status='inactive'] {
+    background: var(--zinc-500);
+  }
+  .status-dot[data-status='warning'] {
+    background: var(--yellow-500);
+  }
+  .status-dot[data-status='error'] {
+    background: var(--red-500);
+  }
+  .status-dot[data-status='success'] {
+    background: var(--lime-500);
+  }
+  .status-dot[data-status='custom'] {
+    background: var(--amber-400);
+  }
+  .status-dot[data-color='purple'] {
+    background: var(--purple-400);
+  }
+  .status-dot[data-color='blue'] {
+    background: var(--blue-400);
+  }
+  .status-dot[data-color='lime'] {
+    background: var(--lime-400);
+  }
+  .status-dot[data-color='amber'] {
+    background: var(--amber-400);
+  }
+  .status-dot[data-size='xs'] {
+    width: 0.375rem;
+    height: 0.375rem;
+  }
+  .status-dot[data-size='sm'] {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+  .status-dot[data-size='md'] {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+  .status-dot[data-size='lg'] {
+    width: 1rem;
+    height: 1rem;
+  }
+}

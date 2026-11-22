@@ -1,0 +1,69 @@
+@layer components {
+  .stat-grid {
+    display: grid;
+    gap: calc(var(--space) * 3);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    --label: var(--lime-300);
+    --value: var(--lime-100);
+    --modifier: var(--lime-300);
+  }
+  .stat-grid[data-variant='equipment'] {
+    --label: var(--lime-400);
+    --value: var(--lime-50);
+  }
+  .stat-grid[data-variant='summary'] {
+    --label: var(--amber-200);
+    --value: var(--amber-100);
+    --modifier: var(--amber-300);
+  }
+  .stat-grid[data-variant='ability'] .stat,
+  .stat-grid[data-variant='summary'] .stat {
+    text-align: center;
+  }
+  .stat-label {
+    margin-bottom: var(--space);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--label);
+  }
+  .stat-head {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+    margin-bottom: var(--space);
+  }
+  .stat-head .stat-label {
+    margin-bottom: 0;
+  }
+  .stat-value {
+    font-size: var(--text-lg);
+    line-height: var(--text-lg-lh);
+    font-weight: 700;
+    color: var(--value);
+  }
+  .stat-modifier {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--modifier);
+  }
+  .stat-grid[data-variant='equipment'] {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  @media (min-width: 40rem) {
+    .stat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .stat-grid[data-variant='equipment'] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 48rem) {
+    .stat-grid[data-variant='ability'],
+    .stat-grid[data-variant='summary'] {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+}

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useLatest } from '@/lib/useLatest';
-import { useFirestoreSync } from '@/lib/useFirestoreSync';
+import { useLatest } from '@dice-jar/browser';
+import { useFirestoreSync } from '@dice-jar/browser';
 import { cn } from '@dice-jar/cn';
-import { useDebouncedSave } from '@/lib/useDebouncedSave';
+import { useDebouncedSave } from '@dice-jar/browser';
 import { Checkbox, Input, Text, Stack } from '@/ui';
 import { PlaybookSection } from '@/playbook/PlaybookSection';
 import { STAT_GROUPS, STATS } from '@/lib/constants';

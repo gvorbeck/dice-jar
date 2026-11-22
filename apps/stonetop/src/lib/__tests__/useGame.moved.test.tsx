@@ -5,7 +5,7 @@ import { addToastSpy, toastModuleMock } from '@/test/toastMock';
 
 vi.mock('firebase/app', () => ({ initializeApp: () => ({}) }));
 vi.mock('firebase/firestore', () => firestoreMockModule());
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
 
 import { useGame } from '../useGame';
 import { assembleGame, splitGame } from '../gameShape';

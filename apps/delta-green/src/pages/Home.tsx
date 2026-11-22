@@ -1,6 +1,6 @@
 import { useId, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useRun } from '@/lib/useRun';
+import { useRun } from '@dice-jar/browser';
 import { newGameId, slugifyGameId } from '@dice-jar/game-id';
 import { isOpenableId, MIN_ID, recentGames } from '@/lib/gameId';
 import { CODENAMES } from '@/rules/data/random';

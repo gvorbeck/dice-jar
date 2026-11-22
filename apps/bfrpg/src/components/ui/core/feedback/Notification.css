@@ -1,0 +1,151 @@
+@layer components {
+  .notification {
+    --from: var(--slate-50);
+    --to: var(--slate-100);
+    --alpha: 95%;
+    --edge: var(--slate-200);
+    --glow: var(--slate-200);
+    --accent: var(--blue-500);
+    position: relative;
+    overflow: hidden;
+    min-width: 20rem;
+    max-width: 28rem;
+    padding: calc(var(--space) * 5);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius-xl);
+    background-image: linear-gradient(
+      to bottom right in oklab,
+      color-mix(in oklab, var(--from) var(--alpha), transparent),
+      color-mix(in oklab, var(--to) var(--alpha), transparent)
+    );
+    box-shadow:
+      0 10px 15px -3px color-mix(in oklab, var(--glow) 50%, transparent),
+      0 4px 6px -4px color-mix(in oklab, var(--glow) 50%, transparent);
+    backdrop-filter: blur(12px);
+    /* ToastProvider removes a dismissed toast after 200ms (EXIT_DURATION_MS), so the exit must finish in that time. */
+    transition: all 200ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .notification[data-priority='success'] {
+    --from: var(--lime-50);
+    --to: var(--lime-100);
+    --edge: var(--lime-200);
+    --glow: var(--lime-200);
+    --accent: var(--lime-500);
+  }
+  .notification[data-priority='warning'] {
+    --from: var(--amber-50);
+    --to: var(--orange-100);
+    --edge: var(--amber-200);
+    --glow: var(--amber-200);
+    --accent: var(--amber-500);
+  }
+  .notification[data-priority='error'] {
+    --from: var(--red-50);
+    --to: var(--rose-100);
+    --alpha: 90%;
+    --edge: var(--red-200);
+    --glow: var(--red-200);
+    --accent: var(--red-500);
+  }
+  @media (prefers-color-scheme: dark) {
+    .notification {
+      --from: var(--slate-900);
+      --to: var(--slate-800);
+      --alpha: 90%;
+      --edge: var(--slate-700);
+      --glow: var(--slate-900);
+    }
+    .notification[data-priority='success'] {
+      --from: var(--lime-950);
+      --to: var(--lime-900);
+      --alpha: 80%;
+      --edge: var(--lime-800);
+      --glow: color-mix(in oklab, var(--lime-900) 60%, transparent);
+    }
+    .notification[data-priority='warning'] {
+      --from: var(--amber-950);
+      --to: var(--orange-900);
+      --alpha: 80%;
+      --edge: var(--amber-800);
+      --glow: color-mix(in oklab, var(--amber-900) 60%, transparent);
+    }
+    .notification[data-priority='error'] {
+      --from: var(--red-950);
+      --to: var(--rose-900);
+      --alpha: 80%;
+      --edge: var(--red-700);
+      --glow: color-mix(in oklab, var(--red-900) 80%, transparent);
+    }
+  }
+  .notification:not([data-shown]) {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+  .notification[data-shown] {
+    opacity: 1;
+    /* A toast is shown from its first render, so the slide-in starts from here. */
+    @starting-style {
+      opacity: 0;
+      transform: translateX(100%) scale(0.95);
+    }
+  }
+  .notification-accent {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0.25rem;
+    border-top-left-radius: var(--radius-xl);
+    border-bottom-left-radius: var(--radius-xl);
+    background: var(--accent);
+  }
+  .notification .btn.notification-close {
+    position: absolute;
+    top: calc(var(--space) * 3);
+    right: calc(var(--space) * 3);
+    width: 1.75rem;
+    height: 1.75rem;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 9999px;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .notification .btn.notification-close[data-hovered] {
+    background: color-mix(in srgb, var(--black) 5%, transparent);
+  }
+  .notification-body {
+    padding-left: calc(var(--space) * 4);
+    padding-right: calc(var(--space) * 4);
+  }
+  .notification-body[data-dismissible] {
+    padding-right: calc(var(--space) * 12);
+  }
+  .notification-body .typography[data-variant='h6'] {
+    margin-bottom: calc(var(--space) * 2);
+    font-weight: 600;
+  }
+  .notification-body .typography[data-variant='body'] {
+    line-height: 1.625;
+  }
+  @media (prefers-color-scheme: dark) {
+    .notification .btn.notification-close[data-hovered] {
+      background: color-mix(in srgb, var(--white) 10%, transparent);
+    }
+  }
+
+  .toast-region {
+    position: fixed;
+    top: calc(var(--space) * 4);
+    right: calc(var(--space) * 4);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: calc(var(--space) * 3);
+    max-height: 100vh;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .toast-region > * {
+    pointer-events: auto;
+  }
+}

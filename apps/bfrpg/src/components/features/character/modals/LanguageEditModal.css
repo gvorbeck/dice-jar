@@ -1,0 +1,5 @@
+@layer components {
+  .language-rule.hr {
+    margin-top: calc(var(--space) * 6);
+  }
+}

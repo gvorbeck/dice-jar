@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { Button, Tooltip } from '@/ui';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useToast } from '@dice-jar/browser';
 import { exportGame, readImportFile, type GameExportEnvelope, type ImportSummary } from '@/lib/gameBackup';
 import { ImportGameModal } from './modals/ImportGameModal';
 

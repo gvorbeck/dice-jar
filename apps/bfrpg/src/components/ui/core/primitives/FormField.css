@@ -1,0 +1,33 @@
+@layer components {
+  /* A label, a control, then an optional hint and error, each half a rem apart. */
+  .form-field > * + * {
+    margin-top: calc(var(--space) * 2);
+  }
+  .form-field-label {
+    display: block;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    font-weight: 500;
+    color: var(--zinc-100);
+  }
+  .form-field-required {
+    margin-left: calc(var(--space) * 1);
+    color: var(--red-400);
+  }
+  .form-field-control {
+    position: relative;
+  }
+  .form-field-hint {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-400);
+  }
+  .form-field-error {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 1);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-lh);
+    color: var(--red-400);
+  }
+}

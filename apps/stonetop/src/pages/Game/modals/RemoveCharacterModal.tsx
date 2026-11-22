@@ -1,6 +1,6 @@
 import { useState, useId, useCallback } from 'react';
 import { Button, Heading, Modal, Text } from '@/ui';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useToast } from '@dice-jar/browser';
 import { getPlaybook } from '@/lib/constants';
 import type { Character } from '@/model';
 

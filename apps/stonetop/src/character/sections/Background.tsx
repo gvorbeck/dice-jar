@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { useLatest } from '@/lib/useLatest';
-import { useDebouncedSave } from '@/lib/useDebouncedSave';
+import { useLatest } from '@dice-jar/browser';
+import { useDebouncedSave } from '@dice-jar/browser';
 import { useCollapsibleSection } from '@/lib/useCollapsibleSection';
 import { useOptimisticField } from '@/lib/useOptimisticField';
 import { PlaybookSection } from '@/playbook/PlaybookSection';

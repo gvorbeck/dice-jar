@@ -9,12 +9,20 @@ const m = vi.hoisted(() => ({
 vi.mock('firebase/app', () => ({ initializeApp: m.initializeApp }));
 vi.mock('firebase/app-check', () => ({ initializeAppCheck: m.initializeAppCheck, ReCaptchaEnterpriseProvider: class {} }));
 vi.mock('firebase/firestore', () => ({
+  FieldPath: class {
+    segments: string[];
+    constructor(...segments: string[]) {
+      this.segments = segments;
+    }
+  },
+  deleteField: () => 'DELETE',
   initializeFirestore: m.initializeFirestore,
   connectFirestoreEmulator: m.connectFirestoreEmulator,
   persistentLocalCache: () => ({}),
   persistentMultipleTabManager: () => ({}),
 }));
-import { initFirestore } from './index';
+import { REMOVED } from '@dice-jar/diff';
+import { initFirestore, updatePairs } from './index';
 
 const env = {
   VITE_FIREBASE_API_KEY: 'k',
@@ -63,5 +71,18 @@ describe('initFirestore', () => {
     initFirestore({ ...env, VITE_FIRESTORE_EMULATOR: ':8080', DEV: true, VITE_APPCHECK_DEBUG_TOKEN: 'tok' });
     expect(m.connectFirestoreEmulator).toHaveBeenCalledWith('db', 'localhost', 8080);
     expect((globalThis as unknown as Record<string, unknown>).FIREBASE_APPCHECK_DEBUG_TOKEN).toBe('tok');
+  });
+});
+
+describe('updatePairs', () => {
+  it('turns changes into field/value pairs under the prefix, with removals as deletes', () => {
+    const pairs = updatePairs(
+      [
+        [['a', 'b'], 1],
+        [['c'], REMOVED],
+      ],
+      ['live'],
+    );
+    expect(pairs).toEqual([{ segments: ['live', 'a', 'b'] }, 1, { segments: ['live', 'c'] }, 'DELETE']);
   });
 });

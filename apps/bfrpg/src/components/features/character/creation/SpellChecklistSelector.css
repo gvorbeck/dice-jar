@@ -1,0 +1,51 @@
+@layer components {
+  .spell-checks-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: calc(var(--space) * 8);
+  }
+  .spell-checks-loading > div {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  .spell-checks-about,
+  .spell-checks-search {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .spell-checks-count {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .spell-checks-count .typography {
+    color: var(--zinc-300);
+  }
+  .spell-checks-levels > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 6);
+  }
+  .spell-checks-levels .typography[data-variant='subHeading'] {
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .spell-checks-grid {
+    display: grid;
+    gap: calc(var(--space) * 2);
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .spell-checks-grid .checkbox {
+    padding: calc(var(--space) * 3);
+    border: 1px solid color-mix(in oklab, var(--zinc-700) 50%, transparent);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--zinc-800) 50%, transparent);
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .spell-checks-grid .checkbox:hover {
+    background: color-mix(in oklab, var(--zinc-700) 50%, transparent);
+  }
+  .spell-checks-none {
+    padding-block: calc(var(--space) * 8);
+    text-align: center;
+  }
+  @media (min-width: 48rem) {
+    .spell-checks-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}

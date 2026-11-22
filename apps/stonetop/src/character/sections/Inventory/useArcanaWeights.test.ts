@@ -3,8 +3,8 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { toastModuleMock, addToastSpy } from '@/test/toastMock';
 import type { ArcanaMinorEntry, ArcanaMajorEntry } from '@/model';
 
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
 
 // Mock the heavy datasets so the hook's dynamic import() resolves to tiny fixtures — this is
 // also what proves the hook reads only id/name/weight (the fixtures carry nothing else).

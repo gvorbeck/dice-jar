@@ -1,0 +1,2 @@
+// Domain Spell Components
+export {};

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { toastModuleMock, addToastSpy } from '@/test/toastMock';
 
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
 
 import { useTrackedField } from '../useTrackedField';
 import type { PlaybookFeatures } from '@/model';

@@ -1,5 +1,5 @@
 import type { FirestoreError } from 'firebase/firestore';
-import { INVALID_WRITE_MESSAGE } from '@/lib/constants';
+import { INVALID_WRITE_MESSAGE } from '@dice-jar/browser';
 import { isPlainObject, isRecord, isString } from '@/lib/typeGuards';
 import type { Character, CharacterData } from '@/model';
 

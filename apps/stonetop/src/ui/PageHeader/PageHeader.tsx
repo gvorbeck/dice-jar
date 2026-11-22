@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback, useId } from 'react';
 import { Link } from 'react-router-dom';
 import { useCopy } from '@dice-jar/browser';
 import { Button, Heading, Input, Text, RuleDivider, Tooltip } from '@/ui';
-import { useToast } from '@/ui/Toast/ToastContext';
+import { useToast } from '@dice-jar/browser';
 import { PageNav } from './PageNav';
 import { ThemeToggle } from './ThemeToggle';
 import type { GameNav } from './gameNav';

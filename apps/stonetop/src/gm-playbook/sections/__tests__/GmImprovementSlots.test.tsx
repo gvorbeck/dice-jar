@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toastModuleMock } from '@/test/toastMock';
 
-vi.mock('@/ui/Toast/ToastContext', () => toastModuleMock());
+vi.mock('@dice-jar/browser/toast', () => toastModuleMock());
 
 import { GmImprovementSlots } from '../GmImprovementSlots';
 import { makeEmptyGmImprovement } from '../steadingImprovementsData';

@@ -1,0 +1,62 @@
+@layer components {
+  .player.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .player-body {
+    flex: 1 1 0%;
+  }
+  .player-head {
+    display: flex;
+    align-items: flex-start;
+    gap: calc(var(--space) * 3);
+    margin-bottom: calc(var(--space) * 3);
+  }
+  .player-who {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+  .player-name.typography {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: var(--space);
+    color: var(--zinc-100);
+  }
+  .player-meta {
+    margin-bottom: calc(var(--space) * 2);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-lh);
+    color: var(--zinc-400);
+  }
+  .player-meta span {
+    text-transform: capitalize;
+  }
+  .player-abilities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space);
+  }
+  .player-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(var(--space) * 2);
+    margin-top: calc(var(--space) * 3);
+    padding-top: calc(var(--space) * 3);
+    border-top: 1px solid color-mix(in oklab, var(--zinc-700) 50%, transparent);
+  }
+  .btn.player-act {
+    padding: calc(var(--space) * 2);
+    color: var(--zinc-400);
+    transition: color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .btn.player-act[data-hovered] {
+    color: var(--amber-400);
+    background: color-mix(in oklab, var(--zinc-700) 50%, transparent);
+  }
+  .btn.player-act[data-danger][data-hovered] {
+    color: var(--red-400);
+  }
+}

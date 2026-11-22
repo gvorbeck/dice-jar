@@ -1,0 +1,57 @@
+@layer components {
+  .levelup-ready .text-header {
+    color: var(--lime-400);
+  }
+  .levelup-body > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 4);
+  }
+  .levelup-gain > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .levelup-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .levelup-total {
+    padding-top: calc(var(--space) * 2);
+    border-top: 1px solid color-mix(in oklab, var(--amber-700) 30%, transparent);
+  }
+  .levelup-options {
+    padding-top: calc(var(--space) * 3);
+    border-top: 1px solid color-mix(in oklab, var(--amber-700) 30%, transparent);
+  }
+  .levelup-options > :not(:last-child) {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .levelup-choices {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space) * 2);
+  }
+  .levelup-manual.text-input {
+    width: 5rem;
+  }
+  .levelup-reroll.btn {
+    gap: var(--space);
+  }
+  .levelup-status {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(var(--space) * 4);
+  }
+  .levelup-status > div {
+    display: flex;
+    justify-content: space-between;
+  }
+  .levelup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(var(--space) * 3);
+    padding-top: calc(var(--space) * 4);
+    border-top: 1px solid var(--zinc-700);
+  }
+  .levelup-confirm.btn {
+    min-width: 120px;
+  }
+}

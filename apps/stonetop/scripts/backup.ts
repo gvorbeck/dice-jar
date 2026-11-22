@@ -1,7 +1,7 @@
 // Saves games to ./firestore-backup-<timestamp>.json, all of them or just `--only id,id`. Read-only.
 import * as fs from 'fs';
 import * as path from 'path';
-import { adminDb } from './admin.ts';
+import { adminDb } from '@dice-jar/admin';
 import { backupGames } from './backupCore.ts';
 
 const flag = process.argv.indexOf('--only');
@@ -11,7 +11,7 @@ if (flag !== -1 && !only?.length) {
   process.exit(1);
 }
 
-const data = await backupGames(adminDb(), {
+const data = await backupGames(adminDb('demo-stonetop'), {
   only,
   onProgress: (done, total) => {
     if (done % 100 === 0 && done !== total) console.log(`  ${done} / ${total} games`);
