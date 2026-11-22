@@ -119,7 +119,9 @@ function Stepper({
       {/* Step Navigation - Hidden on mobile, visible on large screens */}
       <aside className="stepper-aside">
         <nav role="navigation" aria-label="Step navigation" className="stepper-nav">
-          <Typography variant="sectionHeading">Steps</Typography>
+          <Typography variant="sectionHeading" as="h3">
+            Steps
+          </Typography>
           <List variant="steps" spacing="loose" aria-label="Progress steps">
             {stepItems.map((item, index) => {
               const isActive = index === safeCurrentStep;
@@ -136,13 +138,12 @@ function Stepper({
                     className="stepper-step"
                     data-state={state}
                     aria-current={isActive ? 'step' : undefined}
-                    aria-label={`Step ${index + 1}: ${item.title}${isCompleted ? ' (completed)' : ''}`}
                   >
                     <div className="stepper-number">
                       {isCompleted ? <Icon name="check" size="md" aria-hidden={true} /> : <span aria-hidden="true">{index + 1}</span>}
                     </div>
                     <div className="stepper-step-text">
-                      <TextHeader variant="h6" size="sm" underlined={false}>
+                      <TextHeader variant="h6" as="span" size="sm" underlined={false}>
                         {item.title}
                       </TextHeader>
                       {isActive && <div className="stepper-step-note">Current step</div>}
@@ -157,7 +158,7 @@ function Stepper({
       </aside>
 
       {/* Main Content Area */}
-      <main className="stepper-main">
+      <div className="stepper-main">
         {/* Mobile Step Indicator */}
         <div className="stepper-mobile">
           <Card variant="standard">
@@ -226,7 +227,7 @@ function Stepper({
           </Typography>
           <div>{currentStepItem?.content}</div>
         </section>
-      </main>
+      </div>
     </div>
   );
 }

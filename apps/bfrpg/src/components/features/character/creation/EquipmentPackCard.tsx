@@ -44,7 +44,9 @@ function EquipmentPackCard({
     >
       <div className="pack-head">
         <div>
-          <Typography variant="h6">{pack.name}</Typography>
+          <Typography variant="h6" as="h4">
+            {pack.name}
+          </Typography>
           <div className="pack-badges">
             {isRecommended && (
               <Badge variant="success" size="sm">

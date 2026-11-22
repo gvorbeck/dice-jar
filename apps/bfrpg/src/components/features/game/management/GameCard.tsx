@@ -38,7 +38,7 @@ export function GameCard({ game, user, onDelete, isDeleting }: GameCardProps) {
       {/* Game Header */}
       <div className="char-head">
         <div>
-          <Typography variant="h4" className="char-name">
+          <Typography variant="h4" as="h3" className="char-name">
             {game.name}
           </Typography>
         </div>
@@ -46,24 +46,24 @@ export function GameCard({ game, user, onDelete, isDeleting }: GameCardProps) {
 
       {/* Game Notes */}
       {game.notes && (
-        <section aria-labelledby={`game-${game.id}-notes-label`}>
+        <div>
           <div className="game-notes">
             <div className="game-notes-head">
               <StatusDot status="active" ariaLabel="Game notes section" />
-              <Typography id={`game-${game.id}-notes-label`} variant="helper" className="char-kind-label">
+              <Typography variant="helper" className="char-kind-label">
                 Notes
               </Typography>
             </div>
             <Typography variant="body">{truncateText(game.notes)}</Typography>
           </div>
-        </section>
+        </div>
       )}
 
       {/* Game Stats */}
       {game.players && game.players.length > 0 && (
-        <section aria-labelledby={`game-${game.id}-stats-label`} className="game-stats">
+        <div className="game-stats">
           <StatCard label="Players" value={game.players.length} size="sm" fullName="Number of players in this game" />
-        </section>
+        </div>
       )}
     </BaseCard>
   );

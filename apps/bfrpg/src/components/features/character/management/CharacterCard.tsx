@@ -30,7 +30,7 @@ const CharacterCard = memo(function CharacterCard({ character, user, onDelete, i
       {/* Character Header */}
       <div className="char-head">
         <div>
-          <Typography variant="h4" className="char-name">
+          <Typography variant="h4" as="h3" className="char-name">
             {character.name}
           </Typography>
           {character.level && (

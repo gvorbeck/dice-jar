@@ -88,14 +88,13 @@ test.describe('Character Creation Workflow', () => {
     // Verify character data is shown in review - look for the complete summary
     await expect(page.getByText('Test Fighter - Human Fighter')).toBeVisible();
 
-    // Successfully created a basic human fighter character through all steps!
-    // The character has:
-    // - Rolled ability scores
-    // - Selected Human race
-    // - Selected Fighter class
-    // - Rolled hit points
-    // - Skipped equipment (optional)
-    // - Named "Test Fighter"
+    // Complete saves the character and opens its sheet; a reload shows it was stored, not just held in the page
+    await nextButton.click();
+    await expect(page).toHaveURL(/\/u\/[^/]+\/c\/[^/]+$/);
+    const sheet = page.getByRole('heading', { name: 'Test Fighter' });
+    await expect(sheet).toBeVisible();
+    await page.reload();
+    await expect(sheet).toBeVisible();
   });
 
   test('handles character creation navigation', async ({ page }) => {

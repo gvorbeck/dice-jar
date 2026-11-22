@@ -25,7 +25,9 @@ function StepWrapperComponent({ title, description, children, validationMessage,
   return (
     <section {...sectionProps}>
       <header>
-        <Typography variant="h4">{title}</Typography>
+        <Typography variant="h4" as="h3">
+          {title}
+        </Typography>
         <Typography variant="description">{description}</Typography>
       </header>
 

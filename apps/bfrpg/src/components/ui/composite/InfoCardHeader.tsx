@@ -22,7 +22,7 @@ export default function InfoCardHeader({ icon, title, badge, iconSize = 'md', sp
       <div className="info-card-icon" data-size={iconSize}>
         {icon}
       </div>
-      <Typography variant="h5" weight="semibold" className="info-card-title">
+      <Typography variant="h5" as="h4" weight="semibold" className="info-card-title">
         {title}
       </Typography>
       {badge && <Badge variant={badge.variant || 'supplemental'}>{badge.text}</Badge>}

@@ -142,7 +142,7 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
           <Card variant="success" className="kit-inventory">
             <div className="kit-title">
               <Icon name="clipboard" size="md" />
-              <Typography variant="h5" color="zinc" weight="semibold">
+              <Typography variant="h5" as="h4" color="zinc" weight="semibold">
                 Equipment Inventory
               </Typography>
             </div>
@@ -226,7 +226,9 @@ function EquipmentStep({ character, onCharacterChange }: EquipmentStepProps) {
                       <div>
                         <div className="kit-pack-title">
                           <Icon name="check" size="sm" />
-                          <Typography variant="h6">{selectedPack.name}</Typography>
+                          <Typography variant="h6" as="h5">
+                            {selectedPack.name}
+                          </Typography>
                         </div>
                         <Typography variant="bodySmall" color="secondary">
                           {selectedPack.description}

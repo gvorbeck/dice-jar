@@ -39,6 +39,7 @@
     "@dice-jar/cn": "*",
     "@dice-jar/dice": "*",
     "@dice-jar/diff": "*",
+    "@dice-jar/e2e-helpers": "*",
     "@dice-jar/stale-build": "*",
     "@firebase/rules-unit-testing": "^6.0.0",
     "@playwright/test": "^1.65.0",

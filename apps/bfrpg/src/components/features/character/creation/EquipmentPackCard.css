@@ -6,7 +6,6 @@
     cursor: pointer;
   }
   .pack:not([data-affordable]) {
-    opacity: 0.6;
     cursor: not-allowed;
   }
   .pack[data-affordable]:not([data-selected]):hover {

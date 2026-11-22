@@ -34,7 +34,7 @@ export function ItemGrid<T extends { id: string }>({ items, loading, error, empt
     return (
       <div className="item-grid">
         <div className="item-grid-head">
-          <Typography variant="h4">
+          <Typography variant="h4" as="h2">
             <Icon name={header.icon} size="md" />
             {header.title}
           </Typography>
@@ -76,7 +76,7 @@ export function ItemGrid<T extends { id: string }>({ items, loading, error, empt
           <Icon name={emptyState.icon} size="xl" />
         </div>
         <div className="item-grid-copy">
-          <Typography variant="h4" color="primary">
+          <Typography variant="h4" as="h2" color="primary">
             {emptyState.title}
           </Typography>
           <Typography variant="body" color="secondary">
@@ -97,7 +97,7 @@ export function ItemGrid<T extends { id: string }>({ items, loading, error, empt
   return (
     <div className="item-grid">
       <div className="item-grid-head">
-        <Typography variant="h4">
+        <Typography variant="h4" as="h2">
           <Icon name={header.icon} size="md" />
           {header.title}
         </Typography>

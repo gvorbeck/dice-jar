@@ -65,9 +65,14 @@ function ArmorProperties({ editForm, updateEditForm }: ArmorPropertiesProps) {
       </Typography>
 
       <div className="form-grid" data-cols="1">
-        {editForm.AC && (
+        {editForm.AC !== undefined && (
           <FormField label="Armor Class">
-            <TextInput value={editForm.AC.toString()} onChange={(value) => updateEditForm('AC', value)} />
+            {/* A string AC is a shield bonus ("+1"); only a number counts as worn armor, so each keeps its type */}
+            {typeof editForm.AC === 'number' ? (
+              <NumberInput value={editForm.AC} onChange={(value) => updateEditForm('AC', value ?? 0)} />
+            ) : (
+              <TextInput value={editForm.AC} onChange={(value) => updateEditForm('AC', value)} />
+            )}
           </FormField>
         )}
 
@@ -398,7 +403,7 @@ export default function Equipment({
               {(editForm.damage || editForm.twoHandedDamage) && <WeaponProperties editForm={editForm} updateEditForm={updateEditForm} />}
 
               {/* Armor properties */}
-              {(editForm.AC || editForm.missileAC) && <ArmorProperties editForm={editForm} updateEditForm={updateEditForm} />}
+              {(editForm.AC !== undefined || editForm.missileAC) && <ArmorProperties editForm={editForm} updateEditForm={updateEditForm} />}
 
               {/* Modal actions */}
               <div className="form-actions">

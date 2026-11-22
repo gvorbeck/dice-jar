@@ -220,16 +220,17 @@ function AbilityScoreStep({ character, onCharacterChange }: AbilityScoreStepProp
                   onClick={() => handleAbilityClick(abilityName as AbilityName)}
                   disabled={!hasRolledScores}
                   aria-pressed={isSelected}
-                  aria-label={
-                    hasRolledScores
-                      ? isSelected
-                        ? `${abilityName} selected for swap. Click another ability to swap, or click again to deselect.`
-                        : `Select ${abilityName} to swap with another ability`
-                      : abilityName
-                  }
                   className="ability-pick"
                 >
-                  <span className="ability-pick-name">{abilityName}</span>
+                  <span className="ability-pick-name">{abilityName}</span>{' '}
+                  {/* Part of the button's name, so the visible text stays inside it */}
+                  <span className="sr-only">
+                    {hasRolledScores
+                      ? isSelected
+                        ? 'selected for swap. Click another ability to swap, or click again to deselect.'
+                        : 'Select to swap with another ability'
+                      : ''}
+                  </span>
                   {ability.value > 0 && (
                     <div
                       className="ability-pick-mod"

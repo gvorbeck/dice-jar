@@ -71,6 +71,7 @@ export interface CombatantHP {
 }
 
 export interface CombatantWithInitiative extends Record<string, unknown> {
+  id: string; // unique per combatant for the whole fight; name and initiative can repeat
   name: string;
   ac: number;
   initiative: number;

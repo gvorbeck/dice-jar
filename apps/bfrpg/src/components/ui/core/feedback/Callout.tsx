@@ -33,7 +33,7 @@ const Callout = forwardRef<HTMLDivElement, CalloutProps>(
         <div className="callout-head">
           <div className="callout-icon">{displayIcon}</div>
           {title && (
-            <Typography variant="h6" weight="semibold">
+            <Typography variant="h6" as="p" weight="semibold">
               {title}
             </Typography>
           )}

@@ -36,9 +36,6 @@
     font-size: var(--text-sm);
     line-height: var(--text-sm-lh);
   }
-  .upload-hint[data-faint] {
-    color: var(--zinc-500);
-  }
   .upload-actions {
     display: flex;
     justify-content: center;

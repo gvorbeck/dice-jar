@@ -27,7 +27,7 @@
   .lang-tag span {
     font-size: var(--text-sm);
     line-height: var(--text-sm-lh);
-    color: var(--zinc-400);
+    color: var(--zinc-100);
   }
   .lang-used.typography {
     margin-left: calc(var(--space) * 2);

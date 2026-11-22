@@ -17,7 +17,7 @@ interface StatCardProps {
 const StatCard = forwardRef<HTMLDivElement, StatCardProps>(({ label, fullName, value, size = 'md', className }, ref) => (
   <div ref={ref} className={cn('stat-card', className)} data-size={size} title={fullName || label}>
     <div className="stat-card-body">
-      <Typography variant="bodySmall" color="amber" weight="medium" as="h3" className="stat-card-label">
+      <Typography variant="bodySmall" color="amber" weight="medium" as="h4" className="stat-card-label">
         {label}
       </Typography>
       <div className="stat-card-value">{value}</div>

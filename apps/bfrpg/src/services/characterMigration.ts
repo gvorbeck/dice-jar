@@ -204,7 +204,7 @@ function migrateLegacyCharacter(legacyData: LegacyCharacterData): LegacyCharacte
   // Migrate HP structure, from the old `points` form or when there is no current: a modern hp keeps its current hit points.
   if (legacyData['hp'] && (legacyData['hp'].points !== undefined || legacyData['hp'].current === undefined)) {
     migrated['hp'] = {
-      current: legacyData['hp'].points || legacyData['hp'].max || 0,
+      current: legacyData['hp'].points ?? legacyData['hp'].max ?? 0,
       max: legacyData['hp'].max || 0,
       ...(legacyData['hp'].desc && { desc: legacyData['hp'].desc }),
     };

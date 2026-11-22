@@ -15,9 +15,6 @@
     background: var(--zinc-600);
     color: var(--zinc-100);
   }
-  .badge[data-variant='success'] {
-    color: var(--white);
-  }
   .badge[data-variant='warning'] {
     background: var(--amber-500);
   }

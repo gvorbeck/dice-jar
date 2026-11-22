@@ -203,9 +203,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
               >
                 {dragOver ? 'Drop your file here' : 'Click to select a file'}
               </Button>
-              <div className="upload-hint" data-faint>
-                or drag and drop a file here
-              </div>
+              <div className="upload-hint">or drag and drop a file here</div>
             </div>
           </div>
         )}

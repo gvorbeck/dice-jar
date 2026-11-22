@@ -30,3 +30,11 @@ describe('needsMigration', () => {
     expect(needsMigration(processCharacterData(stored({ settings: { version: 2.5 } })) as never)).toBe(false);
   });
 });
+
+describe('processCharacterData hp', () => {
+  it('keeps a legacy character at 0 hit points at 0, not full health', () => {
+    const out = processCharacterData(stored({ settings: { version: 2.5 }, hp: { points: 0, max: 8 } }));
+    expect(out.hp.current).toBe(0);
+    expect(out.hp.max).toBe(8);
+  });
+});

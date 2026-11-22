@@ -36,10 +36,16 @@ interface SavedCombat {
   preCombatInitiatives: Record<string, number>;
 }
 
+// shortcut: pre-combat initiatives are still keyed by name, so same-name monsters share one value; key them by id when that bites.
 const EMPTY_COMBAT: SavedCombat = { combatState: { combatants: [], currentTurn: 0, round: 1, isActive: false }, preCombatInitiatives: {} };
 
 // This game's combat as last left in this browser.
-const readCombat = (key: string) => readStored(key, EMPTY_COMBAT);
+// A combat saved before combatants had an id gets one, so edits match one creature, not all of them.
+const readCombat = (key: string): SavedCombat => {
+  const c = readStored(key, EMPTY_COMBAT);
+  const combatants = c.combatState.combatants.map((x, i) => ({ ...x, id: x.id ?? `${x.name}-${i}` }));
+  return { ...c, combatState: { ...c.combatState, combatants } };
+};
 
 export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) => void) {
   const { addToast } = useToast();
@@ -78,6 +84,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
         const combatChar = char as CombatCharacterData;
 
         return {
+          id: `${char.name}-${index}`,
           name: char.name,
           ac: calculateArmorClass(combatChar),
           initiative: 0,
@@ -102,6 +109,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
           const combatChar = playerChar as CombatCharacterData;
 
           return {
+            id: `${combatant.name}-${index}`,
             name: combatant.name,
             ac: calculateArmorClass(combatChar),
             initiative: 0,
@@ -115,6 +123,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       }
 
       return {
+        id: `${combatant.name}-${index}`,
         name: combatant.name,
         ac: combatant.ac || 11,
         initiative: 0,
@@ -299,13 +308,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
   // Update initiative during combat
   const updateInitiative = useCallback(
     (targetCombatant: CombatantWithInitiative, newInitiative: number) => {
-      const targetIndex = combatants.findIndex((c) => {
-        const sortIdMatch = targetCombatant._sortId && c._sortId && c._sortId === targetCombatant._sortId;
-        const zeroInitiativeMatch = c.initiative === 0 && c.name === targetCombatant.name;
-        const exactMatch = c.name === targetCombatant.name && c.initiative === targetCombatant.initiative;
-
-        return sortIdMatch || zeroInitiativeMatch || exactMatch;
-      });
+      const targetIndex = combatants.findIndex((c) => c.id === targetCombatant.id);
 
       if (targetIndex === -1) return;
 
@@ -366,11 +369,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
   const updateCombatantHp = useCallback(
     (targetCombatant: CombatantWithInitiative, newHp: number) => {
       const updatedCombatants = combatants.map((combatant) => {
-        const isMatch =
-          combatant._sortId === targetCombatant._sortId ||
-          (combatant.name === targetCombatant.name && combatant.initiative === targetCombatant.initiative);
-
-        if (isMatch) {
+        if (combatant.id === targetCombatant.id) {
           return {
             ...combatant,
             hp: { ...combatant.hp, current: Math.max(0, newHp) },

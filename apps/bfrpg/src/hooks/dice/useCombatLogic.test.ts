@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import type { Game } from '@/types';
 import { useCombatLogic } from './useCombatLogic';
 
@@ -28,5 +28,49 @@ describe('useCombatLogic', () => {
     const { result } = renderHook(() => useCombatLogic({ id: 'g1' } as Game));
     expect(result.current.round).toBe(1);
     expect(result.current.isCombatActive).toBe(false);
+  });
+
+  it('changes only the creature that was edited when two have the same name and initiative', () => {
+    const goblin = (id: string, _sortId: number) => ({
+      id,
+      name: 'Goblin',
+      ac: 13,
+      initiative: 3,
+      isPlayer: false,
+      _sortId,
+      dexModifier: 0,
+      hp: { current: 10, max: 10 },
+    });
+    localStorage.setItem(
+      'combat:g1',
+      JSON.stringify({
+        combatState: { combatants: [goblin('Goblin-0', 1), goblin('Goblin-1', 2)], currentTurn: 0, round: 1, isActive: true },
+        preCombatInitiatives: {},
+      }),
+    );
+    const { result } = renderHook(() => useCombatLogic({ id: 'g1' } as Game));
+    act(() => result.current.updateCombatantHp(result.current.combatants[1]!, 4));
+    expect(result.current.combatants.map((c) => c.hp.current)).toEqual([10, 4]);
+    act(() => result.current.updateInitiative(result.current.combatants[1]!, 5));
+    expect(result.current.combatants.map((c) => c.initiative)).toEqual([3, 5]);
+  });
+
+  it('gives a combat saved before ids existed one id per combatant, so one edit changes one creature', () => {
+    const old = (_sortId: number) => ({
+      name: 'Goblin',
+      ac: 13,
+      initiative: 3,
+      isPlayer: false,
+      _sortId,
+      dexModifier: 0,
+      hp: { current: 10, max: 10 },
+    });
+    localStorage.setItem(
+      'combat:g1',
+      JSON.stringify({ combatState: { combatants: [old(1), old(2)], currentTurn: 0, round: 1, isActive: true }, preCombatInitiatives: {} }),
+    );
+    const { result } = renderHook(() => useCombatLogic({ id: 'g1' } as Game));
+    act(() => result.current.updateCombatantHp(result.current.combatants[1]!, 4));
+    expect(result.current.combatants.map((c) => c.hp.current)).toEqual([10, 4]);
   });
 });
