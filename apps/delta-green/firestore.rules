@@ -28,6 +28,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // The global alert banner (packages/alert, README "Global alert"). Anyone can read the one document; only the owner writes it, in the Firebase console.
+    match /alerts/current {
+      allow get: if true;
+      allow list, write: if false;
+    }
+
     match /games/{gameId} {
       allow get: if true;
       allow list: if false;

@@ -23,3 +23,5 @@ skills-lock.json
 .DS_Store
 .vscode/settings.json
 .scripts
+# bfrpg look-baseline screenshots (Mac-only, never committed)
+apps/bfrpg/e2e/visual.spec.ts-snapshots/

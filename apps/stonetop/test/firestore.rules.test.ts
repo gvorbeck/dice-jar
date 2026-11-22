@@ -20,6 +20,16 @@ beforeEach(async () => {
   await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), G), game({ name: 'Stonetop' })));
 });
 
+describe('global alert', () => {
+  it('can be read by anyone, but not listed or written from a browser', async () => {
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'alerts/current'), { messages: [] }));
+    await assertSucceeds(getDoc(doc(db(), 'alerts/current')));
+    await assertFails(getDocs(collection(db(), 'alerts')));
+    await assertFails(setDoc(doc(db(), 'alerts/current'), { messages: [] }));
+    await assertFails(deleteDoc(doc(db(), 'alerts/current')));
+  });
+});
+
 describe('reading', () => {
   it('lets anyone with the ID read a game', async () => {
     await assertSucceeds(getDoc(doc(db(), G)));
