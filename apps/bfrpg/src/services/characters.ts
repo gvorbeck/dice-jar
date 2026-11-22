@@ -3,7 +3,8 @@ import { collection, doc, getDoc, onSnapshot, deleteDoc, type DocumentReference 
 import { auth, db } from '@/lib/firebase';
 import { FIREBASE_COLLECTIONS } from '@/constants';
 import type { Character } from '@/types';
-import { processCharacterData, isLegacyCharacter, CURRENT_VERSION } from './characterMigration';
+import { characterSchema, problemWith, SCHEMA_VERSION } from './documentSchemas';
+import { processCharacterData, needsMigration, OLD_BUILD_VERSION } from './characterMigration';
 import { handleServiceError } from '@/utils';
 import { forget, remember, saveDiff } from './diffSave';
 
@@ -50,7 +51,7 @@ export const watchUserCharacters = (userId: string, ok: (characters: CharacterLi
       ok(
         snapshot.docs.map((d) => {
           const data = d.data();
-          if (!isLegacyCharacter(data)) return toListItem(d.id, data);
+          if (!needsMigration(data)) return toListItem(d.id, data);
           const migrated = processCharacterData(data);
           persistMigration(userId, d.ref, data, migrated);
           return toListItem(d.id, migrated as unknown as Record<string, unknown>);
@@ -72,7 +73,9 @@ export const watchCharacter = (userId: string, characterId: string, ok: (charact
       }
       const data = snapshot.data();
       const character = processCharacterData(data);
-      if (isLegacyCharacter(data)) persistMigration(userId, snapshot.ref, data, character);
+      if (needsMigration(data)) persistMigration(userId, snapshot.ref, data, character);
+      const problem = problemWith(characterSchema, character);
+      if (problem) console.warn(`Character ${characterId} doesn't match its schema, ${problem}`);
       remember(slot(userId, characterId), character);
       ok(character);
     },
@@ -92,7 +95,13 @@ export const getCharacterById = async (userId: string, characterId: string): Pro
 /** Saves a character: only the changed fields when it was read in this tab; a new one gets a fresh id. */
 export const saveCharacter = async (userId: string, character: Character, characterId?: string): Promise<string> => {
   try {
-    const dataToSave = { ...character, settings: { ...character.settings, version: CURRENT_VERSION } };
+    // A new document (an import too) is created now; an existing one keeps its createdAt, or gets it from the migration script.
+    const dataToSave = {
+      ...character,
+      schemaVersion: SCHEMA_VERSION,
+      settings: { ...character.settings, version: OLD_BUILD_VERSION },
+      ...(characterId ? {} : { createdAt: Date.now() }),
+    };
     const ref = characterId ? characterRef(userId, characterId) : doc(charactersRef(userId));
     await saveDiff(ref, slot(userId, ref.id), dataToSave as unknown as Record<string, unknown>, Boolean(characterId));
     return ref.id;

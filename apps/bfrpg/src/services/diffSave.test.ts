@@ -13,7 +13,7 @@ vi.mock('firebase/firestore', () => ({
   deleteField: () => 'DELETE',
 }));
 
-import { saveDiff } from './diffSave';
+import { remember, saveDiff } from './diffSave';
 
 const ref = {} as never;
 
@@ -22,8 +22,19 @@ describe('saveDiff', () => {
 
   it('writes a new document whole', async () => {
     await saveDiff(ref, 'new', { a: 1 });
-    expect(fs.setDoc).toHaveBeenCalledWith(ref, { a: 1 });
+    expect(fs.setDoc).toHaveBeenCalledWith(ref, { a: 1, updatedAt: expect.any(Number) });
     expect(fs.getDoc).not.toHaveBeenCalled();
+  });
+
+  it('stamps updatedAt only on a save that changes something, so a save with nothing new costs no write', async () => {
+    remember('stamp', { a: 1, updatedAt: 5 });
+    await saveDiff(ref, 'stamp', { a: 1, updatedAt: 5 });
+    await saveDiff(ref, 'stamp', { a: 1 }); // a caller that dropped updatedAt doesn't delete it
+    expect(fs.updateDoc).not.toHaveBeenCalled();
+    await saveDiff(ref, 'stamp', { a: 2, updatedAt: 5 });
+    const [, a, , updatedAt, stamp] = fs.updateDoc.mock.calls[0] as [unknown, { path: string }, unknown, { path: string }, number];
+    expect([a.path, updatedAt.path]).toEqual(['a', 'updatedAt']);
+    expect(stamp).toBeGreaterThan(5);
   });
 
   it('reads a named document this tab never read, and sends only what changed', async () => {
@@ -36,6 +47,6 @@ describe('saveDiff', () => {
   it('writes a named document whole when it does not exist yet', async () => {
     fs.getDoc.mockResolvedValue({ exists: () => false });
     await saveDiff(ref, 'named-new', { a: 1 }, true);
-    expect(fs.setDoc).toHaveBeenCalledWith(ref, { a: 1 });
+    expect(fs.setDoc).toHaveBeenCalledWith(ref, { a: 1, updatedAt: expect.any(Number) });
   });
 });

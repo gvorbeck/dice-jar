@@ -81,9 +81,11 @@ export interface Character {
   settings?: {
     useCoinWeight?: boolean; // Whether to include coin weight in encumbrance calculations
     showCantrips?: boolean; // Whether to show the cantrips/orisons section
-    version?: number; // Data format version for migration purposes
   };
   xp: number; // Total experience points
+  schemaVersion?: number; // Stored data format; see services/characterMigration.ts
+  createdAt?: number; // ms since epoch, set once when saved
+  updatedAt?: number; // ms since epoch, set on every save
   scrollCreation?: {
     projects: ScrollCreationProject[];
     totalScrollsCreated?: number;

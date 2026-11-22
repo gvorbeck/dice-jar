@@ -3,13 +3,18 @@ import { EQUIPMENT_CATEGORIES, CURRENCY_TYPES } from '@/constants';
 import { normalizeCurrency } from '@/utils/currency';
 import type { Character } from '@/types';
 
-// Define schema versions for migration steps
-export const CURRENT_VERSION = 2.6;
+import { SCHEMA_VERSION } from './documentSchemas';
 
 // Migration step versions - keep these for historical migration logic
 const VERSION_CUSTOM_CLASSES = 2.4; // Version when custom classes were refactored
 const VERSION_CUSTOM_RACES = 2.5; // Version when custom races were refactored
-const VERSION_COMBINATION_CLASSES = 2.6; // Version when combination classes became single class entities (current)
+const VERSION_COMBINATION_CLASSES = 2.6; // Version when combination classes became single class entities
+
+/**
+ * Written to settings.version beside schemaVersion: the previous build treats a character without it as legacy and rewrites its coins, so two builds would undo each other.
+ * shortcut: the old field stays for one release; delete it (here, in saveCharacter and in the migration) once no tab on the previous build is left.
+ */
+export const OLD_BUILD_VERSION = VERSION_COMBINATION_CLASSES;
 
 // Types for legacy character data
 interface LegacyAbilities {
@@ -27,7 +32,7 @@ interface LegacyHp {
 }
 
 interface LegacySettings {
-  version?: number;
+  version?: number; // the old home of the schema version
   useCoinWeight?: boolean;
 }
 
@@ -66,6 +71,7 @@ interface LegacyCharacterData {
   hp?: LegacyHp;
   equipment?: LegacyEquipmentItem[];
   settings?: LegacySettings;
+  schemaVersion?: number;
   useCoinWeight?: boolean;
   wearing?: boolean;
   customClasses?: Record<string, LegacyCustomClass>;
@@ -73,10 +79,19 @@ interface LegacyCharacterData {
   [key: string]: unknown;
 }
 
+const storedVersion = (data: LegacyCharacterData): number => data.schemaVersion ?? data.settings?.version ?? 0;
+
+/** Whether a stored character differs from what is saved today: an old format, or only the version bookkeeping. */
+export const needsMigration = (data: LegacyCharacterData): boolean =>
+  isLegacyCharacter(data) ||
+  !(storedVersion(data) >= SCHEMA_VERSION) ||
+  data.settings?.version !== OLD_BUILD_VERSION ||
+  Array.isArray(data['desc']);
+
 /**
  * Type guard to check if character data is in legacy format
  */
-export function isLegacyCharacter(data: LegacyCharacterData): boolean {
+function isLegacyCharacter(data: LegacyCharacterData): boolean {
   // Check for legacy format indicators
   const hasLegacyAbilities = Boolean(data['abilities']?.modifiers && data['abilities']?.scores);
 
@@ -92,8 +107,8 @@ export function isLegacyCharacter(data: LegacyCharacterData): boolean {
 
   const hasCustomRaceProperty = typeof data['customRace'] === 'object' && data['customRace'] !== null;
 
-  const needsVersionUpdate =
-    !data['settings']?.version || (typeof data['settings']?.version === 'number' && data['settings'].version < CURRENT_VERSION);
+  // Only a document older than the last format change goes through the legacy converter; one that merely lacks schemaVersion is current.
+  const needsVersionUpdate = !(storedVersion(data) >= VERSION_COMBINATION_CLASSES);
 
   const hasArrayClass = Array.isArray(data['class']);
 
@@ -176,25 +191,18 @@ function migrateLegacyCharacter(legacyData: LegacyCharacterData): LegacyCharacte
     }
   }
 
-  // Migrate currency from separate properties to nested object
-  const currency: Record<string, number> = { gold: 0 };
-  if (typeof legacyData['gold'] === 'number') currency['gold'] = legacyData['gold'];
-  if (typeof legacyData['silver'] === 'number') currency['silver'] = legacyData['silver'];
-  if (typeof legacyData['copper'] === 'number') currency['copper'] = legacyData['copper'];
-  if (typeof legacyData['electrum'] === 'number') currency['electrum'] = legacyData['electrum'];
-  if (typeof legacyData['platinum'] === 'number') currency['platinum'] = legacyData['platinum'];
+  // Migrate currency from separate properties to nested object, only when the old properties are there: a character that is merely
+  // on an older version already holds its coins in `currency`, and rebuilding it from nothing would zero them.
+  const currencyKeys = ['gold', 'silver', 'copper', 'electrum', 'platinum'] as const;
+  if (currencyKeys.some((key) => typeof legacyData[key] === 'number')) {
+    const currency: Record<string, number> = { gold: 0 };
+    for (const key of currencyKeys) if (typeof legacyData[key] === 'number') currency[key] = legacyData[key];
+    migrated['currency'] = currency;
+  }
+  for (const key of currencyKeys) delete migrated[key];
 
-  migrated['currency'] = currency;
-
-  // Clean up old currency properties
-  delete migrated['gold'];
-  delete migrated['silver'];
-  delete migrated['copper'];
-  delete migrated['electrum'];
-  delete migrated['platinum'];
-
-  // Migrate HP structure
-  if (legacyData['hp']) {
+  // Migrate HP structure, from the old `points` form or when there is no current: a modern hp keeps its current hit points.
+  if (legacyData['hp'] && (legacyData['hp'].points !== undefined || legacyData['hp'].current === undefined)) {
     migrated['hp'] = {
       current: legacyData['hp'].points || legacyData['hp'].max || 0,
       max: legacyData['hp'].max || 0,
@@ -261,10 +269,9 @@ function migrateLegacyCharacter(legacyData: LegacyCharacterData): LegacyCharacte
     );
   }
 
-  // Set version and preserve/create settings
+  // Preserve/create settings
   migrated['settings'] = {
     ...migrated['settings'],
-    version: CURRENT_VERSION,
     useCoinWeight: migrated['useCoinWeight'] || migrated['settings']?.useCoinWeight || false,
   };
 
@@ -402,57 +409,39 @@ export function processCharacterData(data: unknown): Character {
 
   let migratedData = data as LegacyCharacterData;
 
+  // The steps below key off the version the document was stored at, which the legacy conversion must not hide.
+  let currentVersion = storedVersion(migratedData);
   if (isLegacyCharacter(migratedData)) {
     // First handle the main legacy migration (pre-2.3)
     migratedData = migrateLegacyCharacter(migratedData);
   }
 
-  // Handle version 2.3 to 2.4 migration (custom classes refactor)
-  let currentVersion = migratedData['settings']?.version || 0;
   if (currentVersion < VERSION_CUSTOM_CLASSES) {
     migratedData = migrateCustomClasses(migratedData);
-
-    // Update version to 2.4
-    migratedData['settings'] = {
-      ...migratedData['settings'],
-      version: VERSION_CUSTOM_CLASSES,
-    };
     currentVersion = VERSION_CUSTOM_CLASSES;
   }
 
-  // Handle version 2.4 to 2.5 migration (custom races refactor)
   if (currentVersion < VERSION_CUSTOM_RACES) {
     migratedData = migrateCustomRaces(migratedData);
-
-    // Update version to 2.5
-    migratedData['settings'] = {
-      ...migratedData['settings'],
-      version: VERSION_CUSTOM_RACES,
-    };
     currentVersion = VERSION_CUSTOM_RACES;
   }
 
-  // Handle version 2.5 to 2.6 migration (combination classes refactor)
   // ALWAYS run if class is still an array, regardless of version number
-  const needsClassMigration = currentVersion < VERSION_COMBINATION_CLASSES || Array.isArray(migratedData['class']);
-
-  if (needsClassMigration) {
+  if (currentVersion < VERSION_COMBINATION_CLASSES || Array.isArray(migratedData['class'])) {
     migratedData = migrateCombinationClasses(migratedData);
-
-    // Update version to current
-    migratedData['settings'] = {
-      ...migratedData['settings'],
-      version: CURRENT_VERSION,
-    };
   }
 
-  // Ensure current characters have version set
-  if (!migratedData['settings']?.version) {
-    migratedData['settings'] = {
-      ...migratedData['settings'],
-      version: CURRENT_VERSION,
-    };
-  }
+  // The custom-class step can set a class name the legacy rules rewrite (to its ID); settle it now, so migrating the result again changes nothing.
+  if (isLegacyCharacter(migratedData)) migratedData = migrateLegacyCharacter(migratedData);
+
+  // Fields the sheet reads as numbers and lists: an old file that left them out still opens (and imports) with their empty values.
+  migratedData['xp'] ??= 0;
+  migratedData['equipment'] ??= [];
+  migratedData['currency'] ??= { gold: 0 };
+  // An older editor stored the description as a list of lines; the sheet shows and edits it as one text.
+  if (Array.isArray(migratedData['desc'])) migratedData['desc'] = (migratedData['desc'] as unknown[]).map(String).join('\n');
+
+  migratedData = { ...migratedData, schemaVersion: SCHEMA_VERSION, settings: { ...migratedData['settings'], version: OLD_BUILD_VERSION } };
 
   // After migration, legacy data should now conform to current Character interface
   // The migration functions ensure all required fields are present with proper defaults

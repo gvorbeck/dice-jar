@@ -71,7 +71,7 @@ export const mockBasicCharacter: Character = {
   hp: { current: 8, max: 8, die: '1d8' },
   equipment: mockEquipment,
   currency: { gold: 30, silver: 0, copper: 0 },
-  settings: { version: 2.6 },
+  schemaVersion: 3,
 };
 
 export const mockMagicUserCharacter: Character = {
@@ -100,7 +100,7 @@ export const mockMagicUserCharacter: Character = {
   ],
   spells: mockSpells,
   currency: { gold: 25, silver: 0, copper: 0 },
-  settings: { version: 2.6 },
+  schemaVersion: 3,
 };
 
 export const mockMultiClassCharacter: Character = {
@@ -117,7 +117,7 @@ export const mockMultiClassCharacter: Character = {
   equipment: mockEquipment,
   spells: mockSpells,
   currency: { gold: 50, silver: 0, copper: 0 },
-  settings: { version: 2.6 },
+  schemaVersion: 3,
 };
 
 export const mockEmptyCharacter: Character = {
@@ -137,5 +137,5 @@ export const mockEmptyCharacter: Character = {
   hp: { current: 0, max: 0 },
   equipment: [],
   currency: { gold: 0 },
-  settings: { version: 2.6 },
+  schemaVersion: 3,
 };

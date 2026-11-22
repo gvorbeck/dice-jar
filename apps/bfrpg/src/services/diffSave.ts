@@ -26,17 +26,16 @@ export async function saveDiff(ref: DocumentReference, key: string, next: Record
     const snapshot = await getDoc(ref);
     if (snapshot.exists()) before = snapshot.data();
   }
-  known.set(key, next);
+  // updatedAt is stamped here, and only on a write that changes something else, so a save with nothing new costs no write.
+  const leaves = before === undefined ? [] : diffPaths(before, next).filter(([path]) => path[0] !== 'updatedAt');
+  if (before !== undefined && !leaves.length) return;
+  const stamped = { ...next, updatedAt: Date.now() };
+  known.set(key, stamped);
   try {
-    if (before === undefined) {
-      await setDoc(ref, next);
-      return;
-    }
-    const leaves = diffPaths(before, next);
-    if (!leaves.length) return;
-    await updateDoc(ref, ...updatePairs(leaves));
+    if (before === undefined) await setDoc(ref, stamped);
+    else await updateDoc(ref, ...updatePairs([...leaves, [['updatedAt'], stamped.updatedAt]]));
   } catch (error) {
-    if (known.get(key) === next) {
+    if (known.get(key) === stamped) {
       if (before === undefined) known.delete(key);
       else known.set(key, before);
     }

@@ -1,6 +1,6 @@
 // Puts one moved game back in a single document, with whatever has been saved since (MIGRATION.md). Without --write it only checks.
 // Usage: node scripts/unmigrate-game.ts <gameId> [--write]
-import { adminDb } from './admin.ts';
+import { adminDb } from '@dice-jar/admin';
 import { unmigrateGame } from './migrateCore.ts';
 
 const gameId = process.argv[2];
@@ -9,7 +9,7 @@ if (!gameId || gameId.startsWith('--')) {
   process.exit(1);
 }
 const write = process.argv.includes('--write');
-const db = adminDb();
+const db = adminDb('demo-stonetop');
 
 if (!write) {
   const game = await db.collection('games').doc(gameId).get();

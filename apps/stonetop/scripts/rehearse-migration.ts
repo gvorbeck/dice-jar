@@ -1,7 +1,7 @@
 // Rehearses the whole migration on a copy of a backup, in the Firestore emulator only: load it, move every game, check each one,
 // put every game back, check again. Run it with `BACKUP=./firestore-backup-<timestamp>.json npm run rehearse-migration`.
 import * as fs from 'fs';
-import { adminDb } from './admin.ts';
+import { adminDb } from '@dice-jar/admin';
 import { sameGame } from './gameAudit.ts';
 import { assembleGame, type Stored } from '../src/lib/gameShape.ts';
 import { migrateAll, unmigrateGame } from './migrateCore.ts';
@@ -20,7 +20,7 @@ if (!file || !fs.existsSync(file)) {
 
 const backup = JSON.parse(fs.readFileSync(file, 'utf8')) as Record<string, Record<string, unknown>>;
 const ids = Object.keys(backup);
-const db = adminDb();
+const db = adminDb('demo-stonetop');
 
 const writer = db.bulkWriter();
 for (const id of ids) void writer.set(db.collection('games').doc(id), backup[id]!);

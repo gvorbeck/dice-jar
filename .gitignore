@@ -22,3 +22,4 @@ ui-debug.log
 skills-lock.json
 .DS_Store
 .vscode/settings.json
+.scripts

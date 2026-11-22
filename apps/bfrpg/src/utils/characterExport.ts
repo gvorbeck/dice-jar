@@ -257,7 +257,7 @@ export function generateCharacterSheetText(character: Character): string {
   // Footer
   sections.push(DIVIDER);
   sections.push(`[Exported from Codex Quest - BFRPG Character Manager]`);
-  sections.push(`[Character Version: ${character.settings?.version || '2.6'} | Export Date: ${formatDate()}]`);
+  sections.push(`[Character Version: ${character.schemaVersion ?? 3} | Export Date: ${formatDate()}]`);
   sections.push(DIVIDER);
 
   return sections.join('\n');

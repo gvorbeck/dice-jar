@@ -2,5 +2,5 @@
   // Tests and configs that run in Node, not the browser: kept apart so Node globals can't leak into src/.
   "extends": "./tsconfig.json",
   "compilerOptions": { "types": ["node"] },
-  "include": ["e2e", "test", "*.config.ts", "src/vite-env.d.ts"]
+  "include": ["e2e", "test", "scripts", "*.config.ts", "src/vite-env.d.ts"]
 }

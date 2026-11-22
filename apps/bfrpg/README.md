@@ -152,3 +152,15 @@ This project is licensed under the [Creative Commons Attribution-ShareAlike 4.0 
   <strong>Ready to create your next character?</strong><br>
   <em>Light up your adventures with codex.quest!</em> 🔥
 </div>
+
+## Data migration
+
+Stored characters and games carry `schemaVersion` (3), `createdAt` and `updatedAt`. `settings.version` stays at 2.6 for one release so a tab still on the previous build keeps working; `schemaVersion` is the real version, and a document is migrated when it is opened. To bring everything over at once, without spending the daily Firestore quota (all from `apps/bfrpg`; the live steps use a service account in `./service-account.json`):
+
+1. `npm run backup` reads every character and game once (one read each) into `firestore-backup-<timestamp>.json`.
+2. `npm run audit-backup -- <file>` and `npm run rehearse-migration` (`BACKUP=<file>` for the real data) use no production reads or writes: the first works from the file, the second runs in the emulator and also checks that a second run does nothing.
+3. `npm run migrate -- --backup <file>` is a dry run. Then `--write --only users/<uid>/characters/<id>` for one document, `--write --limit 200` for batches, then `--write`.
+
+The scripts are built with Vite (`vite build --ssr`) before they run, because the app's code imports through `@/`, which plain `node` can't resolve; stonetop's scripts run directly with `node scripts/x.ts`.
+
+A document already current costs nothing. One that migrates costs 1 read and 1 write (a transaction that skips it if it changed since the backup, then writes only the changed fields); `--verify` adds 1 read to check it. A document that would not fit its schema is refused and left alone. A run can be stopped and resumed: finished documents are remembered next to the backup file.

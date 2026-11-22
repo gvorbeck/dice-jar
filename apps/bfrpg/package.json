@@ -18,7 +18,11 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "firebase emulators:exec --only auth,firestore --project demo-bfrpg 'playwright test'",
     "check": "npm run lint && npm run typecheck && npm run knip && npm run test:coverage",
-    "test:rules": "firebase emulators:exec --only firestore --project demo-bfrpg 'vitest run --config vitest.rules.config.ts'"
+    "test:rules": "firebase emulators:exec --only firestore --project demo-bfrpg 'vitest run --config vitest.rules.config.ts'",
+    "backup": "vite build --ssr scripts/backup.ts --outDir .scripts --emptyOutDir --logLevel error && GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node .scripts/backup.js",
+    "audit-backup": "vite build --ssr scripts/audit-backup.ts --outDir .scripts --emptyOutDir --logLevel error && node .scripts/audit-backup.js",
+    "migrate": "vite build --ssr scripts/migrate.ts --outDir .scripts --emptyOutDir --logLevel error && GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node .scripts/migrate.js",
+    "rehearse-migration": "firebase emulators:exec --only firestore --project demo-bfrpg 'vite build --ssr scripts/rehearse-migration.ts --outDir .scripts --emptyOutDir --logLevel error && node .scripts/rehearse-migration.js'"
   },
   "dependencies": {
     "@dice-jar/firebase": "*",
@@ -26,9 +30,11 @@
     "react": "^19.3.1",
     "react-aria-components": "^1.22.1",
     "react-dom": "^19.3.1",
-    "react-router-dom": "^7.18.5"
+    "react-router-dom": "^7.18.5",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@dice-jar/admin": "*",
     "@dice-jar/browser": "*",
     "@dice-jar/cn": "*",
     "@dice-jar/dice": "*",
@@ -44,6 +50,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.2.1",
     "@vitest/coverage-v8": "^5.1.0",
+    "firebase-admin": "^14.5.0",
     "firebase-tools": "^15.35.0",
     "jsdom": "^31.0.0",
     "knip": "6.45.1",

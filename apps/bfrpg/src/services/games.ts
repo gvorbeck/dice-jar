@@ -4,6 +4,7 @@ import { db } from '@/lib/firebase';
 import { FIREBASE_COLLECTIONS } from '@/constants';
 import type { Game } from '@/types';
 import { handleServiceError } from '@/utils';
+import { gameSchema, problemWith, SCHEMA_VERSION } from './documentSchemas';
 import { forget, remember, saveDiff } from './diffSave';
 
 export type { Game };
@@ -30,18 +31,21 @@ export const watchGame = (userId: string, gameId: string, ok: (game: Game | null
         ok(null);
         return;
       }
+      const problem = problemWith(gameSchema, snapshot.data());
+      if (problem) console.warn(`Game ${gameId} doesn't match its schema, ${problem}`);
       remember(slot(userId, gameId), snapshot.data());
       ok({ id: snapshot.id, ...snapshot.data() } as Game);
     },
     bad,
   );
 
-/** One look at a game, for places that don't need it live. */
 /** Saves a game: only the changed fields when it was read in this tab; a new one gets a fresh id. */
 export const saveGame = async (userId: string, game: Omit<Game, 'id'>, gameId?: string): Promise<string> => {
   try {
     const ref = gameId ? gameRef(userId, gameId) : doc(gamesRef(userId));
-    await saveDiff(ref, slot(userId, ref.id), game as Record<string, unknown>, Boolean(gameId));
+    // Only a new game gets createdAt; an existing one keeps its own, or gets it from the migration script.
+    const next = { ...game, schemaVersion: SCHEMA_VERSION, ...(gameId ? {} : { createdAt: Date.now() }) };
+    await saveDiff(ref, slot(userId, ref.id), next, Boolean(gameId));
     return ref.id;
   } catch (error) {
     handleServiceError(error, { action: 'saving game', context: { userId, gameId, gameName: game['name'] } });

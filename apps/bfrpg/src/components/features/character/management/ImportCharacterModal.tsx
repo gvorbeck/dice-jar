@@ -6,7 +6,8 @@ import { useCharacterMutations } from '@/hooks/mutations/useEnhancedMutations';
 import { useRun, useToast } from '@dice-jar/browser';
 import { getErrorMessage } from '@/utils';
 import { processCharacterData } from '@/services/characterMigration';
-import { isValidCharacterStructure, validateImportedCharacter } from '@/validation/character';
+import { characterSchema, problemWith } from '@/services/documentSchemas';
+import { validateImportedCharacter } from '@/validation/character';
 import type { Character } from '@/types';
 import './ImportCharacterModal.css';
 
@@ -33,7 +34,7 @@ const EXAMPLE_CHARACTER = `{
   "hp": { "current": 8, "max": 8, "die": "1d8" },
   "currency": { "gold": 100 },
   "equipment": [],
-  "settings": { "version": 2.6 }
+  "schemaVersion": 3
 }`;
 
 export default function ImportCharacterModal({ isOpen, onClose, userId }: ImportCharacterModalProps) {
@@ -61,14 +62,7 @@ export default function ImportCharacterModal({ isOpen, onClose, userId }: Import
         throw new Error('Invalid file format. Please upload a valid JSON file.');
       }
 
-      // 2. Validate basic structure
-      if (!isValidCharacterStructure(rawData)) {
-        throw new Error(
-          'Character file is missing required data. Please ensure the file contains all required fields (name, abilities, race, class, hp, level).',
-        );
-      }
-
-      // 3. Migrate and process data
+      // 2. Migrate and process data
       let migratedCharacter: Character;
       try {
         migratedCharacter = processCharacterData(rawData);
@@ -77,13 +71,15 @@ export default function ImportCharacterModal({ isOpen, onClose, userId }: Import
         throw new Error('Unable to process character data. The file may be corrupted or use an incompatible format.');
       }
 
-      // 4. Validate character data
+      // 3. Validate: the schema for structure, then the book's ranges
+      const problem = problemWith(characterSchema, migratedCharacter);
+      if (problem) throw new Error(`Character data validation failed: ${problem}`);
       const validationResult = validateImportedCharacter(migratedCharacter);
       if (!validationResult.isValid) {
         throw new Error(`Character data validation failed: ${validationResult.errors.join(', ')}`);
       }
 
-      // 5. Save character (without ID to create new)
+      // 4. Save character (without ID to create new)
       // No characterId = create new character
       const id = await saveCharacter({ userId, character: migratedCharacter });
       if (id === undefined) throw new Error('Failed to save character. Please try again.');

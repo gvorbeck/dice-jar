@@ -227,32 +227,6 @@ function validateReviewStep(character: Character): ValidationResult {
 }
 
 /**
- * Validate that imported data has the basic structure of a Character
- * Used for import validation before migration
- */
-export function isValidCharacterStructure(data: unknown): data is Character {
-  if (typeof data !== 'object' || data === null) {
-    return false;
-  }
-
-  const obj = data as Record<string, unknown>;
-
-  // Check for required fields
-  return (
-    typeof obj['name'] === 'string' &&
-    'abilities' in obj &&
-    typeof obj['abilities'] === 'object' &&
-    obj['abilities'] !== null &&
-    typeof obj['race'] === 'string' &&
-    typeof obj['class'] === 'string' &&
-    'hp' in obj &&
-    typeof obj['hp'] === 'object' &&
-    obj['hp'] !== null &&
-    typeof obj['level'] === 'number'
-  );
-}
-
-/**
  * Validate character data integrity after import
  * Returns detailed validation errors for user feedback
  */

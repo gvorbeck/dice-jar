@@ -8,7 +8,7 @@ import type { ValidationSchema } from '@/validation';
 import { Rules } from '@/validation';
 import { allClasses, allRaces } from '@/data';
 import { CHARACTER_CLASSES } from '@/constants';
-import { CURRENT_VERSION } from '@/services/characterMigration';
+import { SCHEMA_VERSION } from '@/services/documentSchemas';
 // Note: Using direct imports here to avoid circular dependency with barrel file
 import { GAME_MECHANICS } from './mechanics';
 import { isWornArmor, isWornShield } from '@/utils/equipment';
@@ -165,7 +165,7 @@ export function createEmptyCharacter(): Character {
     hp: { current: 0, max: 0 },
     level: 1,
     xp: 0,
-    settings: { version: CURRENT_VERSION },
+    schemaVersion: SCHEMA_VERSION,
   };
 }
 

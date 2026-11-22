@@ -63,6 +63,19 @@
   --st-radius: 6px; /* --radius-lg */
   --st-font-serif: 'IM Fell English', Georgia, serif;
   --st-font-sans: 'Inter', system-ui, sans-serif;
+  --cq-bg: oklch(21% 0.006 285.885); /* bfrpg --zinc-900 */
+  --cq-panel: oklch(27.4% 0.006 286.033); /* zinc-800 */
+  --cq-rule: oklch(37% 0.013 285.805); /* zinc-700 */
+  --cq-fg: oklch(96.7% 0.001 286.375); /* zinc-100 */
+  --cq-dim: oklch(70.5% 0.015 286.067); /* zinc-400 */
+  --cq-line: color-mix(in oklch, var(--cq-fg) 50%, transparent); /* border-border/50 */
+  --cq-amber-300: oklch(87.9% 0.169 91.605);
+  --cq-amber-400: oklch(82.8% 0.189 84.429);
+  --cq-amber-500: oklch(76.9% 0.188 70.08);
+  --cq-amber-700: oklch(55.5% 0.163 48.998);
+  --cq-radius: 0.5rem; /* --radius-lg */
+  --cq-font-title: 'Wellfleet', serif;
+  --cq-font-sans: ui-sans-serif, system-ui, sans-serif;
   /* A torn paper edge, tiled along a card's bottom; --tear is its height. */
   --tear: 14px;
   --tex-torn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='151' height='14'%3E%3Cpath d='M0 0H151V8L144 12 137 5 129 11 120 3 112 13 104 7 95 10 87 2 79 12 70 6 62 14 53 4 45 9 36 1 28 11 19 6 11 13 4 4 0 7Z'/%3E%3C/svg%3E");

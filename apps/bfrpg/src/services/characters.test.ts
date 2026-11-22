@@ -17,7 +17,10 @@ vi.mock('firebase/firestore', () => ({
   onSnapshot: (_ref: unknown, ok: (snap: unknown) => void) => void snapshots.push(ok),
 }));
 
-import { watchCharacter } from './characters';
+import { mockBasicCharacter } from '@/test/mocks/character-data';
+import { saveCharacter, watchCharacter } from './characters';
+import { OLD_BUILD_VERSION } from './characterMigration';
+import { SCHEMA_VERSION } from './documentSchemas';
 
 const legacy = { name: 'Brother Marcus', hp: { points: 5 } };
 const open = () => {
@@ -40,5 +43,26 @@ describe('migrating an old character on open', () => {
     open();
     expect(remember).toHaveBeenCalledWith('characters/alice/c1', legacy);
     expect(saveDiff).toHaveBeenCalledWith({ id: 'c1' }, 'characters/alice/c1', expect.objectContaining({ name: 'Brother Marcus' }));
+  });
+});
+
+const saved = () => (saveDiff.mock.calls.at(-1) as unknown as [unknown, string, Record<string, unknown>])[2];
+
+describe('saveCharacter', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('gives a new character (an import too) a fresh createdAt, never the one it carries', async () => {
+    await saveCharacter('alice', { ...mockBasicCharacter, createdAt: 1 });
+    expect(saved()['createdAt']).toBeGreaterThan(1);
+  });
+
+  it('leaves createdAt alone on an existing character, so a save never invents one', async () => {
+    await saveCharacter('alice', mockBasicCharacter, 'c1');
+    expect(saved()).not.toHaveProperty('createdAt');
+  });
+
+  it('writes settings.version beside schemaVersion, for tabs on the previous build', async () => {
+    await saveCharacter('alice', mockBasicCharacter, 'c1');
+    expect(saved()).toMatchObject({ schemaVersion: SCHEMA_VERSION, settings: { version: OLD_BUILD_VERSION } });
   });
 });
