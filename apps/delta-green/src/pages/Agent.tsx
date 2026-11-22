@@ -86,17 +86,20 @@ function AgentBody({ gameId, agentId, init }: { gameId: string; agentId: string;
   // so this tab's next save can't write its stale copy over them. Leaves changed here as well keep this tab's value.
   const [remote, setRemote] = useState<RemoteLive | null>(null);
   // Each change is written once it has been still for a moment, and at once when the page hides or closes. What was loaded isn't written back.
-  const saveC = useDebouncedSave(
-    (v: Character) => saveCharacter(gameId, agentId, v),
-    600,
-    (e) => report('c')(false, e),
-    () => report('c')(true),
-  ).onChange;
+  // The hook runs saves one after another and waits for each to resolve. Offline the server's answer can take any time, so waiting for it would
+  // hold every later edit in memory, where closing the tab loses it. Like stonetop's editCharacter, a save resolves once queued; the answer is reported when it comes.
+  // shortcut: a write the server refuses is reported but not retried by the hook (it counts as saved once queued); the next edit resends it through the diff.
+  const queued = (key: keyof typeof fails, write: Promise<unknown>) => {
+    write.then(
+      () => report(key)(true),
+      (e) => report(key)(false, e),
+    );
+    return Promise.resolve();
+  };
+  const saveC = useDebouncedSave((v: Character) => queued('c', saveCharacter(gameId, agentId, v)), 600).onChange;
   const { onChange: saveL, noteRemoteValue } = useDebouncedSave(
-    (v: Live | null) => (v ? saveLive(gameId, agentId, v) : Promise.resolve()),
+    (v: Live | null) => (v ? queued('live', saveLive(gameId, agentId, v)) : Promise.resolve()),
     600,
-    (e) => report('live')(false, e),
-    () => report('live')(true),
   );
   // With no sheet of this tab's on the server yet, the remote one (Discord damage before or just after creation finished)
   // started from the fresh sheet; a sheet still being created takes it whole, so finishing creation can't reset it.

@@ -42,6 +42,8 @@ export function readImport(raw: unknown): { c: Character; live: Live | null }[] 
  * moves it back, so its changes go out again with the next diff.
  */
 const known = new Map<string, unknown>();
+// Which send `known` stands for (0 = what was loaded), so overlapping rejections only ever move it back to an older base.
+const sends = new Map<string, { n: number; at: number }>();
 const slot = (g: string, a: string, field: string) => `${g}/${a}/${field}`;
 
 // Arrays in `live` that other writers also add to (the Discord bot checks failed skills): saved and merged as additions and removals, not replaced.
@@ -72,9 +74,18 @@ function saveField(g: string, a: string, field: 'character' | 'live', value: unk
   };
   if (removals.length) update(removals);
   update([...main, 'updatedAt', Date.now(), ...Object.entries(extra).flat()]);
+  const s = sends.get(k) ?? { n: 0, at: 0 };
+  sends.set(k, s);
+  const baseAt = s.at;
+  s.at = ++s.n;
   known.set(k, value);
   return batch.commit().catch((e) => {
-    if (known.get(k) === value) known.set(k, before);
+    // A newer write may already have moved `known` on; this one's changes must go out again either way, so go back to its base unless an older rejection already went further back.
+    // `known` was replaced since (a reload, or someone else's save arrived): the diff to the next save is against that, which already resends this one's changes.
+    if (sends.get(k) === s && baseAt < s.at) {
+      known.set(k, before);
+      s.at = baseAt;
+    }
     throw e;
   });
 }
@@ -101,6 +112,7 @@ export function watchLive(g: string, a: string, onRemote: (remote: Live, base: L
       } // missing or unreadable: keep what's on screen
       if (base && !diffPaths(base, remote).length) return; // nothing new (key order doesn't matter)
       known.set(k, remote);
+      sends.delete(k);
       onRemote(remote, base);
     },
     () => {},
@@ -125,6 +137,7 @@ export const loadAgent = async (g: string, a: string): Promise<{ c: Character; l
   } catch {
     throw new DamagedAgent();
   }
+  for (const field of ['character', 'live']) sends.delete(slot(g, a, field));
   known.set(slot(g, a, 'character'), c);
   known.set(slot(g, a, 'live'), live);
   return { c, live };
