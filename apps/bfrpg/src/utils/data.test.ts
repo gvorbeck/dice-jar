@@ -5,6 +5,10 @@ describe('sanitizeCharacterName', () => {
   it('strips tags and characters a name may not hold, then trims', () => {
     expect(sanitizeCharacterName("  <b>Thorin</b> O'Brien-Smith Jr. 3<script>  ")).toBe("Thorin O'Brien-Smith Jr.");
   });
+
+  it('does not leave a tag behind from nested brackets', () => {
+    expect(sanitizeCharacterName('<<b>script>alert')).toBe('scriptalert');
+  });
 });
 
 describe('getErrorMessage', () => {

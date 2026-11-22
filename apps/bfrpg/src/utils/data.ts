@@ -53,8 +53,13 @@ export function getErrorMessage(error: unknown, fallbackMessage: string = 'An un
 // ============================================================================
 
 function stripHtml(html: string): string {
-  // Remove HTML tags using regex (safer than innerHTML)
-  return html.replace(/<[^>]*>/g, '');
+  // Repeat until stable so nested input like "<<b>script>" can't leave a tag behind
+  let prev: string;
+  do {
+    prev = html;
+    html = html.replace(/<[^>]*>/g, '');
+  } while (html !== prev);
+  return html;
 }
 
 export function sanitizeCharacterName(name: string): string {
