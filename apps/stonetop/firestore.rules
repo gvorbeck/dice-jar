@@ -30,6 +30,12 @@ service cloud.firestore {
       return ['name', 'createdAt', 'characters', 'schemaVersion', 'content', 'threats', 'iWonder', 'steading', 'notes', 'notesLocks', 'restoreToken'];
     }
 
+    // The global alert banner (packages/alert, README "Global alert"). Anyone can read the one document; only the owner writes it, in the Firebase console.
+    match /alerts/current {
+      allow get: if true;
+      allow list, write: if false;
+    }
+
     match /games/{id} {
       allow get:    if true;
       allow list:   if false;

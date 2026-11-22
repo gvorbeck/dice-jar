@@ -42,6 +42,16 @@ beforeEach(async () => {
   });
 });
 
+describe('global alert', () => {
+  it('can be read by anyone, but not listed or written from a browser', async () => {
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'alerts/current'), { messages: [] }));
+    await assertSucceeds(getDoc(doc(db(), 'alerts/current')));
+    await assertFails(getDocs(collection(db(), 'alerts')));
+    await assertFails(setDoc(doc(db(), 'alerts/current'), { messages: [] }));
+    await assertFails(deleteDoc(doc(db(), 'alerts/current')));
+  });
+});
+
 describe('server-only collections', () => {
   for (const path of ['gameSecrets/g1', 'discordPending/a1', 'discordGuilds/x', 'discordClaims/x']) {
     it(`${path} cannot be read or written`, async () => {
