@@ -143,9 +143,11 @@ export function generateCharacterSheetText(character: Character): string {
     sections.push(DIVIDER);
 
     // Categorize equipment
-    const weapons = character.equipment.filter((item) => item.category === 'Weapon');
-    const armor = character.equipment.filter((item) => item.category === 'Armor');
-    const other = character.equipment.filter((item) => item.category !== 'Weapon' && item.category !== 'Armor');
+    // Categories in the data are lowercase and many ('swords', 'bows', ...), so a weapon is an item with damage.
+    const isArmor = (item: { category: string }) => item.category === 'armor' || item.category === 'shields';
+    const weapons = character.equipment.filter((item) => item.damage);
+    const armor = character.equipment.filter((item) => !item.damage && isArmor(item));
+    const other = character.equipment.filter((item) => !item.damage && !isArmor(item));
 
     if (weapons.length > 0) {
       sections.push('Weapons:');
