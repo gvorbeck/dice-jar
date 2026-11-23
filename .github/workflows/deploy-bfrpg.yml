@@ -3,7 +3,7 @@ name: Deploy bfrpg
 on:
   push:
     branches: [main]
-    paths: [apps/bfrpg/**, packages/**, package.json, package-lock.json, .nvmrc] # root files too: npm ci runs from the root, so a lockfile-only update must rebuild
+    paths: [.github/workflows/deploy-bfrpg.yml, apps/bfrpg/**, packages/**, package.json, package-lock.json, .nvmrc] # root files too: npm ci runs from the root, so a lockfile-only update must rebuild
   workflow_dispatch:
 permissions:
   contents: read

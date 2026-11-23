@@ -333,12 +333,14 @@ section {
   border-color: var(--st-border-accent);
 }
 
-/* Codex.Quest: a zinc panel with an amber Wellfleet title, and its chunky amber button. */
+/* Codex.Quest: the app's lime "success" card (lime-950 tint, lime-600 edge), a Wellfleet title and its amber button. */
 .card.cq {
-  border: 2px solid var(--cq-line);
+  border: 2px solid var(--cq-lime-600);
   border-bottom: 0; /* torn off */
   border-radius: var(--cq-radius) var(--cq-radius) 0 0;
-  background: linear-gradient(to bottom right, var(--cq-panel), var(--cq-bg));
+  background:
+    linear-gradient(color-mix(in oklab, var(--cq-lime-950) 20%, transparent)),
+    linear-gradient(to bottom right, var(--cq-panel), var(--cq-bg));
   color: var(--cq-fg);
   font: 400 1rem/1.5 var(--cq-font-sans);
 }
@@ -350,8 +352,8 @@ section {
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--cq-rule);
   font: 700 clamp(1.5rem, 11cqi, 2rem) / 1.2 var(--cq-font-title);
-  /* The app's logotype: amber gradient lettering. */
-  background: linear-gradient(to right, var(--cq-amber-300), var(--cq-amber-500));
+  /* The app's gradient lettering, in its lime. */
+  background: linear-gradient(to right, var(--cq-lime-300), var(--cq-lime-500));
   background-clip: text;
   color: transparent;
 }
@@ -369,7 +371,10 @@ section {
 }
 .card.cq:hover {
   background-color: transparent;
-  border-color: var(--cq-amber-400);
+  border-color: var(--cq-lime-400);
+}
+.card.cq:hover p.card-meta {
+  box-shadow: 0 6px 0 0 var(--cq-amber-700);
 }
 
 .about p {
