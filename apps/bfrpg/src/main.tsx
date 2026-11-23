@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import '@fontsource/wellfleet/latin-400.css';
 import { reloadForNewBuild } from '@dice-jar/stale-build';
 import App from './App.tsx';
 import { migrateOldStores } from './lib/localState';
