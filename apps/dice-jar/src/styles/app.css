@@ -339,7 +339,7 @@ section {
   border-bottom: 0; /* torn off */
   border-radius: var(--cq-radius) var(--cq-radius) 0 0;
   background:
-    linear-gradient(color-mix(in oklab, var(--cq-lime-950) 20%, transparent)),
+    linear-gradient(color-mix(in oklab, var(--cq-lime-950) 20%, transparent), color-mix(in oklab, var(--cq-lime-950) 20%, transparent)),
     linear-gradient(to bottom right, var(--cq-panel), var(--cq-bg));
   color: var(--cq-fg);
   font: 400 1rem/1.5 var(--cq-font-sans);
