@@ -1,0 +1,41 @@
+/* The same in every app, so it uses system colors and rem, not any one app's tokens; every app's index.html sets color-scheme, so Canvas follows its theme. */
+.dj-alert {
+  --line: blue;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--line);
+  background: color-mix(in oklab, var(--line) 14%, Canvas);
+  color: CanvasText;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.dj-alert-warning {
+  --line: orange;
+}
+.dj-alert-error {
+  --line: red;
+}
+.dj-alert-success {
+  --line: green;
+}
+.dj-alert p {
+  margin: 0;
+}
+.dj-alert button {
+  flex: none;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.dj-alert button:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+}

@@ -1,25 +1,23 @@
 import { Suspense, lazy, useState } from 'react';
 import './App.css';
-import { ErrorBoundary, ToastProvider } from '@dice-jar/browser';
+import { ErrorBoundary, GlobalAlerts, ToastProvider, type Alert } from '@dice-jar/browser';
 import { ErrorPage, Notification, LoadingState } from '@/components/ui/core/feedback';
 import { Header } from '@/components/app/Header';
 import { Footer } from '@/components/app/Footer';
 import { Routes } from '@/components/app/Routes';
 import { useAppData, useNetworkStatus } from '@/hooks';
-import { getInitialAlerts, type AlertConfig } from '@/constants';
 
 const SignInModal = lazy(() => import('./components/modals/auth/SignInModal'));
 
-const OFFLINE_ALERT: AlertConfig = {
+const OFFLINE_ALERT: Alert = {
+  id: 'offline',
   message: "You're offline. Changes will be saved when you reconnect.",
   type: 'warning',
-  dismissible: false,
 };
 
 // Inner app component, inside the toast provider
 function AppContent() {
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
-  const [alerts, setAlerts] = useState<AlertConfig[]>(() => getInitialAlerts());
   const { isOnline } = useNetworkStatus();
 
   useAppData();
@@ -28,20 +26,10 @@ function AppContent() {
     setIsSignInModalOpen(false);
   };
 
-  const handleAlertClose = (alertIndex: number) => {
-    setAlerts((prevAlerts) => prevAlerts.filter((_, index) => index !== alertIndex));
-  };
-
-  const headerProps = {
-    setIsSignInModalOpen,
-    // Last, so the dismissible alerts keep their indexes for onAlertClose.
-    alerts: isOnline ? alerts : [...alerts, OFFLINE_ALERT],
-    onAlertClose: handleAlertClose,
-  };
-
   return (
     <div className="app">
-      <Header {...headerProps} />
+      <Header setIsSignInModalOpen={setIsSignInModalOpen} />
+      <GlobalAlerts app="bfrpg" extra={isOnline ? [] : [OFFLINE_ALERT]} />
       <Routes />
       <Footer />
 

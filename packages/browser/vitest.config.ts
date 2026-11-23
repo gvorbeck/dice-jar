@@ -8,6 +8,7 @@ export default defineConfig({
         'index.ts',
         'ErrorBoundary.tsx',
         'DiceJarCredit.tsx',
+        'GlobalAlerts.tsx',
         'focus.tsx',
         'useTitle.ts',
         'useRun.ts',

@@ -1,4 +1,5 @@
 import { createRequire } from 'node:module';
+import { serveAlerts } from '@dice-jar/e2e-helpers';
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 
 // firebase-admin is installed under functions/; load it from there so the Discord bot and these helpers share one app.
@@ -15,7 +16,7 @@ export const savedHp = (gameId: string, agentId: string, hp: number) =>
 
 // The Discord panel calls a real Cloud Function URL; keep tests offline apart from the local emulator.
 const offline = (context: BrowserContext) => context.route('**/*.cloudfunctions.net/**', (r) => r.abort());
-test.beforeEach(({ context }) => offline(context));
+test.beforeEach(({ context }) => Promise.all([offline(context), serveAlerts(context)]));
 
 // react-aria hides the real input under its label, so click the label like a person would.
 const choose = (page: Page, text: string | RegExp) => page.locator('label.choice', { hasText: text }).first().click();
@@ -25,7 +26,7 @@ export const hp = (page: Page) => page.getByRole('group', { name: 'HP', exact: t
 /** A page in a new browser context: its own offline cache, so it only sees what reached the server. */
 export async function freshPage(browser: Browser) {
   const context = await browser.newContext();
-  await offline(context);
+  await Promise.all([offline(context), serveAlerts(context)]);
   return context.newPage();
 }
 

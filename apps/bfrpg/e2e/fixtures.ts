@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { test as base } from '@playwright/test';
+import { serveAlerts } from '@dice-jar/e2e-helpers';
 import { initializeApp } from 'firebase/app';
 import { connectAuthEmulator, createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 
@@ -18,7 +19,15 @@ async function newUser() {
  * Every test starts signed in as its own new user (through the app's sign-in form),
  * holding the sample characters and games, saved through the app's own services.
  */
-export const test = base.extend<{ signedIn: void }>({
+export const test = base.extend<{ signedIn: void; alertsStubbed: void }>({
+  // Every test, signed in or not, so none reads the live alerts file.
+  alertsStubbed: [
+    async ({ context }, use) => {
+      await serveAlerts(context);
+      await use();
+    },
+    { auto: true },
+  ],
   signedIn: [
     async ({ page }, use) => {
       const email = await newUser();
