@@ -8,6 +8,26 @@
       {
         "path": "AGENTS.md",
         "description": "The rules every change must follow. Flag any change that breaks one of them."
+      },
+      {
+        "path": "README.md",
+        "description": "What the monorepo holds, how it is laid out and how a change moves from a branch to dev to main."
+      },
+      {
+        "path": "apps/bfrpg/README.md",
+        "description": "What the Basic Fantasy app is and where things are in it. Use it to judge changes under apps/bfrpg."
+      },
+      {
+        "path": "apps/delta-green/README.md",
+        "description": "What the Delta Green app is and where things are in it. Use it to judge changes under apps/delta-green."
+      },
+      {
+        "path": "apps/dice-jar/README.md",
+        "description": "The static landing page: no Firebase, rules or Functions. Use it to judge changes under apps/dice-jar."
+      },
+      {
+        "path": "apps/stonetop/README.md",
+        "description": "What the Stonetop app is and where things are in it, including how its saves and App Check work. Use it to judge changes under apps/stonetop."
       }
     ]
   }

@@ -68,11 +68,13 @@
   --cq-rule: oklch(37% 0.013 285.805); /* zinc-700 */
   --cq-fg: oklch(96.7% 0.001 286.375); /* zinc-100 */
   --cq-dim: oklch(70.5% 0.015 286.067); /* zinc-400 */
-  --cq-line: color-mix(in oklch, var(--cq-fg) 50%, transparent); /* border-border/50 */
-  --cq-amber-300: oklch(87.9% 0.169 91.605);
-  --cq-amber-400: oklch(82.8% 0.189 84.429);
-  --cq-amber-500: oklch(76.9% 0.188 70.08);
+  --cq-lime-300: oklch(89.7% 0.196 126.665);
+  --cq-lime-400: oklch(84.1% 0.238 128.85);
+  --cq-lime-500: oklch(76.8% 0.233 130.85);
+  --cq-lime-600: oklch(64.8% 0.2 131.684);
+  --cq-amber-400: oklch(82.8% 0.189 84.429); /* the app's buttons */
   --cq-amber-700: oklch(55.5% 0.163 48.998);
+  --cq-lime-950: oklch(27.4% 0.072 132.109);
   --cq-radius: 0.5rem; /* --radius-lg */
   --cq-font-title: 'Wellfleet', serif;
   --cq-font-sans: ui-sans-serif, system-ui, sans-serif;
