@@ -2,46 +2,24 @@
   .site-footer {
     margin-top: auto;
     padding-block: calc(var(--space) * 8);
+    border-top: 1px solid color-mix(in oklab, var(--zinc-600) 50%, transparent);
   }
   .site-footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--space) * 2);
     max-width: var(--page-w);
     margin-inline: auto;
     padding-inline: calc(var(--space) * 4);
-  }
-  .site-footer .card {
     text-align: center;
-  }
-  .site-footer-stack > :not(:last-child) {
-    margin-bottom: calc(var(--space) * 6);
-  }
-  .site-footer-stack > .typography:not(:last-child),
-  .site-footer-more > .typography:not(:last-child) {
-    margin-bottom: 0;
   }
   .site-footer-links {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
     justify-content: center;
-    gap: calc(var(--space) * 4);
-  }
-  .site-footer-donate {
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .site-footer-donate:hover {
-    transform: scale(1.05);
-  }
-  .site-footer-rule {
-    border-top: 1px solid color-mix(in oklab, var(--zinc-600) 50%, transparent);
-  }
-  .site-footer-more > :not(:last-child) {
+    gap: calc(var(--space) * 6);
     margin-bottom: calc(var(--space) * 2);
-  }
-  .site-footer-sites {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: calc(var(--space) * 4);
   }
   .footer-link {
     font-size: var(--text-sm);
@@ -55,10 +33,5 @@
   .footer-link:hover {
     color: var(--amber-400);
     text-decoration-color: var(--amber-400);
-  }
-  @media (min-width: 48rem) {
-    .site-footer-links {
-      gap: calc(var(--space) * 6);
-    }
   }
 }
