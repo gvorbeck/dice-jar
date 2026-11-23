@@ -2,6 +2,10 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
+    <!-- Layer order lives here: the build drops it from App.css, and then load order decides whether the reset beats the components. -->
+    <style>
+      @layer base, components;
+    </style>
     <!-- Favicons -->
     <link rel="icon" href="/icons/favicon.ico" sizes="any" />
     <link rel="icon" href="/icons/favicon-16x16.webp" type="image/webp" sizes="16x16" />
