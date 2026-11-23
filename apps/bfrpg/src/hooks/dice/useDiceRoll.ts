@@ -94,32 +94,14 @@ export function useDiceRoll() {
           const percentileRoll = roll('1d100');
           const result = percentileRoll.total;
 
-          // Special cases: 01-05 always succeed, 96-100 always fail
-          const isAutoSuccess = result <= 5;
-          const isAutoFailure = result >= 96;
-          const isSuccess = isAutoSuccess || (!isAutoFailure && result <= targetPercentage);
+          // A percentile roll succeeds on a result equal to or less than the target (Core Rules, p. 2)
+          const isSuccess = result <= targetPercentage;
 
-          let resultMessage = `${skillName}: 1d100 = ${result} vs ${targetPercentage}%`;
-
-          if (isAutoSuccess && result <= targetPercentage) {
-            resultMessage += ' - Success!';
-            addToast(resultMessage, 'success', true);
-          } else if (isAutoSuccess) {
-            resultMessage += ' - Critical Success!';
-            addToast(resultMessage, 'success', true);
-          } else if (isAutoFailure && result > targetPercentage) {
-            resultMessage += ' - Failure';
-            addToast(resultMessage, 'error', true);
-          } else if (isAutoFailure) {
-            resultMessage += ' - Critical Failure!';
-            addToast(resultMessage, 'error', true);
-          } else if (isSuccess) {
-            resultMessage += ' - Success!';
-            addToast(resultMessage, 'success', true);
-          } else {
-            resultMessage += ' - Failure';
-            addToast(resultMessage, 'error', true);
-          }
+          addToast(
+            `${skillName}: 1d100 = ${result} vs ${targetPercentage}% - ${isSuccess ? 'Success!' : 'Failure'}`,
+            isSuccess ? 'success' : 'error',
+            true,
+          );
         }
       } catch {
         addToast('Failed to roll dice', 'error');

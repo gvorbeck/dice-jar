@@ -16,7 +16,7 @@ export const scout: Class = {
     },
   ],
   allowedWeapons: [],
-  allowedArmor: [],
+  allowedArmor: ['leather'], // no metal armor and no shields, like a Thief (Scouts Supplement, p. 1)
   specialAbilities: [
     {
       name: 'Move Silently',

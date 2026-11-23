@@ -77,7 +77,7 @@ export interface CombatantWithInitiative extends Record<string, unknown> {
   initiative: number;
   isPlayer: boolean;
   _sortId: number;
-  dexModifier: number;
+  dexModifier: number; // added to the Initiative roll: the Dexterity bonus plus any racial bonus (a Halfling's +1)
   hp: CombatantHP;
   avatar?: string;
 }

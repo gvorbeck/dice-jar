@@ -7,15 +7,15 @@
 
 /**
  * Mapping of class/race weapon restriction IDs to equipment names
- * Used to properly match weapon restrictions with actual equipment items
+ * Used to properly match weapon restrictions with actual equipment items; the values are item names as `createEquipmentId` writes them (lowercase, spaces to hyphens), so 'Maul/Great Mace' is 'maul/great-mace'
  */
 export const WEAPON_ID_MAPPING: Record<string, string[]> = {
   dagger: ['dagger'],
-  'walking-staff': ['quarterstaff'],
+  'walking-staff': ['club/cudgel/walking-staff'],
   warhammer: ['warhammer'],
   mace: ['mace'],
-  maul: ['maul'],
-  club: ['club'],
+  maul: ['maul/great-mace'],
+  club: ['club/cudgel/walking-staff'],
   quarterstaff: ['quarterstaff'],
   sling: ['sling'],
   shortbow: ['shortbow'],
@@ -23,8 +23,9 @@ export const WEAPON_ID_MAPPING: Record<string, string[]> = {
   spade: ['spade'],
   scimitar: ['scimitar'],
   scythe: ['scythe'],
-  greatsword: ['greatsword'],
+  greatsword: ['two-handed-sword'],
   polearm: [
+    'pole-arm',
     'glaive',
     'halberd',
     'bill-guisarme',
@@ -49,6 +50,7 @@ export const WEAPON_ID_MAPPING: Record<string, string[]> = {
  */
 export const ARMOR_ID_MAPPING: Record<string, string[]> = {
   none: [], // Special case: no armor allowed
+  shield: ['buckler-shield', 'shield', 'tower-shield'],
   padded: ['padded/quilted-armor'],
   leather: ['leather-armor'],
   studded: ['studded-leather-armor'],

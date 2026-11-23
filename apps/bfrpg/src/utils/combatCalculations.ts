@@ -134,7 +134,7 @@ const FIGHTER_TYPE_SAVES: SavingThrowEntry[] = [
   { minLevel: 10, saves: [9, 9, 11, 12, 13] },
   { minLevel: 8, saves: [9, 10, 12, 13, 14] },
   { minLevel: 6, saves: [10, 11, 12, 14, 15] },
-  { minLevel: 4, saves: [11, 12, 13, 14, 15] },
+  { minLevel: 4, saves: [11, 11, 13, 14, 15] },
   { minLevel: 2, saves: [11, 12, 14, 15, 16] },
   { minLevel: 1, saves: [12, 13, 14, 15, 17] },
 ];

@@ -15,8 +15,8 @@ export const druid: Class = {
       min: 9,
     },
   ],
-  allowedWeapons: ['dagger', 'walking-staff', 'sling', 'shortbow'],
-  allowedArmor: ['leather', 'padded'],
+  allowedWeapons: ['dagger', 'walking-staff', 'quarterstaff', 'sling', 'shortbow'], // "staves" (Druid Supplement, p. 1)
+  allowedArmor: ['leather', 'padded', 'shield'], // shortcut: all shields allowed, the books never say which are wooden (Druid Supplement p. 1; Equipment Emporium p. 11), upgrade if the equipment data gets a material
   spellcasting: {
     spellsPerLevel: {
       2: [1],
