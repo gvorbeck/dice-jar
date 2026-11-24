@@ -1,11 +1,13 @@
 import '@/utils'; // first: validation/rules and utils import each other, and this order is the one that loads
 import { describe, it, expect } from 'vitest';
 import { allClasses, allRaces } from '@/data';
-import { createMockCharacter } from '@/test/helpers';
+import { createMockCharacter, createMockAbilityScores } from '@/test/helpers';
 import {
   getSpellSlots,
   getRacialModificationInfo,
   isCurrentClassStillValid,
+  isClassEligible,
+  cascadeValidateCharacter,
   hasRequiredStartingSpells,
   getPrimaryClassInfo,
 } from './character';
@@ -104,5 +106,41 @@ describe('getPrimaryClassInfo', () => {
       usesSpells: false,
     });
     expect(getPrimaryClassInfo(createMockCharacter({ class: '' }), allClasses)).toBeNull();
+  });
+});
+
+// A class has a minimum ability score: Strength 9 for a Fighter, Wisdom 9 for a Cleric (Core Rules p. 7), Intelligence 9 for a
+// Magic-User and Dexterity 9 for a Thief (pp. 8-9). A Ranger needs Strength 9, Wisdom 11 and Dexterity 11 (Rangers and Paladins p. 1).
+describe('class ability requirements', () => {
+  const scores = (over: Record<string, number>) =>
+    createMockAbilityScores(Object.fromEntries(Object.entries(over).map(([k, value]) => [k, { value, modifier: 0 }])));
+  const meets = (id: string, over: Record<string, number>) =>
+    isClassEligible(
+      createMockCharacter({ abilities: scores(over) }),
+      allClasses.find((c) => c.id === id)!,
+    );
+
+  it('needs the minimum score, and no more', () => {
+    expect(meets('fighter', { strength: 9 })).toBe(true);
+    expect(meets('fighter', { strength: 8 })).toBe(false);
+    expect(meets('cleric', { wisdom: 8 })).toBe(false);
+    expect(meets('magic-user', { intelligence: 8 })).toBe(false);
+    expect(meets('thief', { dexterity: 8 })).toBe(false);
+  });
+
+  it('needs every ability the class names', () => {
+    const ranger = { strength: 9, wisdom: 11, dexterity: 11 };
+    expect(meets('ranger', ranger)).toBe(true);
+    expect(meets('ranger', { ...ranger, wisdom: 10 })).toBe(false);
+    expect(meets('ranger', { ...ranger, dexterity: 10 })).toBe(false);
+  });
+
+  it('drops a class the abilities no longer meet', () => {
+    const human = allRaces.find((r) => r.id === 'human')!;
+    const weak = createMockCharacter({ class: 'fighter', abilities: scores({ strength: 8 }) });
+    expect(isCurrentClassStillValid(weak, human, allClasses)).toBe(false);
+    expect(cascadeValidateCharacter(weak, human, allClasses)).toMatchObject({ race: 'human', class: '' });
+    const strong = createMockCharacter({ class: 'fighter', abilities: scores({ strength: 9 }) });
+    expect(isCurrentClassStillValid(strong, human, allClasses)).toBe(true);
   });
 });

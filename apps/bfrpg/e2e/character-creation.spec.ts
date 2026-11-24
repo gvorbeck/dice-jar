@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures';
+import { test, expect, rollHigh } from './fixtures';
 
 test.describe('Character Creation Workflow', () => {
   test('can roll ability scores', async ({ page }) => {
@@ -27,6 +27,7 @@ test.describe('Character Creation Workflow', () => {
     // Step 1: Roll ability scores
     await expect(page.getByRole('heading', { name: 'Roll Ability Scores' })).toBeVisible();
 
+    await rollHigh(page);
     const rollButton = page.getByRole('button', { name: 'Roll All Abilities' });
     await rollButton.click();
 

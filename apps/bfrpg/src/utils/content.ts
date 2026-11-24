@@ -93,6 +93,18 @@ export function monsterToCombatant(monster: Monster, variantIndex: number = 0): 
 // TREASURE SYSTEM - BFRPG COMPLIANT
 // ============================================================================
 
+/**
+ * Magic items found: how many (a number or dice), which column of the Magic Item table to roll on, and any items added on top
+ * ("any 1d4 + 1 scroll"). Core Rules pp. 164-166. A `chance` of 0 never finds any.
+ */
+type MagicKind = 'any' | 'weapon-or-armor' | 'no-weapons' | 'potion' | 'scroll';
+interface MagicConfig {
+  chance: number;
+  count: string | number;
+  kind?: MagicKind;
+  plus?: ('potion' | 'scroll')[];
+}
+
 interface TreasureConfig {
   copper: { chance: number; amount: string };
   silver: { chance: number; amount: string };
@@ -101,7 +113,7 @@ interface TreasureConfig {
   platinum: { chance: number; amount: string };
   gems: { chance: number; amount: string };
   jewelry: { chance: number; amount: string };
-  magic: { chance: number; amount: number };
+  magic: MagicConfig;
 }
 
 interface IndividualTreasureConfig {
@@ -112,7 +124,7 @@ interface IndividualTreasureConfig {
   platinum: { amount: string; chance?: number };
   gems: { amount: string; chance?: number };
   jewelry: { amount: string; chance?: number };
-  magic: { amount: number; chance?: number };
+  magic: MagicConfig;
 }
 
 // BFRPG-compliant treasure tables. Coin amounts are in hundreds of coins unless noted, so '5d6*100' is Type A copper (Core Rules, p. 164; unguarded, p. 165).
@@ -125,7 +137,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 50, amount: '1d10*100' },
     gems: { chance: 50, amount: '6d6' },
     jewelry: { chance: 50, amount: '6d6' },
-    magic: { chance: 30, amount: 3 },
+    magic: { chance: 30, count: 3 },
   },
   B: {
     copper: { chance: 75, amount: '5d10*100' },
@@ -135,7 +147,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 0, amount: '0' },
     gems: { chance: 25, amount: '1d6' },
     jewelry: { chance: 25, amount: '1d6' },
-    magic: { chance: 10, amount: 1 },
+    magic: { chance: 10, count: 1, kind: 'weapon-or-armor' },
   },
   C: {
     copper: { chance: 60, amount: '6d6*100' },
@@ -145,7 +157,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 0, amount: '0' },
     gems: { chance: 25, amount: '1d4' },
     jewelry: { chance: 25, amount: '1d4' },
-    magic: { chance: 15, amount: 2 },
+    magic: { chance: 15, count: '1d2' },
   },
   D: {
     copper: { chance: 30, amount: '4d6*100' },
@@ -155,7 +167,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 0, amount: '0' },
     gems: { chance: 30, amount: '1d8' },
     jewelry: { chance: 30, amount: '1d8' },
-    magic: { chance: 20, amount: 2 },
+    magic: { chance: 20, count: '1d2', plus: ['potion'] },
   },
   E: {
     copper: { chance: 30, amount: '2d8*100' },
@@ -165,7 +177,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 0, amount: '0' },
     gems: { chance: 10, amount: '1d10' },
     jewelry: { chance: 10, amount: '1d10' },
-    magic: { chance: 30, amount: 4 },
+    magic: { chance: 30, count: '1d4', plus: ['scroll'] },
   },
   F: {
     copper: { chance: 0, amount: '0' },
@@ -175,7 +187,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 70, amount: '2d8*100' },
     gems: { chance: 20, amount: '2d12' },
     jewelry: { chance: 10, amount: '1d12' },
-    magic: { chance: 35, amount: 4 },
+    magic: { chance: 35, count: '1d4', kind: 'no-weapons', plus: ['potion', 'scroll'] },
   },
   G: {
     copper: { chance: 0, amount: '0' },
@@ -185,7 +197,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 75, amount: '5d8*100' },
     gems: { chance: 25, amount: '3d6' },
     jewelry: { chance: 25, amount: '1d10' },
-    magic: { chance: 50, amount: 4 },
+    magic: { chance: 50, count: '1d4', plus: ['scroll'] },
   },
   H: {
     copper: { chance: 0, amount: '8d10*100' }, // Dragon treasure - varies by age
@@ -195,7 +207,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 0, amount: '9d8*100' },
     gems: { chance: 0, amount: '1d100' },
     jewelry: { chance: 0, amount: '10d4' },
-    magic: { chance: 0, amount: 4 },
+    magic: { chance: 0, count: '1d4', plus: ['potion', 'scroll'] },
   },
   I: {
     copper: { chance: 0, amount: '0' },
@@ -205,7 +217,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 80, amount: '3d10*100' },
     gems: { chance: 50, amount: '2d6' },
     jewelry: { chance: 50, amount: '2d6' },
-    magic: { chance: 15, amount: 1 },
+    magic: { chance: 15, count: 1 },
   },
   J: {
     copper: { chance: 45, amount: '3d8' },
@@ -215,7 +227,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 0, amount: '0' },
     gems: { chance: 0, amount: '0' },
     jewelry: { chance: 0, amount: '0' },
-    magic: { chance: 0, amount: 0 },
+    magic: { chance: 0, count: 0 },
   },
   K: {
     copper: { chance: 0, amount: '0' },
@@ -225,7 +237,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 0, amount: '0' },
     gems: { chance: 0, amount: '0' },
     jewelry: { chance: 0, amount: '0' },
-    magic: { chance: 0, amount: 0 },
+    magic: { chance: 0, count: 0 },
   },
   L: {
     copper: { chance: 0, amount: '0' },
@@ -235,8 +247,9 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 0, amount: '0' },
     gems: { chance: 50, amount: '1d4' },
     jewelry: { chance: 0, amount: '0' },
-    magic: { chance: 0, amount: 0 },
+    magic: { chance: 0, count: 0 },
   },
+  // Type M has no magic items (Core Rules, p. 164)
   M: {
     copper: { chance: 0, amount: '0' },
     silver: { chance: 0, amount: '0' },
@@ -245,7 +258,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 90, amount: '2d8*1000' },
     gems: { chance: 55, amount: '5d4' },
     jewelry: { chance: 45, amount: '2d6' },
-    magic: { chance: 40, amount: 2 },
+    magic: { chance: 0, count: 0 },
   },
   N: {
     copper: { chance: 0, amount: '0' },
@@ -255,7 +268,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 0, amount: '0' },
     gems: { chance: 0, amount: '0' },
     jewelry: { chance: 0, amount: '0' },
-    magic: { chance: 50, amount: 4 },
+    magic: { chance: 40, count: '2d4', kind: 'potion' },
   },
   O: {
     copper: { chance: 0, amount: '0' },
@@ -265,7 +278,7 @@ const LAIR_TREASURE_CONFIGS: Record<LairTreasureType, TreasureConfig> = {
     platinum: { chance: 0, amount: '0' },
     gems: { chance: 0, amount: '0' },
     jewelry: { chance: 0, amount: '0' },
-    magic: { chance: 50, amount: 1 },
+    magic: { chance: 50, count: '1d4', kind: 'scroll' },
   },
 };
 
@@ -278,7 +291,7 @@ const INDIVIDUAL_TREASURE_CONFIGS: Record<IndividualTreasureType, IndividualTrea
     platinum: { amount: '0' },
     gems: { amount: '0' },
     jewelry: { amount: '0' },
-    magic: { amount: 0 },
+    magic: { chance: 0, count: 0 },
   },
   Q: {
     copper: { amount: '0' },
@@ -288,7 +301,7 @@ const INDIVIDUAL_TREASURE_CONFIGS: Record<IndividualTreasureType, IndividualTrea
     platinum: { amount: '0' },
     gems: { amount: '0' },
     jewelry: { amount: '0' },
-    magic: { amount: 0 },
+    magic: { chance: 0, count: 0 },
   },
   R: {
     copper: { amount: '0' },
@@ -298,7 +311,7 @@ const INDIVIDUAL_TREASURE_CONFIGS: Record<IndividualTreasureType, IndividualTrea
     platinum: { amount: '0' },
     gems: { amount: '0' },
     jewelry: { amount: '0' },
-    magic: { amount: 0 },
+    magic: { chance: 0, count: 0 },
   },
   S: {
     copper: { amount: '0' },
@@ -308,7 +321,7 @@ const INDIVIDUAL_TREASURE_CONFIGS: Record<IndividualTreasureType, IndividualTrea
     platinum: { amount: '0' },
     gems: { amount: '0' },
     jewelry: { amount: '0' },
-    magic: { amount: 0 },
+    magic: { chance: 0, count: 0 },
   },
   T: {
     copper: { amount: '0' },
@@ -318,7 +331,7 @@ const INDIVIDUAL_TREASURE_CONFIGS: Record<IndividualTreasureType, IndividualTrea
     platinum: { amount: '1d6' },
     gems: { amount: '0' },
     jewelry: { amount: '0' },
-    magic: { amount: 0 },
+    magic: { chance: 0, count: 0 },
   },
   U: {
     copper: { amount: '1d20', chance: 50 },
@@ -328,7 +341,7 @@ const INDIVIDUAL_TREASURE_CONFIGS: Record<IndividualTreasureType, IndividualTrea
     platinum: { amount: '0' },
     gems: { amount: '1d4', chance: 5 },
     jewelry: { amount: '1d4', chance: 5 },
-    magic: { amount: 1, chance: 2 },
+    magic: { chance: 2, count: 1 },
   },
   V: {
     copper: { amount: '0' },
@@ -338,7 +351,7 @@ const INDIVIDUAL_TREASURE_CONFIGS: Record<IndividualTreasureType, IndividualTrea
     platinum: { amount: '1d20', chance: 25 },
     gems: { amount: '1d4', chance: 10 },
     jewelry: { amount: '1d4', chance: 10 },
-    magic: { amount: 1, chance: 5 },
+    magic: { chance: 5, count: 1 },
   },
 };
 
@@ -351,7 +364,7 @@ const UNGUARDED_TREASURE_CONFIGS: Record<UnguardedTreasureLevel, TreasureConfig>
     platinum: { chance: 1, amount: '1d4*100' },
     gems: { chance: 7, amount: '1d4' },
     jewelry: { chance: 3, amount: '1d4' },
-    magic: { chance: 2, amount: 1 },
+    magic: { chance: 2, count: 1 },
   },
   2: {
     copper: { chance: 50, amount: '1d10*100' },
@@ -361,7 +374,7 @@ const UNGUARDED_TREASURE_CONFIGS: Record<UnguardedTreasureLevel, TreasureConfig>
     platinum: { chance: 2, amount: '1d4*100' },
     gems: { chance: 10, amount: '1d6' },
     jewelry: { chance: 7, amount: '1d4' },
-    magic: { chance: 5, amount: 1 },
+    magic: { chance: 5, count: 1 },
   },
   3: {
     copper: { chance: 30, amount: '2d6*100' },
@@ -371,7 +384,7 @@ const UNGUARDED_TREASURE_CONFIGS: Record<UnguardedTreasureLevel, TreasureConfig>
     platinum: { chance: 4, amount: '1d4*100' },
     gems: { chance: 15, amount: '1d6' },
     jewelry: { chance: 7, amount: '1d6' },
-    magic: { chance: 8, amount: 1 },
+    magic: { chance: 8, count: 1 },
   },
   4: {
     copper: { chance: 20, amount: '3d6*100' },
@@ -381,7 +394,7 @@ const UNGUARDED_TREASURE_CONFIGS: Record<UnguardedTreasureLevel, TreasureConfig>
     platinum: { chance: 8, amount: '1d4*100' },
     gems: { chance: 20, amount: '1d8' },
     jewelry: { chance: 10, amount: '1d6' },
-    magic: { chance: 12, amount: 1 },
+    magic: { chance: 12, count: 1 },
   },
   5: {
     copper: { chance: 20, amount: '3d6*100' },
@@ -391,7 +404,7 @@ const UNGUARDED_TREASURE_CONFIGS: Record<UnguardedTreasureLevel, TreasureConfig>
     platinum: { chance: 8, amount: '1d4*100' },
     gems: { chance: 20, amount: '1d8' },
     jewelry: { chance: 10, amount: '1d6' },
-    magic: { chance: 12, amount: 1 },
+    magic: { chance: 12, count: 1 },
   },
   6: {
     copper: { chance: 15, amount: '4d6*100' },
@@ -401,7 +414,7 @@ const UNGUARDED_TREASURE_CONFIGS: Record<UnguardedTreasureLevel, TreasureConfig>
     platinum: { chance: 15, amount: '1d4*100' },
     gems: { chance: 30, amount: '1d8' },
     jewelry: { chance: 15, amount: '1d6' },
-    magic: { chance: 16, amount: 1 },
+    magic: { chance: 16, count: 1 },
   },
   7: {
     copper: { chance: 15, amount: '4d6*100' },
@@ -411,7 +424,7 @@ const UNGUARDED_TREASURE_CONFIGS: Record<UnguardedTreasureLevel, TreasureConfig>
     platinum: { chance: 15, amount: '1d4*100' },
     gems: { chance: 30, amount: '1d8' },
     jewelry: { chance: 15, amount: '1d6' },
-    magic: { chance: 16, amount: 1 },
+    magic: { chance: 16, count: 1 },
   },
   8: {
     copper: { chance: 10, amount: '5d6*100' },
@@ -421,21 +434,44 @@ const UNGUARDED_TREASURE_CONFIGS: Record<UnguardedTreasureLevel, TreasureConfig>
     platinum: { chance: 30, amount: '1d4*100' },
     gems: { chance: 40, amount: '1d8' },
     jewelry: { chance: 30, amount: '1d8' },
-    magic: { chance: 20, amount: 1 },
+    magic: { chance: 20, count: 1 },
   },
 };
 
-// Gem generation tables (BFRPG-compliant)
+// Gem Type, d% (Core Rules, p. 165): each row holds up to its `upTo`. A Jewel (5,000 gp) comes only from the optional value
+// adjustment, which is not used here, so a roll of 96 to 00 is a Gem.
 const GEM_TYPES = [
-  { name: 'Ornamental', baseValue: 10, chance: 20, dice: '1d10' },
-  { name: 'Semiprecious', baseValue: 50, chance: 45, dice: '1d8' },
-  { name: 'Fancy', baseValue: 100, chance: 75, dice: '1d6' },
-  { name: 'Precious', baseValue: 500, chance: 95, dice: '1d4' },
-  { name: 'Gem', baseValue: 1000, chance: 99, dice: '1d2' },
-  { name: 'Jewel', baseValue: 5000, chance: 100, dice: '1' },
+  { name: 'Ornamental', baseValue: 10, upTo: 20 },
+  { name: 'Semiprecious', baseValue: 50, upTo: 45 },
+  { name: 'Fancy', baseValue: 100, upTo: 75 },
+  { name: 'Precious', baseValue: 500, upTo: 95 },
+  { name: 'Gem', baseValue: 1000, upTo: 100 },
 ];
 
-const MAGIC_ITEM_TYPES = ['Potion', 'Scroll', 'Wand', 'Ring', 'Armor', 'Weapon', 'Miscellaneous'];
+// Magic Item, d% (Core Rules, pp. 165-166), by column: the upper roll of each type. 100 is the book's 00.
+const MAGIC_ITEM_TABLES: Record<'any' | 'weapon-or-armor' | 'no-weapons', [upTo: number, type: string][]> = {
+  any: [
+    [25, 'Weapon'],
+    [35, 'Armor'],
+    [55, 'Potion'],
+    [85, 'Scroll'],
+    [90, 'Wand, Staff, or Rod'],
+    [97, 'Miscellaneous Item'],
+    [100, 'Rare Item'],
+  ],
+  'weapon-or-armor': [
+    [70, 'Weapon'],
+    [100, 'Armor'],
+  ],
+  'no-weapons': [
+    [12, 'Armor'],
+    [40, 'Potion'],
+    [79, 'Scroll'],
+    [86, 'Wand, Staff, or Rod'],
+    [96, 'Miscellaneous Item'],
+    [100, 'Rare Item'],
+  ],
+};
 
 // Generation functions
 function generateCurrency(config: TreasureConfig | IndividualTreasureConfig, result: TreasureResult): void {
@@ -465,27 +501,19 @@ function generateCurrency(config: TreasureConfig | IndividualTreasureConfig, res
 
 function generateGem(): string {
   const rolled = roll('1d100').total;
-  let gemType = GEM_TYPES[0]!; // Default to ornamental
-
-  for (const type of GEM_TYPES) {
-    if (rolled <= type.chance) {
-      gemType = type;
-      break;
-    }
-  }
-
-  const value = gemType.baseValue + roll('1d10').total - 1; // Slight value variation
-  return `${gemType.name} Gem (${value} gp)`;
+  const gemType = GEM_TYPES.find((type) => rolled <= type.upTo) ?? GEM_TYPES[GEM_TYPES.length - 1]!;
+  return `${gemType.name === 'Gem' ? 'Gem' : `${gemType.name} gem`} (${gemType.baseValue} gp)`;
 }
 
+// Standard items of jewelry are valued at 2d8 x 100 gp (Core Rules, p. 165).
 function generateJewelry(): string {
-  const baseValue = 50 + roll('3d6').total * 10;
-  return `Jewelry Piece (${baseValue} gp)`;
+  return `Jewelry Piece (${roll('2d8*100').total} gp)`;
 }
 
-function generateMagicItem(): string {
-  const itemType = MAGIC_ITEM_TYPES[Math.floor(Math.random() * MAGIC_ITEM_TYPES.length)];
-  return `${itemType} (identify required)`;
+function magicItemOfType(kind: 'any' | 'weapon-or-armor' | 'no-weapons'): string {
+  const rolled = roll('1d100').total;
+  const type = MAGIC_ITEM_TABLES[kind].find(([upTo]) => rolled <= upTo)![1];
+  return `${type} (identify required)`;
 }
 
 function generateGemsAndJewelry(config: TreasureConfig, result: TreasureResult): void {
@@ -508,14 +536,18 @@ function generateGemsAndJewelry(config: TreasureConfig, result: TreasureResult):
   }
 }
 
-function generateMagicItems(config: TreasureConfig, result: TreasureResult): void {
-  if (roll('1d100').total <= config.magic.chance) {
-    const itemCount = config.magic.amount;
-    for (let i = 0; i < itemCount; i++) {
-      result.magicItems.push(generateMagicItem());
-    }
-    result.breakdown.push(`Magic Items: ${itemCount} generated`);
+function generateMagicItems(config: { magic: MagicConfig }, result: TreasureResult): void {
+  const { chance, count, kind = 'any', plus = [] } = config.magic;
+  if (chance === 0 || roll('1d100').total > chance) return;
+
+  const found = typeof count === 'number' ? count : roll(count).total;
+  for (let i = 0; i < found; i++) {
+    result.magicItems.push(
+      kind === 'potion' ? 'Potion (identify required)' : kind === 'scroll' ? 'Scroll (identify required)' : magicItemOfType(kind),
+    );
   }
+  for (const extra of plus) result.magicItems.push(`${extra === 'potion' ? 'Potion' : 'Scroll'} (identify required)`);
+  result.breakdown.push(`Magic Items: ${found + plus.length} generated`);
 }
 
 function generateLairTreasure(type: LairTreasureType): TreasureResult {
@@ -577,9 +609,7 @@ function generateIndividualTreasure(type: IndividualTreasureType): TreasureResul
       }
     }
 
-    if (config.magic.chance && roll('1d100').total <= config.magic.chance) {
-      result.magicItems.push(generateMagicItem());
-    }
+    generateMagicItems(config, result);
   }
 
   return result;
