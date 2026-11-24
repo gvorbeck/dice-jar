@@ -11,7 +11,8 @@ import { CHARACTER_CLASSES } from '@/constants';
 import { SCHEMA_VERSION } from '@/services/documentSchemas';
 // Note: Using direct imports here to avoid circular dependency with barrel file
 import { GAME_MECHANICS } from './mechanics';
-import { isWornArmor, isWornShield } from '@/utils/equipment';
+import { CAPACITY_ROUNDING_FACTOR, cleanEquipmentArray, isWornArmor, isWornShield } from '@/utils/equipment';
+import { calculateCoinWeight, calculateTotalCoinCount } from '@/utils/currency';
 
 // ============================================================================
 // EQUIPMENT TYPE GUARDS & CALCULATIONS
@@ -44,15 +45,26 @@ const isEquipmentArray = (equipment: unknown[]): equipment is Equipment[] => {
   );
 };
 
+/** The stored modifier of an ability, or the one its score gives when the sheet has none. */
+export const getAbilityModifier = (
+  character: { abilities?: Partial<Record<keyof Character['abilities'], { value: number; modifier?: number }>> },
+  ability: keyof Character['abilities'],
+): number => {
+  const score = character.abilities?.[ability];
+  return score ? (score.modifier ?? calculateModifier(score.value)) : 0;
+};
+
+/** Armor, any shield, and the Dexterity bonus or penalty (Core Rules, p. 4); a monster has no ability scores, so no bonus. */
 export function calculateArmorClass(character: Character | { equipment?: EquipmentLike[] }): number {
+  const dexterityBonus = 'abilities' in character ? getAbilityModifier(character, 'dexterity') : 0;
   const equipment = character.equipment;
   if (!Array.isArray(equipment)) {
-    return GAME_MECHANICS.DEFAULT_UNARMORED_AC;
+    return GAME_MECHANICS.DEFAULT_UNARMORED_AC + dexterityBonus;
   }
 
   if (!isEquipmentArray(equipment)) {
     console.warn('Invalid equipment array passed to calculateArmorClass');
-    return GAME_MECHANICS.DEFAULT_UNARMORED_AC;
+    return GAME_MECHANICS.DEFAULT_UNARMORED_AC + dexterityBonus;
   }
 
   let baseAC = GAME_MECHANICS.DEFAULT_UNARMORED_AC;
@@ -68,37 +80,66 @@ export function calculateArmorClass(character: Character | { equipment?: Equipme
     shieldBonus += parseShieldBonus(shield.AC ?? 0, shield.name ?? 'Unknown Shield');
   });
 
-  return baseAC + shieldBonus;
+  return baseAC + shieldBonus + dexterityBonus;
 }
 
+/** Light and heavy load in pounds: the race's figures, plus 10% for each point of Strength bonus and minus 20% for each of penalty (Core Rules, p. 42). */
+export function getCarryingCapacity(character: Character) {
+  const baseCapacity = getRaceById(character.race)?.carryingCapacity || {
+    light: 60,
+    heavy: 150,
+    strengthModifier: { positive: 0.1, negative: 0.2 },
+  };
+  const strMod = getAbilityModifier(character, 'strength');
+  const { positive, negative } = baseCapacity.strengthModifier;
+  const capacityMultiplier = strMod >= 0 ? 1 + strMod * positive : 1 + strMod * negative;
+  const round = (pounds: number) => Math.round((pounds * capacityMultiplier) / CAPACITY_ROUNDING_FACTOR) * CAPACITY_ROUNDING_FACTOR;
+  return { light: round(baseCapacity.light), heavy: round(baseCapacity.heavy) };
+}
+
+/**
+ * What a character carries against what they can carry: gear (a beast of burden is not carried) plus coins unless the sheet turns
+ * their weight off, against the character's own capacity plus the beasts' (Core Rules, p. 42). The one source for the Weight panel and movement.
+ * shortcut: the book gives each animal its own load and says nothing on who carries what, so gear is pooled with the animals' capacity; split it per item if players ask.
+ */
+export function getCharacterLoad(character: Character) {
+  const items = cleanEquipmentArray(character.equipment ?? []);
+  const isBeast = (item: Equipment) => item.category === 'beasts-of-burden';
+  const equipmentWeight = items.filter((item) => !isBeast(item)).reduce((sum, item) => sum + item.weight * item.amount, 0);
+  const coinWeight = character.settings?.useCoinWeight !== false ? calculateCoinWeight(calculateTotalCoinCount(character.currency)) : 0;
+  const pc = getCarryingCapacity(character);
+  const beasts = items
+    .filter(isBeast)
+    .reduce(
+      (sum, item) => ({ light: sum.light + (item.lowCapacity || 0) * item.amount, heavy: sum.heavy + (item.capacity || 0) * item.amount }),
+      { light: 0, heavy: 0 },
+    );
+  return {
+    equipmentWeight,
+    coinWeight,
+    weight: equipmentWeight + coinWeight,
+    pc,
+    beasts,
+    light: pc.light + beasts.light,
+    heavy: pc.heavy + beasts.heavy,
+  };
+}
+
+/** Speed by the armor worn, and 10' less when heavily loaded; the armor's own weight counts toward the load (Core Rules, p. 42). */
 export function calculateMovementRate(character: Character): string {
-  if (!character.equipment) {
-    return GAME_MECHANICS.DEFAULT_MOVEMENT_RATE;
-  }
+  const equipment = character.equipment ?? [];
+  const wornArmor = equipment.find(isWornArmor);
+  const armorName = wornArmor?.name.toLowerCase() ?? '';
 
-  const wornArmor = character.equipment.find(isWornArmor);
-
-  if (!wornArmor) {
-    return GAME_MECHANICS.DEFAULT_MOVEMENT_RATE;
-  }
-
-  const armorName = wornArmor.name.toLowerCase();
-
+  let speed: string = GAME_MECHANICS.DEFAULT_MOVEMENT_RATE;
   if (armorName.includes('leather') || armorName.includes('magic')) {
-    return GAME_MECHANICS.LEATHER_ARMOR_MOVEMENT;
+    speed = GAME_MECHANICS.LEATHER_ARMOR_MOVEMENT;
+  } else if (/chain|scale|splint|plate|mail/.test(armorName)) {
+    speed = GAME_MECHANICS.METAL_ARMOR_MOVEMENT;
   }
 
-  if (
-    armorName.includes('chain') ||
-    armorName.includes('scale') ||
-    armorName.includes('splint') ||
-    armorName.includes('plate') ||
-    armorName.includes('mail')
-  ) {
-    return GAME_MECHANICS.METAL_ARMOR_MOVEMENT;
-  }
-
-  return GAME_MECHANICS.DEFAULT_MOVEMENT_RATE;
+  const load = getCharacterLoad(character);
+  return load.weight > load.light ? `${parseInt(speed, 10) - 10}'` : speed;
 }
 
 // Ability score ranges and their modifiers
@@ -429,14 +470,30 @@ export function getRacialModificationInfo(character: Character): RacialModificat
   return null;
 }
 
-export function isRaceEligible(character: Character, race: Race): boolean {
-  return race.abilityRequirements.every((req: RaceRequirement) => {
+const meetsRequirements = (character: Character, requirements: RaceRequirement[]): boolean =>
+  requirements.every((req) => {
     const abilityValue = character.abilities[req.ability].value;
     const meetsMin = req.min ? abilityValue >= req.min : true;
     const meetsMax = req.max ? abilityValue <= req.max : true;
     return meetsMin && meetsMax;
   });
+
+export const isRaceEligible = (character: Character, race: Race): boolean => meetsRequirements(character, race.abilityRequirements);
+
+/**
+ * The percent a race adds to all experience earned: Humans 10%, Half-orcs and Half-ogres 5%, Half-elves 5% unless in a combination
+ * class (Core Rules p. 6, Half Humans Supplement). Taken from the race data; a custom race has none.
+ */
+export function getExperienceBonusPercent(character: Character): number {
+  const bonus = getRaceById(character.race)?.specialAbilities.find((a) => a.effects?.experienceBonus)?.effects?.experienceBonus;
+  if (!bonus) return 0;
+  const inCombinationClass =
+    character.class === CHARACTER_CLASSES.FIGHTER_MAGIC_USER || character.class === CHARACTER_CLASSES.MAGIC_USER_THIEF;
+  return bonus.conditions?.includes('not combination class') && inCombinationClass ? 0 : bonus.value;
 }
+
+/** A class has a minimum score in its prime requisite or requisites (Core Rules, pp. 7-9). */
+export const isClassEligible = (character: Character, cls: Class): boolean => meetsRequirements(character, cls.abilityRequirements);
 
 export function hasValidAbilityScores(character: Character): boolean {
   const abilities = Object.values(character.abilities);
@@ -452,9 +509,9 @@ export function isCurrentClassStillValid(character: Character, selectedRace: Rac
 
   const custom = isCustomClass(character.class);
   const classAllowed = custom || selectedRace.allowedClasses.includes(character.class);
-  const classExists = custom || availableClasses.some((cls) => cls.id === character.class);
+  const standardClass = availableClasses.find((cls) => cls.id === character.class);
 
-  return classAllowed && classExists;
+  return custom || (classAllowed && !!standardClass && isClassEligible(character, standardClass));
 }
 
 function areCurrentSpellsStillValid(character: Character, availableClasses: Class[]): boolean {

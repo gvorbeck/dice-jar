@@ -1,6 +1,6 @@
 import { OptionToggle } from '@/components/ui/core/primitives';
 import { StepWrapper } from '@/components/ui/core/layout';
-import { Card } from '@/components/ui/core/display';
+import { Card, Typography } from '@/components/ui/core/display';
 import { RequirementCard } from '@/components/ui/composite';
 import { Icon } from '@/components/ui';
 import { StandardClassSelector, CombinationClassSelector, SpellSelector } from '@/components/features/character/creation';
@@ -16,6 +16,7 @@ import {
   assignStartingCantrips,
   getCharacterSpellSystemType,
   hasCustomRace,
+  isClassEligible,
 } from '@/utils';
 import type { Spell, Cantrip, BaseStepProps, Character } from '@/types';
 import { store } from '@dice-jar/browser';
@@ -53,18 +54,17 @@ function ClassStepComponent({
 
   // Filter classes based on race restrictions and supplemental content setting
   // Excludes combination classes - those are shown separately via CombinationClassSelector
-  const availableClasses = useMemo(() => {
-    // Custom races have no class restrictions
-    if (hasCustomRace(character)) {
-      return allClasses.filter((cls) => (includeSupplementalClass || !cls.supplementalContent) && !COMBINATION_CLASS_IDS.includes(cls.id));
-    }
-
-    return allClasses.filter(
+  const { availableClasses, belowMinimums } = useMemo(() => {
+    const candidates = allClasses.filter(
       (cls) =>
-        selectedRace?.allowedClasses.includes(cls.id) &&
+        (hasCustomRace(character) || selectedRace?.allowedClasses.includes(cls.id)) && // custom races have no class restrictions
         (includeSupplementalClass || !cls.supplementalContent) &&
         !COMBINATION_CLASS_IDS.includes(cls.id),
     );
+    return {
+      availableClasses: candidates.filter((cls) => isClassEligible(character, cls)),
+      belowMinimums: candidates.filter((cls) => !isClassEligible(character, cls)),
+    };
   }, [selectedRace, includeSupplementalClass, character]);
 
   // Check if the character's race can use combination classes
@@ -311,6 +311,11 @@ function ClassStepComponent({
       {/* Class Selection */}
       {!useCombinationClass ? (
         <>
+          {belowMinimums.length > 0 && (
+            <Typography variant="body" color="secondary">
+              Not available at these ability scores: {belowMinimums.map((cls) => cls.name).join(', ')}.
+            </Typography>
+          )}
           <StandardClassSelector
             character={character}
             availableClasses={availableClasses}

@@ -10,6 +10,7 @@ export const scout: Class = {
   hitDie: '1d6',
   primaryAttribute: 'dexterity',
   abilityRequirements: [
+    { ability: 'wisdom', min: 9 }, // both Wisdom and Dexterity (Scouts Supplement, p. 1)
     {
       ability: 'dexterity',
       min: 9,

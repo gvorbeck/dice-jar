@@ -1,7 +1,7 @@
 // Every page, scanned with axe: home, both tabs, the creation steps, a character sheet, a game sheet and the not-found page.
 import type { Page } from '@playwright/test';
 import { expectAccessible } from '@dice-jar/e2e-helpers';
-import { expect, test } from './fixtures';
+import { expect, rollHigh, test } from './fixtures';
 
 const hrefOf = async (page: Page, pattern: string, tab?: string) => {
   await page.goto('/');
@@ -32,6 +32,7 @@ test('every page has no accessibility violations', async ({ page }) => {
 
 test('each character creation step has no accessibility violations', async ({ page }) => {
   await page.goto('/new-character');
+  await rollHigh(page);
   await page.getByRole('button', { name: 'Roll All Abilities' }).click();
   const next = page.getByRole('button', { name: /next/i });
   await expect(next).toBeEnabled();
