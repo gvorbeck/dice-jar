@@ -40,6 +40,7 @@ export default defineConfig({
             if (id.includes('equipment.json')) return 'equipment';
             // Keep everything else in main bundle
           }
+          return undefined;
         },
       },
     },
