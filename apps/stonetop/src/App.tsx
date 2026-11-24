@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { ToastProvider } from '@dice-jar/browser';
+import { GlobalAlerts, ToastProvider } from '@dice-jar/browser';
 import { ToastEntry } from '@/ui/Toast/Toast';
 import { SaveStatusProvider } from '@/ui/SaveStatus/SaveStatusProvider';
 import { SaveStatus } from '@/ui/SaveStatus/SaveStatus';
@@ -56,6 +56,7 @@ export const App = () => {
   return (
     <ToastProvider Entry={ToastEntry}>
       <SaveStatusProvider>
+        <GlobalAlerts app="stonetop" />
         <ErrorBoundary resetKey={pathname}>
           <Suspense
             fallback={

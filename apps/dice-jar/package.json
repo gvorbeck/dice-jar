@@ -27,6 +27,7 @@
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@dice-jar/browser": "*",
     "@dice-jar/e2e-helpers": "*",
     "@playwright/test": "^1.65.0",
     "@types/react": "^19.3.0",

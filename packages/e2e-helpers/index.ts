@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page } from '@playwright/test';
+import { expect, type BrowserContext, type Page } from '@playwright/test';
 
 /** Fails with the list of accessibility violations (axe) on whatever the page shows now. */
 export const expectAccessible = async (page: Page) => {
@@ -21,3 +21,9 @@ export const expectSkipLink = async (page: Page) => {
   await page.keyboard.press('Enter');
   await expect(page.getByRole('main')).toBeFocused();
 };
+
+/** Serves `alerts` as the global alerts file, so no test reads the live one. */
+export const serveAlerts = (context: BrowserContext, alerts: object[] = []) =>
+  context.route('https://dicejar.games/alerts.json', (r) =>
+    r.fulfill({ json: { alerts }, headers: { 'access-control-allow-origin': '*' } }),
+  );

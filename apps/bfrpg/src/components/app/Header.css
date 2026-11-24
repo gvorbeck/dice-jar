@@ -123,9 +123,6 @@
     margin-left: auto;
     opacity: 0.6;
   }
-  .site-alerts > * + * {
-    margin-top: 0;
-  }
   @media (min-width: 40rem) {
     .site-logo {
       width: 3rem;

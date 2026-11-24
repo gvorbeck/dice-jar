@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { GlobalAlerts } from '@dice-jar/browser';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Loading } from './ui/bits';
 
@@ -28,15 +29,18 @@ const Root = () => {
 export const App = () => {
   const { pathname } = useLocation();
   return (
-    <ErrorBoundary key={pathname}>
-      <Suspense fallback={<Loading className="dim page" />}>
-        <Routes>
-          <Route path="/" element={<Root />} />
-          <Route path="/g/:gameId" element={<Game />} />
-          <Route path="/g/:gameId/a/:agentId" element={<Agent />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-    </ErrorBoundary>
+    <>
+      <GlobalAlerts app="delta-green" />
+      <ErrorBoundary key={pathname}>
+        <Suspense fallback={<Loading className="dim page" />}>
+          <Routes>
+            <Route path="/" element={<Root />} />
+            <Route path="/g/:gameId" element={<Game />} />
+            <Route path="/g/:gameId/a/:agentId" element={<Agent />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
+    </>
   );
 };
