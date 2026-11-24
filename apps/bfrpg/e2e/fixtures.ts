@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { test as base } from '@playwright/test';
+import { test as base, type Page } from '@playwright/test';
 import { serveAlerts } from '@dice-jar/e2e-helpers';
 import { initializeApp } from 'firebase/app';
 import { connectAuthEmulator, createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
@@ -60,4 +60,13 @@ export const test = base.extend<{ signedIn: void; alertsStubbed: void }>({
     { auto: true },
   ],
 });
+/**
+ * Pins the dice at their highest, so a rolled character meets every class's minimum score and the class a test picks is on the list
+ * (Core Rules p. 7: a Fighter needs Strength 9, which 3d6 misses about one time in three). Call it before rolling.
+ */
+export const rollHigh = (page: Page) =>
+  page.evaluate(() => {
+    Math.random = () => 0.999;
+  });
+
 export { expect } from '@playwright/test';

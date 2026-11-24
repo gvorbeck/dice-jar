@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react';
 import type { Equipment, Character } from '@/types';
-import { getRaceById } from '@/utils';
 import {
   cleanEquipmentArray,
   ensureEquipmentAmount,
@@ -9,9 +8,7 @@ import {
   isWearableItem,
   formatWeight,
   formatCost,
-  CAPACITY_ROUNDING_FACTOR,
 } from '@/utils/equipment';
-import { calculateTotalWeight } from '@/utils/currency';
 
 /**
  * Core hook for equipment operations on existing characters
@@ -138,43 +135,6 @@ function useEquipmentManagerCore(character: Character | undefined, onEquipmentCh
     [character, onEquipmentChange],
   );
 
-  // Calculate carrying capacity using race data from BFRPG rules
-  const getCarryingCapacity = useCallback((character: Character) => {
-    if (!character) return { light: 60, heavy: 150 };
-
-    // Get race data to determine base carrying capacity
-    const raceData = getRaceById(character.race);
-    const baseCapacity = raceData?.carryingCapacity || {
-      light: 60,
-      heavy: 150,
-      strengthModifier: { positive: 0.1, negative: 0.2 },
-    };
-
-    // Apply strength modifier per BFRPG rules
-    const strMod = character.abilities?.strength?.modifier || 0;
-    const { positive, negative } = baseCapacity.strengthModifier;
-    const capacityMultiplier = strMod >= 0 ? 1 + strMod * positive : 1 + strMod * negative;
-
-    return {
-      light: Math.round((baseCapacity.light * capacityMultiplier) / CAPACITY_ROUNDING_FACTOR) * CAPACITY_ROUNDING_FACTOR,
-      heavy: Math.round((baseCapacity.heavy * capacityMultiplier) / CAPACITY_ROUNDING_FACTOR) * CAPACITY_ROUNDING_FACTOR,
-    };
-  }, []);
-
-  // Calculate total equipment weight
-  const totalWeight = useMemo(() => {
-    return calculateTotalWeight(cleanedEquipment);
-  }, [cleanedEquipment]);
-
-  // Get encumbrance status based on BFRPG rules
-  const encumbranceStatus = useMemo(() => {
-    if (!character) return 'light';
-    const capacity = getCarryingCapacity(character);
-    if (totalWeight > capacity.heavy) return 'overloaded';
-    if (totalWeight > capacity.light) return 'heavy';
-    return 'light';
-  }, [character, totalWeight, getCarryingCapacity]);
-
   return {
     addEquipmentToInventory,
     removeEquipmentFromInventory,
@@ -183,9 +143,6 @@ function useEquipmentManagerCore(character: Character | undefined, onEquipmentCh
     isArmorItem,
     isShieldItem,
     isWearableItem,
-    getCarryingCapacity,
-    totalWeight,
-    encumbranceStatus,
     formatWeight,
     formatCost,
   };
@@ -214,9 +171,6 @@ export function useEquipmentManager(character: Character | undefined, onEquipmen
         isArmorItem,
         isShieldItem,
         isWearableItem,
-        getCarryingCapacity: () => ({ light: 60, heavy: 150 }),
-        totalWeight: 0,
-        encumbranceStatus: 'light' as const,
         formatWeight,
         formatCost,
       };

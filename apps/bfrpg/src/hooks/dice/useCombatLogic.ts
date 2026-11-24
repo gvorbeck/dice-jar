@@ -3,7 +3,7 @@ import { usePlayerCharacters } from '../character';
 import { useToast } from '@dice-jar/browser';
 import { store } from '@dice-jar/browser';
 import type { CombatantWithInitiative, Game, GameCombatant, CombatCharacterData } from '@/types';
-import { calculateArmorClass, findById, normalizeCombatantHP, sortCombatantsByInitiative } from '@/utils';
+import { calculateArmorClass, getAbilityModifier, findById, normalizeCombatantHP, sortCombatantsByInitiative } from '@/utils';
 import { allRaces } from '@/data';
 import { readStored } from '@/lib/localState';
 import { roll } from '@dice-jar/dice';
@@ -32,7 +32,7 @@ const rollInitiative = (dexModifier: number | undefined) => Math.max(1, roll('1d
 const initiativeModifier = (character: CombatCharacterData): number => {
   const race = findById(String(character.race), allRaces);
   const racial = race?.specialAbilities?.find((a) => a.effects?.initiativeBonus)?.effects?.initiativeBonus?.value ?? 0;
-  return (character.abilities?.dexterity?.modifier ?? 0) + racial;
+  return getAbilityModifier(character, 'dexterity') + racial;
 };
 
 interface CombatState {

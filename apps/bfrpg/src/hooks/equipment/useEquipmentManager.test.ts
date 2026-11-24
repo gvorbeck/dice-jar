@@ -2,12 +2,12 @@ import '@/utils'; // first: validation/rules and utils import each other, and th
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { createMockCharacter, createMockEquipment, createMockAbilityScores } from '@/test/helpers';
+import { getCarryingCapacity } from '@/utils';
 import { useEquipmentManager } from './useEquipmentManager';
 
 const strength = (value: number, modifier: number) => createMockAbilityScores({ strength: { value, modifier } });
 const withStrength = (race: string, modifier: number) => createMockCharacter({ race, abilities: strength(10, modifier) });
-const capacity = (race: string, modifier: number) =>
-  renderHook(() => useEquipmentManager(withStrength(race, modifier))).result.current.getCarryingCapacity(withStrength(race, modifier));
+const capacity = (race: string, modifier: number) => getCarryingCapacity(withStrength(race, modifier));
 
 // Carrying Capacity, Core Rules p. 42: [Strength modifier, light, heavy] for Dwarf, Elf and Human, then for Halfling.
 // Strength 3 is -3, 4-5 is -2, 6-8 is -1, 9-12 is 0, 13-15 is +1, 16-17 is +2, and 18 is +3.
@@ -85,25 +85,9 @@ describe('useEquipmentManager inventory', () => {
   });
 });
 
-// Lightly loaded to 60 lb and heavily loaded to 150 lb for a human of average Strength (Core Rules p. 42).
-describe('encumbranceStatus', () => {
-  const status = (weight: number) =>
-    setup([createMockEquipment({ name: 'Anvil', weight, amount: 1 })], { abilities: strength(10, 0) }).result.current.encumbranceStatus;
-
-  it('is light up to the light load, heavy to the heavy load, then overloaded', () => {
-    expect([status(60), status(61), status(150), status(151)]).toEqual(['light', 'heavy', 'heavy', 'overloaded']);
-  });
-
-  it('adds up the weight of what is carried', () => {
-    expect(setup([{ ...rope, amount: 3 }]).result.current.totalWeight).toBe(30);
-  });
-});
-
 describe('with no character', () => {
-  it('does nothing and reports the average human load', () => {
+  it('does nothing', () => {
     const { result } = renderHook(() => useEquipmentManager(undefined));
-    expect(result.current.getCarryingCapacity({} as never)).toEqual({ light: 60, heavy: 150 });
-    expect(result.current).toMatchObject({ totalWeight: 0, encumbranceStatus: 'light' });
     expect(() => result.current.toggleWearing(0)).not.toThrow();
   });
 });

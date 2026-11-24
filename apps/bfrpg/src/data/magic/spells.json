@@ -427,7 +427,7 @@
       "paladin": null,
       "cleric": 4,
       "magic-user": 3,
-      "druid": null,
+      "druid": 4,
       "illusionist": 4,
       "necromancer": 3
     },
@@ -697,7 +697,7 @@
       "paladin": null,
       "cleric": 5,
       "magic-user": null,
-      "druid": null,
+      "druid": 4,
       "illusionist": null,
       "necromancer": null
     },
@@ -787,7 +787,7 @@
       "paladin": 1,
       "cleric": 1,
       "magic-user": 1,
-      "druid": null,
+      "druid": 1,
       "illusionist": 1,
       "necromancer": 1
     },
@@ -1207,7 +1207,7 @@
       "paladin": 1,
       "cleric": 1,
       "magic-user": null,
-      "druid": null,
+      "druid": 1,
       "illusionist": null,
       "necromancer": null
     },
@@ -1222,7 +1222,7 @@
       "paladin": 2,
       "cleric": 2,
       "magic-user": null,
-      "druid": null,
+      "druid": 2,
       "illusionist": null,
       "necromancer": null
     },
@@ -1342,7 +1342,7 @@
       "paladin": null,
       "cleric": 4,
       "magic-user": null,
-      "druid": null,
+      "druid": 4,
       "illusionist": null,
       "necromancer": null
     },
@@ -1745,11 +1745,11 @@
     "level": {
       "spellcrafter": null,
       "paladin": null,
-      "druid": null,
+      "druid": 5,
       "illusionist": null,
       "necromancer": null,
       "magic-user": null,
-      "cleric": 5
+      "cleric": null
     },
     "duration": "instantaneous",
     "description": "A flame strike produces a vertical column of divine fire roaring downward (cylinder of 10 ft radius, 30 ft high). The spell deals 6d8 points of damage to any creatures within the area of effect; a save vs. Spells for half damage is allowed."
@@ -3727,7 +3727,7 @@
       "paladin": null,
       "illusionist": null,
       "necromancer": null,
-      "magic-user": 5,
+      "magic-user": null,
       "druid": null,
       "cleric": null
     },
@@ -3742,9 +3742,9 @@
       "paladin": null,
       "illusionist": null,
       "necromancer": null,
-      "magic-user": 3,
+      "magic-user": null,
       "druid": null,
-      "cleric": null
+      "cleric": 4
     },
     "duration": "instantaneous",
     "description": "This spell allows the caster to shape, bend, and form an existing piece of stone (of up to 10 cubic feet + 1 cubic foot per level) into any shape they wish.\n\nFine detail is not possible but primitive doors, walls, bridges, or similar items can be created with this spell.\n\nStone shaped in the form of moving or mechanical parts will not work on a roll of 1-2 on 1d6."

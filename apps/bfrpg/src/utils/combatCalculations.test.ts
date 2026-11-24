@@ -86,3 +86,66 @@ describe('getSavingThrows (Core Rules p. 61)', () => {
     expect(Math.min(...Object.values(saves))).toBeGreaterThanOrEqual(1);
   });
 });
+
+// The rest of the Saving Throw Tables by Class, Core Rules p. 61: every column for the Magic-User and Thief, and the Spells column of
+// the Cleric and Fighter (printed as a leading column of the next table). [first level of each band, Death Ray, Wands, Paralysis,
+// Breath, Spells].
+const MAGIC_USER_SAVES = [[1, 13, 14, 13, 16, 15], [2, 13, 14, 13, 15, 14], [4, 12, 13, 12, 15, 13], [6, 12, 12, 11, 14, 13], [8, 11, 11, 10, 14, 12], [10, 11, 10, 9, 13, 11], [12, 10, 10, 9, 13, 11], [14, 10, 9, 8, 12, 10], [16, 9, 8, 7, 12, 9], [18, 9, 7, 6, 11, 9], [20, 8, 6, 5, 11, 8]] as const; // prettier-ignore
+const THIEF_SAVES = [[1, 13, 14, 13, 16, 15], [2, 12, 14, 12, 15, 14], [4, 11, 13, 12, 14, 13], [6, 11, 13, 11, 13, 13], [8, 10, 12, 11, 12, 12], [10, 9, 12, 10, 11, 11], [12, 9, 10, 10, 10, 11], [14, 8, 10, 9, 9, 10], [16, 7, 9, 9, 8, 9], [18, 7, 9, 8, 7, 9], [20, 6, 8, 8, 6, 8]] as const; // prettier-ignore
+const CLERIC_SPELLS = [[1, 15], [2, 14], [4, 14], [6, 13], [8, 13], [10, 12], [12, 12], [14, 11], [16, 11], [18, 10], [20, 10]] as const; // prettier-ignore
+const FIGHTER_SPELLS = [[1, 17], [2, 16], [4, 15], [6, 15], [8, 14], [10, 13], [12, 13], [14, 12], [16, 11], [18, 11], [20, 10]] as const; // prettier-ignore
+
+describe('getSavingThrows, the rest of the table (Core Rules p. 61)', () => {
+  const saves = (cls: string, level: number) => getSavingThrows(createMockCharacter({ class: cls, race: 'human', level }));
+
+  it.each([
+    ['magic-user', MAGIC_USER_SAVES],
+    ['thief', THIEF_SAVES],
+  ] as const)('%s matches the book in every column at the start of every band', (cls, rows) => {
+    for (const [level, deathRay, magicWands, paralysis, dragonBreath, spells] of rows) {
+      expect(saves(cls, level), `${cls} level ${level}`).toEqual({ deathRay, magicWands, paralysis, dragonBreath, spells });
+    }
+  });
+
+  it.each([
+    ['cleric', CLERIC_SPELLS],
+    ['fighter', FIGHTER_SPELLS],
+  ] as const)('%s matches the book in the Spells column', (cls, rows) => {
+    for (const [level, spells] of rows) expect(saves(cls, level).spells, `${cls} level ${level}`).toBe(spells);
+  });
+
+  it('uses the table of its type for a supplement class', () => {
+    expect(saves('illusionist', 5)).toEqual(saves('magic-user', 5));
+    expect(saves('assassin', 5)).toEqual(saves('thief', 5));
+    expect(saves('druid', 5)).toEqual(saves('cleric', 5));
+    expect(saves('ranger', 5)).toEqual(saves('fighter', 5));
+  });
+});
+
+// Racial saving throw bonuses [Death Ray or Poison, Magic Wands, Paralysis or Petrify, Dragon Breath, Spells], from each race's own
+// entry: Half Humans Supplement p. 1 (Half-elf, Half-orc), Dokkalfar p. 1, New Races Supplement pp. 2-4 (Canein, Chelonian, Phaerim,
+// and Faun, who save like Dwarves, p. 3). The book's "Poison" is the Death Ray or Poison save.
+describe('racial saving throw bonuses from the race data', () => {
+  const bonus = (race: string) => {
+    const base = getSavingThrows(createMockCharacter({ class: 'fighter', race: 'human', level: 1 }));
+    const s = getSavingThrows(createMockCharacter({ class: 'fighter', race, level: 1 }));
+    return [base.deathRay - s.deathRay, base.magicWands - s.magicWands, base.paralysis - s.paralysis, base.dragonBreath - s.dragonBreath, base.spells - s.spells]; // prettier-ignore
+  };
+
+  it('finds a race stored with capital letters', () => {
+    expect(bonus('Faun')).toEqual([4, 4, 4, 3, 4]);
+  });
+
+  it.each([
+    ['half-elf', [0, 1, 0, 0, 1]],
+    ['half-orc', [1, 0, 0, 0, 0]],
+    ['dokkalfar', [2, 2, 0, 0, 2]],
+    ['canein', [2, 0, 2, 0, 0]],
+    ['chelonian', [2, 0, 0, 0, 0]],
+    ['phaerim', [0, 2, 1, 0, 2]],
+    ['faun', [4, 4, 4, 3, 4]],
+    ['half-ogre', [0, 0, 0, 0, 0]],
+  ])('a %s gets %j', (race, expected) => {
+    expect(bonus(race)).toEqual(expected);
+  });
+});
