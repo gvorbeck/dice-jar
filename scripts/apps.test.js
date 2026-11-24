@@ -61,6 +61,9 @@ for (const app of gameApps) {
   if (csp)
     test(`${app.name}'s Content-Security-Policy lets the page fetch the global alerts file`, () => {
       const connect = csp.split(';').find((d) => d.trim().startsWith('connect-src')) ?? '';
-      assert.ok(connect.includes('https://dicejar.games'), `${app.name}/firebase.json: add https://dicejar.games to connect-src`);
+      assert.ok(
+        connect.split(/\s+/).includes('https://dicejar.games'),
+        `${app.name}/firebase.json: add https://dicejar.games to connect-src`,
+      );
     });
 }
