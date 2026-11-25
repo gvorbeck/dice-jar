@@ -1983,7 +1983,7 @@
     "name": "Warp Wood*",
     "range": "50’",
     "level": {
-      "spellcrafter": null,
+      "spellcrafter": 2,
       "paladin": null,
       "druid": 2,
       "illusionist": null,
