@@ -144,6 +144,7 @@ describe('racial saving throw bonuses from the race data', () => {
     ['chelonian', [2, 0, 0, 0, 0]],
     ['phaerim', [0, 2, 1, 0, 2]],
     ['faun', [4, 4, 4, 3, 4]],
+    ['gnome', [4, 0, 0, 3, 0]], // Gnomes Supplement p. 1
     ['half-ogre', [0, 0, 0, 0, 0]],
   ])('a %s gets %j', (race, expected) => {
     expect(bonus(race)).toEqual(expected);

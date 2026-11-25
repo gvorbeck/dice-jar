@@ -157,6 +157,16 @@ This project is licensed under the [Creative Commons Attribution-ShareAlike 4.0 
 
 Rules logic and rules data come from the books, checked with the `basic-fantasy-rules` MCP server (Core Rules and the supplements the app supports). Cite the page in the test or comment, as the saving-throw, attack-bonus, carrying-capacity and spell-slot tests do.
 
+### Known rules gaps
+
+The rules logic and data were compared with the books area by area (tests cite the pages). What is not done is new work, not unchecked work, and each gap is an issue:
+
+- A buckler adds +1 AC against melee only and a tower shield +3 against missiles: [#89](https://github.com/gvorbeck/dice-jar/issues/89).
+- The treasure generator names the kind of magic item but not which one, and doesn't use the jewelry description table: [#90](https://github.com/gvorbeck/dice-jar/issues/90). Type H (dragon) treasure never rolls: [#91](https://github.com/gvorbeck/dice-jar/issues/91).
+- The New Spells Supplement's "(NS)" spells are not in the data: [#92](https://github.com/gvorbeck/dice-jar/issues/92). Three Druid spells carry a different name than the book: [#93](https://github.com/gvorbeck/dice-jar/issues/93).
+- Leveling up heals to the new maximum hit points, which the books don't say: [#94](https://github.com/gvorbeck/dice-jar/issues/94).
+- The Equipment Emporium's magic items and most spell text are not compared: [#95](https://github.com/gvorbeck/dice-jar/issues/95).
+
 ## Data migration
 
 Stored characters and games carry `schemaVersion` (3), `createdAt` and `updatedAt`. `settings.version` stays at 2.6 for one release so a tab still on the previous build keeps working; `schemaVersion` is the real version, and a document is migrated when it is opened. To bring everything over at once, without spending the daily Firestore quota (all from `apps/bfrpg`; the live steps use a service account in `./service-account.json`):
