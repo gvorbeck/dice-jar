@@ -70,6 +70,7 @@ export function Counter({
   min = 0,
   max,
   warn,
+  card,
   onChange,
 }: {
   label: string;
@@ -78,17 +79,19 @@ export function Counter({
   min?: number;
   max: number;
   warn?: boolean;
+  /** A box with a big number and the buttons under it, for a score that is the point of its step. */
+  card?: boolean;
   onChange: (v: number) => void;
 }) {
   const noteId = useId();
   return (
-    <div className="counter" role="group" aria-label={label} aria-describedby={note ? noteId : undefined}>
+    <div className={card ? 'counter card' : 'counter'} role="group" aria-label={label} aria-describedby={note ? noteId : undefined}>
       <strong>{label}</strong>
-      <Btn label={`Decrease ${label}`} disabled={value <= min} onPress={() => onChange(value - 1)}>
+      <Btn className="minus" label={`Decrease ${label}`} disabled={value <= min} onPress={() => onChange(value - 1)}>
         −
       </Btn>
       <output className={warn ? 'warn' : undefined}>{value}</output>
-      <Btn label={`Increase ${label}`} disabled={value >= max} onPress={() => onChange(value + 1)}>
+      <Btn className="plus" label={`Increase ${label}`} disabled={value >= max} onPress={() => onChange(value + 1)}>
         +
       </Btn>
       {note && (

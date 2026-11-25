@@ -1,20 +1,9 @@
 import { useState } from 'react';
 import { MAX_XP, type Character } from '@/model/character';
-import {
-  ABILITIES,
-  ABILITY_NAMES,
-  LEVELS,
-  armorClass,
-  levelFor,
-  raiseScores,
-  rerolledHp,
-  rollPicks,
-  slotCount,
-  slotsUsed,
-  type Ability,
-} from '@/rules';
+import { ABILITIES, LEVELS, armorClass, levelFor, raiseScores, rerolledHp, rollPicks, slotCount, slotsUsed, type Ability } from '@/rules';
 import { Btn, Check, Counter, DetailFields, Num, Text, type Up } from '@/ui';
 import { Hint, TableTitle } from '@/ui/bits';
+import { AbilityScores } from './AbilityScores';
 import { Inventory } from './Inventory';
 import { Roller } from './Roller';
 
@@ -88,17 +77,7 @@ export function Sheet({
             <TableTitle>
               <span id="abilities">ABILITIES</span>
             </TableTitle>
-            <dl className="abilities">
-              {ABILITIES.map((a) => (
-                <div key={a}>
-                  <dt>
-                    {a.toUpperCase()}
-                    <span className="sr-only"> {ABILITY_NAMES[a]}</span>
-                  </dt>
-                  <dd>{c.abilities[a]}</dd>
-                </div>
-              ))}
-            </dl>
+            <AbilityScores scores={c.abilities} />
             <Hint>
               Spell books per day: {c.abilities.int} (INT). Companions and patron blessings: {c.abilities.cha} (CHA). Item slots and wounds:
               10 + CON.

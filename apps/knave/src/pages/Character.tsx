@@ -68,7 +68,10 @@ function Body({ gameId, id, init }: { gameId: string; id: string; init: Sheet_ }
 
   const failed = fails.save || fails.roll ? 'Not saved: check your connection and reload.' : '';
   return (
-    <Page title={c.name.trim() || 'Unnamed'} wide={mode === 'sheet'}>
+    <Page title={c.name.trim() || 'Unnamed'} wide>
+      <Link className="back" to={gameUrl(gameId)}>
+        Back to game {gameId}
+      </Link>
       {mode === 'create' ? (
         <Creator
           c={c}
@@ -91,9 +94,6 @@ function Body({ gameId, id, init }: { gameId: string; id: string; init: Sheet_ }
           }
         />
       )}
-      <p>
-        <Link to={gameUrl(gameId)}>Back to game {gameId}</Link>
-      </p>
     </Page>
   );
 }
