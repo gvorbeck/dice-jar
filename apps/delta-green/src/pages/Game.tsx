@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { asLoss, pad2, diceLabel, lowHp, testText, wpNote } from '@/rules/outcome';
 import { UNNAMED } from '@/model/names';
-import { downloadJson, useRun } from '@dice-jar/browser';
+import { downloadJson, rememberId, useRun } from '@dice-jar/browser';
 import {
   createGame,
   deleteAgent,
@@ -14,7 +14,7 @@ import {
   useRolls,
   type RollDoc,
 } from '@/lib/games';
-import { forgetSavedAgent, hasSavedAgent, isOpenableId, MIN_ID, rememberGame } from '@/lib/gameId';
+import { forgetSavedAgent, hasSavedAgent, isOpenableId, MIN_ID, RECENT_GAMES } from '@/lib/gameId';
 import { ScrollRegion } from '@/ui/ScrollRegion';
 import { Win } from '@/ui/Win';
 import { DiscordPanel } from '@/DiscordPanel';
@@ -114,7 +114,7 @@ export default function Game() {
   const has = (id: string) => !agents.data || agents.data.some((a) => a.id === id);
   const link = location.origin + gameUrl(gameId); // no query or hash the visitor arrived with
   useEffect(() => {
-    if (exists.data) rememberGame(gameId);
+    if (exists.data) rememberId(RECENT_GAMES, gameId);
   }, [exists.data, gameId]);
 
   // Not awaited: the write only settles once the server acknowledges it, which never happens offline. The list updates from the local cache.

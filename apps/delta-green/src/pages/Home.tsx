@@ -1,8 +1,8 @@
 import { useId, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useRun } from '@dice-jar/browser';
+import { recentIds, useRun } from '@dice-jar/browser';
 import { newGameId, slugifyGameId } from '@dice-jar/game-id';
-import { isOpenableId, MIN_ID, recentGames } from '@/lib/gameId';
+import { isOpenableId, MIN_ID, RECENT_GAMES } from '@/lib/gameId';
 import { CODENAMES } from '@/rules/data/random';
 import { Win } from '@/ui/Win';
 import { Page } from './Page';
@@ -46,7 +46,7 @@ export default function Home() {
   const { busy, err, run } = useRun('Could not create a game. Check your connection and try again.');
   const inputId = useId();
   const slug = slugifyGameId(raw, MAX_ID);
-  const recent = recentGames();
+  const recent = recentIds(RECENT_GAMES);
 
   const open = (e: FormEvent) => {
     e.preventDefault();

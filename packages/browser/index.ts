@@ -63,6 +63,25 @@ export function useCopy(): [CopyState, (text: string) => Promise<boolean>] {
   return [state, copy];
 }
 
+/** Button label for each copy state; `idle` is the resting text. */
+export const copyLabel = (s: CopyState, idle: string, ok = 'Link copied ✓') => (s === 'ok' ? ok : s === 'fail' ? 'Copy failed' : idle);
+
+/** For a `role="status"` sr-only span beside the button, since a changed button label isn't announced. */
+export const copyNote = (s: CopyState) => (s === 'ok' ? 'Copied' : s === 'fail' ? 'Copy failed: select and copy it by hand' : '');
+
+/** Game IDs this browser opened, newest first, kept under `key` so a landing page can offer a way back in. */
+export const recentIds = (key: string): string[] => {
+  try {
+    const v = JSON.parse(store.get(key) ?? '[]');
+    return Array.isArray(v) ? v.filter((x) => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+};
+export const rememberId = (key: string, id: string) => {
+  store.set(key, JSON.stringify([id, ...recentIds(key).filter((x) => x !== id)].slice(0, 5)));
+};
+
 export { ErrorBoundary } from './ErrorBoundary';
 export { DiceJarCredit } from './DiceJarCredit';
 export { GlobalAlerts, parseAlerts, type Alert } from './GlobalAlerts';

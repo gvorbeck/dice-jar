@@ -8,19 +8,8 @@ export const MIN_ID = 3;
 /** An ID this app would create or open: already in slug form and long enough. */
 export const isOpenableId = (id: string) => id.length >= MIN_ID && slugifyGameId(id, MAX_ID) === id;
 
-// Games this browser has opened, newest first, so the landing page can offer a way back in.
-const RECENT = 'dg.games';
-export const recentGames = (): string[] => {
-  try {
-    const v = JSON.parse(store.get(RECENT) ?? '[]');
-    return Array.isArray(v) ? v.filter((x) => typeof x === 'string') : [];
-  } catch {
-    return [];
-  }
-};
-export const rememberGame = (id: string) => {
-  store.set(RECENT, JSON.stringify([id, ...recentGames().filter((x) => x !== id)].slice(0, 5)));
-};
+/** localStorage key of the games this browser opened. */
+export const RECENT_GAMES = 'dg.games';
 
 /** True when an Agent saved by the old local-only editor is still in this browser. */
 export const hasSavedAgent = () => store.get(SAVED_AGENT_KEY) !== null;

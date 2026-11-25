@@ -7,7 +7,7 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { overBudget, type BudgetAlert } from './budget.js';
+import { overBudget, type BudgetAlert } from '../../../../packages/budget';
 import { handle, privately, type Interaction } from './bot.js';
 import { gamePath, isGameId, secretPath } from '../../src/lib/paths';
 import { formatEntry, isWebhookUrl, postWebhook, verifyDiscord, webhookName, type Roll } from './discord.js';

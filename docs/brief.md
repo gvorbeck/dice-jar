@@ -2,6 +2,8 @@
 
 > **Renamed:** apps are named after the game system, so the app this brief calls `codename` is now `apps/delta-green`. It still deploys to yourcodena.me. The Stonetop app, which the brief calls `hearthfire` (source `~/Sites/hearthfire`), will be imported as `apps/stonetop`. The text below keeps the old names.
 >
+> **Knave (Nov 2026):** glyph-quest was not migrated. It became `apps/knave`, a link-only app that started over: no accounts, no data migration. The glyph-quest rows, the "Rebuild glyph-quest" phase and the account-app notes below are history.
+>
 > **Status (Nov 2026):** the scaffold described here is done. The rules agents follow now live in [AGENTS.md](../AGENTS.md). "Scope of this work" is history; "Later phases" is still the plan, starting with importing codename.
 
 Repo name: `dice-jar`. Package scope: `@dice-jar/*`.
@@ -25,9 +27,9 @@ The owner has built the same kind of app four times, each on a slightly differen
 - **codename is not imported yet.** Treat `~/Sites/codename` as a read-only reference. Do not edit it, and do not copy its app code in during scaffolding.
 - **Set up everything so that importing codename later is the lightest possible lift.** Same Node version, same script names, same ESLint rules, same tsconfig, same test layout. Do not add a stricter rule that codename would fail unless this brief lists it.
 - **Other apps are rebuilt to the standard, not ported as they are.** That means React Aria Components for UI, codename's Firestore setup and document conventions (each app needs a data migration), and codename's tooling.
-- **Import order: codename, hearthfire, codex-quest, glyph-quest.** codename comes in first, after the scaffold is done.
-- **Existing data gets migrated.** The document shapes of hearthfire, codex-quest and glyph-quest are brought in line with codename's. Each app needs a migration of its live data at some point; existing users and games must survive it.
-- **Two access models live side by side, one per app.** Link-only (codename, hearthfire) and accounts (codex-quest, glyph-quest). Account apps keep their accounts. See "Data standard".
+- **Import order: codename, hearthfire, codex-quest.** (glyph-quest was replaced by `apps/knave` instead.) codename comes in first, after the scaffold is done.
+- **Existing data gets migrated.** The document shapes of hearthfire and codex-quest are brought in line with codename's. Each app needs a migration of its live data at some point; existing users and games must survive it.
+- **Two access models live side by side, one per app.** Link-only (codename, hearthfire) and accounts (codex-quest). Account apps keep their accounts. See "Data standard".
 - **Commit history does not matter.** Apps come in as plain copies. No `git subtree`, no `filter-repo`.
 - **Strict from the first commit.** Nothing lands without passing format, lint, types, unused-code and tests.
 - **One Firebase project and one custom domain per app.** Apps never share a database.
@@ -106,11 +108,11 @@ Each rebuilt app follows codename's Firestore conventions. Read codename's `READ
 
 Each app uses exactly one. Everything in the list above applies to both.
 
-|               | Link-only (codename, hearthfire) | Accounts (codex-quest, glyph-quest) |
-| ------------- | -------------------------------- | ----------------------------------- |
-| Document path | `games/{gameId}/...`             | `users/{uid}/...`                   |
-| Rule guard    | knowing the ID                   | `request.auth.uid == uid`           |
-| Extra UI      | game ID entry, recent games      | sign-in, sign-out                   |
+|               | Link-only (codename, hearthfire) | Accounts (codex-quest)    |
+| ------------- | -------------------------------- | ------------------------- |
+| Document path | `games/{gameId}/...`             | `users/{uid}/...`         |
+| Rule guard    | knowing the ID                   | `request.auth.uid == uid` |
+| Extra UI      | game ID entry, recent games      | sign-in, sign-out         |
 
 - Shared save code takes a document reference from the app. It never builds a path, so it works under either model. codename's `src/lib/agents.ts` builds `games/{g}/agents/{a}` itself today; that changes when the code moves to `packages/`.
 - Auth code goes in its own package, created when codex-quest comes in and not before. Link-only apps never depend on it.
@@ -141,7 +143,7 @@ What this means for each migration:
 
 - **hearthfire:** split the one game document into codename's layout: `games/{id}` plus `characters/{id}` and `rolls/{id}` subcollections. This removes its 1 MiB document ceiling and makes diff saves per character possible. Its notes use a lock so two people don't edit at once; decide whether diff saves replace that. Its `scripts/` are the starting point for the migration script.
 - **codex-quest:** export the live rules from the console into the repo before anything else; nobody can test or change them safely until then. Cross-user character reads must keep working, so the rules need an explicit read grant for characters in a game. Replace migrate-on-read with one migration script, then delete `characterMigration.ts`.
-- **glyph-quest:** export the live rules first, as above. It is hosted as a Next.js server app; the rebuild is a static Vite app like the others, so its Hosting setup changes too.
+- **glyph-quest:** not migrated. It was rebuilt from scratch as `apps/knave`, a link-only static Vite app on the same Firebase project; its old data is deleted at release.
 
 ## Rules MCP
 
@@ -193,7 +195,7 @@ Add a section to `AGENTS.md` titled "Bringing an app in" with the import checkli
 1. **Import codename.** Copy it to `apps/codename` unchanged, run Prettier once, and get every check green. Move its deploy workflow over with it, triggered by changes under `apps/codename/` or `packages/`. No packages yet: nothing is shared until a second app exists.
 2. **Rebuild hearthfire.** First split the rules MCP into one server per game, make its Delta Green wording neutral, and add Stonetop (see "Rules MCP"). Move what it needs out of codename into `packages/` as it needs it: the UI kit and tokens (`src/ui`, `src/styles/tokens.css`) and the game-agnostic parts of `src/lib` (Firebase init, diff saves, autosave, stale-build reload). codename switches to the packages in the same change. Then migrate hearthfire's data.
 3. **Rebuild codex-quest.** Add a Basic Fantasy RPG rules server and export the live Firestore rules first. The first account app: this is where the auth package is created. Then migrate its data.
-4. **Rebuild glyph-quest.** Add a Knave rules server and export the live Firestore rules first. The largest rewrite (Next.js and MUI today). Then migrate its data.
+4. **glyph-quest: done differently.** It became `apps/knave` (see the note at the top), with a Knave rules server and no data migration.
 
 Each app gets its own deploy workflow modelled on codename's `deploy.yml`: rules first, then Functions, then Hosting.
 

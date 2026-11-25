@@ -1,0 +1,19 @@
+Knave
+
+Knave is a tabletop RPG by Ben Milton, with art by Peter Mullen. This app is an
+unofficial companion made by J. Garrett Vorbeck; it is not made or endorsed by
+the game's creators.
+
+The code is released under the MIT license in the LICENSE file at the root of
+this repository. That license does not extend to the game's content (rules,
+the careers and spell names in src/rules/data, names and trademarks), which
+stays with its owners.
+
+The footer uses the same sentence as the old glyph.quest footer: "an independent
+production of J. Garrett Vorbeck and is not affiliated with Questing Beast LLC".
+
+TODO(owner): Knave 2e has a "Knave 2e Third Party License", published in the
+Knave 2e Creator Kit folder linked from https://questingblog.com/knave-2e-creator-kit/
+(https://drive.google.com/drive/folders/1QWhMigw9xEKeJ9Q5-pYesSVrDkS9NTEN). Its
+text could not be read automatically. Read it and state here what it allows for
+the careers and spell-name tables in src/rules/data.

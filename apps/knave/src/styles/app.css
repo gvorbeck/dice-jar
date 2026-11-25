@@ -1,0 +1,331 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 1.125rem/1.3 var(--font-body);
+}
+#root {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+#root > :is(header, main, footer) {
+  width: min(100% - 2rem, var(--page-w));
+  margin-inline: auto;
+}
+main:focus {
+  outline: none;
+}
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 400;
+}
+h1 {
+  font: 400 clamp(2.4rem, 8vw, 3.5rem) / 1 var(--font-display);
+  margin-block: 1.5rem 1rem;
+}
+h3 {
+  font: 700 1rem var(--font-label);
+  letter-spacing: 0.04em;
+  margin-top: 1rem;
+}
+p {
+  margin: 0.5rem 0;
+}
+a {
+  color: inherit;
+}
+section {
+  margin-block: 1.75rem;
+}
+ul,
+ol {
+  padding-left: 1.25rem;
+}
+code {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+.dim {
+  color: var(--dim);
+}
+.warn {
+  color: var(--warn);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.skip {
+  position: absolute;
+  left: 0.5rem;
+  top: -4rem;
+  z-index: 2;
+  padding: 0.25rem 0.75rem;
+  background: var(--ink);
+  color: var(--on-ink);
+}
+.skip:focus {
+  top: 0.5rem;
+}
+
+/* Masthead and logo */
+.masthead {
+  padding-block: 0.75rem;
+}
+.wordmark {
+  font: 400 1.75rem / 1 var(--font-display);
+  text-decoration: none;
+}
+.logo {
+  background: linear-gradient(var(--logo-red), var(--logo-orange) 45%, var(--logo-yellow));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 3px var(--outline);
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--outline);
+  font-size: clamp(3.5rem, 18vw, 6rem);
+  width: fit-content;
+}
+.lede {
+  font-size: 1.25rem;
+}
+footer {
+  padding-block: 1.5rem;
+  border-top: var(--border-thin) solid var(--rule);
+  margin-top: 2rem;
+}
+
+/* The black bar above a table or box */
+.table-title {
+  background: var(--ink);
+  color: var(--on-ink);
+  font: 700 0.95rem var(--font-label);
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 0.15em 0.5em;
+  margin-bottom: 0.75rem;
+}
+
+/* Controls */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem 0.75rem;
+  margin-block: 0.5rem;
+}
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: var(--border-thin) solid var(--ink);
+  border-radius: 0;
+  padding: 0.2rem 0.4rem;
+  min-height: 2.25rem;
+}
+textarea {
+  width: 100%;
+  min-height: 6rem;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+.field:has(textarea) {
+  width: 100%;
+}
+.field > label,
+label.field {
+  font: 700 0.85rem var(--font-label);
+  letter-spacing: 0.04em;
+}
+.btn {
+  font: 700 0.95rem var(--font-label);
+  letter-spacing: 0.04em;
+  color: inherit;
+  background: transparent;
+  border: var(--border) solid var(--ink);
+  border-radius: 0;
+  padding: 0.2rem 0.8rem;
+  min-height: 2.25rem;
+  min-width: 2.25rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn:is(:hover, [data-hovered]):not(:disabled, [data-disabled]),
+.btn[aria-current='step'],
+.btn.primary {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+.btn:is(:hover, [data-hovered]):not(:disabled, [data-disabled]) {
+  text-decoration: underline;
+}
+.btn:is(:disabled, [data-disabled]) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+:is(.btn, input, textarea, select, a, .choice):is(:focus-visible, [data-focus-visible]) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Checkboxes drawn as a square, like a line on the sheet */
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.25rem;
+  cursor: pointer;
+}
+.choice .mark {
+  width: 1.2rem;
+  height: 1.2rem;
+  border: var(--border) solid var(--ink);
+  flex: none;
+}
+.choice[data-selected] .mark {
+  background: var(--ink);
+  box-shadow: inset 0 0 0 3px var(--paper);
+}
+
+/* Creation steps */
+.steps {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* A number with − and + */
+.counter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block: 0.4rem;
+}
+.counter strong {
+  min-width: 11ch;
+  font: 700 1rem var(--font-label);
+  letter-spacing: 0.04em;
+}
+.counter output {
+  min-width: 2ch;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+/* The six abilities, as the book lists them */
+.abilities {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+  margin: 0;
+}
+.abilities div {
+  border: var(--border) solid var(--ink);
+  text-align: center;
+  padding: 0.25rem 0;
+}
+.abilities dt {
+  font: 700 0.9rem var(--font-label);
+  letter-spacing: 0.04em;
+}
+.abilities dd {
+  margin: 0;
+  font: 400 2rem / 1 var(--font-display);
+}
+
+/* Lists */
+.items,
+.characters {
+  list-style: none;
+  padding: 0;
+}
+.items li,
+.characters li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding-block: 0.3rem;
+  border-bottom: var(--border-thin) solid var(--rule);
+}
+.items li > :first-child,
+.characters li > :first-child {
+  flex: 1 1 12rem;
+}
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th {
+  font: 700 0.85rem var(--font-label);
+  letter-spacing: 0.04em;
+  text-align: left;
+}
+th,
+td {
+  overflow-wrap: anywhere; /* a long roll breakdown wraps instead of scrolling the table */
+  padding: 0.25rem 0.5rem;
+  border-bottom: var(--border-thin) solid var(--rule);
+  vertical-align: top;
+}
+.num {
+  text-align: right;
+}
+
+/* Dialogs */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: rgb(0 0 0 / 0.55);
+}
+.modal {
+  background: var(--paper);
+  border: var(--border) solid var(--ink);
+  max-width: min(100% - 2rem, 28rem);
+  padding: var(--gap);
+}
+.dialog {
+  outline: none;
+}
+
+@media (max-width: 30rem) {
+  .abilities {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

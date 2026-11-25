@@ -11,7 +11,7 @@ updates:
   # One root lockfile covers every workspace. Each app's functions/ has its own lockfile, so it is listed too.
   # Minor and patch updates come as one PR a week; each major version gets its own PR, since those can break things.
   - package-ecosystem: npm
-    directories: [/, /apps/delta-green/functions]
+    directories: [/, /apps/delta-green/functions, /apps/knave/functions]
     target-branch: dev
     schedule:
       interval: weekly

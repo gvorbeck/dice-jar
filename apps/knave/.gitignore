@@ -1,0 +1,15 @@
+node_modules
+dist
+.claude
+.agents
+.env
+firebase-debug.log
+.firebase
+skills-lock.json
+*.tsbuildinfo
+functions/lib
+firestore-debug.log
+ui-debug.log
+test-results
+playwright-report
+coverage
