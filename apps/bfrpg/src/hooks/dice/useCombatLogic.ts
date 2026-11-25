@@ -3,7 +3,8 @@ import { usePlayerCharacters } from '../character';
 import { useToast } from '@dice-jar/browser';
 import { store } from '@dice-jar/browser';
 import type { CombatantWithInitiative, Game, GameCombatant, CombatCharacterData } from '@/types';
-import { calculateArmorClass, normalizeCombatantHP, sortCombatantsByInitiative } from '@/utils';
+import { calculateArmorClass, getAbilityModifier, findById, normalizeCombatantHP, sortCombatantsByInitiative } from '@/utils';
+import { allRaces } from '@/data';
 import { readStored } from '@/lib/localState';
 import { roll } from '@dice-jar/dice';
 
@@ -23,6 +24,16 @@ const hashString = (str: string): number => {
  * Uses name + index to ensure unique IDs even for combatants with the same name.
  */
 const getCombatantSortId = (name: string, index: number): number => hashString(`${name}-${index}`);
+
+// 1d6 plus the Dexterity bonus (Core Rules, p. 51). shortcut: 0 means "not rolled yet" here, so a result below 1 counts as 1, and equal numbers act together anyway.
+const rollInitiative = (dexModifier: number | undefined) => Math.max(1, roll('1d6').total + (dexModifier ?? 0));
+
+// What a player adds to their Initiative roll: the Dexterity bonus, and a race's own bonus (a Halfling's +1, Core Rules p. 6).
+const initiativeModifier = (character: CombatCharacterData): number => {
+  const race = findById(String(character.race), allRaces);
+  const racial = race?.specialAbilities?.find((a) => a.effects?.initiativeBonus)?.effects?.initiativeBonus?.value ?? 0;
+  return getAbilityModifier(character, 'dexterity') + racial;
+};
 
 interface CombatState {
   combatants: CombatantWithInitiative[];
@@ -90,7 +101,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
           initiative: 0,
           isPlayer: true,
           _sortId: getCombatantSortId(char.name, index),
-          dexModifier: combatChar.abilities?.dexterity?.modifier ?? 0,
+          dexModifier: initiativeModifier(combatChar),
           hp: normalizeCombatantHP(combatChar),
           avatar: combatChar.avatar,
         } as CombatantWithInitiative;
@@ -115,7 +126,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
             initiative: 0,
             isPlayer: true,
             _sortId: getCombatantSortId(combatant.name, index),
-            dexModifier: combatChar.abilities?.dexterity?.modifier ?? 0,
+            dexModifier: initiativeModifier(combatChar),
             hp: normalizeCombatantHP(combatChar),
             avatar: combatChar.avatar,
           } as CombatantWithInitiative;
@@ -237,7 +248,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       const preCombatInitiative = preCombatInitiatives[combatant.name] || 0;
       return {
         ...combatant,
-        initiative: preCombatInitiative > 0 ? preCombatInitiative : roll('1d6').total,
+        initiative: preCombatInitiative > 0 ? preCombatInitiative : rollInitiative(combatant.dexModifier),
         _sortId: getCombatantSortId(combatant.name, index),
       };
     });
@@ -261,7 +272,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       const combatant = combatants[combatantIndex];
       if (!combatant) return;
 
-      const newInitiative = roll('1d6').total;
+      const newInitiative = rollInitiative(combatant.dexModifier);
       const updatedCombatants = [...combatants];
       updatedCombatants[combatantIndex] = {
         ...combatant,
@@ -350,7 +361,7 @@ export function useCombatLogic(game?: Game, onUpdateGame?: (updatedGame: Game) =
       if (!combatant.isPlayer) {
         return {
           ...combatant,
-          initiative: roll('1d6').total,
+          initiative: rollInitiative(combatant.dexModifier),
           _sortId: getCombatantSortId(combatant.name, index),
         };
       }

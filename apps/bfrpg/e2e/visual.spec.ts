@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import type { Page, TestInfo } from '@playwright/test';
-import { expect, test } from './fixtures';
+import { expect, rollHigh, test } from './fixtures';
 
 // Look baseline for the style conversion, chromium only.
 //   VISUAL=1 npx playwright test visual --project=chromium            writes full-page PNGs to e2e/visual.spec.ts-snapshots/ (git-ignored)
@@ -79,6 +79,7 @@ test.describe('look baseline', () => {
       test('creation steps', async ({ page }, info) => {
         await seeded(page);
         await page.goto('/new-character');
+        await rollHigh(page);
         await page.getByRole('button', { name: 'Roll All Abilities' }).click();
         await expect(page.getByRole('heading', { name: 'Ability Scores', exact: true })).toBeVisible();
         await shot(page, 'creation-1-abilities', info);

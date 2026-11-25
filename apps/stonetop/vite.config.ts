@@ -59,6 +59,7 @@ export default defineConfig({
           // each caches independently of the main CharacterPlaybook chunk.
           if (id.includes('/src/rules/arcana/major')) return 'arcana-major-data';
           if (id.includes('/src/rules/arcana/minor')) return 'arcana-minor-data';
+          return undefined; // everything else: the default chunk
         },
       },
     },

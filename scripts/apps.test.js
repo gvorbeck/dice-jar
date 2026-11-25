@@ -51,3 +51,19 @@ for (const app of gameApps)
     assert.match(head(app.name), /<script type="application\/ld\+json">/, `${app.name}/index.html: add the WebApplication JSON-LD`);
     assert.ok(readFileSync(join(apps, app.name, 'public/llms.txt'), 'utf8').startsWith('# '), `add ${app.name}/public/llms.txt`);
   });
+
+// A Content-Security-Policy blocks the fetch of the global alerts file unless its host is listed, and the banner hides that failure.
+for (const app of gameApps) {
+  const file = join(apps, app.name, 'firebase.json');
+  const csp = statSync(file, { throwIfNoEntry: false })
+    ? JSON.stringify(JSON.parse(readFileSync(file, 'utf8')).hosting).match(/Content-Security-Policy","value":"([^"]*)"/)?.[1]
+    : undefined;
+  if (csp)
+    test(`${app.name}'s Content-Security-Policy lets the page fetch the global alerts file`, () => {
+      const connect = csp.split(';').find((d) => d.trim().startsWith('connect-src')) ?? '';
+      assert.ok(
+        connect.split(/\s+/).includes('https://dicejar.games'),
+        `${app.name}/firebase.json: add https://dicejar.games to connect-src`,
+      );
+    });
+}

@@ -1,10 +1,11 @@
-import { test, expect } from './fixtures';
+import { test, expect, rollHigh } from './fixtures';
 
 test.describe('Equipment Selection Workflow', () => {
   test('buying an item spends gold and adds its weight and cost', async ({ page }) => {
     await page.goto('/new-character');
     const next = page.getByRole('button', { name: /^Go to next step/ });
 
+    await rollHigh(page);
     await page.getByRole('button', { name: 'Roll All Abilities' }).click();
     await next.click();
     await page.getByLabel('Race*').selectOption('human');

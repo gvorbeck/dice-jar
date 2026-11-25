@@ -26,6 +26,10 @@ const SUPPORTED_EQUIPMENT_CURRENCIES = [CURRENCY_TYPES.GOLD, CURRENCY_TYPES.SILV
 export const isArmorItem = (item: Equipment): boolean =>
   item.category?.toLowerCase().includes('armor') || (item.AC !== undefined && !item.category?.toLowerCase().includes('shield'));
 
+// Bows and slings have no damage of their own in the data (their ammunition does), so they are named by category.
+export const isWeaponItem = (item: Equipment): boolean =>
+  item.category !== 'ammunition' && (!!item.damage || item.category === 'bows' || item.category === 'slings-and-hurled-weapons');
+
 export const isShieldItem = (item: Equipment): boolean => item.category?.toLowerCase().includes('shield');
 
 export const isWearableItem = (item: Equipment): boolean => isArmorItem(item) || isShieldItem(item);
@@ -488,9 +492,8 @@ function checkClassArmorRestriction(equipment: Equipment, classes: RestrictionDa
 export function isEquipmentRestricted(equipment: Equipment, restrictionData: RestrictionData): RestrictionResult {
   // Ammunition is not restricted - only the weapon that fires it is restricted
   // (e.g., clerics can use stones because they can use slings)
-  const isAmmunition = equipment.category === 'ammunition';
-  const isWeapon = !!equipment.damage && !isAmmunition;
-  const isArmor = equipment.category === 'armor';
+  const isWeapon = isWeaponItem(equipment);
+  const isArmor = isWearableItem(equipment); // shields too: Magic-Users and Thieves may not use them
 
   // Check weapon restrictions
   if (isWeapon) {

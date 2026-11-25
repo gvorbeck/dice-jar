@@ -5,7 +5,7 @@
 
 import type { ValidationRule } from '@/types/validation';
 import { createRule } from './core';
-import type { Character, Race, Class, AbilityScore } from '@/types';
+import type { Race, Class } from '@/types';
 import { isCustomClass, isCustomRace } from '@/utils';
 
 // Ability score constants
@@ -89,43 +89,4 @@ export const Rules = {
         ),
       'One or more selected classes are not available',
     ),
-};
-
-/**
- * Type guards as validation rules
- */
-const TypeGuards = {
-  isAbilityScore: createRule<unknown>(
-    'isAbilityScore',
-    (obj): obj is AbilityScore => {
-      if (typeof obj !== 'object' || obj === null) return false;
-      const score = obj as Record<string, unknown>;
-      return (
-        typeof score['value'] === 'number' &&
-        Number.isInteger(score['value']) &&
-        score['value'] >= ABILITY_SCORE_RANGE.MIN &&
-        score['value'] <= ABILITY_SCORE_RANGE.MAX &&
-        typeof score['modifier'] === 'number' &&
-        Number.isInteger(score['modifier'])
-      );
-    },
-    'Invalid ability score structure',
-  ),
-
-  hasValidAbilitiesStructure: createRule<unknown>(
-    'hasValidAbilitiesStructure',
-    (character): character is { abilities: Character['abilities'] } => {
-      if (typeof character !== 'object' || character === null) return false;
-      const char = character as Record<string, unknown>;
-
-      if (typeof char['abilities'] !== 'object' || char['abilities'] === null) return false;
-      const abilities = char['abilities'] as Record<string, unknown>;
-
-      return ABILITY_NAMES.every((abilityName) => {
-        const ability = abilities[abilityName];
-        return TypeGuards.isAbilityScore.validate(ability);
-      });
-    },
-    'Invalid character abilities structure',
-  ),
 };

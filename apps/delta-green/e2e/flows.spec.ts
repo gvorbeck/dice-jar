@@ -2,7 +2,7 @@
 // Checks that need "did it reach the server?" use a second browser context: it has its own offline cache, so it can only see saved data.
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
-import { expectSkipLink } from '@dice-jar/e2e-helpers';
+import { expectAccessible, expectSkipLink, serveAlerts } from '@dice-jar/e2e-helpers';
 import { agentDoc, createAgent, freshPage, hp, savedHp, startAgent } from './helpers';
 import { newCharacter } from '../src/model/character';
 import { encodeSheet, freshLive } from '../src/model/live';
@@ -241,6 +241,7 @@ test('a game this browser cannot reach is not reported as missing', async ({ pag
   await page.getByRole('button', { name: 'Generate game' }).click();
   await page.waitForURL(/\/g\/[^/]+$/);
   const blocked = await browser.newContext();
+  await serveAlerts(blocked);
   await blocked.route(/127\.0\.0\.1:8080/, (r) => r.abort());
   const p = await blocked.newPage();
   await p.goto(page.url());
@@ -366,4 +367,16 @@ test('a bad file on the game page says so inside the backup box', async ({ page 
     .getByLabel('Agent or backup file')
     .setInputFiles({ name: 'nope.json', mimeType: 'application/json', buffer: Buffer.from('nope') });
   await expect(page.getByRole('region', { name: 'BACKUP AND IMPORT' }).getByRole('alert')).toContainText('not an Agent or a game backup');
+});
+
+test('a global message shows on the home page and stays dismissed after a reload', async ({ page, context }) => {
+  await serveAlerts(context, [{ id: 'e2e', type: 'warning', message: 'Maintenance tonight', dismissible: true }]); // the later route wins over the empty one
+  await page.goto('/');
+  await expect(page.getByRole('status').filter({ hasText: 'Maintenance tonight' })).toBeVisible();
+  await expectAccessible(page);
+  await page.getByRole('button', { name: 'Dismiss: Maintenance tonight' }).click();
+  await expect(page.getByText('Maintenance tonight')).toBeHidden();
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Generate game' })).toBeVisible();
+  await expect(page.getByText('Maintenance tonight')).toBeHidden();
 });

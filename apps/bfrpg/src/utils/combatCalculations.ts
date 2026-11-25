@@ -4,7 +4,7 @@
  */
 
 import type { Character } from '@/types';
-import { getClassById } from '@/utils/character';
+import { getClassById, getRaceById } from '@/utils/character';
 import { CHARACTER_CLASSES } from '@/constants';
 
 /**
@@ -134,7 +134,7 @@ const FIGHTER_TYPE_SAVES: SavingThrowEntry[] = [
   { minLevel: 10, saves: [9, 9, 11, 12, 13] },
   { minLevel: 8, saves: [9, 10, 12, 13, 14] },
   { minLevel: 6, saves: [10, 11, 12, 14, 15] },
-  { minLevel: 4, saves: [11, 12, 13, 14, 15] },
+  { minLevel: 4, saves: [11, 11, 13, 14, 15] },
   { minLevel: 2, saves: [11, 12, 14, 15, 16] },
   { minLevel: 1, saves: [12, 13, 14, 15, 17] },
 ];
@@ -189,35 +189,25 @@ function getBaseSavingThrows(level: number, characterClass: string): [number, nu
   return entry?.saves || DEFAULT_SAVES;
 }
 
+/** The save a race's bonus applies to, in the order [Death Ray, Wands, Paralysis, Breath, Spells]. */
+const SAVE_INDEX: Record<string, number> = {
+  'Death Ray or Poison': 0,
+  'Magic Wands': 1,
+  'Paralysis or Petrify': 2,
+  'Dragon Breath': 3,
+  Spells: 4,
+};
+
 /**
- * Get racial saving throw bonuses
+ * Get racial saving throw bonuses from the race's own data (Dwarf +4, Elf +2 vs Wands and Spells, and so on).
  * Returns array of bonuses [Death Ray, Wands, Paralysis, Breath, Spells]
  */
 function getRacialSavingThrowBonuses(race: string): [number, number, number, number, number] {
   const bonuses: [number, number, number, number, number] = [0, 0, 0, 0, 0];
-
-  switch (race.toLowerCase()) {
-    case 'dwarf':
-      bonuses[0] = 4; // Death Ray
-      bonuses[1] = 4; // Wands
-      bonuses[2] = 4; // Paralysis
-      bonuses[3] = 3; // Breath
-      bonuses[4] = 4; // Spells
-      break;
-    case 'elf':
-      bonuses[1] = 2; // Wands
-      bonuses[2] = 1; // Paralysis
-      bonuses[4] = 2; // Spells
-      break;
-    case 'halfling':
-      bonuses[0] = 4; // Death Ray
-      bonuses[1] = 4; // Wands
-      bonuses[2] = 4; // Paralysis
-      bonuses[3] = 3; // Breath
-      bonuses[4] = 4; // Spells
-      break;
+  for (const { type, bonus } of getRaceById(race.toLowerCase())?.savingThrows ?? []) {
+    const index = SAVE_INDEX[type];
+    if (index !== undefined) bonuses[index] = (bonuses[index] ?? 0) + bonus;
   }
-
   return bonuses;
 }
 

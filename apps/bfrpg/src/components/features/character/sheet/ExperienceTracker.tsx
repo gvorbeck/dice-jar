@@ -2,7 +2,7 @@ import React, { useState, useId, useEffect } from 'react';
 import { Button } from '@/components/ui';
 import { TextInput } from '@/components/ui/core/primitives';
 import { LevelUpModal } from '@/components/modals/LazyModals';
-import { canLevelUp, hasCustomClasses, getXPToNextLevel } from '@/utils';
+import { canLevelUp, hasCustomClasses, getXPToNextLevel, getExperienceBonusPercent } from '@/utils';
 import type { Character, Class } from '@/types';
 import './ExperienceTracker.css';
 
@@ -19,8 +19,8 @@ interface ExperienceTrackerProps {
   containerProps?: React.HTMLAttributes<HTMLDivElement>;
 }
 
-// Simple math expression evaluator
-const evaluateExpression = (expr: string, currentValue: number): number => {
+// Simple math expression evaluator. A +N is XP earned, so a race's bonus goes on it (rounded down); setting a total or taking away does not.
+const evaluateExpression = (expr: string, currentValue: number, bonusPercent = 0): number => {
   // Remove spaces and convert to lowercase
   const cleaned = expr.trim().toLowerCase();
 
@@ -31,7 +31,7 @@ const evaluateExpression = (expr: string, currentValue: number): number => {
     const number = parseFloat(numberStr);
 
     if (!isNaN(number)) {
-      return operation === '+' ? currentValue + number : currentValue - number;
+      return operation === '+' ? currentValue + Math.floor((number * (100 + bonusPercent)) / 100) : currentValue - number;
     }
   }
 
@@ -60,6 +60,7 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
 
   // Check if character can level up using utility function
   const isLevelUpEnabled = canLevelUp(character, classes);
+  const bonusPercent = getExperienceBonusPercent(character);
 
   // Calculate XP needed to reach next level for standard classes
   const xpToNextLevel = !hasCustomClasses(character) ? getXPToNextLevel(character, classes) : null;
@@ -74,7 +75,7 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
   };
 
   const handleInputSubmit = () => {
-    const newXP = evaluateExpression(inputValue, character.xp);
+    const newXP = evaluateExpression(inputValue, character.xp, bonusPercent);
     const clampedXP = Math.max(0, newXP); // Ensure XP doesn't go negative
 
     setInputValue(clampedXP.toString());
@@ -155,6 +156,12 @@ const ExperienceTracker: React.FC<ExperienceTrackerProps> = ({ character, classe
             Level Up
           </Button>
         </div>
+
+        {bonusPercent > 0 && (
+          <div className="xp-note">
+            Your +{bonusPercent}% experience bonus is added to each +N you type. To enter XP exactly, type the new total.
+          </div>
+        )}
 
         {/* Helper text for XP to next level (only for standard classes) */}
         {xpToNextLevel !== null && (

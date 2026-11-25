@@ -86,19 +86,3 @@ export const LOADING_MESSAGES = {
   savingChanges: 'Saving changes...',
   loadingPlayerData: 'Loading player data...',
 } as const;
-
-// Alert System Configuration
-export interface AlertConfig {
-  message: string;
-  type: 'info' | 'warning' | 'error' | 'success';
-  dismissible: boolean;
-  autoHide?: boolean;
-  duration?: number; // in milliseconds
-}
-
-/**
- * Get the appropriate alerts based on app state
- */
-export function getInitialAlerts(): AlertConfig[] {
-  return [];
-}

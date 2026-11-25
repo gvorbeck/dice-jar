@@ -18,7 +18,8 @@ vi.mock('firebase/firestore', () => ({
 }));
 
 import { mockBasicCharacter } from '@/test/mocks/character-data';
-import { saveCharacter, watchCharacter } from './characters';
+import { getDoc, deleteDoc } from 'firebase/firestore';
+import { saveCharacter, watchCharacter, watchUserCharacters, getCharacterById, deleteCharacter } from './characters';
 import { OLD_BUILD_VERSION } from './characterMigration';
 import { SCHEMA_VERSION } from './documentSchemas';
 
@@ -64,5 +65,72 @@ describe('saveCharacter', () => {
   it('writes settings.version beside schemaVersion, for tabs on the previous build', async () => {
     await saveCharacter('alice', mockBasicCharacter, 'c1');
     expect(saved()).toMatchObject({ schemaVersion: SCHEMA_VERSION, settings: { version: OLD_BUILD_VERSION } });
+  });
+});
+
+describe('watchUserCharacters', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const list = (docs: unknown[]) => {
+    const ok = vi.fn();
+    watchUserCharacters('alice', ok, vi.fn());
+    snapshots.at(-1)?.({ docs });
+    return ok.mock.calls[0]![0];
+  };
+  const current = { ...mockBasicCharacter, schemaVersion: SCHEMA_VERSION, settings: { version: OLD_BUILD_VERSION } };
+
+  it('lists each character by name, race, class, level and XP', () => {
+    auth.currentUser = { uid: 'alice' };
+    const items = list([{ id: 'c1', data: () => ({ ...current, name: 'Brom', xp: 40 }), ref: { id: 'c1' } }]);
+    expect(items).toEqual([expect.objectContaining({ id: 'c1', name: 'Brom', race: 'human', class: 'fighter', level: 1, xp: 40 })]);
+    expect(saveDiff).not.toHaveBeenCalled();
+  });
+
+  it('names a nameless character, and migrates an old one it lists, for its owner', () => {
+    auth.currentUser = { uid: 'alice' };
+    const items = list([{ id: 'c2', data: () => ({ hp: { points: 5 } }), ref: { id: 'c2' } }]);
+    expect(items[0].name).toBe('Unnamed Character');
+    expect(saveDiff).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('watchCharacter when there is none', () => {
+  it('says so with null', () => {
+    const ok = vi.fn();
+    watchCharacter('alice', 'gone', ok, vi.fn());
+    snapshots.at(-1)?.({ exists: () => false });
+    expect(ok).toHaveBeenCalledWith(null);
+  });
+});
+
+describe('getCharacterById', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('returns the character, or null when there is none', async () => {
+    vi.mocked(getDoc).mockResolvedValueOnce({ exists: () => true, data: () => ({ ...mockBasicCharacter, name: 'Brom' }) } as never);
+    expect((await getCharacterById('alice', 'c1'))?.name).toBe('Brom');
+    vi.mocked(getDoc).mockResolvedValueOnce({ exists: () => false } as never);
+    expect(await getCharacterById('alice', 'c1')).toBeNull();
+  });
+
+  it('turns a failed read into a service error', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(getDoc).mockRejectedValueOnce(new Error('offline'));
+    await expect(getCharacterById('alice', 'c1')).rejects.toThrow();
+  });
+});
+
+describe('deleteCharacter', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('deletes the document', async () => {
+    await deleteCharacter('alice', 'c1');
+    expect(deleteDoc).toHaveBeenCalledWith({ id: 'c1', path: 'users/alice/characters/c1' });
+  });
+
+  it('turns a failed delete into a service error', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(deleteDoc).mockRejectedValueOnce(new Error('denied'));
+    await expect(deleteCharacter('alice', 'c1')).rejects.toThrow();
   });
 });

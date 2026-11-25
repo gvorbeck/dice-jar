@@ -5,6 +5,7 @@
 
 import type { Character } from '@/types';
 import { getClassById, getRaceById, formatModifier, calculateArmorClass, calculateMovementRate } from '@/utils/character';
+import { isWeaponItem, isWearableItem } from '@/utils/equipment';
 import { getBaseAttackBonus, getSavingThrows } from '@/utils/combatCalculations';
 
 // Constants
@@ -143,9 +144,9 @@ export function generateCharacterSheetText(character: Character): string {
     sections.push(DIVIDER);
 
     // Categorize equipment
-    const weapons = character.equipment.filter((item) => item.category === 'Weapon');
-    const armor = character.equipment.filter((item) => item.category === 'Armor');
-    const other = character.equipment.filter((item) => item.category !== 'Weapon' && item.category !== 'Armor');
+    const weapons = character.equipment.filter(isWeaponItem);
+    const armor = character.equipment.filter((item) => !isWeaponItem(item) && isWearableItem(item));
+    const other = character.equipment.filter((item) => !isWeaponItem(item) && !isWearableItem(item));
 
     if (weapons.length > 0) {
       sections.push('Weapons:');

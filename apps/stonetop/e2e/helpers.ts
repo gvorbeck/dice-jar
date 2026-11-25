@@ -1,10 +1,17 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { expect, type Browser, type Page } from '@playwright/test';
+import { expect, test, type Browser, type Page } from '@playwright/test';
+import { serveAlerts } from '@dice-jar/e2e-helpers';
 import { migrateGame } from '../scripts/migrateCore.ts';
 
+test.beforeEach(({ context }) => serveAlerts(context));
+
 /** A page in a new browser context: its own offline cache, so it only sees what reached the server. Close it with `await page.context().close()` when the test is done. */
-export const freshPage = async (browser: Browser) => (await browser.newContext()).newPage();
+export const freshPage = async (browser: Browser) => {
+  const context = await browser.newContext();
+  await serveAlerts(context);
+  return context.newPage();
+};
 
 /** Creates a game from the home page and returns its ID. Ends on the game page. */
 export const createGame = async (page: Page) => {

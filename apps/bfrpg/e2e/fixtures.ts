@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { test as base } from '@playwright/test';
+import { test as base, type Page } from '@playwright/test';
+import { serveAlerts } from '@dice-jar/e2e-helpers';
 import { initializeApp } from 'firebase/app';
 import { connectAuthEmulator, createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 
@@ -18,7 +19,15 @@ async function newUser() {
  * Every test starts signed in as its own new user (through the app's sign-in form),
  * holding the sample characters and games, saved through the app's own services.
  */
-export const test = base.extend<{ signedIn: void }>({
+export const test = base.extend<{ signedIn: void; alertsStubbed: void }>({
+  // Every test, signed in or not, so none reads the live alerts file.
+  alertsStubbed: [
+    async ({ context }, use) => {
+      await serveAlerts(context);
+      await use();
+    },
+    { auto: true },
+  ],
   signedIn: [
     async ({ page }, use) => {
       const email = await newUser();
@@ -51,4 +60,13 @@ export const test = base.extend<{ signedIn: void }>({
     { auto: true },
   ],
 });
+/**
+ * Pins the dice at their highest, so a rolled character meets every class's minimum score and the class a test picks is on the list
+ * (Core Rules p. 7: a Fighter needs Strength 9, which 3d6 misses about one time in three). Call it before rolling.
+ */
+export const rollHigh = (page: Page) =>
+  page.evaluate(() => {
+    Math.random = () => 0.999;
+  });
+
 export { expect } from '@playwright/test';

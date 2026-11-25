@@ -34,8 +34,7 @@ export default defineConfig({
         '**/node_modules/**',
         'src/test/**',
       ],
-      // shortcut: interim floor at the imported app's measured coverage (owner-approved 2026-11-20); raise it with every test added, reach 77/74/68/78 in the tests phase
-      thresholds: { lines: 31, statements: 30, branches: 29, functions: 26 },
+      thresholds: { lines: 82, statements: 80, branches: 69, functions: 78 },
     },
   },
   resolve: {

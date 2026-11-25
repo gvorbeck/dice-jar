@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@dice-jar/stale-build": "*"
+    "@dice-jar/stale-build": "*",
+    "react-aria-components": "^1.22.1"
   },
   "peerDependencies": {
     "react": "^19.3.1",
@@ -18,11 +19,8 @@
   "devDependencies": {
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.3.0",
-    "@vitest/coverage-v8": "^5.1.0",
     "jsdom": "^31.0.0",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "typescript": "^5.9.3",
-    "vitest": "^5.0.4"
+    "react-dom": "^19.3.1"
   }
 }

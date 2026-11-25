@@ -153,6 +153,10 @@ This project is licensed under the [Creative Commons Attribution-ShareAlike 4.0 
   <em>Light up your adventures with codex.quest!</em> 🔥
 </div>
 
+## Rules
+
+Rules logic and rules data come from the books, checked with the `basic-fantasy-rules` MCP server (Core Rules and the supplements the app supports). Cite the page in the test or comment, as the saving-throw, attack-bonus, carrying-capacity and spell-slot tests do.
+
 ## Data migration
 
 Stored characters and games carry `schemaVersion` (3), `createdAt` and `updatedAt`. `settings.version` stays at 2.6 for one release so a tab still on the previous build keeps working; `schemaVersion` is the real version, and a document is migrated when it is opened. To bring everything over at once, without spending the daily Firestore quota (all from `apps/bfrpg`; the live steps use a service account in `./service-account.json`):

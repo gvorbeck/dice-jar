@@ -1,4 +1,4 @@
-import React, { useState, useId, useEffect } from 'react';
+import React, { useState, useId, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui';
 import { NumberInput } from '@/components/ui/core/primitives';
 import { rollNotation } from '@dice-jar/dice';
@@ -24,11 +24,15 @@ interface SimpleRollerProps {
 const SimpleRoller: React.FC<SimpleRollerProps> = ({ formula, label, initialValue, minValue, maxValue, onChange, containerProps }) => {
   const [value, setValue] = useState<number | undefined>(initialValue);
   const [lastRollResult, setLastRollResult] = useState<string>('');
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const componentId = useId();
   const inputId = `${componentId}-input`;
   const buttonId = `${componentId}-button`;
   const labelId = `${componentId}-label`;
   const resultId = `${componentId}-result`;
+
+  // A pending announcement must not run after the page is gone
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   // Sync internal state with initialValue prop changes
   useEffect(() => {
@@ -50,16 +54,20 @@ const SimpleRoller: React.FC<SimpleRollerProps> = ({ formula, label, initialValu
     setLastRollResult(rollDescription);
 
     // Announce the result to screen readers
-    setTimeout(() => {
-      const announcer = document.getElementById('dice-announcer');
-      if (announcer) {
-        announcer.textContent = rollDescription;
-        // Clear after announcement
-        setTimeout(() => {
-          announcer.textContent = '';
-        }, 1000);
-      }
-    }, 100);
+    timers.current.push(
+      setTimeout(() => {
+        const announcer = document.getElementById('dice-announcer');
+        if (announcer) {
+          announcer.textContent = rollDescription;
+          // Clear after announcement
+          timers.current.push(
+            setTimeout(() => {
+              announcer.textContent = '';
+            }, 1000),
+          );
+        }
+      }, 100),
+    );
   };
 
   const handleInputChange = (newValue: number | undefined) => {

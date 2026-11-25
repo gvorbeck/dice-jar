@@ -2,17 +2,17 @@
 
 Tabletop RPG character apps, one per game, sharing their tooling and, once a second app needs it, their code. Package scope: `@dice-jar/*`.
 
-delta-green and stonetop are in so far (stonetop is the app behind hearthfire.camp). `apps/dice-jar` is the landing page at dicejar.games, listing the apps. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
+delta-green, stonetop and bfrpg are in so far (stonetop is the app behind hearthfire.camp, and bfrpg the one behind codex.quest). `apps/dice-jar` is the landing page at dicejar.games, listing the apps. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
 
-| App         | Game              | Rules MCP server    | Access    |
-| ----------- | ----------------- | ------------------- | --------- |
-| delta-green | Delta Green       | `delta-green-rules` | link-only |
-| stonetop    | Stonetop          | `stonetop-rules`    | link-only |
-| dice-jar    | none (landing)    | none                | public    |
-| codex-quest | Basic Fantasy RPG | `bfrpg-rules`       | accounts  |
-| glyph-quest | Knave             | `knave-rules`       | accounts  |
+| App         | Game              | Rules MCP server      | Access    |
+| ----------- | ----------------- | --------------------- | --------- |
+| delta-green | Delta Green       | `delta-green-rules`   | link-only |
+| stonetop    | Stonetop          | `stonetop-rules`      | link-only |
+| dice-jar    | none (landing)    | none                  | public    |
+| bfrpg       | Basic Fantasy RPG | `basic-fantasy-rules` | accounts  |
+| glyph-quest | Knave             | `knave-rules`         | accounts  |
 
-Rules servers are named `<game>-rules`. `delta-green-rules` and `stonetop-rules` are connected; the other two are not yet.
+Rules servers are named `<game>-rules`; bfrpg's is `basic-fantasy-rules`, named for the game as its books call it. `delta-green-rules`, `stonetop-rules` and `basic-fantasy-rules` are connected; the Knave one is not yet.
 
 ## Licensing
 

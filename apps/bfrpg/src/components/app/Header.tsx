@@ -5,17 +5,13 @@ import { Typography } from '@/components/ui/core/display';
 import { useAuth } from '@/hooks';
 import { signOut } from '@/services';
 import { DOM_IDS, CSS_CLASSES, HTML_ROLES } from '@/constants';
-import { GlobalAlert } from '@/components/app/GlobalAlert';
-import type { AlertConfig } from '@/constants';
 import './Header.css';
 
 interface HeaderProps {
   setIsSignInModalOpen: (open: boolean) => void;
-  alerts: AlertConfig[];
-  onAlertClose: (alertIndex: number) => void;
 }
 
-export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderProps) {
+export function Header({ setIsSignInModalOpen }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
 
@@ -134,13 +130,6 @@ export function Header({ setIsSignInModalOpen, alerts, onAlertClose }: HeaderPro
           </div>
         </nav>
       </header>
-      {alerts.length > 0 && (
-        <div className="site-alerts">
-          {alerts.map((alert, index) => (
-            <GlobalAlert key={`alert-${index}`} alert={alert} onClose={() => onAlertClose(index)} />
-          ))}
-        </div>
-      )}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SimpleRoller from './SimpleRoller';
 
@@ -15,5 +15,16 @@ describe('SimpleRoller', () => {
     render(<SimpleRoller formula="3d6x2" />);
     fireEvent.click(screen.getByRole('button'));
     expect(screen.getByText(/Failed to roll 3d6x2/)).toBeTruthy();
+  });
+
+  it('does not touch the page for a screen reader announcement after it unmounts', () => {
+    vi.useFakeTimers();
+    const { unmount } = render(<SimpleRoller formula="1d4" />);
+    fireEvent.click(screen.getByRole('button'));
+    unmount();
+    const lookup = vi.spyOn(document, 'getElementById');
+    vi.advanceTimersByTime(2000);
+    expect(lookup).not.toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });
