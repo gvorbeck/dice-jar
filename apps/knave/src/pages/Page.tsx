@@ -4,7 +4,7 @@ import { DiceJarCredit, SkipLink, useFocusMain } from '@dice-jar/browser';
 import { useSiteTitle } from '@/lib/useSiteTitle';
 
 /** Skip link, header, <main> and footer shared by every page. */
-export const Page = ({ title, children }: { title?: string; children: ReactNode }) => {
+export const Page = ({ title, wide, children }: { title?: string; wide?: boolean; children: ReactNode }) => {
   useSiteTitle(title);
   useFocusMain();
   return (
@@ -12,10 +12,10 @@ export const Page = ({ title, children }: { title?: string; children: ReactNode 
       <SkipLink className="skip" />
       <header className="masthead">
         <Link to="/" className="wordmark">
-          Knave
+          Glyph Quest
         </Link>
       </header>
-      <main id="main" tabIndex={-1}>
+      <main id="main" tabIndex={-1} className={wide ? 'wide' : undefined}>
         {children}
       </main>
       <footer>

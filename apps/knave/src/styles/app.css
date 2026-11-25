@@ -14,9 +14,16 @@ body {
   display: grid;
   grid-template-rows: auto 1fr auto;
 }
-#root > :is(header, main, footer) {
+/* Every page shares one left edge with the masthead; wide pages and the footer fill the column, others stop at a reading width. */
+#root > :is(main, footer) {
   width: min(100% - 2rem, var(--page-w));
-  margin-inline: auto;
+  margin-left: max(1rem, calc((100% - var(--page-w-wide)) / 2));
+}
+#root > :is(main.wide, footer) {
+  width: min(100% - 2rem, var(--page-w-wide));
+}
+main :is(p, ul, ol) {
+  max-width: 44rem;
 }
 main:focus {
   outline: none;
@@ -83,7 +90,9 @@ code {
 
 /* Masthead and logo */
 .masthead {
-  padding-block: 0.75rem;
+  padding: 0.75rem max(1rem, calc((100% - var(--page-w-wide)) / 2));
+  border-bottom: 5px solid;
+  border-image: linear-gradient(90deg, var(--logo-red), var(--logo-orange), var(--logo-yellow)) 1;
 }
 .wordmark {
   font: 400 1.75rem / 1 var(--font-display);
@@ -94,11 +103,57 @@ code {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  -webkit-text-stroke: 3px var(--outline);
+  -webkit-text-stroke: 4px var(--outline);
   paint-order: stroke fill;
-  text-shadow: 4px 4px 0 var(--outline);
-  font-size: clamp(3.5rem, 18vw, 6rem);
+  text-shadow: 5px 5px 0 var(--outline);
+  font-size: clamp(3.5rem, 14vw, 7.5rem);
+  line-height: 0.95;
+  margin: 0;
   width: fit-content;
+}
+
+/* The cover plate: gouache cave under the logo. Light in both schemes, because the logo's black outline has to read against it. */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: 3.5rem 1rem 2rem;
+  margin-block: 1.5rem;
+  border: var(--border) solid var(--ink);
+  box-shadow: var(--lift);
+  background:
+    radial-gradient(ellipse at 50% 55%, transparent 30%, color-mix(in srgb, var(--cave-slate) 55%, transparent) 100%),
+    linear-gradient(160deg, var(--cave-mist) 0%, var(--cave-bone) 60%, var(--cave-umber) 135%);
+}
+.hero::before {
+  /* grain, so it reads as paint and not as a gradient */
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+.hero::after {
+  /* stalactites along the top edge */
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1.6rem;
+  z-index: -1;
+  background: conic-gradient(from 135deg at 50% 0, var(--cave-slate) 90deg, transparent 0) 0 0 / 2.4rem 1.6rem repeat-x;
+}
+.edition {
+  margin: 0;
+  padding: 0.1em 1em;
+  background: var(--outline);
+  color: var(--on-accent);
+  font: 700 1rem var(--font-label);
+  letter-spacing: 0.12em;
 }
 .lede {
   font-size: 1.25rem;
@@ -109,6 +164,21 @@ footer {
   margin-top: 2rem;
 }
 
+/* Two columns of boxes, as the book sets its pages */
+.cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  gap: 0 2.5rem;
+  align-items: start;
+}
+.cols > * {
+  min-width: 0;
+}
+.cols > section,
+.cols > div > section:first-child {
+  margin-top: 0;
+}
+
 /* The black bar above a table or box */
 .table-title {
   background: var(--ink);
@@ -116,8 +186,9 @@ footer {
   font: 700 0.95rem var(--font-label);
   letter-spacing: 0.04em;
   text-align: center;
-  padding: 0.15em 0.5em;
+  padding: 0.2em 0.5em;
   margin-bottom: 0.75rem;
+  box-shadow: 4px 4px 0 var(--rule);
 }
 
 /* Controls */
@@ -171,19 +242,38 @@ label.field {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 3px 3px 0 var(--ink);
 }
-.btn:is(:hover, [data-hovered]):not(:disabled, [data-disabled]),
 .btn[aria-current='step'],
 .btn.primary {
   background: var(--ink);
   color: var(--on-ink);
+  box-shadow: 3px 3px 0 var(--logo-orange);
 }
 .btn:is(:hover, [data-hovered]):not(:disabled, [data-disabled]) {
-  text-decoration: underline;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.btn:is(:hover, [data-hovered]):not(:disabled, [data-disabled], .primary, [aria-current='step']) {
+  background: var(--rule); /* the filled buttons are already dark, so they keep their fill */
+}
+.btn:is(:active, [data-pressed]):not(:disabled, [data-disabled]) {
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn {
+    transition: transform 0.08s;
+  }
+  .btn:is(:hover, [data-hovered]):not(:disabled, [data-disabled]) {
+    transform: translate(1px, 1px);
+  }
+  .btn:is(:active, [data-pressed]):not(:disabled, [data-disabled]) {
+    transform: translate(3px, 3px);
+  }
 }
 .btn:is(:disabled, [data-disabled]) {
   opacity: 0.45;
   cursor: not-allowed;
+  box-shadow: none;
 }
 :is(.btn, input, textarea, select, a, .choice):is(:focus-visible, [data-focus-visible]) {
   outline: 3px solid var(--focus);
@@ -234,8 +324,7 @@ label.field {
 .counter output {
   min-width: 2ch;
   text-align: center;
-  font-weight: 700;
-  font-size: 1.4rem;
+  font: 400 2rem / 1 var(--font-display);
 }
 
 /* The six abilities, as the book lists them */
@@ -247,16 +336,18 @@ label.field {
 }
 .abilities div {
   border: var(--border) solid var(--ink);
+  background: var(--panel);
+  box-shadow: var(--lift);
   text-align: center;
-  padding: 0.25rem 0;
+  padding: 0.35rem 0 0.2rem;
 }
 .abilities dt {
   font: 700 0.9rem var(--font-label);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 .abilities dd {
   margin: 0;
-  font: 400 2rem / 1 var(--font-display);
+  font: 400 3rem / 1.05 var(--font-display);
 }
 
 /* Lists */
@@ -314,6 +405,7 @@ td {
   border: var(--border) solid var(--ink);
   max-width: min(100% - 2rem, 28rem);
   padding: var(--gap);
+  box-shadow: var(--lift);
 }
 .dialog {
   outline: none;
@@ -322,6 +414,9 @@ td {
 @media (max-width: 30rem) {
   .abilities {
     grid-template-columns: repeat(3, 1fr);
+  }
+  .hero {
+    padding-top: 3rem;
   }
 }
 @media (prefers-reduced-motion: no-preference) {

@@ -14,8 +14,8 @@ const Probe = ({ title }: { title?: string }) => {
 it('adds the site name, or the default when there is no title', () => {
   const root = createRoot(document.createElement('div'));
   act(() => root.render(createElement(Probe, { title: 'Wren' })));
-  expect(document.title).toBe('Wren · Knave');
+  expect(document.title).toBe('Wren · Glyph Quest');
   act(() => root.render(createElement(Probe, {})));
-  expect(document.title).toBe('Knave · Character creator and party tracker');
+  expect(document.title).toBe('Glyph Quest · Character creator and party tracker');
   act(() => root.unmount());
 });

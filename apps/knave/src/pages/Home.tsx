@@ -28,59 +28,64 @@ export default function Home() {
     });
 
   return (
-    <Page>
-      <h1 className="logo">Knave</h1>
+    <Page wide>
+      <header className="hero">
+        <h1 className="logo">Glyph Quest</h1>
+        <p className="edition">A KNAVE 2E COMPANION</p>
+      </header>
       <p className="lede">Make your character, keep the party together, and roll where the whole table can see.</p>
 
-      <section aria-labelledby="start">
-        <TableTitle>
-          <span id="start">START A NEW GAME</span>
-        </TableTitle>
-        <p>
-          Get a fresh game ID to share with your table. Anyone with the ID can see the game's characters and rolls, so it works like an
-          unlisted link.
-        </p>
-        <button className="btn primary" onClick={generate} disabled={busy}>
-          {busy ? 'Creating…' : 'Generate game'}
-        </button>
-        <Alert>{err}</Alert>
-      </section>
-
-      <section aria-labelledby="open">
-        <TableTitle>
-          <span id="open">OPEN A GAME</span>
-        </TableTitle>
-        <form className="row" onSubmit={open}>
-          <label htmlFor={inputId}>Game ID</label>
-          <input
-            id={inputId}
-            value={raw}
-            onChange={(e) => setRaw(e.target.value)}
-            autoCapitalize="none"
-            autoComplete="off"
-            spellCheck={false}
-          />
-          <button className="btn primary" disabled={!isOpenableId(slug)}>
-            Open
+      <div className="cols">
+        <section aria-labelledby="start">
+          <TableTitle>
+            <span id="start">START A NEW GAME</span>
+          </TableTitle>
+          <p>
+            Get a fresh game ID to share with your table. Anyone with the ID can see the game's characters and rolls, so it works like an
+            unlisted link.
+          </p>
+          <button className="btn primary" onClick={generate} disabled={busy}>
+            {busy ? 'Creating…' : 'Generate game'}
           </button>
-        </form>
-        <Hint>
-          {slug && slug !== raw ? `Opens ${slug}. ` : ''}Letters, numbers and dashes, at least {MIN_ID}. An ID nobody has used yet offers to
-          create that game.
-        </Hint>
-        {recent.length > 0 && (
-          <>
-            <h3>Recent</h3>
-            <ul>
-              {recent.map((id) => (
-                <li key={id}>
-                  <Link to={gameUrl(id)}>{id}</Link>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </section>
+          <Alert>{err}</Alert>
+        </section>
+
+        <section aria-labelledby="open">
+          <TableTitle>
+            <span id="open">OPEN A GAME</span>
+          </TableTitle>
+          <form className="row" onSubmit={open}>
+            <label htmlFor={inputId}>Game ID</label>
+            <input
+              id={inputId}
+              value={raw}
+              onChange={(e) => setRaw(e.target.value)}
+              autoCapitalize="none"
+              autoComplete="off"
+              spellCheck={false}
+            />
+            <button className="btn primary" disabled={!isOpenableId(slug)}>
+              Open
+            </button>
+          </form>
+          <Hint>
+            {slug && slug !== raw ? `Opens ${slug}. ` : ''}Type any ID you like (letters, numbers and dashes, {MIN_ID} or more). If no game
+            has it yet, you can create it.
+          </Hint>
+          {recent.length > 0 && (
+            <>
+              <h3>Recent</h3>
+              <ul>
+                {recent.map((id) => (
+                  <li key={id}>
+                    <Link to={gameUrl(id)}>{id}</Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+      </div>
     </Page>
   );
 }

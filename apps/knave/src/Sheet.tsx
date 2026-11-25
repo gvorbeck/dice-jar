@@ -82,90 +82,96 @@ export function Sheet({
         {failed}
       </p>
 
-      <section aria-labelledby="abilities">
-        <TableTitle>
-          <span id="abilities">ABILITIES</span>
-        </TableTitle>
-        <dl className="abilities">
-          {ABILITIES.map((a) => (
-            <div key={a}>
-              <dt>
-                {a.toUpperCase()}
-                <span className="sr-only"> {ABILITY_NAMES[a]}</span>
-              </dt>
-              <dd>{c.abilities[a]}</dd>
+      <div className="cols">
+        <div>
+          <section aria-labelledby="abilities">
+            <TableTitle>
+              <span id="abilities">ABILITIES</span>
+            </TableTitle>
+            <dl className="abilities">
+              {ABILITIES.map((a) => (
+                <div key={a}>
+                  <dt>
+                    {a.toUpperCase()}
+                    <span className="sr-only"> {ABILITY_NAMES[a]}</span>
+                  </dt>
+                  <dd>{c.abilities[a]}</dd>
+                </div>
+              ))}
+            </dl>
+            <Hint>
+              Spell books per day: {c.abilities.int} (INT). Companions and patron blessings: {c.abilities.cha} (CHA). Item slots and wounds:
+              10 + CON.
+            </Hint>
+          </section>
+
+          <section aria-labelledby="vitals">
+            <TableTitle>
+              <span id="vitals">VITALS</span>
+            </TableTitle>
+            <p>
+              Armor Class <b>{armorClass(c.items)}</b>. Slots used {slotsUsed(c.items, c.coins)} of {slots}.
+            </p>
+            <Counter
+              label="HP"
+              value={c.hp}
+              max={c.hpMax}
+              warn={c.hp === 0}
+              note={`of ${c.hpMax}`}
+              onChange={(v) => up((d) => void (d.hp = v))}
+            />
+            <Counter
+              label="Wounds"
+              value={c.wounds}
+              max={slots}
+              warn={c.wounds > 0}
+              note={`of ${slots}`}
+              onChange={(v) => up((d) => void (d.wounds = v))}
+            />
+            <p className="warn" role="status">
+              {dead && 'Every slot is filled with a wound: this character is dead (p. 6).'}
+              {!dead && c.hp === 0 && 'At 0 HP, each point of damage fills a slot with a wound, from the highest down (p. 6).'}
+            </p>
+            <div className="row">
+              <Btn disabled={dead} onPress={() => up((d) => void (d.hp = d.hpMax))}>
+                Rest: HP to maximum
+              </Btn>
+              <Btn disabled={c.wounds === 0} onPress={() => up((d) => void d.wounds--)}>
+                Safe haven: heal a wound
+              </Btn>
             </div>
-          ))}
-        </dl>
-        <Hint>
-          Spell books per day: {c.abilities.int} (INT). Companions and patron blessings: {c.abilities.cha} (CHA). Item slots and wounds: 10
-          + CON.
-        </Hint>
-      </section>
+            <Hint>Rest needs two watches of sleep and a meal the night before; a safe haven heals a wound too (p. 6).</Hint>
+            <div className="row">
+              <Num label="XP" value={c.xp} max={MAX_XP} onChange={(v) => up((d) => void (d.xp = v))} />
+              <Num label="Coins" value={c.coins} max={MAX_XP} onChange={(v) => up((d) => void (d.coins = v))} />
+            </div>
+            <Hint>
+              {next === undefined ? 'Level 10 is the top.' : `Level ${c.level + 1} at ${next.toLocaleString('en-US')} XP.`} A coin of
+              treasure brought back from a dangerous place is 1 XP (p. 6).
+            </Hint>
+          </section>
 
-      <section aria-labelledby="vitals">
-        <TableTitle>
-          <span id="vitals">VITALS</span>
-        </TableTitle>
-        <p>
-          Armor Class <b>{armorClass(c.items)}</b>. Slots used {slotsUsed(c.items, c.coins)} of {slots}.
-        </p>
-        <Counter
-          label="HP"
-          value={c.hp}
-          max={c.hpMax}
-          warn={c.hp === 0}
-          note={`of ${c.hpMax}`}
-          onChange={(v) => up((d) => void (d.hp = v))}
-        />
-        <Counter
-          label="Wounds"
-          value={c.wounds}
-          max={slots}
-          warn={c.wounds > 0}
-          note={`of ${slots}`}
-          onChange={(v) => up((d) => void (d.wounds = v))}
-        />
-        <p className="warn" role="status">
-          {dead && 'Every slot is filled with a wound: this character is dead (p. 6).'}
-          {!dead && c.hp === 0 && 'At 0 HP, each point of damage fills a slot with a wound, from the highest down (p. 6).'}
-        </p>
-        <div className="row">
-          <Btn disabled={dead} onPress={() => up((d) => void (d.hp = d.hpMax))}>
-            Rest: HP to maximum
-          </Btn>
-          <Btn disabled={c.wounds === 0} onPress={() => up((d) => void d.wounds--)}>
-            Safe haven: heal a wound
-          </Btn>
+          {levelFor(c.xp) > c.level && <LevelUp c={c} up={up} />}
         </div>
-        <Hint>Rest needs two watches of sleep and a meal the night before; a safe haven heals a wound too (p. 6).</Hint>
-        <div className="row">
-          <Num label="XP" value={c.xp} max={MAX_XP} onChange={(v) => up((d) => void (d.xp = v))} />
-          <Num label="Coins" value={c.coins} max={MAX_XP} onChange={(v) => up((d) => void (d.coins = v))} />
+        <div>
+          <Inventory c={c} up={up} />
+          <Roller c={c} onRoll={onRoll} />
+
+          <section aria-labelledby="details">
+            <TableTitle>
+              <span id="details">DETAILS</span>
+            </TableTitle>
+            <DetailFields c={c} up={up} />
+          </section>
+
+          <section aria-labelledby="notes">
+            <TableTitle>
+              <span id="notes">NOTES</span>
+            </TableTitle>
+            <Text label="Notes" area value={c.notes} onChange={(v) => up((d) => void (d.notes = v))} />
+          </section>
         </div>
-        <Hint>
-          {next === undefined ? 'Level 10 is the top.' : `Level ${c.level + 1} at ${next.toLocaleString('en-US')} XP.`} A coin of treasure
-          brought back from a dangerous place is 1 XP (p. 6).
-        </Hint>
-      </section>
-
-      {levelFor(c.xp) > c.level && <LevelUp c={c} up={up} />}
-      <Inventory c={c} up={up} />
-      <Roller c={c} onRoll={onRoll} />
-
-      <section aria-labelledby="details">
-        <TableTitle>
-          <span id="details">DETAILS</span>
-        </TableTitle>
-        <DetailFields c={c} up={up} />
-      </section>
-
-      <section aria-labelledby="notes">
-        <TableTitle>
-          <span id="notes">NOTES</span>
-        </TableTitle>
-        <Text label="Notes" area value={c.notes} onChange={(v) => up((d) => void (d.notes = v))} />
-      </section>
+      </div>
     </>
   );
 }

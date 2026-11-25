@@ -1,6 +1,6 @@
-# Knave
+# Glyph Quest
 
-A character creator and party tracker for Knave 2nd Edition. It is going to run at [knave.dicejar.games](https://knave.dicejar.games/) and [glyph.quest](https://glyph.quest/).
+Glyph Quest is a character creator and party tracker for Knave 2nd Edition. It is going to run at [glyph.quest](https://glyph.quest/) and [knave.dicejar.games](https://knave.dicejar.games/). The app is `apps/knave`, named for the game, the way bfrpg is Codex Quest.
 
 It follows PC Creation in order: abilities and hit points, careers, gear, then a name and description. After that you keep playing from the sheet. A game keeps everyone's characters and rolls in one place. There are no accounts.
 

@@ -68,7 +68,7 @@ function Body({ gameId, id, init }: { gameId: string; id: string; init: Sheet_ }
 
   const failed = fails.save || fails.roll ? 'Not saved: check your connection and reload.' : '';
   return (
-    <Page title={c.name.trim() || 'Unnamed'}>
+    <Page title={c.name.trim() || 'Unnamed'} wide={mode === 'sheet'}>
       {mode === 'create' ? (
         <Creator
           c={c}

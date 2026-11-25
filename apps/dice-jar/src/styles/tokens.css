@@ -63,6 +63,12 @@
   --st-radius: 6px; /* --radius-lg */
   --st-font-serif: 'IM Fell English', Georgia, serif;
   --st-font-sans: 'Inter', system-ui, sans-serif;
+  --gq-paper: #fbf8f3; /* knave --paper */
+  --gq-ink: #221f20; /* knave --ink */
+  --gq-rule: #d1d3d4;
+  --gq-orange: #ec5726; /* the logo gradient's middle */
+  --gq-font-label: 'Alegreya SC', Georgia, serif;
+  --gq-font-display: 'UnifrakturCook', 'Pirata One', Georgia, serif; /* falls back to a serif: the landing page does not ship the font */
   --cq-bg: oklch(21% 0.006 285.885); /* bfrpg --zinc-900 */
   --cq-panel: oklch(27.4% 0.006 286.033); /* zinc-800 */
   --cq-rule: oklch(37% 0.013 285.805); /* zinc-700 */

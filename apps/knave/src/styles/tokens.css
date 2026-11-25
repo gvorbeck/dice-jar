@@ -5,6 +5,7 @@
   --font-body: 'Crimson Text', Georgia, 'Times New Roman', serif;
   --font-label: 'Alegreya SC', var(--font-body);
   --paper: #fbf8f3;
+  --panel: #f1ece3; /* boxes on the page */
   --ink: #221f20;
   --rule: #d1d3d4; /* callouts, table lines */
   --on-ink: #fff; /* text on an --ink bar */
@@ -13,17 +14,24 @@
   --focus: #1b4fd1;
   --outline: #000; /* the logo's outline and drop shadow */
   --on-accent: #fff;
+  --cave-umber: #59524b; /* the cover painting, for the hero */
+  --cave-slate: #2c3443;
+  --cave-bone: #c6a38c;
+  --cave-mist: #d6d4d9;
   --logo-red: #ec2826;
   --logo-orange: #ec5726;
   --logo-yellow: #f9a81a;
   --gap: 1rem;
   --page-w: 46rem;
+  --page-w-wide: 64rem;
+  --lift: 4px 4px 0 var(--ink); /* the logo's hard drop shadow, on boxes and buttons */
   --border-thin: 1px;
   --border: 2px;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --paper: #1a1819;
+    --panel: #242123;
     --ink: #ede6da;
     --rule: #3b3a40;
     --on-ink: #1a1819;

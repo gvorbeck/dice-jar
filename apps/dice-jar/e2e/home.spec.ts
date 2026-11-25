@@ -7,7 +7,8 @@ test('the landing page links each live app and has no accessibility violations',
   await expect(page.getByRole('link', { name: 'YOURCODENA.ME' })).toHaveAttribute('href', 'https://yourcodena.me/');
   await expect(page.getByRole('link', { name: 'Hearthfire' })).toHaveAttribute('href', 'https://hearthfire.camp/');
   await expect(page.getByRole('link', { name: 'Codex.Quest' })).toHaveAttribute('href', 'https://codex.quest/');
-  await expect(page.getByText('Coming soon')).toHaveCount(1);
+  await expect(page.getByRole('link', { name: 'Glyph Quest' })).toHaveAttribute('href', 'https://glyph.quest/');
+  await expect(page.getByText('Coming soon')).toHaveCount(0);
   await expectAccessible(page);
 });
 

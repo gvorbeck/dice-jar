@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://knave.dicejar.games/sitemap.xml
+Sitemap: https://glyph.quest/sitemap.xml

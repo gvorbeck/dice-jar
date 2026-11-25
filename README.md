@@ -2,7 +2,7 @@
 
 Tabletop RPG character apps, one per game, sharing their tooling and, once a second app needs it, their code. Package scope: `@dice-jar/*`.
 
-delta-green, stonetop, bfrpg and knave are in so far (stonetop is the app behind hearthfire.camp, bfrpg the one behind codex.quest, and knave the one that replaces glyph.quest). `apps/dice-jar` is the landing page at dicejar.games, listing the apps. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
+delta-green, stonetop, bfrpg and knave are in so far (stonetop is the app behind hearthfire.camp, bfrpg the one behind codex.quest, and knave the one behind glyph.quest, called Glyph Quest). `apps/dice-jar` is the landing page at dicejar.games, listing the apps. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
 
 | App         | Game              | Rules MCP server      | Access    |
 | ----------- | ----------------- | --------------------- | --------- |
