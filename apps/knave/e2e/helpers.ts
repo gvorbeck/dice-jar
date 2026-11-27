@@ -35,7 +35,6 @@ export async function startCharacter(page: Page, atStep?: (page: Page) => Promis
   await next(page);
 
   await atStep?.(page);
-  await page.getByRole('button', { name: "Take my careers' items" }).click();
   await choose(page, 'Helmet');
   await page.getByRole('button', { name: 'Roll coins' }).click();
   await next(page);

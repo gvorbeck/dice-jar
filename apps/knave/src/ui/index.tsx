@@ -112,8 +112,18 @@ export const DetailFields = ({ c, up }: { c: Character; up: Up }) => (
 );
 
 /** A checkbox that reads as a line of the sheet. */
-export const Check = ({ selected, onChange, children }: { selected: boolean; onChange: (v: boolean) => void; children: ReactNode }) => (
-  <Checkbox className="choice" isSelected={selected} onChange={onChange}>
+export const Check = ({
+  selected,
+  onChange,
+  disabled,
+  children,
+}: {
+  selected: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+  children: ReactNode;
+}) => (
+  <Checkbox className="choice" isSelected={selected} onChange={onChange} isDisabled={disabled}>
     <span className="mark" />
     {children}
   </Checkbox>

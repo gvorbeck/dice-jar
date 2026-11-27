@@ -34,6 +34,9 @@ export const COINS_PER_SLOT = 500; // p. 6
 // shortcut: reads "500 coins use a full slot" as whole slots only, so 499 coins take none; round up if the owner prefers.
 export const slotsUsed = (items: readonly { slots: number }[], coins: number) =>
   items.reduce((n, i) => n + i.slots, 0) + Math.floor(coins / COINS_PER_SLOT);
+/** p. 4: you only take what you can carry, so an item needs its slots free. */
+export const fits = (items: readonly { slots: number }[], coins: number, slots: number, con: number) =>
+  slotsUsed(items, coins) + slots <= slotCount(con);
 /** p. 6: wounds fill slots from the highest down, so gear that reaches into them must be dropped. */
 export const droppedSlots = (used: number, max: number, wounds: number) => Math.max(0, used - (max - wounds));
 
@@ -88,12 +91,35 @@ export const checkResult = (d20: number, bonus: number, target: number, attack: 
 
 /** p. 4: the items of these careers, in order. */
 export const careerItems = (careers: readonly string[]) => careers.flatMap((n) => CAREERS.find((c) => c.name === n)?.items ?? []);
+/** p. 4: "you gain those careers' items". Swapping a career takes its items back out and puts the new one's in; the rest of the gear is left alone. */
+export const withCareerItems = <T extends { name: string }>(
+  items: readonly T[],
+  before: readonly string[],
+  after: readonly string[],
+  make: (name: string) => T,
+) => {
+  const kept = [...items];
+  for (const name of careerItems(before.filter((c) => !after.includes(c)))) {
+    const i = kept.findIndex((x) => x.name === name);
+    if (i >= 0) kept.splice(i, 1);
+  }
+  return [...kept, ...careerItems(after.filter((c) => !before.includes(c))).map(make)];
+};
+/** For each name in order, whether the gear holds a copy for it: a name listed twice needs two copies. */
+export const carried = (names: readonly string[], items: readonly { name: string }[]) =>
+  names.map((n, i) => items.filter((x) => x.name === n).length > names.slice(0, i).filter((m) => m === n).length);
 /** The careers after choosing `name` for slot `i`; an empty name clears that slot and the ones after it. */
 export const withCareer = (careers: readonly string[], i: number, name: string) =>
   name ? Object.assign([...careers], { [i]: name }) : careers.slice(0, i);
 
 /** pp. 4-5: careers and spell books are rolled on d100, and a roll of 00 is 100. */
-export const rollCareer = () => CAREERS[roll('d100').total - 1]!;
+export const rollCareer = (taken: readonly string[] = []) => {
+  let career;
+  // Not the book's rule: a repeat gains nothing, so this app rolls again.
+  do career = CAREERS[roll('d100').total - 1]!;
+  while (taken.includes(career.name));
+  return career;
+};
 export const rollSpell = () => SPELLS[roll('d100').total - 1]!;
 export const rollCoins = () => roll('3d6*10').total; // p. 4
 export const rollHp = () => roll('d6').total; // p. 4

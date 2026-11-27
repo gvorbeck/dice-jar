@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MAX_ITEMS, missing, type Character, type Item } from '@/model/character';
+import { MAX_ITEMS, hasRoom, missing, type Character, type Item } from '@/model/character';
 import {
   ABILITIES,
   ABILITY_NAMES,
@@ -16,8 +16,10 @@ import {
   rollSpell,
   slotCount,
   slotsUsed,
-  careerItems,
   withCareer,
+  withCareerItems,
+  careerItems,
+  carried,
 } from '@/rules';
 import { CAREERS } from '@/rules/data/careers';
 import { Btn, Check, Counter, DetailFields, Select, type Up } from '@/ui';
@@ -63,14 +65,27 @@ function SoFar({ c }: { c: Character }) {
 export function Creator({ c, up, onDone }: { c: Character; up: Up; onDone: () => void }) {
   const [step, setStep] = useState(0);
   const left = START_POINTS - Object.values(c.abilities).reduce((a, b) => a + b, 0);
-  const has = (name: string) => c.items.some((i) => i.name === name);
+  const fromCareers = careerItems(c.careers);
+  // A career's copy of a supply is not the supply: only copies beyond the career's count as picked here.
+  const has = (name: string) => c.items.filter((i) => i.name === name).length > fromCareers.filter((n) => n === name).length;
+  const room = (slots: number) => hasRoom(c, slots);
   const add = (item: Item) => up((d) => void (d.items.length < MAX_ITEMS && d.items.push(item)));
-  const toggle = (item: Item, on: boolean) => (on ? add(item) : up((d) => void (d.items = d.items.filter((i) => i.name !== item.name))));
-  const startItems = careerItems(c.careers);
+  const drop = (name: string) =>
+    up((d) => {
+      const i = d.items.findIndex((x) => x.name === name);
+      if (i >= 0) d.items.splice(i, 1);
+    });
+  const toggle = (item: Item, on: boolean) => (on ? add(item) : drop(item.name));
+  const ticked = carried(fromCareers, c.items);
   const books = c.items.filter((i) => i.name.startsWith(SPELLBOOK)).length;
   const issues = missing(c);
 
-  const setCareer = (i: number, name: string) => up((d) => void (d.careers = withCareer(d.careers, i, name)));
+  const setCareer = (i: number, name: string) =>
+    up((d) => {
+      const careers = withCareer(d.careers, i, name);
+      d.items = withCareerItems(d.items, d.careers, careers, (n) => gear(n));
+      d.careers = careers;
+    });
 
   return (
     <>
@@ -148,10 +163,16 @@ export function Creator({ c, up, onDone }: { c: Character; up: Up; onDone: () =>
                         >
                           <option value="">— choose —</option>
                           {CAREERS.map((x) => (
-                            <option key={x.name}>{x.name}</option>
+                            <option key={x.name} disabled={x.name === c.careers[1 - i]}>
+                              {x.name}
+                            </option>
                           ))}
                         </Select>
-                        <Btn label={`Roll career ${i + 1}`} disabled={i > c.careers.length} onPress={() => setCareer(i, rollCareer().name)}>
+                        <Btn
+                          label={`Roll career ${i + 1}`}
+                          disabled={i > c.careers.length}
+                          onPress={() => setCareer(i, rollCareer(c.careers).name)}
+                        >
                           Roll
                         </Btn>
                       </div>
@@ -178,30 +199,39 @@ export function Creator({ c, up, onDone }: { c: Character; up: Up; onDone: () =>
                 <span id="starting-gear">STARTING GEAR</span>
               </TableTitle>
               <p className="callout">
-                You get your careers' items and 3d6×10 coins, plus 2 rations, a 50' rope, 2 torches, a quiver of 20 arrows, armor pieces and
-                weapons (p. 38), all as many as you can carry (p. 4).
+                Your careers' items are packed already: untick any you'd rather leave behind. You also get 3d6×10 coins, plus 2 rations, a
+                50' rope, 2 torches, a quiver of 20 arrows, armor pieces and weapons (p. 38), all as many as you can carry (p. 4).
               </p>
               <div className="row">
                 <Btn onPress={() => up((d) => void (d.coins = rollCoins()))}>Roll coins</Btn>
                 <span>{c.coins} coins</span>
-                <Btn
-                  disabled={!startItems.length || startItems.every(has)}
-                  onPress={() => startItems.forEach((n) => !has(n) && add(gear(n)))}
-                >
-                  Take my careers' items
-                </Btn>
               </div>
               <div className="two">
+                {fromCareers.length > 0 && (
+                  <div>
+                    <h3>From your careers</h3>
+                    {fromCareers.map((n, i) => (
+                      <Check
+                        key={i}
+                        selected={ticked[i]!}
+                        disabled={!ticked[i] && !room(1)}
+                        onChange={(on) => (on ? add(gear(n)) : drop(n))}
+                      >
+                        {n}
+                      </Check>
+                    ))}
+                  </div>
+                )}
                 <div>
                   <h3>Supplies</h3>
                   {STARTING_GEAR.map((n) => (
-                    <Check key={n} selected={has(n)} onChange={(on) => toggle(gear(n), on)}>
+                    <Check key={n} selected={has(n)} disabled={!has(n) && !room(1)} onChange={(on) => toggle(gear(n), on)}>
                       {n}
                     </Check>
                   ))}
                   <h3>Spell books</h3>
                   <div className="row">
-                    <Btn disabled={books >= c.abilities.int} onPress={() => add(gear(SPELLBOOK + rollSpell()))}>
+                    <Btn disabled={books >= c.abilities.int || !room(1)} onPress={() => add(gear(SPELLBOOK + rollSpell()))}>
                       Draw a random spell book
                     </Btn>
                     <span>
@@ -212,21 +242,29 @@ export function Creator({ c, up, onDone }: { c: Character; up: Up; onDone: () =>
                 <div>
                   <h3>Armor (1 slot and 1 AP each)</h3>
                   {ARMOR_PIECES.map((n) => (
-                    <Check key={n} selected={has(n)} onChange={(on) => toggle(gear(n, 1, true), on)}>
+                    <Check key={n} selected={has(n)} disabled={!has(n) && !room(1)} onChange={(on) => toggle(gear(n, 1, true), on)}>
                       {n}
                     </Check>
                   ))}
                 </div>
               </div>
               <h3>Weapons</h3>
+              <ul className="callout">
+                <li>A two-handed weapon deals d8 to a one-handed weapon's d6, but takes two slots (p. 38).</li>
+                <li>Melee attacks add STR. Ranged attacks add WIS, and can't be made while you're in melee (p. 20).</li>
+                <li>
+                  A natural 1 on an attack breaks the weapon. So does a power attack, a melee hit you choose to roll with double damage dice
+                  (p. 20).
+                </li>
+              </ul>
               <div className="row">
                 {WEAPONS.map((w) => (
-                  <Btn key={w.kind} onPress={() => add(gear(`${w.kind} (${w.damage})`, w.slots))}>
+                  <Btn key={w.kind} disabled={!room(w.slots)} onPress={() => add(gear(`${w.kind} (${w.damage})`, w.slots))}>
                     Add {w.kind.toLowerCase()} ({w.damage}, {w.slots} {w.slots === 1 ? 'slot' : 'slots'})
                   </Btn>
                 ))}
               </div>
-              <Inventory c={c} up={up} />
+              <Inventory c={c} up={up} onlyWhatFits />
             </section>
           )}
 

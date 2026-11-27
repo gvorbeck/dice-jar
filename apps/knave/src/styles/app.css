@@ -291,6 +291,10 @@ label.field {
   min-height: 2.25rem;
   cursor: pointer;
 }
+.choice[data-disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 .choice .mark {
   width: 1.2rem;
   height: 1.2rem;
@@ -336,6 +340,10 @@ label.field {
   border-left: 6px solid;
   border-image: linear-gradient(var(--logo-red), var(--logo-yellow)) 1;
   margin-block: 0.75rem 1rem;
+}
+
+ul.callout {
+  padding-left: 2rem;
 }
 
 /* Six scores, each a box with its own buttons */

@@ -4,9 +4,11 @@ import {
   LEVELS,
   armorClass,
   careerItems,
+  carried,
   checkResult,
   checkTarget,
   droppedSlots,
+  fits,
   levelFor,
   raiseScores,
   rerolledHp,
@@ -19,6 +21,7 @@ import {
   scoresFromDice,
   slotCount,
   withCareer,
+  withCareerItems,
   slotsUsed,
 } from './index';
 import { CAREERS } from './data/careers';
@@ -41,6 +44,12 @@ describe('slots and wounds (pp. 4, 6)', () => {
     expect(slotsUsed([{ slots: 1 }, { slots: 2 }], 0)).toBe(3);
     expect(slotsUsed([{ slots: 1 }], 499)).toBe(1);
     expect(slotsUsed([{ slots: 1 }], 1000)).toBe(3);
+  });
+  it('fits an item only when its slots are free, coins included', () => {
+    const nine = Array.from({ length: 9 }, () => ({ slots: 1 }));
+    expect(fits(nine, 0, 1, 0)).toBe(true); // CON 0 gives 10 slots
+    expect(fits(nine, 0, 2, 0)).toBe(false);
+    expect(fits(nine, 500, 1, 0)).toBe(false);
   });
   it('wounds fill slots from the top, so gear reaching into them is dropped', () => {
     expect(droppedSlots(12, 12, 2)).toBe(2);
@@ -122,6 +131,46 @@ describe('careers on the sheet (p. 4)', () => {
   it('gives the three items of each career, in order', () => {
     expect(careerItems(['acolyte', 'acrobat'])).toEqual(['candlestick', 'censer', 'incense', 'flash powder', 'balls', 'lamp oil']);
     expect(careerItems(['nothing'])).toEqual([]);
+  });
+  // p. 4 says only "roll or pick two careers"; not taking one twice is this app's choice, since a repeat gains nothing.
+  it('rolls again when it lands on a career already taken', () => {
+    vi.spyOn(Math, 'random').mockReturnValueOnce(0).mockReturnValue(0.015); // d100: 1, then 2
+    expect(rollCareer(['acolyte']).name).toBe('acrobat');
+  });
+  describe('careers give their items (p. 4)', () => {
+    const make = (name: string) => ({ name });
+    const names = (items: { name: string }[]) => items.map((i) => i.name);
+
+    it('adds the items of a career as it is chosen, keeping other gear', () => {
+      expect(names(withCareerItems([make('rope')], [], ['acolyte'], make))).toEqual(['rope', 'candlestick', 'censer', 'incense']);
+    });
+    it('swaps only the changed career’s items', () => {
+      const had = withCareerItems([], [], ['acolyte', 'acrobat'], make);
+      const kept = had.filter((i) => i.name !== 'balls'); // dropped by the player, so it stays dropped
+      expect(names(withCareerItems(kept, ['acolyte', 'acrobat'], ['actor', 'acrobat'], make))).toEqual([
+        'flash powder',
+        'lamp oil',
+        'wig',
+        'makeup',
+        'costume',
+      ]);
+    });
+    it('ticks one box per copy carried, so two of a name need two copies', () => {
+      const gear = [make('lantern'), make('rope')];
+      expect(carried(['lantern', 'mask', 'lantern'], gear)).toEqual([true, false, false]);
+      expect(carried(['lantern', 'mask', 'lantern'], [...gear, make('lantern')])).toEqual([true, false, true]);
+    });
+    it('clearing the first career takes both careers’ items out', () => {
+      const had = withCareerItems([], [], ['acolyte', 'acrobat'], make);
+      expect(withCareerItems(had, ['acolyte', 'acrobat'], withCareer(['acolyte', 'acrobat'], 0, ''), make)).toEqual([]);
+    });
+    it('takes back one copy of a name shared with other gear, not all of them', () => {
+      const had = [make("50' rope"), ...withCareerItems([], [], ['woodcutter'], make)];
+      expect(names(withCareerItems(had, ['woodcutter'], [], make)).filter((n) => n === "50' rope")).toEqual(["50' rope"]);
+    });
+    it('gives all three of a repeated item', () => {
+      expect(names(withCareerItems([], [], ['musician'], make))).toEqual(['instrument', 'instrument', 'instrument']);
+    });
   });
   it('sets a slot, and clearing one clears the slots after it', () => {
     expect(withCareer([], 0, 'acolyte')).toEqual(['acolyte']);

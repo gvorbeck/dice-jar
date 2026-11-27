@@ -30,6 +30,8 @@ describe('missing', () => {
   });
   it('is empty for a finished one', () => expect(missing(done())).toEqual([]));
   it('wants a name that is more than spaces', () => expect(missing(done({ name: '  ' }))).toEqual(['Name your character']));
+  it('wants two different careers', () =>
+    expect(missing(done({ careers: ['acolyte', 'acolyte'] }))).toEqual(['Choose two different careers']));
   it('allows only the gear the slots can carry (p. 4)', () => {
     const items = Array.from({ length: 13 }, () => ({ name: 'rope', slots: 1, armor: false })); // CON 2 gives 12 slots
     expect(missing(done({ items }))).toEqual(['Carry no more than your item slots']);

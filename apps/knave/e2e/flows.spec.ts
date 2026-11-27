@@ -104,6 +104,54 @@ test('a sheet whose name was cleared still opens as the sheet, not the creator',
   await other.context().close();
 });
 
+test('the same career cannot be picked twice', async ({ page }) => {
+  await startCharacter(page); // acolyte and acrobat
+  await page.getByRole('button', { name: /Careers/ }).click();
+  const second = page.getByLabel('Career 2', { exact: true });
+  await expect(second.locator('option', { hasText: /^acolyte$/ })).toBeDisabled();
+  await expect(second.locator('option', { hasText: /^actor$/ })).toBeEnabled();
+});
+
+test("a career's items are listed on Gear and can be left behind", async ({ page }) => {
+  await startCharacter(page); // acolyte and acrobat
+  await page.getByRole('button', { name: /Gear/ }).click();
+  const box = page.getByRole('checkbox', { name: 'candlestick' });
+  await expect(box).toBeChecked();
+  await expect(page.getByText(/Slots:\s*7 of/)).toBeVisible(); // six career items and the helmet
+  await page.locator('label.choice', { hasText: 'candlestick' }).click();
+  await expect(box).not.toBeChecked();
+  await expect(page.getByText(/Slots:\s*6 of/)).toBeVisible();
+});
+
+test('changing a career swaps its items', async ({ page }) => {
+  await startCharacter(page); // acolyte and acrobat
+  await page.getByRole('button', { name: /Careers/ }).click();
+  await page.getByLabel('Career 1', { exact: true }).selectOption('actor');
+  await page.getByRole('button', { name: /Gear/ }).click();
+  await expect(page.getByRole('checkbox', { name: 'wig' })).toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'candlestick' })).toHaveCount(0);
+  await expect(page.getByRole('checkbox', { name: 'lamp oil' })).toBeChecked(); // the second career stays
+});
+
+test('gear that does not fit in the free slots cannot be added', async ({ page }) => {
+  await startCharacter(page); // CON 1 gives 11 slots; six career items and the helmet fill 7
+  await page.getByRole('button', { name: /Gear/ }).click();
+  const twoHanded = page.getByRole('button', { name: /Add two-handed weapon/ });
+  await twoHanded.click();
+  await twoHanded.click();
+  await expect(page.getByText(/Slots:\s*11 of/)).toBeVisible();
+  await expect(page.getByRole('button', { name: /Add one-handed weapon/ })).toBeDisabled();
+  await expect(page.getByRole('checkbox', { name: 'Shield' })).toBeDisabled();
+  await expect(page.getByRole('checkbox', { name: 'Helmet' })).toBeEnabled(); // what is carried can always be left
+  await page.getByRole('textbox', { name: 'New item' }).fill('idol');
+  await expect(page.getByRole('button', { name: 'Add item' })).toBeDisabled();
+  await page.locator('label.choice', { hasText: 'candlestick' }).click();
+  await expect(page.getByRole('button', { name: 'Add item' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Add item' }).click(); // full again, with the candlestick left out
+  await expect(page.getByRole('checkbox', { name: 'candlestick' })).toBeDisabled();
+  await expect(page.getByRole('checkbox', { name: 'censer' })).toBeEnabled();
+});
+
 test('a dead character cannot rest', async ({ page }) => {
   await createCharacter(page); // CON 1: 11 slots
   const rest = page.getByRole('button', { name: 'Rest: HP to maximum' });

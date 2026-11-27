@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ABILITIES, MAX_SCORE, START_POINTS, slotCount, slotsUsed, type Ability } from '@/rules';
+import { ABILITIES, MAX_SCORE, START_POINTS, fits, slotCount, slotsUsed, type Ability } from '@/rules';
 
 /** Lengths the rules in firestore.rules also enforce. */
 export const MAX_LINE = 100;
@@ -57,12 +57,16 @@ export const parseCharacter = (raw: unknown): Character => schema.parse(raw);
 export const isCreated = (c: Character) => c.created;
 
 /** What still blocks the sheet, in the order the creation steps ask for it (p. 4). */
+/** p. 4: creation takes only what can be carried. */
+export const hasRoom = (c: Character, slots: number) => c.items.length < MAX_ITEMS && fits(c.items, c.coins, slots, c.abilities.con);
+
 export const missing = (c: Character) =>
   [
     Object.values(c.abilities).reduce((a, b) => a + b, 0) < START_POINTS && `Place ${START_POINTS} ability points`,
     c.careers.length < 2 && 'Choose two careers',
     c.hpMax < 1 && 'Roll hit points',
     slotsUsed(c.items, c.coins) > slotCount(c.abilities.con) && 'Carry no more than your item slots', // p. 4: only what you can carry
+    c.careers.length > new Set(c.careers).size && 'Choose two different careers',
     !c.name.trim() && 'Name your character',
   ].filter((m): m is string => !!m);
 
