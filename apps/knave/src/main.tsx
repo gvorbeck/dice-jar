@@ -7,6 +7,7 @@ import '@fontsource/crimson-text/latin-700.css';
 import '@fontsource/alegreya-sc/latin-700.css';
 import './styles/tokens.css';
 import './styles/app.css';
+import './styles/ornament.css';
 import { App } from './App';
 import { reloadForNewBuild } from '@dice-jar/stale-build';
 

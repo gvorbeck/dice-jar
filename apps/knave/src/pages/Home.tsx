@@ -5,6 +5,7 @@ import { slugifyGameId } from '@dice-jar/game-id';
 import { isOpenableId, makeGameId, MIN_ID, RECENT_GAMES } from '@/lib/gameId';
 import { gameUrl, MAX_ID } from '@/lib/paths';
 import { Alert, Hint, TableTitle } from '@/ui/bits';
+import { CoverArt } from '@/ui/CoverArt';
 import { Page } from './Page';
 
 export default function Home() {
@@ -30,6 +31,7 @@ export default function Home() {
   return (
     <Page wide>
       <header className="hero">
+        <CoverArt />
         <h1 className="logo">Glyph Quest</h1>
         <p className="edition">A KNAVE 2E COMPANION</p>
       </header>
