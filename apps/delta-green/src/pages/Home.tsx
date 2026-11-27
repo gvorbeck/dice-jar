@@ -1,8 +1,8 @@
 import { useId, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { recentIds, useRun } from '@dice-jar/browser';
-import { newGameId, slugifyGameId } from '@dice-jar/game-id';
-import { isOpenableId, MIN_ID, RECENT_GAMES } from '@/lib/gameId';
+import { isOpenableId, MIN_GAME_ID, newGameId, slugifyGameId } from '@dice-jar/game-id';
+import { RECENT_GAMES } from '@/lib/gameId';
 import { CODENAMES } from '@/rules/data/random';
 import { Win } from '@/ui/Win';
 import { Page } from './Page';
@@ -50,7 +50,7 @@ export default function Home() {
 
   const open = (e: FormEvent) => {
     e.preventDefault();
-    if (isOpenableId(slug)) nav(gameUrl(slug));
+    if (isOpenableId(slug, MAX_ID)) nav(gameUrl(slug));
   };
   // Firestore loads on click, not with the landing page.
   const generate = () =>
@@ -76,13 +76,13 @@ export default function Home() {
             autoComplete="off"
             spellCheck={false}
           />
-          <button className="btn primary" disabled={!isOpenableId(slug)}>
+          <button className="btn primary" disabled={!isOpenableId(slug, MAX_ID)}>
             Open
           </button>
         </form>
         <Hint>
-          {slug && slug !== raw ? `Opens ${slug}. ` : ''}Letters, numbers and dashes, at least {MIN_ID}. An ID nobody has used yet offers to
-          create that game.
+          {slug && slug !== raw ? `Opens ${slug}. ` : ''}Letters, numbers and dashes, at least {MIN_GAME_ID}. An ID nobody has used yet
+          offers to create that game.
         </Hint>
         {recent.length > 0 && (
           <>

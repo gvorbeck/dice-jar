@@ -67,3 +67,32 @@ for (const app of gameApps) {
       );
     });
 }
+
+// Hosting headers every Firebase app sends, so one app can't quietly ship without them (the landing page is on GitHub Pages, which sets none).
+const securityHeaders = [
+  'Cache-Control',
+  'X-Frame-Options',
+  'X-Content-Type-Options',
+  'Referrer-Policy',
+  'Permissions-Policy',
+  'Cross-Origin-Opener-Policy',
+];
+for (const app of gameApps) {
+  const file = join(apps, app.name, 'firebase.json');
+  if (!statSync(file, { throwIfNoEntry: false })) continue;
+  test(`${app.name} sends the shared security headers and caches built assets`, () => {
+    const headers = JSON.parse(readFileSync(file, 'utf8')).hosting.headers;
+    const keys = headers.find((h) => h.source === '**')?.headers.map((h) => h.key) ?? [];
+    for (const key of securityHeaders) assert.ok(keys.includes(key), `${app.name}/firebase.json: add ${key} to the "**" headers`);
+    // shortcut: bfrpg has no Content-Security-Policy yet (Google sign-in popup and its inline JSON-LD need testing under one), add it and drop this exemption.
+    if (app.name !== 'bfrpg')
+      assert.ok(keys.includes('Content-Security-Policy'), `${app.name}/firebase.json: add a Content-Security-Policy to the "**" headers`);
+    // Firebase applies the last matching rule, so the long-lived assets rule has to come after the "**" no-cache one.
+    assert.ok(
+      headers.findIndex((h) => h.source === '/assets/**') > headers.findIndex((h) => h.source === '**'),
+      `${app.name}/firebase.json: put the "/assets/**" rule after "**"`,
+    );
+    const assets = headers.find((h) => h.source === '/assets/**')?.headers.find((h) => h.key === 'Cache-Control')?.value ?? '';
+    assert.match(assets, /immutable/, `${app.name}/firebase.json: serve /assets/** with an immutable Cache-Control`);
+  });
+}

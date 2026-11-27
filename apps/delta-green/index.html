@@ -41,6 +41,8 @@
       }
     </script>
     <title>YOURCODENA.ME // Agent Intake</title>
+    <!-- Opens the connection to Firestore early, so the first live read is not held up by connection setup. -->
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
   </head>
   <body>
     <div id="root"></div>

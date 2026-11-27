@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { roll, rollNotation, withDie, withModifier } from './index';
+import { roll, rollNotation, shuffle, withDie, withModifier } from './index';
 
 describe('roll', () => {
   it('returns the outcome of valid notation', () => {
@@ -136,5 +136,14 @@ describe('rollNotation limits', () => {
   it('rejects overlong input and unsafe totals instead of throwing', () => {
     expect(rollNotation('('.repeat(5000)).ok).toBe(false);
     expect(rollNotation(Array(70).fill('999999').join('*')).ok).toBe(false);
+  });
+});
+
+describe('shuffle', () => {
+  it('swaps each slot with the one the rng picks, and leaves the input alone', () => {
+    const input = ['a', 'b', 'c'];
+    expect(shuffle(input, () => 0)).toEqual(['b', 'c', 'a']);
+    expect(shuffle(input, () => 0.999)).toEqual(['a', 'b', 'c']);
+    expect(input).toEqual(['a', 'b', 'c']);
   });
 });

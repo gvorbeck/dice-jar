@@ -2,8 +2,9 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { rememberId, useRun } from '@dice-jar/browser';
 import { createGame, deleteCharacter, useCharacters, useGameExists, useRolls, type CharacterCard } from '@/lib/games';
-import { isOpenableId, MIN_ID, RECENT_GAMES } from '@/lib/gameId';
-import { characterUrl, gameUrl } from '@/lib/paths';
+import { isOpenableId, MIN_GAME_ID } from '@dice-jar/game-id';
+import { RECENT_GAMES } from '@/lib/gameId';
+import { characterUrl, gameUrl, MAX_ID } from '@/lib/paths';
 import { Alert, CopyButton, Hint, Loading, SubList, TableTitle } from '@/ui/bits';
 import { Notice, Page } from './Page';
 
@@ -73,7 +74,7 @@ export default function Game() {
       </Page>
     );
   if (!exists.data) {
-    const valid = isOpenableId(gameId);
+    const valid = isOpenableId(gameId, MAX_ID);
     return (
       <Notice page={gameId} title="No such game">
         <p>
@@ -87,7 +88,7 @@ export default function Game() {
             Back
           </Link>
         </div>
-        {!valid && <Hint>IDs use lowercase letters, numbers and dashes, at least {MIN_ID} characters.</Hint>}
+        {!valid && <Hint>IDs use lowercase letters, numbers and dashes, at least {MIN_GAME_ID} characters.</Hint>}
         <Alert>{err}</Alert>
       </Notice>
     );

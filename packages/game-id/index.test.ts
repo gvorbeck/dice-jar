@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { newGameId, randomInt, slugifyGameId } from './index';
+import { isOpenableId, MIN_GAME_ID, newGameId, randomInt, slugifyGameId } from './index';
 
 describe('newGameId', () => {
   it('is two lowercase words and six characters, safe as a URL segment', () => {
@@ -34,5 +34,16 @@ describe('slugifyGameId', () => {
   });
   it('cuts to the length limit without leaving a trailing dash', () => {
     expect(slugifyGameId('abc-def', 4)).toBe('abc');
+  });
+});
+
+describe('isOpenableId', () => {
+  it('opens only IDs that are slugs and long enough', () => {
+    expect(isOpenableId('a'.repeat(MIN_GAME_ID))).toBe(true);
+    expect(isOpenableId('a'.repeat(MIN_GAME_ID - 1))).toBe(false);
+    expect(isOpenableId('Not A Slug')).toBe(false);
+  });
+  it('refuses an ID longer than the limit', () => {
+    expect(isOpenableId('abcde', 4)).toBe(false);
   });
 });

@@ -23,3 +23,9 @@ export const slugifyGameId = (raw: string, max = 100) =>
     .replace(/[^a-z0-9]+/g, '-')
     .slice(0, max)
     .replace(/^-+|-+$/g, '');
+
+/** The shortest game ID an app creates or opens. */
+export const MIN_GAME_ID = 3;
+
+/** An ID an app would create or open: already in slug form (cut at `max`) and at least MIN_GAME_ID long. */
+export const isOpenableId = (id: string, max = 100) => id.length >= MIN_GAME_ID && slugifyGameId(id, max) === id;

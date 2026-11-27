@@ -11,7 +11,7 @@ export default defineConfig({
     coverage: {
       include: ['src/**', 'functions/src/**'],
       exclude: ['**/*.tsx'], // screens are covered by the browser tests in e2e/; this floor guards the logic
-      thresholds: { lines: 77, statements: 74, branches: 68, functions: 78 },
+      thresholds: { lines: 81, statements: 79, branches: 73, functions: 84 },
     },
   },
 });

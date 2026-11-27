@@ -14,14 +14,15 @@ import {
   useRolls,
   type RollDoc,
 } from '@/lib/games';
-import { forgetSavedAgent, hasSavedAgent, isOpenableId, MIN_ID, RECENT_GAMES } from '@/lib/gameId';
+import { isOpenableId, MIN_GAME_ID } from '@dice-jar/game-id';
+import { forgetSavedAgent, hasSavedAgent, RECENT_GAMES } from '@/lib/gameId';
 import { ScrollRegion } from '@/ui/ScrollRegion';
 import { Win } from '@/ui/Win';
 import { DiscordPanel } from '@/DiscordPanel';
 import GmScreen from '@/GmScreen';
 import { Notice, Page } from './Page';
 import { Alert, CopyButton, Hint, LineForm, Loading, OutcomeText, SubList, useJsonPicker } from '@/ui/bits';
-import { agentUrl, gameUrl } from '@/lib/paths';
+import { agentUrl, gameUrl, MAX_ID } from '@/lib/paths';
 
 // Lazy: ui/index brings in the rules and react-aria, which this page otherwise doesn't load. Delete loads it through run() first, so a failed load shows an inline error instead of crashing the page.
 const ConfirmDialog = lazy(() => import('@/ui').then((m) => ({ default: m.ConfirmDialog })));
@@ -211,7 +212,7 @@ export default function Game() {
       </Page>
     );
   if (!exists.data) {
-    const valid = isOpenableId(gameId);
+    const valid = isOpenableId(gameId, MAX_ID);
     return (
       <Notice page={gameId} title="NO SUCH GAME">
         <p>
@@ -225,7 +226,7 @@ export default function Game() {
             Back
           </Link>
         </div>
-        {!valid && <Hint>IDs use lowercase letters, numbers and dashes, at least {MIN_ID} characters.</Hint>}
+        {!valid && <Hint>IDs use lowercase letters, numbers and dashes, at least {MIN_GAME_ID} characters.</Hint>}
         <Alert>{err}</Alert>
       </Notice>
     );

@@ -20,7 +20,7 @@ A monorepo of tabletop RPG character apps. What's here and how it's laid out: [R
 - Game rules come from the book. Before writing or changing rules logic or rules data, look it up with that app's rules MCP server (`<game>-rules`; each app's README names its server) and cite the page in the test or comment. Never use another game's server for it. If the app's server isn't connected, stop and say so.
 - A known limit gets a comment: `// shortcut: <the limit>, <when to upgrade>`.
 - Comments say why, in one line. No comments that repeat the code.
-- A coverage floor only goes up. A new app starts at or above delta-green's floor (lines 77, statements 74, branches 68, functions 78).
+- A coverage floor only goes up. A new app starts at or above delta-green's floor (lines 81, statements 79, branches 73, functions 84).
 - Never skip a hook (`--no-verify`), disable a lint rule inline, or lower a threshold to get a change through. Fix the cause or ask.
 - Licensing: the root `LICENSE` is MIT and covers everything except a directory with its own `LICENSE` or `NOTICE`. An app's game content follows the game's license, not MIT. Never commit book text or other licensed material to the root or `packages/`; ask the owner what an app's `NOTICE` must say.
 - Never commit, push or merge. The user does that.
