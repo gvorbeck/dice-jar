@@ -106,34 +106,73 @@ code {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  -webkit-text-stroke: 4px var(--outline);
-  paint-order: stroke fill;
-  text-shadow: 5px 5px 0 var(--outline);
-  font-size: clamp(3.5rem, 14vw, 7.5rem);
-  line-height: 0.95;
+  font-size: clamp(2.5rem, 10vw, 4.75rem);
+  line-height: 1.05;
+  text-align: center;
   margin: 0;
-  width: fit-content;
 }
 
-/* The cover plate: painted cave under the logo. Light in both schemes, because the logo's black outline has to read against it. */
-.hero {
-  position: relative;
-  isolation: isolate;
+/* The home page as a spread: the titled engraving on one side, the ways in on the other */
+.spread {
   display: grid;
-  justify-items: center;
-  gap: 1rem;
-  padding: 1.5rem 1rem;
+  gap: 1.75rem 2.5rem;
   margin-block: 1.5rem;
+}
+@media (min-width: 52rem) {
+  .spread {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+.engraving {
+  margin: 0;
+}
+.frame {
+  position: relative;
+}
+.engraving img {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 0.4rem;
+  background: var(--outline);
   border: var(--plate);
   box-shadow: var(--lift);
+  filter: sepia(0.2) contrast(1.1) brightness(0.92);
+}
+/* Laid over the foot of the engraving; black in both schemes, so the logo's colour reads against it */
+.title-plate {
+  position: absolute;
+  inset: auto 1.25rem 1.25rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem;
+  background: color-mix(in srgb, var(--outline) 86%, transparent);
+  color: var(--on-accent);
+  border: var(--plate-width) double var(--on-accent);
 }
 .edition {
   margin: 0;
-  padding: 0.1em 1em;
-  background: var(--outline);
-  color: var(--on-accent);
-  font: 700 1rem var(--font-label);
-  letter-spacing: 0.12em;
+  font: 700 clamp(0.75rem, 2.5vw, 1rem) var(--font-label);
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+.engraving figcaption {
+  margin-top: 0.75rem;
+  color: var(--dim);
+  font: 700 0.8rem var(--font-label);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.doors {
+  min-width: 0;
+}
+.doors > .lede {
+  margin-top: 0;
+}
+.doors section:last-child {
+  margin-bottom: 0;
 }
 .lede {
   font-size: 1.25rem;

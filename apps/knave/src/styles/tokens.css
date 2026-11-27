@@ -14,14 +14,10 @@
   --focus: #1b4fd1;
   --outline: #000; /* the logo's outline and drop shadow */
   --on-accent: #fff;
-  --ink-plate: #221f20; /* the cover's rock, dark in both schemes */
   --vignette: color-mix(in srgb, var(--cave-umber) 28%, transparent);
   --grain-opacity: 0.22;
   --grain-blend: multiply;
-  --cave-umber: #59524b; /* the cover painting, for the hero */
-  --cave-slate: #2c3443;
-  --cave-bone: #c6a38c;
-  --cave-mist: #d6d4d9;
+  --cave-umber: #59524b; /* the vignette round the page */
   --logo-red: #ec2826;
   --logo-orange: #ec5726;
   --logo-yellow: #f9a81a;
@@ -31,7 +27,7 @@
   --lift: 4px 4px 0 var(--ink); /* the logo's hard drop shadow, on boxes and buttons */
   --border-thin: 1px;
   --border: 2px;
-  --plate-width: 4px; /* the double rule round plates and the cover */
+  --plate-width: 4px; /* the double rule round the home page plates */
   --plate: var(--plate-width) double var(--ink);
 }
 @media (prefers-color-scheme: dark) {
