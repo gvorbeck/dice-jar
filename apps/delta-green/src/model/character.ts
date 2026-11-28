@@ -121,7 +121,11 @@ const migrations: Record<number, (c: Raw) => Raw> = {};
 
 export function parseCharacter(raw: unknown): Character {
   let c = raw as Raw | null;
-  while (c && typeof c.version === 'number' && c.version < CHARACTER_VERSION) c = migrations[c.version]!(c);
+  while (c && typeof c.version === 'number' && c.version < CHARACTER_VERSION) {
+    const migrate = Object.hasOwn(migrations, c.version) ? migrations[c.version] : undefined;
+    if (!migrate) throw new Error(`No migration from character version ${c.version}`);
+    c = migrate(c);
+  }
   return characterSchema.parse(c);
 }
 

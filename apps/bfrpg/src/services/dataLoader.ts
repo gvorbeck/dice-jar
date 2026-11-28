@@ -197,7 +197,7 @@ export async function loadSpellsForClass(classId: string, level?: number): Promi
     setCachedData(cacheKey, filteredSpells);
     return filteredSpells;
   } catch (error) {
-    console.error(`Error loading spells for ${classId}:`, error);
+    console.error('Error loading spells for', classId, error);
     return [];
   }
 }
