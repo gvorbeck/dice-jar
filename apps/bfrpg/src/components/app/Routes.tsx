@@ -1,11 +1,10 @@
 import { Route, Routes as RouterRoutes, useLocation } from 'react-router-dom';
-import { ErrorBoundary, useTitle } from '@dice-jar/browser';
+import { ErrorBoundary, useFocusMain, useTitle } from '@dice-jar/browser';
 import { Suspense, lazy, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { TextHeader } from '@/components/ui/composite';
 import { Typography } from '@/components/ui/core/display';
 import { ErrorPage, LoadingState } from '@/components/ui/core/feedback';
-import { DOM_IDS } from '@/constants';
 import './Routes.css';
 
 const Home = lazy(() => import('../pages/Home'));
@@ -52,9 +51,14 @@ function Guard({ title, message, showHomeLink, children }: GuardProps) {
 const sheetProblem = (kind: string) =>
   `There was a problem displaying this ${kind} sheet. The ${kind} data may be corrupted or there's an issue loading the ${kind} information.`;
 
+// Keyed by path so the hook runs again on every in-app navigation (Routes itself mounts once).
+const FocusMain = () => (useFocusMain(), null);
+
 export function Routes() {
+  const { pathname } = useLocation();
   return (
-    <main role="main" id={DOM_IDS.MAIN_CONTENT} className="site-main">
+    <main id="main" tabIndex={-1} className="site-main">
+      <FocusMain key={pathname} />
       <Suspense fallback={<LoadingState variant="page" message="Loading page..." />}>
         <RouterRoutes>
           <Route

@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { SkipLink } from '@dice-jar/browser';
 import { Button, Image } from '@/components/ui';
 import { Typography } from '@/components/ui/core/display';
 import { useAuth } from '@/hooks';
 import { signOut } from '@/services';
-import { DOM_IDS, CSS_CLASSES, HTML_ROLES } from '@/constants';
+import { CSS_CLASSES, HTML_ROLES } from '@/constants';
 import './Header.css';
 
 interface HeaderProps {
@@ -25,9 +26,7 @@ export function Header({ setIsSignInModalOpen }: HeaderProps) {
 
   return (
     <>
-      <a href={`#${DOM_IDS.MAIN_CONTENT}`} className={CSS_CLASSES.SKIP_LINK}>
-        Skip to main content
-      </a>
+      <SkipLink className={CSS_CLASSES.SKIP_LINK} />
 
       <header role={HTML_ROLES.BANNER} className="site-header">
         <nav role="navigation" aria-label="Main navigation" className="site-nav">

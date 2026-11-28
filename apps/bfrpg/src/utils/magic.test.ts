@@ -17,7 +17,7 @@ import {
   delay,
 } from './magic';
 
-vi.mock('@dice-jar/dice', () => ({ roll: vi.fn() }));
+vi.mock('@dice-jar/dice', () => ({ roll: vi.fn(), shuffle: <T>(a: T[]) => [...a] }));
 const rolls = (total: number) => vi.mocked(roll).mockReturnValue({ total } as never);
 beforeEach(() => vi.mocked(roll).mockReset());
 

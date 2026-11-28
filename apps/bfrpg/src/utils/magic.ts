@@ -10,7 +10,7 @@ import { cantripData } from '@/data';
 import { CHARACTER_CLASSES } from '@/constants';
 import { loadSpellsForClass, loadAllFirstLevelSpells, loadAllSpells } from '@/services/dataLoader';
 // Note: Using direct import here to avoid circular dependency with barrel file
-import { roll } from '@dice-jar/dice';
+import { roll, shuffle } from '@dice-jar/dice';
 import { canCastSpells, getSpellcastingAbilityModifier } from './character';
 import { allClasses } from '@/data/classes';
 
@@ -203,8 +203,7 @@ export function assignStartingCantrips(character: Character): Cantrip[] {
   const availableCantrips = getAvailableCantrips(character);
   const selectedCantrips: Cantrip[] = [];
 
-  // Shuffle available cantrips and pick the first numCantrips
-  const shuffled = [...availableCantrips].sort(() => Math.random() - 0.5);
+  const shuffled = shuffle(availableCantrips);
   for (let i = 0; i < Math.min(numCantrips, shuffled.length); i++) {
     const cantrip = shuffled[i];
     if (cantrip) {

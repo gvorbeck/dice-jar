@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { slugifyGameId } from '@dice-jar/game-id';
+import { isOpenableId, slugifyGameId } from '@dice-jar/game-id';
 import { gameIdExists } from '@/lib/game';
 
 export type IdStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
 
-const MIN_LENGTH = 3;
 const DEBOUNCE_MS = 1000;
 
 export const useGameIdCheck = (raw: string) => {
@@ -27,7 +26,7 @@ export const useGameIdCheck = (raw: string) => {
 
     const currentSlug = slugifyGameId(raw);
 
-    if (currentSlug.length < MIN_LENGTH) {
+    if (!isOpenableId(currentSlug)) {
       setStatus('invalid');
       return;
     }

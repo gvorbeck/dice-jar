@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 // Browser tests: `npm run test:e2e` starts the Firestore emulator, then this starts the app pointed at it.
 // The demo-* project ID and dummy keys mean nothing here can reach the real Firebase project.
-const PORT = 5180;
+const PORT = 5184; // its own port: delta-green has 5180, and a reused server there would be the wrong app
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: true,

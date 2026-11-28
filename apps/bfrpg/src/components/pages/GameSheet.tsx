@@ -204,11 +204,6 @@ export default function GameSheet() {
           <Breadcrumb items={breadcrumbItems} />
         </header>
 
-        {/* Skip link for accessibility */}
-        <a href="#main-content" className="game-skip">
-          Skip to main content
-        </a>
-
         {/* Hero section with game info */}
         <GameHero
           game={game}
@@ -220,7 +215,7 @@ export default function GameSheet() {
         />
 
         {/* Game Sheet Content */}
-        <main id="main-content" className="game-body">
+        <div className="game-body">
           <PlayersSection players={game.players || []} showDivider={false} {...(isGameMaster && { onDeletePlayer: handleDeletePlayer })} />
 
           {/* Add Character section - only show for game master */}
@@ -242,7 +237,7 @@ export default function GameSheet() {
 
           {/* Empty state when no content */}
           {!hasContent && <GameSheetEmptyState gameName={game.name} />}
-        </main>
+        </div>
 
         {/* Dice Roller Modal */}
         <DiceRollerModal />

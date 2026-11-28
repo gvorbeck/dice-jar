@@ -1,6 +1,6 @@
 // Every page, scanned with axe: home, both tabs, the creation steps, a character sheet, a game sheet and the not-found page.
 import type { Page } from '@playwright/test';
-import { expectAccessible } from '@dice-jar/e2e-helpers';
+import { expectAccessible, expectSkipLink } from '@dice-jar/e2e-helpers';
 import { expect, rollHigh, test } from './fixtures';
 
 const hrefOf = async (page: Page, pattern: string, tab?: string) => {
@@ -51,4 +51,17 @@ test('each character creation step has no accessibility violations', async ({ pa
   await next.click();
   await page.getByLabel(/character name/i).fill('Test Fighter');
   await expectAccessible(page); // review
+});
+
+test('the skip link moves focus to the page', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('tab', { name: 'Games' })).toBeVisible();
+  await expectSkipLink(page);
+});
+
+test('focus moves to the page after in-app navigation', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('a[href^="/u/"][href*="/c/"]').first().click();
+  await expect(page).toHaveURL(/\/c\//);
+  await expect(page.getByRole('main')).toBeFocused();
 });

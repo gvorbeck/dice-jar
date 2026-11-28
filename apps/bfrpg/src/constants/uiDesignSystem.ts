@@ -3,13 +3,6 @@
  * Centralized design tokens, styling patterns, and UI configuration
  */
 
-// DOM Element Configuration
-export const DOM_IDS = {
-  MAIN_CONTENT: 'main-content',
-  MOBILE_MENU: 'mobile-menu',
-  ROOT: 'root',
-} as const;
-
 export const CSS_CLASSES = {
   SKIP_LINK: 'skip-link',
   SR_ONLY: 'sr-only',

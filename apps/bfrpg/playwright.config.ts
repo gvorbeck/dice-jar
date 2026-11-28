@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// Its own port, not Vite's default 5173: with reuseExistingServer, a dev server already there would be tested instead.
+const PORT = 5183;
+
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
@@ -18,7 +21,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:5173',
+    baseURL: `http://localhost:${PORT}`,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -57,8 +60,8 @@ export default defineConfig({
 
   // `npm run test:e2e` starts the Auth and Firestore emulators, then this starts the app pointed at them (.env.emulator).
   webServer: {
-    command: 'npx vite --mode emulator --port 5173 --strictPort',
-    url: 'http://localhost:5173',
+    command: `npx vite --mode emulator --port ${PORT} --strictPort`,
+    url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
   },
 });

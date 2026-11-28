@@ -1,5 +1,5 @@
 {
-  "includeBranches": ["dev", "main"],
+  "includeBranches": ["main"],
   "autoReview": ["open", "push"],
   "excludeAuthors": ["dependabot*"],
   "ignorePatterns": "**/package-lock.json\n**/dist/**\n**/coverage/**",

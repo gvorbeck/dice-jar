@@ -1,12 +1,5 @@
-import { slugifyGameId } from '@dice-jar/game-id';
 import { store } from '@dice-jar/browser';
-import { MAX_ID } from './paths';
 import { SAVED_AGENT_BAK, SAVED_AGENT_KEY } from './storage';
-
-export const MIN_ID = 3;
-
-/** An ID this app would create or open: already in slug form and long enough. */
-export const isOpenableId = (id: string) => id.length >= MIN_ID && slugifyGameId(id, MAX_ID) === id;
 
 /** localStorage key of the games this browser opened. */
 export const RECENT_GAMES = 'dg.games';

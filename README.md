@@ -85,7 +85,7 @@ Adding or removing a Firestore field takes two releases, because open tabs keep 
 
 [`label-pr.yml`](.github/workflows/label-pr.yml) labels each PR with the name of every app it touches, so PRs can be filtered by app.
 
-Dependabot targets `dev`: npm weekly (minor and patch grouped, each major alone), GitHub Actions monthly. Greptile reviews PRs against [AGENTS.md](AGENTS.md) (`greptile.json`).
+Dependabot targets `dev`: npm weekly (minor and patch grouped, each major alone), GitHub Actions monthly. Greptile reviews release PRs into `main` against [AGENTS.md](AGENTS.md) (`greptile.json`); PRs into `dev` get no review, to save its monthly credits.
 
 ## Branch protection
 

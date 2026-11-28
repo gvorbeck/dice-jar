@@ -193,6 +193,16 @@ export const roll = (notation: string, rng: Rng = Math.random): DiceRollOutcome 
   return parsed.outcome;
 };
 
+/** A shuffled copy (Fisher–Yates), so every order is equally likely; a sort with a random comparator is not. */
+export const shuffle = <T>(items: readonly T[], rng: Rng = Math.random): T[] => {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j]!, out[i]!];
+  }
+  return out;
+};
+
 // A trailing dice term with no modifiers, e.g. the "2d6" in "1d8+2d6", so tapping d6 again can bump it
 // to "3d6" instead of appending "+d6". Group 1 is whatever precedes the count, 2 the count, 3 the sides.
 const TRAILING_DICE = /^(.*?(?:^|[+-]))(\d*)d(\d+)$/;
