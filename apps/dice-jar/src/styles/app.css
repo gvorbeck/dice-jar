@@ -377,6 +377,41 @@ section {
   box-shadow: 0 6px 0 0 var(--cq-amber-700);
 }
 
+/* Glyph Quest: a zine page, black bar over a paper box, hard drop shadow, blackletter title. */
+.card.gq {
+  border: 2px solid var(--gq-ink);
+  border-bottom: 0; /* torn off */
+  background: var(--gq-paper);
+  color: var(--gq-ink);
+  font:
+    400 1.0625rem/1.35 Georgia,
+    'Times New Roman',
+    serif;
+}
+.card.gq .eyebrow {
+  margin: -1.5rem -1.5rem 0.75rem; /* a full-width bar across the top of the card */
+  padding: 0.2em 1.5rem;
+  background: var(--gq-ink);
+  color: var(--gq-paper);
+  font: 700 0.85rem/1.4 var(--gq-font-label);
+  letter-spacing: 0.06em;
+}
+.card.gq h3 {
+  font: 700 clamp(1.75rem, 12cqi, 2.5rem) / 1.05 var(--gq-font-display);
+}
+.card.gq p.card-meta {
+  color: var(--gq-ink);
+  align-self: flex-start;
+  padding: 0.2rem 0.7rem;
+  border: 2px solid var(--gq-ink);
+  box-shadow: 3px 3px 0 var(--gq-orange);
+  font: 700 0.85rem/1.4 var(--gq-font-label);
+  letter-spacing: 0.04em;
+}
+.card.gq:hover {
+  background-color: var(--gq-paper);
+}
+
 .about p {
   max-width: 60ch;
   margin: 0;

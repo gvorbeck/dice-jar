@@ -1,0 +1,47 @@
+/* The look of the Knave 2e book: one-ink zine pages, blackletter headings, small-caps labels. The logo gradient is the only saturated colour. */
+:root {
+  color-scheme: light dark;
+  --font-display: 'UnifrakturCook', 'Pirata One', 'Grenze Gotisch', 'Old English Text MT', serif;
+  --font-body: 'Crimson Text', Georgia, 'Times New Roman', serif;
+  --font-label: 'Alegreya SC', var(--font-body);
+  --paper: #fbf8f3;
+  --panel: #f1ece3; /* boxes on the page */
+  --ink: #221f20;
+  --rule: #d1d3d4; /* callouts, table lines */
+  --on-ink: #fff; /* text on an --ink bar */
+  --dim: #5b5654;
+  --warn: #a4160f;
+  --focus: #1b4fd1;
+  --outline: #000; /* the logo's outline and drop shadow */
+  --on-accent: #fff;
+  --vignette: color-mix(in srgb, var(--cave-umber) 28%, transparent);
+  --grain-opacity: 0.22;
+  --grain-blend: multiply;
+  --cave-umber: #59524b; /* the vignette round the page */
+  --logo-red: #ec2826;
+  --logo-orange: #ec5726;
+  --logo-yellow: #f9a81a;
+  --gap: 1rem;
+  --page-w: 46rem;
+  --page-w-wide: 64rem;
+  --lift: 4px 4px 0 var(--ink); /* the logo's hard drop shadow, on boxes and buttons */
+  --border-thin: 1px;
+  --border: 2px;
+  --plate-width: 4px; /* the double rule round the home page plates */
+  --plate: var(--plate-width) double var(--ink);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1a1819;
+    --panel: #242123;
+    --ink: #ede6da;
+    --vignette: color-mix(in srgb, var(--outline) 70%, transparent);
+    --grain-opacity: 0.09;
+    --grain-blend: screen;
+    --rule: #3b3a40;
+    --on-ink: #1a1819;
+    --dim: #b9b2a6;
+    --warn: #ff8f80;
+    --focus: #8fb0ff;
+  }
+}

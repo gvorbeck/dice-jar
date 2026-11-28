@@ -1,3 +1,5 @@
+// Shared by every app's budget kill switch. Functions don't bundle @dice-jar packages, so they import this file by relative path: keep it free of imports.
+
 /** The fields we read from a Cloud Billing budget notification. Google sends one every ~30 minutes per budget. */
 export interface BudgetAlert {
   costAmount?: unknown;

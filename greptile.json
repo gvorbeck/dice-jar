@@ -26,6 +26,10 @@
         "description": "The static landing page: no Firebase, rules or Functions. Use it to judge changes under apps/dice-jar."
       },
       {
+        "path": "apps/knave/README.md",
+        "description": "What the Knave app is and where things are in it. Use it to judge changes under apps/knave."
+      },
+      {
         "path": "apps/stonetop/README.md",
         "description": "What the Stonetop app is and where things are in it, including how its saves and App Check work. Use it to judge changes under apps/stonetop."
       }

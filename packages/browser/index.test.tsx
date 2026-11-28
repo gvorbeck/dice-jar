@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { downloadJson, downloadText, store, useCopy } from './index';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { copyLabel, copyNote, downloadJson, downloadText, recentIds, rememberId, store, useCopy } from './index';
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -82,5 +82,33 @@ describe('useCopy', () => {
     expect(ok).toBe(false);
     expect(result.current[0]).toBe('fail');
     vi.unstubAllGlobals();
+  });
+});
+
+describe('copyLabel and copyNote', () => {
+  it('label the button for each copy state', () => {
+    expect(copyLabel('idle', 'Copy game link')).toBe('Copy game link');
+    expect(copyLabel('ok', 'Copy game link')).toBe('Link copied ✓');
+    expect(copyLabel('fail', 'Copy game link')).toBe('Copy failed');
+  });
+  it('say what happened to screen readers, and nothing at rest', () => {
+    expect(copyNote('idle')).toBe('');
+    expect(copyNote('ok')).toBe('Copied');
+    expect(copyNote('fail')).toMatch(/Copy failed/);
+  });
+});
+
+describe('recentIds', () => {
+  beforeEach(() => localStorage.clear());
+  it('lists the last five remembered, newest first, once each', () => {
+    for (const id of ['a-1', 'b-2', 'c-3', 'd-4', 'e-5', 'a-1', 'f-6']) rememberId('k', id);
+    expect(recentIds('k')).toEqual(['f-6', 'a-1', 'e-5', 'd-4', 'c-3']);
+  });
+  it('is empty when nothing is stored or what is stored is damaged', () => {
+    expect(recentIds('k')).toEqual([]);
+    localStorage.setItem('k', '{not json');
+    expect(recentIds('k')).toEqual([]);
+    localStorage.setItem('k', '{"a":1}');
+    expect(recentIds('k')).toEqual([]);
   });
 });

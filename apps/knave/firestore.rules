@@ -1,0 +1,83 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // No auth: a game is gated by its hard-to-guess ID. Anyone with the ID can
+    // read and write that game and delete its characters, but cannot list games or
+    // delete anything else (cleanup goes through admin scripts). Writes are shape-checked: only the
+    // fields below, with bounded strings and numbers, so a document can't be stuffed with
+    // arbitrary keys and the roll log can't hold impossible totals. Rules can't count children or
+    // measure bytes, so the number of characters and rolls per game is not capped here
+    // (turn on App Check: see VITE_APPCHECK_SITE_KEY in .env.example).
+    // Adding a field to a document means adding it to its hasOnly list.
+
+    // The global alert banner (packages/alert, README "Global alert"). Anyone can read the one document; only the owner writes it, in the Firebase console.
+    match /alerts/current {
+      allow get: if true;
+      allow list, write: if false;
+    }
+
+    // shortcut: items is checked for its length only (rules can't walk a list), so one item's fields are not bounded here; the 1 MiB document limit is the cap.
+    function validCharacter(c) {
+      return c is map
+        && c.keys().size() <= 30
+        && c.version == 1
+        && c.created is bool
+        && c.name is string && c.name.size() <= 100
+        && c.description is string && c.description.size() <= 4000
+        && c.notes is string && c.notes.size() <= 4000
+        && c.abilities is map && c.abilities.keys().hasOnly(['str', 'dex', 'con', 'int', 'wis', 'cha'])
+        && c.abilities.str is int && c.abilities.str >= 0 && c.abilities.str <= 10
+        && c.abilities.dex is int && c.abilities.dex >= 0 && c.abilities.dex <= 10
+        && c.abilities.con is int && c.abilities.con >= 0 && c.abilities.con <= 10
+        && c.abilities.int is int && c.abilities.int >= 0 && c.abilities.int <= 10
+        && c.abilities.wis is int && c.abilities.wis >= 0 && c.abilities.wis <= 10
+        && c.abilities.cha is int && c.abilities.cha >= 0 && c.abilities.cha <= 10
+        && c.careers is list && c.careers.size() <= 2
+        && c.level is int && c.level >= 1 && c.level <= 10
+        && c.xp is int && c.xp >= 0 && c.xp <= 9999999
+        && c.hp is int && c.hp >= 0 && c.hp <= 999
+        && c.hpMax is int && c.hpMax >= 0 && c.hpMax <= 999
+        && c.wounds is int && c.wounds >= 0 && c.wounds <= 99
+        && c.coins is int && c.coins >= 0 && c.coins <= 9999999
+        && c.items is list && c.items.size() <= 60;
+    }
+
+    match /games/{gameId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.resource.data.keys().hasOnly(['createdAt', 'schemaVersion'])
+        && request.resource.data.createdAt is number
+        && request.resource.data.schemaVersion is number;
+      allow update, delete: if false;
+
+      match /characters/{characterId} {
+        allow read: if true;
+        allow create, update: if request.resource.data.keys().hasOnly(['name', 'careers', 'level', 'hp', 'hpMax', 'character', 'createdAt', 'updatedAt'])
+          && request.resource.data.name is string && request.resource.data.name.size() <= 100
+          && request.resource.data.careers is string && request.resource.data.careers.size() <= 200
+          && request.resource.data.level is int && request.resource.data.level >= 1 && request.resource.data.level <= 10
+          && request.resource.data.hp is int && request.resource.data.hp >= 0 && request.resource.data.hp <= 999
+          && request.resource.data.hpMax is int && request.resource.data.hpMax >= 0 && request.resource.data.hpMax <= 999
+          && validCharacter(request.resource.data.character)
+          && request.resource.data.createdAt is number
+          && request.resource.data.updatedAt is number;
+        // Anyone with the ID can already overwrite a character, so deleting adds no new power.
+        allow delete: if true;
+      }
+
+      // Append-only roll log.
+      match /rolls/{rollId} {
+        allow read: if true;
+        allow create: if request.resource.data.keys().hasOnly(['characterId', 'characterName', 'label', 'detail', 'total', 'createdAt'])
+          && request.resource.data.characterId is string && request.resource.data.characterId.size() > 0 && request.resource.data.characterId.size() <= 40
+          && request.resource.data.characterName is string && request.resource.data.characterName.size() <= 100
+          && request.resource.data.label is string && request.resource.data.label.size() > 0 && request.resource.data.label.size() <= 120
+          && request.resource.data.detail is string && request.resource.data.detail.size() <= 1000
+          && request.resource.data.total is int && request.resource.data.total >= -9999999 && request.resource.data.total <= 9999999
+          && request.resource.data.createdAt == request.time;
+        allow update, delete: if false;
+      }
+    }
+  }
+}

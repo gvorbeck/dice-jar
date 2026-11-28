@@ -2,7 +2,7 @@
 
 Tabletop RPG character apps, one per game, sharing their tooling and, once a second app needs it, their code. Package scope: `@dice-jar/*`.
 
-delta-green, stonetop and bfrpg are in so far (stonetop is the app behind hearthfire.camp, and bfrpg the one behind codex.quest). `apps/dice-jar` is the landing page at dicejar.games, listing the apps. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
+delta-green, stonetop, bfrpg and knave are in so far (stonetop is the app behind hearthfire.camp, bfrpg the one behind codex.quest, and knave the one behind glyph.quest, called Glyph Quest). `apps/dice-jar` is the landing page at dicejar.games, listing the apps. The plan and the conventions every app follows are in [docs/brief.md](docs/brief.md); the rules for changing anything are in [AGENTS.md](AGENTS.md).
 
 | App         | Game              | Rules MCP server      | Access    |
 | ----------- | ----------------- | --------------------- | --------- |
@@ -10,9 +10,9 @@ delta-green, stonetop and bfrpg are in so far (stonetop is the app behind hearth
 | stonetop    | Stonetop          | `stonetop-rules`      | link-only |
 | dice-jar    | none (landing)    | none                  | public    |
 | bfrpg       | Basic Fantasy RPG | `basic-fantasy-rules` | accounts  |
-| glyph-quest | Knave             | `knave-rules`         | accounts  |
+| knave       | Knave             | `knave-rules`         | link-only |
 
-Rules servers are named `<game>-rules`; bfrpg's is `basic-fantasy-rules`, named for the game as its books call it. `delta-green-rules`, `stonetop-rules` and `basic-fantasy-rules` are connected; the Knave one is not yet.
+Rules servers are named `<game>-rules`; bfrpg's is `basic-fantasy-rules`, named for the game as its books call it. `delta-green-rules`, `stonetop-rules`, `basic-fantasy-rules` and `knave-rules` are connected.
 
 ## Licensing
 
@@ -50,7 +50,7 @@ npm ci
 npm run check
 ```
 
-`npm ci` also installs the git hooks. One app's script: `npm run dev -w apps/<app>`. To start an app's dev server: `npm run dj` (the landing page), `npm run dg` (delta-green) or `npm run st` (stonetop).
+`npm ci` also installs the git hooks. One app's script: `npm run dev -w apps/<app>`. To start an app's dev server: `npm run dj` (the landing page), `npm run dg` (delta-green), `npm run st` (stonetop), `npm run bf` (bfrpg) or `npm run kn` (knave).
 
 | Root script                                                                     |                                                                                                                                                    |
 | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |

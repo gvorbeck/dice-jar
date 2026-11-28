@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { overBudget } from './budget.js';
+import { overBudget } from './index';
 
 describe('overBudget', () => {
   it('ignores the 50% and 90% alerts', () => {
