@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "firebase": "^13.2.0"
+    "firebase": "^13.4.0"
   },
   "dependencies": {
     "@dice-jar/diff": "*"
